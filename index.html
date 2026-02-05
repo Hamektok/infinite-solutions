@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Solutions - Market Inventory</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+        /* ============================================
+           INTERACTIVE INVENTORY DISPLAY
+           - Shows thumbnail by default
+           - Click to expand to full inventory
+           - Click "Back" to return to thumbnail
+           ============================================ */
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* Container that switches between views */
+        .container {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* ============================================
+           THUMBNAIL VIEW (Default)
+           ============================================ */
+
+        .thumbnail-view {
+            width: 400px;
+            height: 225px;
+            background: linear-gradient(135deg, #001a2e 0%, #002040 50%, #001530 100%);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #00ffff;
+            box-shadow:
+                0 0 40px rgba(0, 255, 255, 0.6),
+                inset 0 0 80px rgba(0, 150, 200, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .thumbnail-view:hover {
+            transform: scale(1.02);
+            box-shadow:
+                0 0 50px rgba(0, 255, 255, 0.8),
+                inset 0 0 80px rgba(0, 150, 200, 0.3);
+        }
+
+        .thumbnail-view .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 15% 25%, white, transparent),
+                radial-gradient(2px 2px at 85% 15%, white, transparent),
+                radial-gradient(1px 1px at 45% 60%, white, transparent),
+                radial-gradient(2px 2px at 75% 85%, white, transparent),
+                radial-gradient(1px 1px at 30% 75%, white, transparent),
+                radial-gradient(1px 1px at 60% 40%, white, transparent);
+            opacity: 0.6;
+        }
+
+        .thumbnail-view .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 60%);
+            top: -100px;
+            right: -100px;
+            filter: blur(40px);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .thumbnail-view .bracket {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+            z-index: 5;
+        }
+
+        .bracket-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+        .bracket-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+        .bracket-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+        .bracket-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+        .thumbnail-view .content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .thumbnail-view .company-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 38px;
+            font-weight: 900;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow:
+                0 0 20px rgba(0, 255, 255, 1),
+                0 0 40px rgba(0, 255, 255, 0.6),
+                0 0 60px rgba(0, 255, 255, 0.4);
+            margin: 0 0 8px 0;
+            line-height: 1;
+        }
+
+        .thumbnail-view .tagline {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #66d9ff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0 0 20px 0;
+        }
+
+        .thumbnail-view .status-bar {
+            background: rgba(0, 255, 255, 0.15);
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        }
+
+        .thumbnail-view .status-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+            margin: 0;
+        }
+
+        .thumbnail-view .info-row {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+        }
+
+        .thumbnail-view .info-item {
+            font-size: 14px;
+            font-weight: 700;
+            color: #99e6ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .thumbnail-view .info-value {
+            color: #00ff88;
+            font-size: 16px;
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 12px;
+            right: 15px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 12px;
+            color: #66d9ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            z-index: 20;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.9; }
+        }
+
+        /* ============================================
+           FULL INVENTORY VIEW (Hidden by default)
+           ============================================ */
+
+        .inventory-view {
+            display: none;
+            width: 900px;
+            background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #00d9ff;
+            box-shadow:
+                0 0 30px rgba(0, 217, 255, 0.3),
+                inset 0 0 100px rgba(0, 100, 150, 0.1);
+            padding: 0;
+        }
+
+        .inventory-view .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 80%, white, transparent);
+            background-size: 200% 200%;
+            opacity: 0.4;
+        }
+
+        .inventory-view .nebula {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.15) 0%, transparent 70%);
+            top: -150px;
+            right: -150px;
+            filter: blur(60px);
+        }
+
+        .inventory-view .grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 217, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .inventory-view .corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00d9ff;
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+            z-index: 5;
+        }
+
+        .inventory-view .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .inventory-view .corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .inventory-view .corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .inventory-view .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        .inventory-view .content {
+            position: relative;
+            z-index: 10;
+            padding: 35px 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: #00d9ff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow:
+                0 0 20px rgba(0, 217, 255, 0.8),
+                0 0 40px rgba(0, 217, 255, 0.4);
+            margin: 0 0 8px 0;
+        }
+
+        .subtitle {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            color: #88e0ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .section-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #00d9ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 25px 0 15px 0;
+            padding: 10px 15px;
+            background: rgba(0, 217, 255, 0.1);
+            border-left: 4px solid #00d9ff;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .item {
+            background: rgba(0, 50, 80, 0.3);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 6px;
+            padding: 12px 15px;
+            box-shadow: inset 0 0 15px rgba(0, 217, 255, 0.05);
+        }
+
+        .item-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .detail-row {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            color: #88d0e8;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            color: #6fb3d0;
+        }
+
+        .detail-value {
+            color: #00ff99;
+            font-weight: 600;
+        }
+
+        .out-of-stock {
+            color: #ff6666 !important;
+        }
+
+        .footer {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(0, 217, 255, 0.3);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            color: #88e0ff;
+            margin-bottom: 5px;
+        }
+
+        .contact {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            color: #00d9ff;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+
+        .disclaimer {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 12px;
+            color: #6fb3d0;
+            font-style: italic;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        /* Back button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 217, 255, 0.2);
+            border: 2px solid #00d9ff;
+            color: #00ffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(0, 217, 255, 0.3);
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
+            transform: translateX(-3px);
+        }
+
+        /* Show/hide logic */
+        .container.expanded .thumbnail-view {
+            display: none;
+        }
+
+        .container.expanded .inventory-view {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <!-- THUMBNAIL VIEW -->
+        <div class="thumbnail-view" onclick="expandInventory()">
+            <div class="stars"></div>
+            <div class="glow"></div>
+            <div class="bracket bracket-tl"></div>
+            <div class="bracket bracket-tr"></div>
+            <div class="bracket bracket-bl"></div>
+            <div class="bracket bracket-br"></div>
+
+            <div class="content">
+                <h1 class="company-name">INFINITE<br>SOLUTIONS</h1>
+                <div class="tagline">Minerals & Ice Products</div>
+                <div class="status-bar">
+                    <div class="status-text">MARKET OPEN</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-value">97-98%</span> JBV
+                    </div>
+                    <div class="info-item">
+                        <span class="info-value">15+</span> Items
+                    </div>
+                    <div class="info-item">
+                        LX-ZOJ
+                    </div>
+                </div>
+            </div>
+
+            <div class="click-hint">Click for details</div>
+        </div>
+
+        <!-- FULL INVENTORY VIEW -->
+        <div class="inventory-view">
+            <button class="back-button" onclick="collapseInventory()">← Back</button>
+
+            <div class="stars"></div>
+            <div class="nebula"></div>
+            <div class="grid"></div>
+
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+
+            <div class="content">
+                <div class="header">
+                    <h1 class="title">MINERAL & ICE PRODUCT MARKET</h1>
+                    <h2 class="subtitle">INFINITE SOLUTIONS</h2>
+                    <div class="subtitle">LX-ZOJ (Tatara - T2 Reactions)</div>
+                </div>
+
+                <div class="section-header">BULK MINERALS</div>
+
+                <div class="item-grid">
+                    <div class="item">
+                        <div class="item-name">Tritanium</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">41,350,983 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">97% JBV (3% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-name">Pyerite</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value out-of-stock">0 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">98% JBV (2% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header">ICE PRODUCTS</div>
+
+                <div class="item-grid">
+                    <div class="item">
+                        <div class="item-name">Heavy Water</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">~215,478 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">98% JBV (4% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-name">Liquid Ozone</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">~352,750 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">98% JBV (4% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-name">Strontium Clathrates</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">~61,740 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">98% JBV (4% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-name">Oxygen Isotopes</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">~154,210 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">97% JBV (5% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-name">Hydrogen Isotopes</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">~154,210 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">97% JBV (5% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-name">Helium Isotopes</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">~154,210 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">97% JBV (5% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-name">Nitrogen Isotopes</div>
+                        <div class="item-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Stock:</span>
+                                <span class="detail-value">~154,210 units</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price:</span>
+                                <span class="detail-value">97% JBV (5% below alliance)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <div class="footer-text">DM <span class="contact">@Hamektok</span> for bulk contracts</div>
+                    <div class="disclaimer">All mineral estimates are subject to change</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function expandInventory() {
+            document.getElementById('container').classList.add('expanded');
+        }
+
+        function collapseInventory() {
+            document.getElementById('container').classList.remove('expanded');
+        }
+
+        // Optional: Press Escape to go back
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                collapseInventory();
+            }
+        });
+    </script>
+</body>
+</html>
