@@ -397,6 +397,129 @@
         .container.expanded .inventory-view {
             display: block;
         }
+
+        /* ============================================
+           MOBILE RESPONSIVE
+           ============================================ */
+
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            /* Thumbnail view mobile */
+            .thumbnail-view {
+                width: 100%;
+                max-width: 400px;
+                height: auto;
+                min-height: 225px;
+            }
+
+            .thumbnail-view .content {
+                padding: 20px 15px;
+            }
+
+            .thumbnail-view .company-name {
+                font-size: 28px;
+                letter-spacing: 2px;
+            }
+
+            .thumbnail-view .tagline {
+                font-size: 13px;
+                letter-spacing: 2px;
+            }
+
+            .thumbnail-view .status-bar {
+                padding: 6px 12px;
+            }
+
+            .thumbnail-view .status-text {
+                font-size: 16px;
+            }
+
+            .thumbnail-view .info-row {
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .thumbnail-view .info-item {
+                font-size: 12px;
+            }
+
+            .thumbnail-view .info-value {
+                font-size: 14px;
+            }
+
+            .click-hint {
+                font-size: 8px;
+                top: 8px;
+                right: 10px;
+            }
+
+            /* Inventory view mobile */
+            .inventory-view {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .inventory-view .content {
+                padding: 50px 15px 20px 15px;
+            }
+
+            .title {
+                font-size: 20px;
+                letter-spacing: 1px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+
+            .section-header {
+                font-size: 16px;
+                letter-spacing: 1px;
+                padding: 8px 12px;
+                margin: 20px 0 12px 0;
+            }
+
+            /* Single column layout on mobile */
+            .item-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .item {
+                padding: 10px 12px;
+            }
+
+            .item-name {
+                font-size: 16px;
+            }
+
+            .detail-row {
+                font-size: 13px;
+            }
+
+            .footer-text {
+                font-size: 13px;
+            }
+
+            .contact {
+                font-size: 14px;
+            }
+
+            .disclaimer {
+                font-size: 11px;
+            }
+
+            .back-button {
+                font-size: 10px;
+                padding: 5px 10px;
+                top: 8px;
+                left: 8px;
+            }
+        }
     </style>
 </head>
 <body>
