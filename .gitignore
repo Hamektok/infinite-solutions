@@ -10,3 +10,14 @@ __pycache__/
 *.db-journal
 *.db-wal
 *.db-shm
+
+# Sensitive files - ESI credentials and tokens
+config/
+token_manager.py
+credentials.json
+*.token
+*.secret
+
+# Database files
+*.db
+mydatabase
