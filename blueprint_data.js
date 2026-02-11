@@ -13,7 +13,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Combat Utility Drones"
   },
   {
     "name": "Acolyte I Blueprint",
@@ -27,14 +27,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Active Shielding Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Algos Blueprint",
@@ -83,14 +83,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Armor Reinforcement Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Augoror Blueprint",
@@ -104,14 +104,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Berserker TP-900 Blueprint",
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Blackbird Blueprint",
@@ -139,7 +139,7 @@ BLUEPRINT_DATA = [
     "me": 0,
     "te": 0,
     "category": "Ships",
-    "subcategory": "Shuttle Blueprint"
+    "subcategory": "Shuttle"
   },
   {
     "name": "Cap Booster 150 Blueprint",
@@ -195,35 +195,35 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Frequency Crystals"
+    "subcategory": "Mining Crystal"
   },
   {
     "name": "Combat Scanner Probe I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Scan Probe Blueprint"
+    "subcategory": "Scan Probe"
   },
   {
     "name": "Complex Asteroid Mining Crystal Type A I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Frequency Crystals"
+    "subcategory": "Mining Crystal"
   },
   {
     "name": "Core Probe Launcher I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Modules",
+    "subcategory": "Scanning Modules"
   },
   {
     "name": "Core Scanner Probe I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Scan Probe Blueprint"
+    "subcategory": "Scan Probe"
   },
   {
     "name": "Cormorant Blueprint",
@@ -243,15 +243,15 @@ BLUEPRINT_DATA = [
     "name": "Damage Control I Blueprint",
     "me": 10,
     "te": 20,
-    "category": "Ships",
-    "subcategory": "Damage Control Blueprint"
+    "category": "Modules",
+    "subcategory": "Hull & Armor Modules"
   },
   {
     "name": "Data Analyzer I Blueprint",
     "me": 10,
     "te": 20,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Modules",
+    "subcategory": "Scanning Modules"
   },
   {
     "name": "Depleted Uranium L Blueprint",
@@ -278,8 +278,8 @@ BLUEPRINT_DATA = [
     "name": "Drone Damage Amplifier I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Modules",
+    "subcategory": "Drone Modules"
   },
   {
     "name": "Dysporite Reaction Formula",
@@ -293,7 +293,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "EM Pulse Generator Blueprint",
@@ -321,35 +321,35 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 14,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Fighters"
   },
   {
     "name": "Electronic Hardening Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Electronic Superiority Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Epithal Blueprint",
     "me": 9,
     "te": 0,
     "category": "Ships",
-    "subcategory": "Hauler Blueprint"
+    "subcategory": "Hauler"
   },
   {
     "name": "Evasive Maneuvers Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Exequror Blueprint",
@@ -362,8 +362,8 @@ BLUEPRINT_DATA = [
     "name": "Expanded Probe Launcher I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Modules",
+    "subcategory": "Scanning Modules"
   },
   {
     "name": "Fermionic Condensates Reaction Formula",
@@ -412,7 +412,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Ships",
-    "subcategory": "Shuttle Blueprint"
+    "subcategory": "Shuttle"
   },
   {
     "name": "Gravimetric Sensor Cluster Blueprint",
@@ -440,35 +440,35 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Heavy Armor Maintenance Bot I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Heavy Hull Maintenance Bot I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Heavy Shield Maintenance Bot I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Helium Fuel Block Blueprint",
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Uncategorized"
+    "subcategory": "Fuel Blocks"
   },
   {
     "name": "Heron Blueprint",
@@ -489,14 +489,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Hornet EC-300 Blueprint",
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Hurricane Blueprint",
@@ -510,7 +510,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Uncategorized"
+    "subcategory": "Fuel Blocks"
   },
   {
     "name": "Imicus Blueprint",
@@ -566,7 +566,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Combat Utility Drones"
   },
   {
     "name": "Infiltrator I Blueprint",
@@ -580,14 +580,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Interdiction Maneuvers Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Iridium Charge L Blueprint",
@@ -621,302 +621,302 @@ BLUEPRINT_DATA = [
     "name": "Large Algid Energy Administrations Unit I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Energy Weapon Rigs"
   },
   {
     "name": "Large Algid Hybrid Administrations Unit I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Hybrid Weapon Rigs"
   },
   {
     "name": "Large Ancillary Current Router I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Engineer Rigs"
   },
   {
     "name": "Large Auxiliary Nano Pump I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Armor Rigs"
   },
   {
     "name": "Large Auxiliary Thrusters I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Astronautics Rigs"
   },
   {
     "name": "Large Bay Loading Accelerator I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Missile Launcher Rigs"
   },
   {
     "name": "Large Capacitor Control Circuit I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Engineer Rigs"
   },
   {
     "name": "Large Cargohold Optimization I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Astronautics Rigs"
   },
   {
     "name": "Large Core Defense Capacitor Safeguard I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Large Core Defense Charge Economizer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Large Core Defense Field Extender I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Large Core Defense Field Purger I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Large Core Defense Operational Solidifier I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Large Drone Control Range Augmentor I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Drone Rigs"
   },
   {
     "name": "Large Drone Durability Enhancer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Drone Rigs"
   },
   {
     "name": "Large Drone Mining Augmentor I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Drone Rigs"
   },
   {
     "name": "Large Drone Repair Augmentor I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Drone Rigs"
   },
   {
     "name": "Large Drone Scope Chip I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Drone Rigs"
   },
   {
     "name": "Large Drone Speed Augmentor I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Drone Rigs"
   },
   {
     "name": "Large Dynamic Fuel Valve I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Astronautics Rigs"
   },
   {
     "name": "Large EM Armor Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Armor Rigs"
   },
   {
     "name": "Large EM Shield Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Armor Rigs"
   },
   {
     "name": "Large Egress Port Maximizer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Engineer Rigs"
   },
   {
     "name": "Large Emission Scope Sharpener I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Scanning Rigs"
   },
   {
     "name": "Large Energy Ambit Extension I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Energy Weapon Rigs"
   },
   {
     "name": "Large Energy Burst Aerator I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Energy Weapon Rigs"
   },
   {
     "name": "Large Energy Collision Accelerator I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Energy Weapon Rigs"
   },
   {
     "name": "Large Energy Discharge Elutriation I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Energy Weapon Rigs"
   },
   {
     "name": "Large Energy Locus Coordinator I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Energy Weapon Rigs"
   },
   {
     "name": "Large Energy Metastasis Adjuster I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Energy Weapon Rigs"
   },
   {
     "name": "Large Engine Thermal Shielding I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Astronautics Rigs"
   },
   {
     "name": "Large Explosive Armor Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Armor Rigs"
   },
   {
     "name": "Large Explosive Shield Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Armor Rigs"
   },
   {
     "name": "Large Gravity Capacitor Upgrade I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Large Higgs Anchor I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Astronautics Rigs"
   },
   {
     "name": "Large Hybrid Ambit Extension I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Hybrid Weapon Rigs"
   },
   {
     "name": "Large Hybrid Burst Aerator I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Hybrid Weapon Rigs"
   },
   {
     "name": "Large Hybrid Collision Accelerator I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Hybrid Weapon Rigs"
   },
   {
     "name": "Large Hybrid Discharge Elutriation I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Hybrid Weapon Rigs"
   },
   {
     "name": "Large Hybrid Locus Coordinator I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Hybrid Weapon Rigs"
   },
   {
     "name": "Large Kinetic Armor Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Armor Rigs"
   },
   {
     "name": "Large Kinetic Shield Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Large Salvage Tackle I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Resource Processing Rigs"
   },
   {
     "name": "Large Shield Booster I Blueprint",
@@ -936,15 +936,15 @@ BLUEPRINT_DATA = [
     "name": "Large Thermal Armor Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Armor Rigs"
   },
   {
     "name": "Large Thermal Shield Reinforcer I Blueprint",
     "me": 0,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Laser Focusing Crystals Blueprint",
@@ -965,14 +965,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Light Hull Maintenance Bot I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Light Missile Launcher I Blueprint",
@@ -986,7 +986,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Linear Shield Emitter Blueprint",
@@ -1014,21 +1014,21 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Medium Hull Maintenance Bot I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Medium Processor Overclocking Unit I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Engineer Rigs"
   },
   {
     "name": "Medium Shield Booster I Blueprint",
@@ -1049,42 +1049,42 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Logistics Drones"
   },
   {
     "name": "Mercoxit Asteroid Mining Crystal Type A I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Frequency Crystals"
+    "subcategory": "Mining Crystal"
   },
   {
     "name": "Missile Precision Disruption Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Missile Precision Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Missile Range Disruption Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Missile Range Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Mjolnir Cruise Missile Blueprint",
@@ -1133,14 +1133,14 @@ BLUEPRINT_DATA = [
     "me": 8,
     "te": 0,
     "category": "Structures",
-    "subcategory": "Uncategorized"
+    "subcategory": "Deployable Structures"
   },
   {
     "name": "Mobile Tractor Unit Blueprint",
     "me": 10,
     "te": 0,
     "category": "Structures",
-    "subcategory": "Uncategorized"
+    "subcategory": "Deployable Structures"
   },
   {
     "name": "Myrmidon Blueprint",
@@ -1154,7 +1154,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Nanite Repair Paste"
   },
   {
     "name": "Nanoelectrical Microprocessor Blueprint",
@@ -1238,7 +1238,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Omen Blueprint",
@@ -1252,14 +1252,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Optimal Range Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Oxy-Organic Solvents Reaction Formula",
@@ -1273,7 +1273,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Components",
-    "subcategory": "Uncategorized"
+    "subcategory": "Fuel Blocks"
   },
   {
     "name": "Phased Plasma L Blueprint",
@@ -1308,14 +1308,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Combat Utility Drones"
   },
   {
     "name": "Praetor TD-900 Blueprint",
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Probe Blueprint",
@@ -1357,56 +1357,56 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "R.A.M.- Armor/Hull Tech Blueprint",
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "R.A.M.- Electronics Blueprint",
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "R.A.M.- Energy Tech Blueprint",
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "R.A.M.- Robotics Blueprint",
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "R.A.M.- Shield Tech Blueprint",
     "me": 10,
     "te": 0,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "R.A.M.- Starship Tech Blueprint",
     "me": 10,
     "te": 20,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "R.A.M.- Weapon Tech Blueprint",
     "me": 10,
     "te": 0,
     "category": "Components",
-    "subcategory": "Tool Blueprint"
+    "subcategory": "Tool"
   },
   {
     "name": "Radar Sensor Cluster Blueprint",
@@ -1420,14 +1420,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Rapid Repair Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Reinforced Carbon Fiber Reaction Formula",
@@ -1440,8 +1440,8 @@ BLUEPRINT_DATA = [
     "name": "Relic Analyzer I Blueprint",
     "me": 10,
     "te": 20,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Modules",
+    "subcategory": "Scanning Modules"
   },
   {
     "name": "Scalar Capacitor Unit Blueprint",
@@ -1455,14 +1455,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Scan Resolution Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Scourge Cruise Missile Blueprint",
@@ -1518,28 +1518,28 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Shield Extension Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Shield Harmonizing Charge Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Command Burst Charge Blueprint"
+    "subcategory": "Command Burst Charge"
   },
   {
     "name": "Shield Power Relay I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Power Manager Blueprint"
+    "category": "Modules",
+    "subcategory": "Shield Modules"
   },
   {
     "name": "Shield Recharger I Blueprint",
@@ -1553,77 +1553,77 @@ BLUEPRINT_DATA = [
     "me": 5,
     "te": 0,
     "category": "Ships",
-    "subcategory": "Hauler Blueprint"
+    "subcategory": "Hauler"
   },
   {
     "name": "Simple Asteroid Mining Crystal Type A I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Frequency Crystals"
+    "subcategory": "Mining Crystal"
   },
   {
     "name": "Small Dynamic Fuel Valve I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Astronautics Rigs"
   },
   {
     "name": "Small EM Shield Reinforcer I Blueprint",
     "me": 10,
     "te": 20,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Small Gravity Capacitor Upgrade I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Scanning Rigs"
   },
   {
     "name": "Small Hydraulic Bay Thrusters I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Missile Launcher Rigs"
   },
   {
     "name": "Small Kinetic Shield Reinforcer I Blueprint",
     "me": 10,
     "te": 20,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Shield Rigs"
   },
   {
     "name": "Small Low Friction Nozzle Joints I Blueprint",
     "me": 10,
     "te": 20,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Astronautics Rigs"
   },
   {
     "name": "Small Warhead Calefaction Catalyst I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Missile Launcher Rigs"
   },
   {
     "name": "Small Warhead Flare Catalyst I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Missile Launcher Rigs"
   },
   {
     "name": "Small Warhead Rigor Catalyst I Blueprint",
     "me": 10,
     "te": 0,
-    "category": "Ships",
-    "subcategory": "Uncategorized"
+    "category": "Rigs",
+    "subcategory": "Missile Launcher Rigs"
   },
   {
     "name": "Standard M Blueprint",
@@ -1672,14 +1672,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Structures",
-    "subcategory": "Uncategorized"
+    "subcategory": "Deployable Structures"
   },
   {
     "name": "Station Warehouse Container Blueprint",
     "me": 10,
     "te": 20,
     "category": "Structures",
-    "subcategory": "Uncategorized"
+    "subcategory": "Deployable Structures"
   },
   {
     "name": "Synth Crash Booster Reaction Formula",
@@ -1707,14 +1707,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Targeting Range Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Tesseract Capacitor Unit Blueprint",
@@ -1798,14 +1798,14 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Tracking Speed Script Blueprint",
     "me": 10,
     "te": 0,
     "category": "Ammunition",
-    "subcategory": "Uncategorized"
+    "subcategory": "Scripts"
   },
   {
     "name": "Tristan Blueprint",
@@ -1833,21 +1833,21 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Valkyrie TP-600 Blueprint",
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Variegated Asteroid Mining Crystal Type A I Blueprint",
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Frequency Crystals"
+    "subcategory": "Mining Crystal"
   },
   {
     "name": "Venture Blueprint",
@@ -1861,7 +1861,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Vespa I Blueprint",
@@ -1882,7 +1882,7 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 20,
     "category": "Ammunition",
-    "subcategory": "Scan Probe Blueprint"
+    "subcategory": "Scan Probe"
   },
   {
     "name": "Warrior I Blueprint",
@@ -1896,21 +1896,21 @@ BLUEPRINT_DATA = [
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Warrior TP-300 Blueprint",
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "Wasp EC-900 Blueprint",
     "me": 10,
     "te": 0,
     "category": "Drones",
-    "subcategory": "Uncategorized"
+    "subcategory": "Electronic Warfare Drones"
   },
   {
     "name": "X-Large Shield Booster I Blueprint",
