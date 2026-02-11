@@ -1,0 +1,12 @@
+archive/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.log
+.vscode/
+.claude/
+*.db-journal
+*.db-wal
+*.db-shm
