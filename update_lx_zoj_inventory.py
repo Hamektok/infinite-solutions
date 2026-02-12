@@ -228,12 +228,31 @@ def update_html_inventory(inventory):
         return False
 
 def commit_and_push_to_github(snapshot_time):
-    """Commit and push index.html changes to GitHub."""
+    """Commit and push index.html changes to GitHub (always to main branch)."""
     import subprocess
 
     print(f"\n>>> Pushing to GitHub...")
 
     try:
+        # Ensure we are on the main branch (GitHub Pages builds from main)
+        current_branch = subprocess.run(
+            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True
+        )
+        branch_name = current_branch.stdout.strip()
+
+        if branch_name != 'main':
+            print(f"[!] Currently on '{branch_name}' branch, switching to main...")
+            subprocess.run(
+                ['git', 'checkout', 'main'],
+                cwd=PROJECT_DIR,
+                check=True,
+                capture_output=True
+            )
+            print("[OK] Switched to main branch")
+
         # Check if there are changes to index.html
         result = subprocess.run(
             ['git', 'diff', '--quiet', 'index.html'],
