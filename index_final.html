@@ -1525,7 +1525,7 @@
                             </div>
                             <div class="filter-group">
                                 <label>Category:</label>
-                                <select id="categoryFilterBPC" onchange="applyBPCFilters()">
+                                <select id="categoryFilterBPC" onchange="updateSubcategoryFilterBPC(); applyBPCFilters()">
                                     <option value="">All Categories</option>
                                 </select>
                             </div>
@@ -4264,6 +4264,7 @@
 
                     // Populate filter dropdowns
                     populateBPCFilters();
+                    updateSubcategoryFilterBPC();
 
                     // Render table
                     renderBPCs();
@@ -4306,6 +4307,40 @@
                     subcategorySelect.appendChild(option);
                 }
             });
+        }
+
+        // Update BPC subcategory filter based on selected category
+        function updateSubcategoryFilterBPC() {
+            const category = document.getElementById('categoryFilterBPC').value;
+            const subcategoryFilter = document.getElementById('subcategoryFilterBPC');
+
+            // Get current selection
+            const currentSelection = subcategoryFilter.value;
+
+            // Clear existing options except the first "All" option
+            subcategoryFilter.innerHTML = '<option value="">All Sub-Categories</option>';
+
+            // Get relevant subcategories based on selected category
+            let relevantBPCs = allBPCs;
+            if (category) {
+                relevantBPCs = allBPCs.filter(bpc => bpc.category === category);
+            }
+
+            const subcategories = [...new Set(relevantBPCs.map(bpc => bpc.subcategory))].sort();
+
+            subcategories.forEach(subcat => {
+                if (subcat) {
+                    const option = document.createElement('option');
+                    option.value = subcat;
+                    option.textContent = subcat;
+                    subcategoryFilter.appendChild(option);
+                }
+            });
+
+            // Restore selection if still valid
+            if (currentSelection && subcategories.includes(currentSelection)) {
+                subcategoryFilter.value = currentSelection;
+            }
         }
 
         // Apply BPC filters
