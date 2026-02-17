@@ -2247,7 +2247,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Dysprosium": 0,
                         "Thulium": 5322
             },
-            "blueprintsLastUpdated": "Feb 16, 2026 08:00 EVE",
+            "blueprintsLastUpdated": "Feb 17, 2026 07:05 EVE",
             "inventoryLastUpdated": "Feb 17, 2026 06:08 EVE"
 };
 
@@ -5201,16 +5201,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                 let itemsHtml = '';
                 items.forEach(item => {
-                    if (!item.accepted) {
-                        itemsHtml += `
-                            <div class="rate-item not-accepting">
-                                <div class="rate-item-header">
-                                    <span class="rate-item-name">${item.name}</span>
-                                    <span class="not-accepting-badge">Not Accepting</span>
-                                </div>
-                            </div>`;
-                        return;
-                    }
+                    if (!item.accepted) return;
 
                     const isSpecial = String(item.rate) !== String(defaultRate);
                     const pctClass = isSpecial ? 'rate-item-pct special' : 'rate-item-pct';
