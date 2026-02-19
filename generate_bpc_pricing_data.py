@@ -1,18 +1,16 @@
 """
 Generate BPC pricing data for HTML display.
 Creates a JavaScript file with pricing information for all blueprints.
+
+Formula: per_run = Jita 7-day avg best sell × 1% × quality multiplier
 """
 import sqlite3
-import requests
 import json
 from calculate_bpc_pricing import (
     get_jita_sell_prices,
     get_blueprint_product_mapping,
-    get_adjusted_prices,
-    get_system_cost_index,
     calculate_bpc_price,
     calculate_quality_multiplier,
-    LX_ZOJ_SYSTEM_ID
 )
 
 DB_PATH = 'mydatabase.db'
@@ -25,15 +23,12 @@ def get_all_blueprints_with_pricing():
     # Load all required data
     jita_prices = get_jita_sell_prices()
     bp_product_map = get_blueprint_product_mapping()
-    adjusted_prices = get_adjusted_prices()
-    system_cost_index = get_system_cost_index(LX_ZOJ_SYSTEM_ID)
 
     # Get character blueprints
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     # Get all unique blueprints (both BPOs and BPCs)
-    # For BPCs, group by type_id, ME, TE to get unique combinations
     cursor.execute("""
         SELECT DISTINCT type_id, type_name, material_efficiency, time_efficiency
         FROM character_blueprints
@@ -64,8 +59,8 @@ def get_all_blueprints_with_pricing():
         # Calculate sample pricing (10 runs, 1 copy)
         pricing_10 = calculate_bpc_price(
             bp_type_id, product_id, me, te,
-            10, 1,  # 10 runs, 1 copy
-            jita_price, adjusted_prices, system_cost_index
+            10, 1,
+            jita_price
         )
 
         if pricing_10:
@@ -79,7 +74,7 @@ def get_all_blueprints_with_pricing():
                 'qualityPercent': round(quality * 100, 1),
                 'jitaSellPrice': round(jita_price, 2),
                 'price10Runs': round(pricing_10['final_price'], 2),
-                'pricePerRun': round(pricing_10['final_price'] / 10, 2)
+                'pricePerRun': round(pricing_10['per_run'], 2)
             })
 
     conn.close()
@@ -99,10 +94,9 @@ def write_pricing_js(blueprints_data):
         f.write('\n')
         f.write('// Pricing configuration\n')
         f.write('const BPC_PRICING_CONFIG = {\n')
-        f.write('    facility: "Azbel in LX-ZOJ (Geminate)",\n')
-        f.write('    rigBonus: { cost: 0.21, time: 0.42 },\n')
-        f.write('    tax: 0.05,\n')
-        f.write('    basePercentage: 0.02,  // 2% of Jita sell\n')
+        f.write('    formula: "per_run = Jita 7-day avg best sell × 1% × quality",\n')
+        f.write('    priceSource: "7-day avg best sell from market snapshots",\n')
+        f.write('    basePercentage: 0.01,  // 1% of Jita best sell at 100% quality\n')
         f.write('    qualityFormula: "0.25 + (ME/10 × 0.60) + (TE/20 × 0.15)"\n')
         f.write('};\n')
         f.write('\n')
@@ -153,10 +147,6 @@ def main():
     print("=" * 60)
     print(f"Generated pricing for {len(blueprints)} blueprints")
     print(f"Output file: {output_file}")
-    print()
-    print("Next steps:")
-    print("1. Include bpc_pricing_data.js in your HTML")
-    print("2. Add interactive pricing calculator to blueprint display")
     print()
 
 if __name__ == '__main__':
