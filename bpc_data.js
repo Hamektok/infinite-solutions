@@ -2138,17 +2138,7 @@ const BPC_DATA = [
     "me": 10,
     "te": 20,
     "runs": 2,
-    "quantity": 6,
-    "category": "Ships",
-    "subcategory": "Cruiser"
-  },
-  {
-    "typeId": 692,
-    "name": "Stabber Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 10,
-    "quantity": 4,
+    "quantity": 1,
     "category": "Ships",
     "subcategory": "Cruiser"
   },

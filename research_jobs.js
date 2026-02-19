@@ -2,6 +2,22 @@
 // Updated automatically - do not edit manually
 RESEARCH_JOBS = [
   {
+    "name": "Mobile Tractor Unit Blueprint",
+    "research_type": "TE",
+    "current_level": 0,
+    "target_level": 2,
+    "end_date": "2026-03-05T23:23:16+00:00",
+    "job_id": 642561140
+  },
+  {
+    "name": "Einherji I Blueprint",
+    "research_type": "TE",
+    "current_level": 14,
+    "target_level": 16,
+    "end_date": "2026-03-19T00:50:32+00:00",
+    "job_id": 642561088
+  },
+  {
     "name": "Oxygen Fuel Block Blueprint",
     "research_type": "TE",
     "current_level": 0,
