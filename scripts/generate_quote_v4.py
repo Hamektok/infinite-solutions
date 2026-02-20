@@ -414,7 +414,7 @@ FROM item_calculations;
             shipping_display = "INCLUDED"
             final_line_total = line_total
         elif status in ["CHARGED", "PARTIAL"]:
-            shipping_display = f"+{customer_charge:,.0f}"
+            shipping_display = f"+{customer_charge:,.2f}"
             final_line_total = line_total + customer_charge
         else:  # REQUIRES QUOTE
             shipping_display = "[QUOTE]"
@@ -425,16 +425,16 @@ FROM item_calculations;
                 f"{display_name:<45} "
                 f"{qty:>4} "
                 f"{total_m3:>10,.2f} "
-                f"{customer_price:>14,.0f} "
+                f"{customer_price:>14,.2f} "
                 f"{shipping_display:>14} "
-                f"{final_line_total:>16,.0f}"
+                f"{final_line_total:>16,.2f}"
             )
         else:
             quote_lines.append(
                 f"{display_name:<45} "
                 f"{qty:>4} "
                 f"{total_m3:>10,.2f} "
-                f"{customer_price:>14,.0f} "
+                f"{customer_price:>14,.2f} "
                 f"{shipping_display:>14} "
                 f"{'[QUOTE NEEDED]':>16}"
             )
@@ -446,9 +446,9 @@ FROM item_calculations;
         f"{'':<10} "
         f"{'':<14} "
         f"{'':<14} "
-        f"{total_items_cost:>16,.0f}"
+        f"{total_items_cost:>16,.2f}"
     )
-    
+
     if total_customer_shipping > 0:
         quote_lines.append(
             f"{'Shipping Charges':<45} "
@@ -456,7 +456,7 @@ FROM item_calculations;
             f"{'':<10} "
             f"{'':<14} "
             f"{'':<14} "
-            f"{total_customer_shipping:>16,.0f}"
+            f"{total_customer_shipping:>16,.2f}"
         )
     
     quote_lines.append(
@@ -474,7 +474,7 @@ FROM item_calculations;
         f"{'':<10} "
         f"{'':<14} "
         f"{'':<14} "
-        f"{grand_total:>16,.0f}"
+        f"{grand_total:>16,.2f}"
     )
     quote_lines.append("═" * 110)
     
@@ -526,10 +526,10 @@ FROM item_calculations;
             if items_with_bwf < total_items:
                 quote_lines.append(f"  * {items_with_bwf}/{total_items} items available in BWF market")
                 quote_lines.append("")
-            quote_lines.append(f"  BWF Market Price:   {total_bwf_cost:>16,.0f} ISK")
-            quote_lines.append(f"  Our Price:          {grand_total:>16,.0f} ISK")
+            quote_lines.append(f"  BWF Market Price:   {total_bwf_cost:>16,.2f} ISK")
+            quote_lines.append(f"  Our Price:          {grand_total:>16,.2f} ISK")
             quote_lines.append("  " + "─" * 80)
-            quote_lines.append(f"  YOU SAVE:           {savings:>16,.0f} ISK ({savings_pct:.1f}%)")
+            quote_lines.append(f"  YOU SAVE:           {savings:>16,.2f} ISK ({savings_pct:.1f}%)")
             quote_lines.append("═" * 110)
     
     quote_lines.append("")
@@ -670,8 +670,8 @@ FROM item_calculations;
         receipt_lines.append(
             f"{display_name:<50} "
             f"{qty:>4} "
-            f"{customer_price:>14,.0f} "
-            f"{final_total:>16,.0f}"
+            f"{customer_price:>14,.2f} "
+            f"{final_total:>16,.2f}"
         )
     
     if total_customer_shipping > 0:
@@ -680,15 +680,15 @@ FROM item_calculations;
             f"{'Shipping charges (low-margin items)':<50} "
             f"{'':<4} "
             f"{'':<14} "
-            f"{total_customer_shipping:>16,.0f}"
+            f"{total_customer_shipping:>16,.2f}"
         )
-    
+
     receipt_lines.append("─" * 110)
     receipt_lines.append(
         f"{'TOTAL PAYMENT:':<50} "
         f"{'':<4} "
         f"{'':<14} "
-        f"{grand_total:>16,.0f}"
+        f"{grand_total:>16,.2f}"
     )
     receipt_lines.append("═" * 110)
     receipt_lines.append("")
@@ -829,8 +829,8 @@ def main():
     print(f"\nCustomer Quote:   {quote_filename}")
     print(f"Your Profit:      {profit_filename}")
     print(f"Delivery Receipt: {receipt_filename}")
-    print(f"\nCustomer Total: {grand_total:,.0f} ISK")
-    print(f"Your Net Profit: {your_profit:,.0f} ISK")
+    print(f"\nCustomer Total: {grand_total:,.2f} ISK")
+    print(f"Your Net Profit: {your_profit:,.2f} ISK")
     print("\n" + "=" * 110)
     
     # Display quote
