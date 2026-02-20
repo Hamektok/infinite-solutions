@@ -1810,6 +1810,32 @@
             color: #ffffff;
         }
 
+        .btn-shorten-link {
+            padding: 12px 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(0, 170, 200, 0.3));
+            color: #00d9ff;
+            border: 2px solid rgba(0, 217, 255, 0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-shorten-link:hover {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.3), rgba(0, 170, 200, 0.4));
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-shorten-link:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .quote-id-display {
             display: flex;
             align-items: center;
@@ -2227,6 +2253,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         </div>
                         <div class="quote-link-row">
                             <input type="text" class="quote-link-input" id="buybackQuoteLinkInput" readonly onclick="this.select()">
+                            <button class="btn-shorten-link" id="buybackShortenLinkBtn" onclick="shortenBuybackLink()">Shorten</button>
                             <button class="btn-copy-link" id="buybackCopyLinkBtn" onclick="copyBuybackQuoteLink()">Copy Link</button>
                         </div>
                         <div class="quote-id-display">
@@ -5610,6 +5637,37 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     btn.classList.remove('copied');
                 }, 2000);
             });
+        }
+
+        async function shortenBuybackLink() {
+            const input = document.getElementById('buybackQuoteLinkInput');
+            const btn = document.getElementById('buybackShortenLinkBtn');
+            const longUrl = input.value;
+
+            if (!longUrl || longUrl.startsWith('https://is.gd/')) return;
+
+            btn.textContent = 'Shortening...';
+            btn.disabled = true;
+
+            try {
+                const apiUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('API error');
+                const shortUrl = (await response.text()).trim();
+                if (!shortUrl.startsWith('https://')) throw new Error('Bad response');
+                input.value = shortUrl;
+                btn.textContent = 'Shortened!';
+                setTimeout(() => {
+                    btn.textContent = 'Shorten';
+                    btn.disabled = false;
+                }, 3000);
+            } catch (e) {
+                btn.textContent = 'Failed';
+                setTimeout(() => {
+                    btn.textContent = 'Shorten';
+                    btn.disabled = false;
+                }, 2000);
+            }
         }
 
         function loadBuybackFromHash() {
