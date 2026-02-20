@@ -2206,7 +2206,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
                                 <th>Item</th>
                                 <th style="text-align:right;">Quantity</th>
                                 <th style="text-align:center;">Rate</th>
-                                <th style="text-align:right;">Jita Buy (7d avg)</th>
                                 <th style="text-align:right;">Your Payout</th>
                                 <th style="text-align:center;">Status</th>
                             </tr>
@@ -5526,7 +5525,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <td class="item-name-col">${r.name}</td>
                         <td class="qty-col">${r.quantity.toLocaleString()}</td>
                         <td class="rate-col">--</td>
-                        <td class="jita-col">--</td>
                         <td class="payout-col">--</td>
                         <td class="status-col"><span class="status-not-accepted">NOT ACCEPTED</span></td>`;
                 } else if (r.overLimit) {
@@ -5535,7 +5533,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <td class="item-name-col">${r.name}<span class="over-limit-note">Capped at quota - ${r.excessQty.toLocaleString()} excess</span></td>
                         <td class="qty-col"><span class="qty-adjusted">${r.quantity.toLocaleString()}</span><span class="qty-accepted">${r.effectiveQty.toLocaleString()}</span></td>
                         <td class="rate-col">${r.rate}%</td>
-                        <td class="jita-col">${formatISKBuyback(r.jitaValue)} ISK</td>
                         <td class="payout-col">${formatISKBuyback(r.payout)} ISK</td>
                         <td class="status-col"><span class="status-accepted" style="color:#ffaa00;">PARTIAL</span></td>`;
                 } else {
@@ -5543,7 +5540,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <td class="item-name-col">${r.name}</td>
                         <td class="qty-col">${r.quantity.toLocaleString()}</td>
                         <td class="rate-col">${r.rate}%</td>
-                        <td class="jita-col">${formatISKBuyback(r.jitaValue)} ISK</td>
                         <td class="payout-col">${formatISKBuyback(r.payout)} ISK</td>
                         <td class="status-col"><span class="status-accepted">ACCEPTED</span></td>`;
                 }
@@ -5568,10 +5564,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
             }
 
             summaryHtml += `
-                <div class="summary-item">
-                    <div class="summary-label">Total Jita Value</div>
-                    <div class="summary-value items-count">${formatISKBuyback(totalJita)} ISK</div>
-                </div>
                 <div class="summary-item">
                     <div class="summary-label">Your Payout</div>
                     <div class="summary-value">${formatISKBuyback(totalPayout)} ISK</div>
