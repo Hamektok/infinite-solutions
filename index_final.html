@@ -1862,15 +1862,27 @@
 
         /* Side-by-side quote layout */
         .buyback-quote-row {
-            display: flex;
-            gap: 30px;
-            align-items: flex-start;
             margin-top: 35px;
         }
 
-        .buyback-calculator-panel {
+        .buyback-quote-row.side-by-side {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .buyback-quote-row.side-by-side .buyback-calculator-panel {
             width: 380px;
             flex-shrink: 0;
+        }
+
+        /* Stack textarea above buttons inside calculator panel */
+        .buyback-calculator-panel .buyback-input-area {
+            flex-direction: column;
+        }
+
+        .buyback-calculator-panel .buyback-actions {
+            flex-direction: row;
         }
 
         .buyback-results { display: none; }
@@ -2179,7 +2191,7 @@
                 </div>
 
                 <!-- Side-by-side quote layout -->
-                <div class="buyback-quote-row">
+                <div class="buyback-quote-row" id="buybackQuoteRow">
                     <div class="buyback-calculator-panel">
                         <!-- Paste & Calculate -->
                         <div class="buyback-section-header">Instant Quote Calculator</div>
@@ -5624,12 +5636,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
             // Show results
             document.getElementById('buybackResults').classList.add('visible');
+            document.getElementById('buybackQuoteRow').classList.add('side-by-side');
         }
 
         function clearBuybackInput() {
             document.getElementById('buybackPasteInput').value = '';
             document.getElementById('buybackResults').classList.remove('visible');
             document.getElementById('buybackResultsBody').innerHTML = '';
+            document.getElementById('buybackQuoteRow').classList.remove('side-by-side');
         }
 
         function copyBuybackQuoteLink() {
