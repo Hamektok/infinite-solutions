@@ -1926,6 +1926,80 @@
             font-style: italic;
             padding: 20px;
         }
+
+        /* Contract Details step-by-step */
+        .contract-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .contract-step {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            color: #a0c8e0;
+            line-height: 1.5;
+        }
+
+        .step-num {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            background: rgba(0, 217, 255, 0.15);
+            border: 1px solid rgba(0, 217, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: #00d9ff;
+            margin-top: 2px;
+        }
+
+        .contract-field-box {
+            background: rgba(0, 30, 50, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 6px 0 10px 34px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .contract-payout-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        }
+
+        .contract-field-box .quote-link-input {
+            border: none;
+            background: transparent;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        .contract-meta {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0, 217, 255, 0.1);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            color: #4a8aa0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
@@ -2289,25 +2363,45 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <div class="buyback-section-header">Contract Details</div>
                         <div class="panel-placeholder" id="contractPlaceholder">Calculate a quote to see contract details.</div>
                         <div id="contractDetailsContent" style="display:none;">
-                            <div class="buyback-summary" id="buybackSummary"></div>
-                            <div class="quote-share-section" id="buybackShareSection">
-                                <div class="quote-share-header">
-                                    <div class="icon">&#128279;</div>
-                                    <div class="title">Share This Quote</div>
+                            <div class="contract-steps">
+                                <div class="contract-step">
+                                    <span class="step-num">1</span>
+                                    <span>Open <strong>Contracts → Create Contract</strong> in EVE Online.</span>
                                 </div>
-                                <div class="quote-share-description">
-                                    Copy this link and send it to <strong style="color:#00ffff;">@Rax Hakaari</strong> for verification.
-                                    The link contains your items and quantities — prices are recalculated fresh when opened.
+                                <div class="contract-step">
+                                    <span class="step-num">2</span>
+                                    <span>Set type to <strong>Item Exchange</strong>, availability to <strong>Private</strong>, and search for <strong style="color:#00ffff;">Rax Hakaari</strong>.</span>
                                 </div>
-                                <div class="quote-link-row">
-                                    <input type="text" class="quote-link-input" id="buybackQuoteLinkInput" readonly onclick="this.select()">
-                                    <button class="btn-copy-link" id="buybackCopyLinkBtn" onclick="copyBuybackQuoteLink()">Copy Link</button>
+                                <div class="contract-step">
+                                    <span class="step-num">3</span>
+                                    <span>Add all <strong>accepted items</strong> from your quote to the contract.</span>
                                 </div>
-                                <div class="quote-id-display">
+                                <div class="contract-step">
+                                    <span class="step-num">4</span>
+                                    <span>In <strong>"I Will Receive"</strong>, enter this amount exactly:</span>
+                                </div>
+                            </div>
+                            <div class="contract-field-box">
+                                <span class="contract-payout-value" id="contractPayoutDisplay">--</span>
+                                <button class="btn-copy-link" id="copyPayoutBtn" onclick="copyContractPayout()">Copy Amount</button>
+                            </div>
+                            <div class="contract-steps">
+                                <div class="contract-step">
+                                    <span class="step-num">5</span>
+                                    <span>In the <strong>Description</strong> box, paste this quote link:</span>
+                                </div>
+                            </div>
+                            <div class="contract-field-box">
+                                <input type="text" class="quote-link-input" id="buybackQuoteLinkInput" readonly onclick="this.select()">
+                                <button class="btn-copy-link" id="buybackCopyLinkBtn" onclick="copyBuybackQuoteLink()">Copy Link</button>
+                            </div>
+                            <div class="contract-meta">
+                                <div>
                                     <span class="quote-id-label">Quote ID:</span>
                                     <span class="quote-id-value" id="buybackQuoteId">--</span>
-                                    <span class="quote-timestamp" id="buybackQuoteTimestamp"></span>
                                 </div>
+                                <div id="buybackQuoteTimestamp"></div>
+                                <div id="contractAcceptedDisplay"></div>
                             </div>
                         </div>
                     </div>
@@ -5624,29 +5718,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 tbody.appendChild(row);
             });
 
-            // Summary
-            const summaryDiv = document.getElementById('buybackSummary');
-            let summaryHtml = `
-                <div class="summary-item">
-                    <div class="summary-label">Accepted Items</div>
-                    <div class="summary-value items-count">${acceptedCount} / ${totalCount}</div>
-                </div>`;
-
-            if (quotaWarnings > 0) {
-                summaryHtml += `
-                    <div class="summary-item">
-                        <div class="summary-label">Quota Warnings</div>
-                        <div class="summary-value" style="color:#ffaa00; text-shadow:0 0 10px rgba(255,170,0,0.4);">${quotaWarnings} item${quotaWarnings > 1 ? 's' : ''} capped</div>
-                    </div>`;
-            }
-
-            summaryHtml += `
-                <div class="summary-item">
-                    <div class="summary-label">Your Payout</div>
-                    <div class="summary-value">${formatISKBuyback(totalPayout)} ISK</div>
-                </div>`;
-
-            summaryDiv.innerHTML = summaryHtml;
+            // Populate contract details
+            window._lastQuotePayout = totalPayout;
+            document.getElementById('contractPayoutDisplay').textContent = formatISKBuyback(totalPayout) + ' ISK';
+            let acceptedText = `${acceptedCount} / ${totalCount} items accepted`;
+            if (quotaWarnings > 0) acceptedText += ` — ${quotaWarnings} capped at quota`;
+            document.getElementById('contractAcceptedDisplay').textContent = acceptedText;
 
             // Build share link — auto-shorten via is.gd
             const acceptedItems = results.filter(r => r.accepted);
@@ -5706,6 +5783,19 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 btn.classList.add('copied');
                 setTimeout(() => {
                     btn.textContent = 'Copy Link';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function copyContractPayout() {
+            const raw = (window._lastQuotePayout || 0).toFixed(2);
+            navigator.clipboard.writeText(raw).then(() => {
+                const btn = document.getElementById('copyPayoutBtn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy Amount';
                     btn.classList.remove('copied');
                 }, 2000);
             });
