@@ -1868,47 +1868,64 @@
             font-style: italic;
         }
 
-        /* Side-by-side quote layout */
+        /* Three-column quote layout — always visible */
         .buyback-quote-row {
-            margin-top: 35px;
-        }
-
-        .buyback-quote-row.side-by-side {
             display: flex;
-            gap: 30px;
+            gap: 20px;
             align-items: stretch;
+            margin-top: 35px;
+            min-height: 520px;
         }
 
-        .buyback-quote-row.side-by-side .buyback-calculator-panel {
+        .quote-panel {
             flex: 1;
             min-width: 0;
             display: flex;
             flex-direction: column;
+            background: rgba(5, 15, 30, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.15);
+            border-radius: 8px;
+            padding: 20px;
         }
 
-        /* Stack textarea above buttons inside calculator panel */
-        .buyback-calculator-panel .buyback-input-area {
+        .quote-panel .buyback-section-header {
+            margin-top: 0;
+        }
+
+        .quote-panel .buyback-input-area {
             flex-direction: column;
             flex: 1;
+            margin-bottom: 0;
         }
 
-        .buyback-calculator-panel .buyback-paste-box {
+        .quote-panel .buyback-paste-box {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
-        .buyback-calculator-panel .buyback-paste-box textarea {
+        .quote-panel .buyback-paste-box textarea {
             flex: 1;
             height: auto;
         }
 
-        .buyback-calculator-panel .buyback-actions {
+        .quote-panel .buyback-actions {
             flex-direction: row;
+            margin-top: 12px;
         }
 
-        .buyback-results { display: none; }
-        .buyback-results.visible { display: block; flex: 1; min-width: 0; }
+        .panel-placeholder {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2a5a70;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            text-align: center;
+            font-style: italic;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -2212,12 +2229,12 @@
                     <!-- Category cards rendered dynamically by JS -->
                 </div>
 
-                <!-- Side-by-side quote layout -->
+                <!-- Three-column quote layout -->
                 <div class="buyback-quote-row" id="buybackQuoteRow">
-                    <div class="buyback-calculator-panel">
-                        <!-- Paste & Calculate -->
-                        <div class="buyback-section-header">Instant Quote Calculator</div>
 
+                    <!-- Panel 1: Instant Quote Calculator -->
+                    <div class="quote-panel">
+                        <div class="buyback-section-header">Instant Quote Calculator</div>
                         <div class="buyback-input-area">
                             <div class="buyback-paste-box">
                                 <textarea id="buybackPasteInput" placeholder="Paste your inventory here...
@@ -2236,8 +2253,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
                                 <button class="btn-clear" onclick="clearBuybackInput()">Clear</button>
                             </div>
                         </div>
-
-                        <!-- Loaded from link banner -->
                         <div class="quote-loaded-banner" id="buybackLoadedBanner" style="display: none;">
                             <div class="icon">&#128279;</div>
                             <div class="text">
@@ -2247,48 +2262,56 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         </div>
                     </div>
 
-                <!-- Results -->
-                <div class="buyback-results" id="buybackResults">
-                    <div class="buyback-section-header">Quote Results</div>
-
-                    <div class="buyback-table-wrapper">
-                        <table class="buyback-table">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th style="text-align:right;">Quantity</th>
-                                    <th style="text-align:center;">Rate</th>
-                                    <th style="text-align:right;">Your Payout</th>
-                                    <th style="text-align:center;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="buybackResultsBody"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="buyback-summary" id="buybackSummary"></div>
-
-                    <!-- Share Quote Link -->
-                    <div class="quote-share-section" id="buybackShareSection">
-                        <div class="quote-share-header">
-                            <div class="icon">&#128279;</div>
-                            <div class="title">Share This Quote</div>
-                        </div>
-                        <div class="quote-share-description">
-                            Copy this link and send it to <strong style="color:#00ffff;">@Rax Hakaari</strong> for verification.
-                            The link contains your items and quantities — prices are recalculated fresh when opened.
-                        </div>
-                        <div class="quote-link-row">
-                            <input type="text" class="quote-link-input" id="buybackQuoteLinkInput" readonly onclick="this.select()">
-                            <button class="btn-copy-link" id="buybackCopyLinkBtn" onclick="copyBuybackQuoteLink()">Copy Link</button>
-                        </div>
-                        <div class="quote-id-display">
-                            <span class="quote-id-label">Quote ID:</span>
-                            <span class="quote-id-value" id="buybackQuoteId">--</span>
-                            <span class="quote-timestamp" id="buybackQuoteTimestamp"></span>
+                    <!-- Panel 2: Quote Results -->
+                    <div class="quote-panel">
+                        <div class="buyback-section-header">Quote Results</div>
+                        <div class="panel-placeholder" id="resultsPlaceholder">Paste items and click Calculate Quote to see results.</div>
+                        <div id="buybackTableContainer" style="display:none;">
+                            <div class="buyback-table-wrapper">
+                                <table class="buyback-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th style="text-align:right;">Quantity</th>
+                                            <th style="text-align:center;">Rate</th>
+                                            <th style="text-align:right;">Your Payout</th>
+                                            <th style="text-align:center;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="buybackResultsBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Panel 3: Contract Details -->
+                    <div class="quote-panel">
+                        <div class="buyback-section-header">Contract Details</div>
+                        <div class="panel-placeholder" id="contractPlaceholder">Calculate a quote to see contract details.</div>
+                        <div id="contractDetailsContent" style="display:none;">
+                            <div class="buyback-summary" id="buybackSummary"></div>
+                            <div class="quote-share-section" id="buybackShareSection">
+                                <div class="quote-share-header">
+                                    <div class="icon">&#128279;</div>
+                                    <div class="title">Share This Quote</div>
+                                </div>
+                                <div class="quote-share-description">
+                                    Copy this link and send it to <strong style="color:#00ffff;">@Rax Hakaari</strong> for verification.
+                                    The link contains your items and quantities — prices are recalculated fresh when opened.
+                                </div>
+                                <div class="quote-link-row">
+                                    <input type="text" class="quote-link-input" id="buybackQuoteLinkInput" readonly onclick="this.select()">
+                                    <button class="btn-copy-link" id="buybackCopyLinkBtn" onclick="copyBuybackQuoteLink()">Copy Link</button>
+                                </div>
+                                <div class="quote-id-display">
+                                    <span class="quote-id-label">Quote ID:</span>
+                                    <span class="quote-id-value" id="buybackQuoteId">--</span>
+                                    <span class="quote-timestamp" id="buybackQuoteTimestamp"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div><!-- end buyback-quote-row -->
 
                 <div class="footer" style="text-align:center; margin-top:40px; padding-top:20px; border-top:1px solid rgba(0,217,255,0.1);">
@@ -5658,16 +5681,20 @@ Tip: Copy directly from EVE inventory window"></textarea>
             document.getElementById('buybackQuoteTimestamp').textContent =
                 `Generated: ${months[now.getUTCMonth()]} ${now.getUTCDate()}, ${now.getUTCFullYear()} ${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')} EVE`;
 
-            // Show results
-            document.getElementById('buybackResults').classList.add('visible');
-            document.getElementById('buybackQuoteRow').classList.add('side-by-side');
+            // Show results and contract details panels
+            document.getElementById('buybackTableContainer').style.display = 'block';
+            document.getElementById('resultsPlaceholder').style.display = 'none';
+            document.getElementById('contractDetailsContent').style.display = 'block';
+            document.getElementById('contractPlaceholder').style.display = 'none';
         }
 
         function clearBuybackInput() {
             document.getElementById('buybackPasteInput').value = '';
-            document.getElementById('buybackResults').classList.remove('visible');
             document.getElementById('buybackResultsBody').innerHTML = '';
-            document.getElementById('buybackQuoteRow').classList.remove('side-by-side');
+            document.getElementById('buybackTableContainer').style.display = 'none';
+            document.getElementById('resultsPlaceholder').style.display = 'flex';
+            document.getElementById('contractDetailsContent').style.display = 'none';
+            document.getElementById('contractPlaceholder').style.display = 'flex';
         }
 
         function copyBuybackQuoteLink() {
