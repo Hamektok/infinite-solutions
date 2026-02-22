@@ -1283,6 +1283,16 @@ const BPC_DATA = [
     "subcategory": "Ship Components"
   },
   {
+    "typeId": 17349,
+    "name": "Fusion Thruster Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 11,
+    "quantity": 10,
+    "category": "Components",
+    "subcategory": "Ship Components"
+  },
+  {
     "typeId": 17340,
     "name": "Gravimetric Sensor Cluster Blueprint",
     "me": 10,
