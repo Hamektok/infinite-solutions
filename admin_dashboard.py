@@ -1634,7 +1634,7 @@ class AdminDashboard:
         ttk.Label(param_inner, text="CALCULATION PARAMETERS",
                   background='#0a2030', foreground='#00d9ff',
                   font=('Segoe UI', 9, 'bold')).grid(
-                  row=0, column=0, columnspan=6, sticky='w', pady=(0, 8))
+                  row=0, column=0, columnspan=8, sticky='w', pady=(0, 8))
 
         lbl_cfg = dict(background='#0a2030', foreground='#88d0e8', font=('Segoe UI', 10))
 
@@ -1670,9 +1670,21 @@ class AdminDashboard:
         ttk.Entry(param_inner, textvariable=self.export_collat_var, width=8).grid(
             row=2, column=4, sticky='w', padx=(0, 12))
 
+        # Sales tax
+        tk.Label(param_inner, text="Sales Tax %", **lbl_cfg).grid(row=1, column=5, sticky='w', padx=(0, 4))
+        self.export_tax_var = tk.StringVar(value='3.6')
+        ttk.Entry(param_inner, textvariable=self.export_tax_var, width=8).grid(
+            row=2, column=5, sticky='w', padx=(0, 12))
+
+        # Broker fee
+        tk.Label(param_inner, text="Broker Fee %", **lbl_cfg).grid(row=1, column=6, sticky='w', padx=(0, 4))
+        self.export_broker_var = tk.StringVar(value='3.0')
+        ttk.Entry(param_inner, textvariable=self.export_broker_var, width=8).grid(
+            row=2, column=6, sticky='w', padx=(0, 12))
+
         # Recalculate button
         ttk.Button(param_inner, text='⟳  Recalculate', style='Action.TButton',
-                   command=self.load_export_data).grid(row=2, column=5, sticky='w', padx=(4, 0))
+                   command=self.load_export_data).grid(row=2, column=7, sticky='w', padx=(4, 0))
 
         # ── Quick-scenario pills ─────────────────────────────────────────────
         scenario_frame = ttk.Frame(param_card, style='Card.TFrame')
@@ -1748,7 +1760,7 @@ class AdminDashboard:
             'volume':      ('Vol (m³)',       75, 'e'),
             'buy_price':   ('Buy Price',     110, 'e'),
             'sell_price':  ('Sell Price',    110, 'e'),
-            'ship_collat': ('Ship+Collat',   105, 'e'),
+            'ship_collat': ('Ship+Tax+Fees',  115, 'e'),
             'profit':      ('Profit/unit',   105, 'e'),
             'margin':      ('Margin',         75, 'e'),
             'verdict':     ('Verdict',        90, 'center'),
@@ -1799,15 +1811,19 @@ class AdminDashboard:
     def load_export_data(self):
         """Query DB and populate the export treeview."""
         try:
-            ship_rate = float(self.export_ship_var.get())
+            ship_rate  = float(self.export_ship_var.get())
             collat_pct = float(self.export_collat_var.get()) / 100.0
             buy_pct    = float(self.export_buy_pct_var.get()) / 100.0
+            tax_pct    = float(self.export_tax_var.get()) / 100.0
+            broker_pct = float(self.export_broker_var.get()) / 100.0
         except ValueError:
-            messagebox.showerror("Invalid Input", "Shipping rate, collateral, and buy % must be numbers.")
+            messagebox.showerror("Invalid Input", "All parameters must be numeric.")
             return
 
         buy_basis  = self.export_buy_var.get()
         sell_basis = self.export_sell_var.get()
+        # Broker fee only applies when placing an order (JSV or Split), not instant sell (JBV)
+        effective_broker = 0.0 if sell_basis == 'JBV' else broker_pct
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -1840,13 +1856,16 @@ class AdminDashboard:
         best_name, best_margin = '—', -999
 
         for name, category, volume, best_buy, best_sell in rows:
-            buy_price  = self._price_for_basis(buy_basis,  best_buy, best_sell) * buy_pct
-            sell_price = self._price_for_basis(sell_basis, best_buy, best_sell)
-            ship_cost  = volume * ship_rate
-            collat     = buy_price * collat_pct
-            total_cost = buy_price + ship_cost + collat
-            profit     = sell_price - total_cost
-            margin     = (profit / sell_price * 100) if sell_price > 0 else 0
+            buy_price    = self._price_for_basis(buy_basis,  best_buy, best_sell) * buy_pct
+            gross_sell   = self._price_for_basis(sell_basis, best_buy, best_sell)
+            ship_cost    = volume * ship_rate
+            collat       = buy_price * collat_pct
+            sales_tax    = gross_sell * tax_pct
+            broker_fee   = gross_sell * effective_broker
+            net_sell     = gross_sell - sales_tax - broker_fee
+            total_cost   = buy_price + ship_cost + collat
+            profit       = net_sell - total_cost
+            margin       = (profit / net_sell * 100) if net_sell > 0 else 0
 
             if margin >= 5:
                 tag, verdict = 'great', '✓ Export'
@@ -1871,23 +1890,24 @@ class AdminDashboard:
             }.get(category, category.replace('_', ' ').title())
 
             self._export_all_rows.append({
-                'category': cat_display,
-                'item':     name,
-                'volume':   volume,
-                'buy_price':  buy_price,
-                'sell_price': sell_price,
-                'ship_collat': ship_cost + collat,
-                'profit':   profit,
-                'margin':   margin,
-                'verdict':  verdict,
-                'tag':      tag,
+                'category':    cat_display,
+                'item':        name,
+                'volume':      volume,
+                'buy_price':   buy_price,
+                'sell_price':  net_sell,
+                'ship_collat': ship_cost + collat + sales_tax + broker_fee,
+                'profit':      profit,
+                'margin':      margin,
+                'verdict':     verdict,
+                'tag':         tag,
             })
 
         # Update summary cards
         total = len(self._export_all_rows)
         worth = counts['great'] + counts['good']
+        broker_note = f"  (tax {tax_pct*100:.1f}%  broker {effective_broker*100:.1f}%)"
         self._export_summary_labels['scenario'].configure(
-            text=f"{buy_basis} → {sell_basis}", foreground='#66d9ff')
+            text=f"{buy_basis} → {sell_basis}{broker_note}", foreground='#66d9ff')
         self._export_summary_labels['total'].configure(
             text=str(total), foreground='#00ffff')
         self._export_summary_labels['worth'].configure(
