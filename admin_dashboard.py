@@ -125,7 +125,12 @@ class AdminDashboard:
         self.notebook.add(self.inventory_frame, text='  Inventory  ')
         self.build_inventory_tab()
 
-        # Tab 5: Quick Actions
+        # Tab 5: Export Analysis
+        self.export_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.export_frame, text='  Export Analysis  ')
+        self.build_export_tab()
+
+        # Tab 6: Quick Actions
         self.actions_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
@@ -721,6 +726,7 @@ class AdminDashboard:
         self.load_buyback_data()
         self.load_blueprint_settings()
         self.load_inventory()
+        self.load_export_data()
 
     def load_rates(self):
         """Load buyback rates from tracked_market_items."""
@@ -1607,6 +1613,343 @@ class AdminDashboard:
         except Exception as e:
             self.update_status("Error")
             messagebox.showerror("Error", f"Failed to start {label}:\n{str(e)}")
+
+    # ===== EXPORT ANALYSIS =====
+
+    def build_export_tab(self):
+        """Build the Export Analysis tab."""
+        outer = ttk.Frame(self.export_frame)
+        outer.pack(fill='both', expand=True, padx=15, pady=(15, 10))
+
+        ttk.Label(outer,
+                  text="Calculate profit on items exported from local station → sold at Jita, after shipping and collateral.",
+                  style='SubHeader.TLabel').pack(anchor='w', pady=(0, 10))
+
+        # ── Parameter panel ──────────────────────────────────────────────────
+        param_card = ttk.Frame(outer, style='Card.TFrame')
+        param_card.pack(fill='x', pady=(0, 10))
+        param_inner = ttk.Frame(param_card, style='Card.TFrame')
+        param_inner.pack(fill='x', padx=12, pady=10)
+
+        ttk.Label(param_inner, text="CALCULATION PARAMETERS",
+                  background='#0a2030', foreground='#00d9ff',
+                  font=('Segoe UI', 9, 'bold')).grid(
+                  row=0, column=0, columnspan=6, sticky='w', pady=(0, 8))
+
+        lbl_cfg = dict(background='#0a2030', foreground='#88d0e8', font=('Segoe UI', 10))
+
+        # Buy basis
+        tk.Label(param_inner, text="Buy Basis", **lbl_cfg).grid(row=1, column=0, sticky='w', padx=(0, 4))
+        self.export_buy_var = tk.StringVar(value='JBV')
+        buy_menu = ttk.Combobox(param_inner, textvariable=self.export_buy_var, width=18,
+                                values=['JBV', 'Jita Split', 'JSV'], state='readonly')
+        buy_menu.grid(row=2, column=0, sticky='w', padx=(0, 12))
+
+        # Buy %
+        tk.Label(param_inner, text="Buy % of Basis", **lbl_cfg).grid(row=1, column=1, sticky='w', padx=(0, 4))
+        self.export_buy_pct_var = tk.StringVar(value='100')
+        ttk.Entry(param_inner, textvariable=self.export_buy_pct_var, width=8).grid(
+            row=2, column=1, sticky='w', padx=(0, 12))
+
+        # Sell basis
+        tk.Label(param_inner, text="Sell Basis (at Jita)", **lbl_cfg).grid(row=1, column=2, sticky='w', padx=(0, 4))
+        self.export_sell_var = tk.StringVar(value='JSV')
+        sell_menu = ttk.Combobox(param_inner, textvariable=self.export_sell_var, width=18,
+                                 values=['JSV', 'Jita Split', 'JBV'], state='readonly')
+        sell_menu.grid(row=2, column=2, sticky='w', padx=(0, 12))
+
+        # Shipping rate
+        tk.Label(param_inner, text="Shipping (ISK/m³)", **lbl_cfg).grid(row=1, column=3, sticky='w', padx=(0, 4))
+        self.export_ship_var = tk.StringVar(value='125')
+        ttk.Entry(param_inner, textvariable=self.export_ship_var, width=10).grid(
+            row=2, column=3, sticky='w', padx=(0, 12))
+
+        # Collateral
+        tk.Label(param_inner, text="Collateral %", **lbl_cfg).grid(row=1, column=4, sticky='w', padx=(0, 4))
+        self.export_collat_var = tk.StringVar(value='1.0')
+        ttk.Entry(param_inner, textvariable=self.export_collat_var, width=8).grid(
+            row=2, column=4, sticky='w', padx=(0, 12))
+
+        # Recalculate button
+        ttk.Button(param_inner, text='⟳  Recalculate', style='Action.TButton',
+                   command=self.load_export_data).grid(row=2, column=5, sticky='w', padx=(4, 0))
+
+        # ── Quick-scenario pills ─────────────────────────────────────────────
+        scenario_frame = ttk.Frame(param_card, style='Card.TFrame')
+        scenario_frame.pack(fill='x', padx=12, pady=(0, 10))
+        tk.Label(scenario_frame, text="Quick:", **lbl_cfg).pack(side='left', padx=(0, 8))
+
+        scenarios = [
+            ('JBV → JSV  (best case)',   'JBV', '100', 'JSV'),
+            ('JBV → JBV  (safe/instant)', 'JBV', '100', 'JBV'),
+            ('Split → JSV  (conservative)', 'Jita Split', '100', 'JSV'),
+            ('Split → JBV  (worst case)', 'Jita Split', '100', 'JBV'),
+        ]
+        for label, buy, pct, sell in scenarios:
+            ttk.Button(scenario_frame, text=label, style='Action.TButton',
+                       command=lambda b=buy, p=pct, s=sell: self._apply_export_scenario(b, p, s)
+                       ).pack(side='left', padx=3)
+
+        # ── Summary cards ────────────────────────────────────────────────────
+        self.export_summary_frame = ttk.Frame(outer)
+        self.export_summary_frame.pack(fill='x', pady=(0, 8))
+        self._export_summary_labels = {}
+        for key, title in [('scenario', 'SCENARIO'), ('total', 'ITEMS ANALYSED'),
+                            ('worth', 'WORTH EXPORTING'), ('marginal', 'MARGINAL'),
+                            ('avoid', 'AVOID'), ('best', 'BEST OPPORTUNITY')]:
+            card = ttk.Frame(self.export_summary_frame, style='Card.TFrame')
+            card.pack(side='left', fill='both', expand=True, padx=3)
+            tk.Label(card, text=title, background='#0a2030', foreground='#66d9ff',
+                     font=('Segoe UI', 9)).pack(anchor='w', padx=8, pady=(6, 0))
+            val_lbl = tk.Label(card, text='—', background='#0a2030', foreground='#00ffff',
+                               font=('Segoe UI', 12, 'bold'))
+            val_lbl.pack(anchor='w', padx=8, pady=(0, 6))
+            self._export_summary_labels[key] = val_lbl
+
+        # ── Filter row ───────────────────────────────────────────────────────
+        filter_frame = ttk.Frame(outer)
+        filter_frame.pack(fill='x', pady=(0, 6))
+
+        ttk.Label(filter_frame, text="Search:").pack(side='left', padx=(0, 4))
+        self.export_search_var = tk.StringVar()
+        self.export_search_var.trace_add('write', lambda *_: self._filter_export_tree())
+        ttk.Entry(filter_frame, textvariable=self.export_search_var, width=18).pack(side='left', padx=(0, 12))
+
+        ttk.Label(filter_frame, text="Category:").pack(side='left', padx=(0, 4))
+        self.export_cat_var = tk.StringVar(value='All')
+        self.export_cat_menu = ttk.Combobox(filter_frame, textvariable=self.export_cat_var,
+                                            width=20, state='readonly',
+                                            values=['All', 'Minerals', 'Ice Products',
+                                                    'PI Materials', 'Moon Materials',
+                                                    'Salvaged Materials'])
+        self.export_cat_menu.pack(side='left', padx=(0, 12))
+        self.export_cat_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_export_tree())
+
+        ttk.Label(filter_frame, text="Show:").pack(side='left', padx=(0, 4))
+        self.export_show_var = tk.StringVar(value='Profitable')
+        show_menu = ttk.Combobox(filter_frame, textvariable=self.export_show_var,
+                                 width=16, state='readonly',
+                                 values=['All', 'Profitable', 'Marginal', 'Avoid'])
+        show_menu.pack(side='left', padx=(0, 4))
+        show_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_export_tree())
+
+        # ── Treeview ─────────────────────────────────────────────────────────
+        tree_frame = ttk.Frame(outer)
+        tree_frame.pack(fill='both', expand=True)
+
+        cols = ('category', 'item', 'volume', 'buy_price', 'sell_price',
+                'ship_collat', 'profit', 'margin', 'verdict')
+        self.export_tree = ttk.Treeview(tree_frame, columns=cols,
+                                        show='headings', selectmode='browse')
+
+        headings = {
+            'category':   ('Category',      120, 'w'),
+            'item':        ('Item',          200, 'w'),
+            'volume':      ('Vol (m³)',       75, 'e'),
+            'buy_price':   ('Buy Price',     110, 'e'),
+            'sell_price':  ('Sell Price',    110, 'e'),
+            'ship_collat': ('Ship+Collat',   105, 'e'),
+            'profit':      ('Profit/unit',   105, 'e'),
+            'margin':      ('Margin',         75, 'e'),
+            'verdict':     ('Verdict',        90, 'center'),
+        }
+        for col, (heading, width, anchor) in headings.items():
+            self.export_tree.heading(col, text=heading,
+                                     command=lambda c=col: self._sort_export_tree(c))
+            self.export_tree.column(col, width=width, anchor=anchor, stretch=(col == 'item'))
+
+        # Tag colours
+        self.export_tree.tag_configure('great',    foreground='#00ff88')
+        self.export_tree.tag_configure('good',     foreground='#88ff66')
+        self.export_tree.tag_configure('marginal', foreground='#ffcc44')
+        self.export_tree.tag_configure('avoid',    foreground='#ff6666')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical', command=self.export_tree.yview)
+        self.export_tree.configure(yscrollcommand=vsb.set)
+        self.export_tree.pack(side='left', fill='both', expand=True)
+        vsb.pack(side='right', fill='y')
+
+        # Footer
+        ttk.Label(outer,
+                  text="JBV = best buy order · JSV = best sell order · Split = midpoint  |  "
+                       "Margin = (Sell − Buy − Ship − Collat) ÷ Sell  |  "
+                       "Prices from market_price_snapshots (Jita)",
+                  foreground='#2a5070', background='#0d1117',
+                  font=('Segoe UI', 9)).pack(anchor='w', pady=(4, 0))
+
+        # Internal data store for filtering/sorting
+        self._export_all_rows = []
+        self._export_sort_col = 'margin'
+        self._export_sort_asc = False
+
+    def _apply_export_scenario(self, buy, pct, sell):
+        self.export_buy_var.set(buy)
+        self.export_buy_pct_var.set(pct)
+        self.export_sell_var.set(sell)
+        self.load_export_data()
+
+    def _price_for_basis(self, basis, best_buy, best_sell):
+        if basis == 'JBV':
+            return best_buy
+        elif basis == 'JSV':
+            return best_sell
+        else:  # Jita Split
+            return (best_buy + best_sell) / 2
+
+    def load_export_data(self):
+        """Query DB and populate the export treeview."""
+        try:
+            ship_rate = float(self.export_ship_var.get())
+            collat_pct = float(self.export_collat_var.get()) / 100.0
+            buy_pct    = float(self.export_buy_pct_var.get()) / 100.0
+        except ValueError:
+            messagebox.showerror("Invalid Input", "Shipping rate, collateral, and buy % must be numbers.")
+            return
+
+        buy_basis  = self.export_buy_var.get()
+        sell_basis = self.export_sell_var.get()
+
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT it.type_name,
+                   tmi.category,
+                   it.volume,
+                   mps.best_buy,
+                   mps.best_sell
+            FROM tracked_market_items tmi
+            JOIN inv_types it            ON tmi.type_id = it.type_id
+            JOIN market_price_snapshots mps ON tmi.type_id = mps.type_id
+            WHERE mps.timestamp = (
+                SELECT MAX(timestamp) FROM market_price_snapshots
+                WHERE type_id = tmi.type_id
+            )
+              AND mps.best_buy  > 0
+              AND mps.best_sell > 0
+            ORDER BY tmi.category, it.type_name
+        """)
+        rows = cursor.fetchall()
+
+        # Timestamp of newest snapshot
+        cursor.execute("SELECT MAX(timestamp) FROM market_price_snapshots")
+        snap_ts = cursor.fetchone()[0] or '—'
+        conn.close()
+
+        self._export_all_rows = []
+        counts = {'great': 0, 'good': 0, 'marginal': 0, 'avoid': 0}
+        best_name, best_margin = '—', -999
+
+        for name, category, volume, best_buy, best_sell in rows:
+            buy_price  = self._price_for_basis(buy_basis,  best_buy, best_sell) * buy_pct
+            sell_price = self._price_for_basis(sell_basis, best_buy, best_sell)
+            ship_cost  = volume * ship_rate
+            collat     = buy_price * collat_pct
+            total_cost = buy_price + ship_cost + collat
+            profit     = sell_price - total_cost
+            margin     = (profit / sell_price * 100) if sell_price > 0 else 0
+
+            if margin >= 5:
+                tag, verdict = 'great', '✓ Export'
+                counts['great'] += 1
+            elif margin >= 1:
+                tag, verdict = 'good', '✓ Export'
+                counts['good'] += 1
+            elif margin >= 0:
+                tag, verdict = 'marginal', '~ Marginal'
+                counts['marginal'] += 1
+            else:
+                tag, verdict = 'avoid', '✕ Avoid'
+                counts['avoid'] += 1
+
+            if margin > best_margin:
+                best_margin, best_name = margin, name
+
+            cat_display = {
+                'minerals': 'Minerals', 'ice_products': 'Ice Products',
+                'moon_materials': 'Moon Materials', 'pi_materials': 'PI Materials',
+                'salvaged_materials': 'Salvaged Materials',
+            }.get(category, category.replace('_', ' ').title())
+
+            self._export_all_rows.append({
+                'category': cat_display,
+                'item':     name,
+                'volume':   volume,
+                'buy_price':  buy_price,
+                'sell_price': sell_price,
+                'ship_collat': ship_cost + collat,
+                'profit':   profit,
+                'margin':   margin,
+                'verdict':  verdict,
+                'tag':      tag,
+            })
+
+        # Update summary cards
+        total = len(self._export_all_rows)
+        worth = counts['great'] + counts['good']
+        self._export_summary_labels['scenario'].configure(
+            text=f"{buy_basis} → {sell_basis}", foreground='#66d9ff')
+        self._export_summary_labels['total'].configure(
+            text=str(total), foreground='#00ffff')
+        self._export_summary_labels['worth'].configure(
+            text=str(worth), foreground='#00ff88')
+        self._export_summary_labels['marginal'].configure(
+            text=str(counts['marginal']), foreground='#ffcc44')
+        self._export_summary_labels['avoid'].configure(
+            text=str(counts['avoid']), foreground='#ff6666')
+        self._export_summary_labels['best'].configure(
+            text=f"{best_name}  {best_margin:.1f}%", foreground='#00ff88')
+
+        self._filter_export_tree()
+        self.update_status(f"Export analysis updated — {snap_ts[:16] if len(snap_ts) > 16 else snap_ts}")
+
+    def _filter_export_tree(self):
+        """Apply search/category/show filters and repopulate treeview."""
+        search = self.export_search_var.get().lower()
+        cat_filter = self.export_cat_var.get()
+        show = self.export_show_var.get()
+
+        filtered = []
+        for row in self._export_all_rows:
+            if search and search not in row['item'].lower():
+                continue
+            if cat_filter != 'All' and row['category'] != cat_filter:
+                continue
+            if show == 'Profitable' and row['tag'] not in ('great', 'good'):
+                continue
+            if show == 'Marginal' and row['tag'] != 'marginal':
+                continue
+            if show == 'Avoid' and row['tag'] != 'avoid':
+                continue
+            filtered.append(row)
+
+        # Sort
+        reverse = not self._export_sort_asc
+        col = self._export_sort_col
+        filtered.sort(key=lambda r: r[col] if isinstance(r[col], (int, float))
+                      else r[col].lower(), reverse=reverse)
+
+        self.export_tree.delete(*self.export_tree.get_children())
+        for row in filtered:
+            self.export_tree.insert('', 'end', tags=(row['tag'],), values=(
+                row['category'],
+                row['item'],
+                f"{row['volume']:.2f}",
+                f"{row['buy_price']:,.0f}",
+                f"{row['sell_price']:,.0f}",
+                f"{row['ship_collat']:,.0f}",
+                f"{row['profit']:,.0f}",
+                f"{row['margin']:.1f}%",
+                row['verdict'],
+            ))
+
+    def _sort_export_tree(self, col):
+        """Toggle sort on column click."""
+        if self._export_sort_col == col:
+            self._export_sort_asc = not self._export_sort_asc
+        else:
+            self._export_sort_col = col
+            self._export_sort_asc = col in ('category', 'item')
+        self._filter_export_tree()
 
     def update_status(self, text):
         """Update the status indicator."""
