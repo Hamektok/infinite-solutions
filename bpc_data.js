@@ -1863,6 +1863,16 @@ const BPC_DATA = [
     "subcategory": "Frigate"
   },
   {
+    "typeId": 17336,
+    "name": "Radar Sensor Cluster Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 113,
+    "quantity": 4,
+    "category": "Components",
+    "subcategory": "Ship Components"
+  },
+  {
     "typeId": 688,
     "name": "Raven Blueprint",
     "me": 10,
