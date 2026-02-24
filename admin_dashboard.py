@@ -2520,9 +2520,16 @@ class AdminDashboard:
         ttk.Entry(param_inner, textvariable=self.ore_refine_var, width=8).grid(
                   row=3, column=6, sticky='w', padx=(0, 10))
 
+        # Deviation window
+        tk.Label(param_inner, text="Dev Window (days)", **lbl_cfg).grid(row=2, column=7, sticky='w', padx=(0, 4))
+        self.ore_dev_days_var = tk.StringVar(value=self._get_config('ore_param_dev_days', '7'))
+        self.ore_dev_days_var.trace_add('write', lambda *_: self._set_config('ore_param_dev_days', self.ore_dev_days_var.get()))
+        ttk.Entry(param_inner, textvariable=self.ore_dev_days_var, width=6).grid(
+                  row=3, column=7, sticky='w', padx=(0, 10))
+
         # Recalculate
         ttk.Button(param_inner, text='\u27f3  Recalculate', style='Action.TButton',
-                   command=self.load_ore_import_data).grid(row=3, column=7, sticky='w', padx=(8, 0))
+                   command=self.load_ore_import_data).grid(row=3, column=8, sticky='w', padx=(8, 0))
 
         # Fetch button + status (right side)
         fetch_right = ttk.Frame(fetch_inner, style='Card.TFrame')
@@ -2622,7 +2629,7 @@ class AdminDashboard:
         ttk.Label(frow, text="Sort:").pack(side='left', padx=(0, 4))
         self.ore_sort_display_var = tk.StringVar(value='Margin %')
         ttk.Combobox(frow, textvariable=self.ore_sort_display_var, width=16,
-                     values=['Margin %', 'Profit ISK', 'Landed Cost', 'Product Value', 'ISK/m\u00b3'],
+                     values=['Margin %', 'Profit ISK', 'Landed Cost', 'Product Value', 'Deviation %'],
                      state='readonly').pack(side='left')
         self.ore_sort_display_var.trace_add('write', lambda *_: self._filter_ore_tree())
 
@@ -2630,20 +2637,18 @@ class AdminDashboard:
         tree_frame = ttk.Frame(outer)
         tree_frame.pack(fill='both', expand=True)
 
-        cols = ('name', 'batch', 'vol', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'isk_m3')
+        cols = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
         self.ore_tree = ttk.Treeview(tree_frame, columns=cols, show='headings', selectmode='browse')
 
         col_defs = [
-            ('name',      'Ore Name',             200, 'w'),
-            ('batch',     'Batch',                 55, 'e'),
-            ('vol',       'Vol/Batch m\u00b3',     90, 'e'),
+            ('name',      'Ore Name',             210, 'w'),
             ('jita_buy',  'Jita Buy (ISK)',        115, 'e'),
-            ('logistics', 'Ship+Collat (ISK)',     115, 'e'),
+            ('logistics', 'Ship+Collat (ISK)',     120, 'e'),
             ('landed',    'Landed (ISK)',          115, 'e'),
-            ('value',     'Product Value (ISK)',   120, 'e'),
+            ('value',     'Product Value (ISK)',   130, 'e'),
             ('profit',    'Profit (ISK)',          110, 'e'),
-            ('margin',    'Margin %',               80, 'e'),
-            ('isk_m3',    'ISK/m\u00b3',            85, 'e'),
+            ('margin',    'Margin %',               85, 'e'),
+            ('dev',       'vs N-Day Avg %',        105, 'e'),
         ]
         for cid, heading, width, anchor in col_defs:
             self.ore_tree.heading(cid, text=heading,
@@ -2658,6 +2663,8 @@ class AdminDashboard:
                                                   font=('Segoe UI', 8, 'italic'))
         self.ore_tree.tag_configure('row_a', background='#0a2030')
         self.ore_tree.tag_configure('row_b', background='#0d2535')
+        self.ore_tree.tag_configure('dev_high', foreground='#ff7744')   # above avg — pricier
+        self.ore_tree.tag_configure('dev_low',  foreground='#44ddaa')   # below avg — cheaper
 
         vsb = ttk.Scrollbar(tree_frame, orient='vertical',   command=self.ore_tree.yview)
         hsb = ttk.Scrollbar(tree_frame, orient='horizontal', command=self.ore_tree.xview)
@@ -2801,18 +2808,26 @@ class AdminDashboard:
         python_exe = r'C:\Users\lsant\AppData\Local\Python\pythoncore-3.14-64\python.exe'
         fetch_script = os.path.join(PROJECT_DIR, 'scripts', 'fetch_ore_prices.py')
 
+        fetch_error = [None]
+
         def _worker():
             try:
                 import subprocess
-                subprocess.run([python_exe, fetch_script], cwd=PROJECT_DIR,
-                               capture_output=True, timeout=120)
-            except Exception:
-                pass
+                result = subprocess.run([python_exe, fetch_script], cwd=PROJECT_DIR,
+                                        capture_output=True, timeout=120, text=True)
+                if result.returncode != 0:
+                    fetch_error[0] = (result.stderr or result.stdout or 'unknown error').strip()[-200:]
+            except Exception as e:
+                fetch_error[0] = str(e)
             self.root.after(0, _done)
 
         def _done():
             self.ore_fetch_btn.configure(state='normal', text='\u27f3  Fetch Live Jita Prices')
-            self.load_ore_import_data()
+            if fetch_error[0]:
+                self.ore_price_age_lbl.configure(
+                    text=f'\u26a0 Fetch failed: {fetch_error[0]}', foreground='#ff4444')
+            else:
+                self.load_ore_import_data()
 
         threading.Thread(target=_worker, daemon=True).start()
 
@@ -2824,6 +2839,7 @@ class AdminDashboard:
             ship_rate  = float(self.ore_ship_var.get())
             collat_pct = float(self.ore_collat_var.get()) / 100.0
             refine_eff = float(self.ore_refine_var.get()) / 100.0
+            dev_days   = int(float(self.ore_dev_days_var.get() or '7'))
         except ValueError:
             messagebox.showerror("Invalid Input", "All parameters must be numeric.")
             return
@@ -2886,8 +2902,19 @@ class AdminDashboard:
         cursor.execute("SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id IN (%s)" % placeholders, all_ids)
         snap_ts = cursor.fetchone()[0]
 
-        # Volume + portion size for all ore type IDs
+        # N-day average best_buy per ore type (for deviation column)
         ore_ph = ','.join('?' * len(all_ore_ids))
+        cursor.execute(f"""
+            SELECT type_id, AVG(best_buy)
+            FROM market_price_snapshots
+            WHERE type_id IN ({ore_ph})
+              AND best_buy IS NOT NULL
+              AND timestamp >= datetime('now', '-{dev_days} days')
+            GROUP BY type_id
+        """, all_ore_ids)
+        avg_prices = {r[0]: r[1] for r in cursor.fetchall()}
+
+        # Volume + portion size for all ore type IDs
         cursor.execute(f"SELECT type_id, type_name, volume, portion_size FROM inv_types WHERE type_id IN ({ore_ph})",
                        all_ore_ids)
         ore_meta = {r[0]: (r[1], r[2], r[3]) for r in cursor.fetchall()}
@@ -2964,8 +2991,11 @@ class AdminDashboard:
 
             profit  = prod_value - total_cost
             margin  = (profit / total_cost * 100) if total_cost > 0 else 0
-            vol_tot = volume * portion
-            isk_m3  = (profit / vol_tot) if vol_tot > 0 else 0
+
+            # Deviation vs N-day average buy price
+            current_bb = prices.get(type_id, (None, None))[0]
+            avg_bb     = avg_prices.get(type_id)
+            dev_pct    = ((current_bb - avg_bb) / avg_bb * 100) if (current_bb and avg_bb and avg_bb > 0) else None
 
             if type_id in std_ids:
                 ore_cat = 'standard'
@@ -2976,19 +3006,17 @@ class AdminDashboard:
             is_compressed = type_id in compressed_set
 
             self._ore_all_rows.append({
-                'type_id':  type_id,
-                'name':     name,
-                'batch':    portion,
-                'vol':      vol_tot,
-                'jita_buy': ore_cost,
-                'logistics':ship_cost + collat,
-                'landed':   total_cost,
-                'value':    prod_value,
-                'profit':   profit,
-                'margin':      margin,
-                'isk_m3':      isk_m3,
-                'ore_cat':     ore_cat,
-                'compressed':  is_compressed,
+                'type_id':    type_id,
+                'name':       name,
+                'jita_buy':   ore_cost,
+                'logistics':  ship_cost + collat,
+                'landed':     total_cost,
+                'value':      prod_value,
+                'profit':     profit,
+                'margin':     margin,
+                'dev':        dev_pct,
+                'ore_cat':    ore_cat,
+                'compressed': is_compressed,
             })
 
         self._filter_ore_tree()
@@ -2998,7 +3026,7 @@ class AdminDashboard:
         search   = self.ore_search_var.get().lower()
         show     = self.ore_show_var.get()
         sort_map = {'Margin %': 'margin', 'Profit ISK': 'profit',
-                    'Landed Cost': 'landed', 'Product Value': 'value', 'ISK/m\u00b3': 'isk_m3'}
+                    'Landed Cost': 'landed', 'Product Value': 'value', 'Deviation %': 'dev'}
         sort_key = sort_map.get(self.ore_sort_display_var.get(), 'margin')
         type_filter = self._ore_type_filter_val
 
@@ -3017,7 +3045,7 @@ class AdminDashboard:
         elif show == 'Loss Only':
             rows = [r for r in rows if r['profit'] <= 0]
 
-        rows = sorted(rows, key=lambda r: r[sort_key], reverse=True)
+        rows = sorted(rows, key=lambda r: (r[sort_key] is None, r[sort_key] or 0.0), reverse=True)
 
         self.ore_tree.delete(*self.ore_tree.get_children())
 
@@ -3058,7 +3086,7 @@ class AdminDashboard:
                              'ice':      '── Ice ──',
                              'moon':     '── Moon Ores ──'}.get(cat, cat)
                 self.ore_tree.insert('', 'end',
-                    values=(cat_label, '', '', '', '', '', '', '', '', ''),
+                    values=(cat_label, '', '', '', '', '', '', ''),
                     tags=('group_hdr',))
 
             m = r['margin']
@@ -3071,23 +3099,30 @@ class AdminDashboard:
 
             alt = 'row_a' if row_idx % 2 == 0 else 'row_b'
 
-            self.ore_tree.insert('', 'end', tags=(tag, alt), values=(
+            dev = r.get('dev')
+            if dev is not None:
+                dev_str = f"{dev:+.1f}%"
+                dev_tag = 'dev_high' if dev > 5 else ('dev_low' if dev < -5 else '')
+            else:
+                dev_str = '—'
+                dev_tag = ''
+
+            tags = tuple(t for t in (tag, alt, dev_tag) if t)
+            self.ore_tree.insert('', 'end', tags=tags, values=(
                 r['name'],
-                r['batch'],
-                f"{r['vol']:,.1f}",
                 f"{r['jita_buy']:,.0f}",
                 f"{r['logistics']:,.0f}",
                 f"{r['landed']:,.0f}",
                 f"{r['value']:,.0f}",
                 f"{r['profit']:+,.0f}",
                 f"{r['margin']:+.1f}%",
-                f"{r['isk_m3']:+,.0f}",
+                dev_str,
             ))
             row_idx += 1
 
     def _sort_ore_tree(self, col):
         sort_map = {'margin': 'Margin %', 'profit': 'Profit ISK', 'landed': 'Landed Cost',
-                    'value': 'Product Value', 'isk_m3': 'ISK/m\u00b3'}
+                    'value': 'Product Value', 'dev': 'Deviation %'}
         if col in sort_map:
             self.ore_sort_display_var.set(sort_map[col])
         self._filter_ore_tree()
