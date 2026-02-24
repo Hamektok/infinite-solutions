@@ -2019,10 +2019,10 @@ class AdminDashboard:
                  row=0, column=0, columnspan=3, sticky='w', padx=(0, 20), pady=(0, 6))
         tk.Label(param_inner, text="LOGISTICS",
                  foreground='#ffcc44', **hdr_cfg).grid(
-                 row=0, column=3, columnspan=2, sticky='w', padx=(16, 20), pady=(0, 6))
+                 row=0, column=3, columnspan=3, sticky='w', padx=(16, 20), pady=(0, 6))
         tk.Label(param_inner, text="SELL SIDE  (contract, no tax/broker)",
                  foreground='#00ff88', **hdr_cfg).grid(
-                 row=0, column=5, columnspan=4, sticky='w', padx=(16, 0), pady=(0, 6))
+                 row=0, column=6, columnspan=3, sticky='w', padx=(16, 0), pady=(0, 6))
 
         tk.Frame(param_inner, background='#1a3040', height=1).grid(
             row=1, column=0, columnspan=9, sticky='ew', pady=(0, 8))
@@ -2054,17 +2054,17 @@ class AdminDashboard:
             row=2, column=4, sticky='w', padx=(0, 4))
         self.import_ship_var = tk.StringVar(value='125')
         ttk.Entry(param_inner, textvariable=self.import_ship_var, width=10).grid(
-            row=3, column=4, sticky='w', padx=(0, 20))
+            row=3, column=4, sticky='w', padx=(0, 12))
+
+        tk.Label(param_inner, text="Collateral %", **lbl_cfg).grid(
+            row=2, column=5, sticky='w', padx=(0, 4))
+        self.import_collat_var = tk.StringVar(value='1.0')
+        ttk.Entry(param_inner, textvariable=self.import_collat_var, width=8).grid(
+            row=3, column=5, sticky='w', padx=(0, 20))
 
         # Sell side
         tk.Frame(param_inner, background='#1a3040', width=1).grid(
-            row=2, column=5, rowspan=2, sticky='ns', padx=(0, 12))
-        tk.Label(param_inner, text="Collateral %", **lbl_cfg).grid(
-            row=2, column=6, sticky='w', padx=(0, 4))
-        self.import_collat_var = tk.StringVar(value='1.0')
-        ttk.Entry(param_inner, textvariable=self.import_collat_var, width=8).grid(
-            row=3, column=6, sticky='w', padx=(0, 12))
-
+            row=2, column=6, rowspan=2, sticky='ns', padx=(0, 12))
         tk.Label(param_inner, text="Price Reference", **lbl_cfg).grid(
             row=2, column=7, sticky='w', padx=(0, 4))
         self.import_sell_ref_var = tk.StringVar(value='JSV')
