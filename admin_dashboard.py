@@ -2513,9 +2513,16 @@ class AdminDashboard:
         ttk.Entry(param_inner, textvariable=self.ore_collat_var, width=8).grid(
                   row=3, column=5, sticky='w', padx=(0, 10))
 
+        # Refining Efficiency
+        tk.Label(param_inner, text="Refine Eff %", **lbl_cfg).grid(row=2, column=6, sticky='w', padx=(0, 4))
+        self.ore_refine_var = tk.StringVar(value=self._get_config('ore_param_refine_eff', '87.5'))
+        self.ore_refine_var.trace_add('write', lambda *_: self._set_config('ore_param_refine_eff', self.ore_refine_var.get()))
+        ttk.Entry(param_inner, textvariable=self.ore_refine_var, width=8).grid(
+                  row=3, column=6, sticky='w', padx=(0, 10))
+
         # Recalculate
         ttk.Button(param_inner, text='\u27f3  Recalculate', style='Action.TButton',
-                   command=self.load_ore_import_data).grid(row=3, column=6, sticky='w', padx=(8, 0))
+                   command=self.load_ore_import_data).grid(row=3, column=7, sticky='w', padx=(8, 0))
 
         # Fetch button + status (right side)
         fetch_right = ttk.Frame(fetch_inner, style='Card.TFrame')
@@ -2816,6 +2823,7 @@ class AdminDashboard:
             broker_pct = float(self.ore_broker_var.get()) / 100.0
             ship_rate  = float(self.ore_ship_var.get())
             collat_pct = float(self.ore_collat_var.get()) / 100.0
+            refine_eff = float(self.ore_refine_var.get()) / 100.0
         except ValueError:
             messagebox.showerror("Invalid Input", "All parameters must be numeric.")
             return
@@ -2949,7 +2957,7 @@ class AdminDashboard:
                     pct = 1.0
                 mat_bb = prices.get(mat_id, (None, None))[0]  # JBV for sell side
                 if mat_bb and mat_bb > 0:
-                    prod_value += qty * mat_bb * pct
+                    prod_value += qty * refine_eff * mat_bb * pct
 
             if prod_value <= 0:
                 continue
