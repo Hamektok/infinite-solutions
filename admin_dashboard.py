@@ -2531,14 +2531,22 @@ class AdminDashboard:
         ttk.Button(param_inner, text='\u27f3  Recalculate', style='Action.TButton',
                    command=self.load_ore_import_data).grid(row=3, column=8, sticky='w', padx=(8, 0))
 
-        # Fetch button + status (right side)
+        # Fetch buttons + status (right side)
         fetch_right = ttk.Frame(fetch_inner, style='Card.TFrame')
         fetch_right.pack(side='right', anchor='ne', padx=(20, 0))
 
-        self.ore_fetch_btn = ttk.Button(fetch_right, text='\u27f3  Fetch Live Jita Prices',
-                                         style='Action.TButton',
-                                         command=self._run_ore_fetch)
-        self.ore_fetch_btn.pack(anchor='e')
+        btn_row = ttk.Frame(fetch_right, style='Card.TFrame')
+        btn_row.pack(anchor='e')
+        tk.Label(btn_row, text='Fetch:', background='#0a2030',
+                 foreground='#88d0e8', font=('Segoe UI', 9)).pack(side='left', padx=(0, 6))
+        self._ore_fetch_btns = {}
+        for label, cat in [('All', 'all'), ('Standard', 'standard'),
+                            ('Ice', 'ice'), ('Moon', 'moon')]:
+            btn = ttk.Button(btn_row, text=f'\u27f3 {label}',
+                             style='Action.TButton',
+                             command=lambda c=cat: self._run_ore_fetch(c))
+            btn.pack(side='left', padx=(0, 4))
+            self._ore_fetch_btns[cat] = btn
 
         self.ore_price_age_lbl = tk.Label(fetch_right,
             text='\u26a0 Not loaded \u2014 click Fetch to begin',
@@ -2798,11 +2806,15 @@ class AdminDashboard:
         self._ore_comp_lbl.configure(text=labels[val])
         self._filter_ore_tree()
 
-    def _run_ore_fetch(self):
-        """Run fetch_ore_prices.py in a background thread."""
+    def _run_ore_fetch(self, category='all'):
+        """Run fetch_ore_prices.py for the given category in a background thread."""
         import threading
-        self.ore_fetch_btn.configure(state='disabled', text='Fetching...')
-        self.ore_price_age_lbl.configure(text='Fetching Jita 4-4 prices...', foreground='#ffcc44')
+        label_map = {'all': 'All', 'standard': 'Standard', 'ice': 'Ice', 'moon': 'Moon'}
+        for cat, btn in self._ore_fetch_btns.items():
+            btn.configure(state='disabled')
+        self.ore_price_age_lbl.configure(
+            text=f'Fetching {label_map[category]} prices from Jita 4-4...',
+            foreground='#ffcc44')
         self.root.update()
 
         python_exe = r'C:\Users\lsant\AppData\Local\Python\pythoncore-3.14-64\python.exe'
@@ -2813,7 +2825,8 @@ class AdminDashboard:
         def _worker():
             try:
                 import subprocess
-                result = subprocess.run([python_exe, fetch_script], cwd=PROJECT_DIR,
+                result = subprocess.run([python_exe, fetch_script, category],
+                                        cwd=PROJECT_DIR,
                                         capture_output=True, timeout=300, text=True)
                 if result.returncode != 0:
                     fetch_error[0] = (result.stderr or result.stdout or 'unknown error').strip()[-200:]
@@ -2822,7 +2835,8 @@ class AdminDashboard:
             self.root.after(0, _done)
 
         def _done():
-            self.ore_fetch_btn.configure(state='normal', text='\u27f3  Fetch Live Jita Prices')
+            for btn in self._ore_fetch_btns.values():
+                btn.configure(state='normal')
             if fetch_error[0]:
                 self.ore_price_age_lbl.configure(
                     text=f'\u26a0 Fetch failed: {fetch_error[0]}', foreground='#ff4444')

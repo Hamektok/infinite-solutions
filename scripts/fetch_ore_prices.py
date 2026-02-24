@@ -289,21 +289,31 @@ def fetch_jita_price(type_id):
 
 # ── Main ───────────────────────────────────────────────────────────────────
 
+CATEGORY_IDS = {
+    'standard': STD_ORE_IDS + COMPRESSED_STD_ORE_IDS + MINERAL_IDS,
+    'ice':      ICE_IDS + COMPRESSED_ICE_IDS + ICE_PRODUCT_IDS,
+    'moon':     MOON_ORE_IDS + COMPRESSED_MOON_ORE_IDS + MOON_MATERIAL_IDS,
+    'all':      list(ALL_TYPE_IDS),
+}
+
+
 def main():
-    total   = len(ALL_TYPE_IDS)
+    category = sys.argv[1].lower() if len(sys.argv) > 1 else 'all'
+    if category not in CATEGORY_IDS:
+        print(f'Unknown category "{category}". Use: standard | ice | moon | all')
+        sys.exit(1)
+
+    type_ids = CATEGORY_IDS[category]
+    total   = len(type_ids)
     ts      = datetime.now(timezone.utc).isoformat()
     results = []
     errors  = []
 
-    print(f'Fetching Jita 4-4 prices for {total} type IDs '
-          f'({MAX_WORKERS} parallel workers)...')
-    print(f'  Uncompressed: {len(STD_ORE_IDS)} std + {len(ICE_IDS)} ice + {len(MOON_ORE_IDS)} moon')
-    print(f'  Compressed:   {len(COMPRESSED_STD_ORE_IDS)} std + {len(COMPRESSED_ICE_IDS)} ice + {len(COMPRESSED_MOON_ORE_IDS)} moon')
-    print(f'  Products: {len(MINERAL_IDS)} minerals + '
-          f'{len(ICE_PRODUCT_IDS)} ice + {len(MOON_MATERIAL_IDS)} moon mats')
+    print(f'Fetching Jita 4-4 prices — category: {category} ({total} type IDs, '
+          f'{MAX_WORKERS} workers)...')
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as exe:
-        futures = {exe.submit(fetch_jita_price, tid): tid for tid in ALL_TYPE_IDS}
+        futures = {exe.submit(fetch_jita_price, tid): tid for tid in type_ids}
         done = 0
         for future in as_completed(futures):
             tid, bb, bs, bv, sv = future.result()
