@@ -719,6 +719,34 @@ class AdminDashboard:
                                              style='SubHeader.TLabel')
         self.last_updated_label.pack(anchor='w', pady=(30, 0))
 
+    # ===== CONFIG HELPERS =====
+
+    def _get_config(self, key, default=''):
+        """Read a single value from site_config, returning default if missing."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            cursor.execute("SELECT value FROM site_config WHERE key = ?", (key,))
+            row = cursor.fetchone()
+            conn.close()
+            return row[0] if row else default
+        except Exception:
+            return default
+
+    def _set_config(self, key, value):
+        """Persist a single key/value to site_config, silently ignoring errors."""
+        try:
+            conn = sqlite3.connect(DB_PATH, timeout=5)
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT OR REPLACE INTO site_config (key, value) VALUES (?, ?)",
+                (key, str(value))
+            )
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
     # ===== DATA LOADING =====
 
     def load_data(self):
@@ -1646,45 +1674,52 @@ class AdminDashboard:
 
         # Buy basis
         tk.Label(param_inner, text="Buy Basis", **lbl_cfg).grid(row=1, column=0, sticky='w', padx=(0, 4))
-        self.export_buy_var = tk.StringVar(value='JBV')
+        self.export_buy_var = tk.StringVar(value=self._get_config('export_param_buy_basis', 'JBV'))
+        self.export_buy_var.trace_add('write', lambda *_: self._set_config('export_param_buy_basis', self.export_buy_var.get()))
         buy_menu = ttk.Combobox(param_inner, textvariable=self.export_buy_var, width=18,
                                 values=['JBV', 'Jita Split', 'JSV'], state='readonly')
         buy_menu.grid(row=2, column=0, sticky='w', padx=(0, 12))
 
         # Buy %
         tk.Label(param_inner, text="Buy % of Basis", **lbl_cfg).grid(row=1, column=1, sticky='w', padx=(0, 4))
-        self.export_buy_pct_var = tk.StringVar(value='100')
+        self.export_buy_pct_var = tk.StringVar(value=self._get_config('export_param_buy_pct', '100'))
+        self.export_buy_pct_var.trace_add('write', lambda *_: self._set_config('export_param_buy_pct', self.export_buy_pct_var.get()))
         ttk.Entry(param_inner, textvariable=self.export_buy_pct_var, width=8).grid(
             row=2, column=1, sticky='w', padx=(0, 12))
 
         # Sell basis
         tk.Label(param_inner, text="Sell Basis (at Jita)", **lbl_cfg).grid(row=1, column=2, sticky='w', padx=(0, 4))
-        self.export_sell_var = tk.StringVar(value='JSV')
+        self.export_sell_var = tk.StringVar(value=self._get_config('export_param_sell_basis', 'JSV'))
+        self.export_sell_var.trace_add('write', lambda *_: self._set_config('export_param_sell_basis', self.export_sell_var.get()))
         sell_menu = ttk.Combobox(param_inner, textvariable=self.export_sell_var, width=18,
                                  values=['JSV', 'Jita Split', 'JBV'], state='readonly')
         sell_menu.grid(row=2, column=2, sticky='w', padx=(0, 12))
 
         # Shipping rate
         tk.Label(param_inner, text="Shipping (ISK/m³)", **lbl_cfg).grid(row=1, column=3, sticky='w', padx=(0, 4))
-        self.export_ship_var = tk.StringVar(value='125')
+        self.export_ship_var = tk.StringVar(value=self._get_config('export_param_ship_rate', '125'))
+        self.export_ship_var.trace_add('write', lambda *_: self._set_config('export_param_ship_rate', self.export_ship_var.get()))
         ttk.Entry(param_inner, textvariable=self.export_ship_var, width=10).grid(
             row=2, column=3, sticky='w', padx=(0, 12))
 
         # Collateral
         tk.Label(param_inner, text="Collateral %", **lbl_cfg).grid(row=1, column=4, sticky='w', padx=(0, 4))
-        self.export_collat_var = tk.StringVar(value='1.0')
+        self.export_collat_var = tk.StringVar(value=self._get_config('export_param_collat_pct', '1.0'))
+        self.export_collat_var.trace_add('write', lambda *_: self._set_config('export_param_collat_pct', self.export_collat_var.get()))
         ttk.Entry(param_inner, textvariable=self.export_collat_var, width=8).grid(
             row=2, column=4, sticky='w', padx=(0, 12))
 
         # Sales tax
         tk.Label(param_inner, text="Sales Tax %", **lbl_cfg).grid(row=1, column=5, sticky='w', padx=(0, 4))
-        self.export_tax_var = tk.StringVar(value='3.6')
+        self.export_tax_var = tk.StringVar(value=self._get_config('export_param_tax_pct', '3.6'))
+        self.export_tax_var.trace_add('write', lambda *_: self._set_config('export_param_tax_pct', self.export_tax_var.get()))
         ttk.Entry(param_inner, textvariable=self.export_tax_var, width=8).grid(
             row=2, column=5, sticky='w', padx=(0, 12))
 
         # Broker fee
         tk.Label(param_inner, text="Broker Fee %", **lbl_cfg).grid(row=1, column=6, sticky='w', padx=(0, 4))
-        self.export_broker_var = tk.StringVar(value='3.0')
+        self.export_broker_var = tk.StringVar(value=self._get_config('export_param_broker_pct', '3.0'))
+        self.export_broker_var.trace_add('write', lambda *_: self._set_config('export_param_broker_pct', self.export_broker_var.get()))
         ttk.Entry(param_inner, textvariable=self.export_broker_var, width=8).grid(
             row=2, column=6, sticky='w', padx=(0, 12))
 
@@ -2030,20 +2065,23 @@ class AdminDashboard:
         # Buy side
         tk.Label(param_inner, text="Buy From", **lbl_cfg).grid(
             row=2, column=0, sticky='w', padx=(0, 4))
-        self.import_buy_var = tk.StringVar(value='JSV  (instant, from sell orders)')
+        self.import_buy_var = tk.StringVar(value=self._get_config('import_param_buy_basis', 'JSV  (instant, from sell orders)'))
+        self.import_buy_var.trace_add('write', lambda *_: self._set_config('import_param_buy_basis', self.import_buy_var.get()))
         ttk.Combobox(param_inner, textvariable=self.import_buy_var, width=22,
                      values=['JSV  (instant, from sell orders)', 'JBV  (place buy order)'],
                      state='readonly').grid(row=3, column=0, sticky='w', padx=(0, 12))
 
         tk.Label(param_inner, text="Buy % of Basis", **lbl_cfg).grid(
             row=2, column=1, sticky='w', padx=(0, 4))
-        self.import_buy_pct_var = tk.StringVar(value='100')
+        self.import_buy_pct_var = tk.StringVar(value=self._get_config('import_param_buy_pct', '100'))
+        self.import_buy_pct_var.trace_add('write', lambda *_: self._set_config('import_param_buy_pct', self.import_buy_pct_var.get()))
         ttk.Entry(param_inner, textvariable=self.import_buy_pct_var, width=8).grid(
             row=3, column=1, sticky='w', padx=(0, 12))
 
         tk.Label(param_inner, text="Broker Fee %", **lbl_cfg).grid(
             row=2, column=2, sticky='w', padx=(0, 4))
-        self.import_broker_var = tk.StringVar(value='0.0')
+        self.import_broker_var = tk.StringVar(value=self._get_config('import_param_broker_pct', '0.0'))
+        self.import_broker_var.trace_add('write', lambda *_: self._set_config('import_param_broker_pct', self.import_broker_var.get()))
         ttk.Entry(param_inner, textvariable=self.import_broker_var, width=8).grid(
             row=3, column=2, sticky='w', padx=(0, 20))
 
@@ -2052,13 +2090,15 @@ class AdminDashboard:
             row=2, column=3, rowspan=2, sticky='ns', padx=(0, 12))
         tk.Label(param_inner, text="Shipping (ISK/m\u00b3)", **lbl_cfg).grid(
             row=2, column=4, sticky='w', padx=(0, 4))
-        self.import_ship_var = tk.StringVar(value='125')
+        self.import_ship_var = tk.StringVar(value=self._get_config('import_param_ship_rate', '125'))
+        self.import_ship_var.trace_add('write', lambda *_: self._set_config('import_param_ship_rate', self.import_ship_var.get()))
         ttk.Entry(param_inner, textvariable=self.import_ship_var, width=10).grid(
             row=3, column=4, sticky='w', padx=(0, 12))
 
         tk.Label(param_inner, text="Collateral %", **lbl_cfg).grid(
             row=2, column=5, sticky='w', padx=(0, 4))
-        self.import_collat_var = tk.StringVar(value='1.0')
+        self.import_collat_var = tk.StringVar(value=self._get_config('import_param_collat_pct', '1.0'))
+        self.import_collat_var.trace_add('write', lambda *_: self._set_config('import_param_collat_pct', self.import_collat_var.get()))
         ttk.Entry(param_inner, textvariable=self.import_collat_var, width=8).grid(
             row=3, column=5, sticky='w', padx=(0, 20))
 
@@ -2067,14 +2107,16 @@ class AdminDashboard:
             row=2, column=6, rowspan=2, sticky='ns', padx=(0, 12))
         tk.Label(param_inner, text="Price Reference", **lbl_cfg).grid(
             row=2, column=7, sticky='w', padx=(0, 4))
-        self.import_sell_ref_var = tk.StringVar(value='JSV')
+        self.import_sell_ref_var = tk.StringVar(value=self._get_config('import_param_sell_ref', 'JSV'))
+        self.import_sell_ref_var.trace_add('write', lambda *_: self._set_config('import_param_sell_ref', self.import_sell_ref_var.get()))
         ttk.Combobox(param_inner, textvariable=self.import_sell_ref_var,
                      width=14, values=['JSV', 'Jita Split', 'JBV'],
                      state='readonly').grid(row=3, column=7, sticky='w', padx=(0, 12))
 
         tk.Label(param_inner, text="Sell Markup %", **lbl_cfg).grid(
             row=2, column=8, sticky='w', padx=(0, 4))
-        self.import_markup_var = tk.StringVar(value='115')
+        self.import_markup_var = tk.StringVar(value=self._get_config('import_param_markup_pct', '115'))
+        self.import_markup_var.trace_add('write', lambda *_: self._set_config('import_param_markup_pct', self.import_markup_var.get()))
         ttk.Entry(param_inner, textvariable=self.import_markup_var, width=8).grid(
             row=3, column=8, sticky='w', padx=(0, 12))
 
