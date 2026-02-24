@@ -308,12 +308,16 @@ def main():
         for future in as_completed(futures):
             tid, bb, bs, bv, sv = future.result()
             done += 1
+            # Always insert a row, even with NULL prices.  This stamps the current
+            # fetch timestamp on every type_id so that stale prices from previous
+            # runs are never served up for items that have no orders right now.
             if bb is not None or bs is not None:
                 spread = ((bs - bb) / bb * 100) if (bb and bs and bb > 0) else None
-                results.append((ts, tid, bb, bs, spread, bv or 0, sv or 0))
             else:
+                spread = None
                 errors.append(tid)
-            print(f'\r  {done}/{total} fetched — {len(results)} priced, '
+            results.append((ts, tid, bb, bs, spread, bv or 0, sv or 0))
+            print(f'\r  {done}/{total} fetched — {done - len(errors)} priced, '
                   f'{len(errors)} no orders', end='', flush=True)
 
     print(f'\n\nInserting {len(results)} records into market_price_snapshots...')
