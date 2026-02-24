@@ -2756,7 +2756,7 @@ class AdminDashboard:
         self.root.update()
 
         python_exe = r'C:\Users\lsant\AppData\Local\Python\pythoncore-3.14-64\python.exe'
-        fetch_script = os.path.join(SCRIPT_DIR, 'scripts', 'fetch_ore_prices.py')
+        fetch_script = os.path.join(PROJECT_DIR, 'scripts', 'fetch_ore_prices.py')
 
         def _worker():
             try:
