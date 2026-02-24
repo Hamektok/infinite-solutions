@@ -2568,6 +2568,19 @@ class AdminDashboard:
             background='#0a1520', foreground='#00ff88', font=('Segoe UI', 9))
         self._ore_type_lbl.pack(side='left', padx=(12, 0))
 
+        # Compression toggle (right side of same row)
+        tk.Frame(type_row, background='#1a3040', width=1).pack(side='left', fill='y', padx=(16, 8))
+        tk.Label(type_row, text="Form:", background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 10)).pack(side='left', padx=(0, 6))
+        self._ore_comp_filter = tk.StringVar(value='compressed')
+        for label, val in [('Compressed', 'compressed'), ('Uncompressed', 'uncompressed'), ('Both', 'both')]:
+            ttk.Button(type_row, text=label,
+                       command=lambda v=val: self._set_ore_comp_filter(v)
+                       ).pack(side='left', padx=3)
+        self._ore_comp_lbl = tk.Label(type_row, text='',
+            background='#0a1520', foreground='#66d9ff', font=('Segoe UI', 9))
+        self._ore_comp_lbl.pack(side='left', padx=(8, 0))
+
         # ── Summary cards ────────────────────────────────────────────────
         self.ore_summary_frame = ttk.Frame(outer)
         self.ore_summary_frame.pack(fill='x', pady=(0, 6))
@@ -2764,6 +2777,13 @@ class AdminDashboard:
         self._ore_type_lbl.configure(text=f'Showing: {labels[val]}')
         self._filter_ore_tree()
 
+    def _set_ore_comp_filter(self, val):
+        """Switch compressed/uncompressed/both filter and refresh tree."""
+        self._ore_comp_filter.set(val)
+        labels = {'compressed': 'Compressed only', 'uncompressed': 'Uncompressed only', 'both': 'Both forms'}
+        self._ore_comp_lbl.configure(text=labels[val])
+        self._filter_ore_tree()
+
     def _run_ore_fetch(self):
         """Run fetch_ore_prices.py in a background thread."""
         import threading
@@ -2808,23 +2828,35 @@ class AdminDashboard:
         cursor = conn.cursor()
 
         # Collect all type IDs we need prices for
-        all_ore_ids = (
-            # Standard
-            [1230,17470,17471,46689, 1228,17463,17464,46687, 1224,17459,17460,46686,
-             18,17455,17456,46685, 1227,17867,17868,46684, 20,17452,17453,46683,
-             21,17440,17441,46680, 1231,17444,17445,46681, 1226,17448,17449,46682,
-             1229,17865,17866,46679, 1232,17436,17437,46675, 1225,17432,17433,46677,
-             19,17466,17467,46688, 1223,17428,17429,46676, 22,17425,17426,46678,
-             11396,17869,17870] +
-            # Ice
-            [16262,16263,16264,16265,16266,16267,16268,16269,17975,17976,17977,17978] +
-            # Moon ores
-            [45490,45491,45492,45493, 46280,46282,46284,46286, 46281,46283,46285,46287,
-             45494,45495,45496,45497, 46288,46290,46292,46294, 46289,46291,46293,46295,
-             45498,45499,45500,45501, 46296,46298,46300,46302, 46297,46299,46301,46303,
-             45502,45503,45504,45506, 46304,46306,46308,46310, 46305,46307,46309,46311,
-             45510,45511,45512,45513, 46312,46314,46316,46318, 46313,46315,46317,46319]
-        )
+        _std_raw = [1230,17470,17471,46689, 1228,17463,17464,46687, 1224,17459,17460,46686,
+                    18,17455,17456,46685, 1227,17867,17868,46684, 20,17452,17453,46683,
+                    21,17440,17441,46680, 1231,17444,17445,46681, 1226,17448,17449,46682,
+                    1229,17865,17866,46679, 1232,17436,17437,46675, 1225,17432,17433,46677,
+                    19,17466,17467,46688, 1223,17428,17429,46676, 22,17425,17426,46678,
+                    11396,17869,17870]
+        _std_comp = [62516,62517,62518,62519, 62520,62521,62522,62523,
+                     62524,62525,62526,62527, 62528,62529,62530,62531,
+                     62532,62533,62534,62535, 62536,62537,62538,62539,
+                     62540,62541,62542,62543, 62544,62545,62546,62547,
+                     62548,62549,62550,62551, 62552,62553,62554,62555,
+                     62556,62557,62558,62559, 62560,62561,62562,62563,
+                     62564,62565,62566,62567, 62568,62569,62570,62571,
+                     62572,62573,62574,62575, 62586,62587,62588]
+        _ice_raw  = [16262,16263,16264,16265,16266,16267,16268,16269,17975,17976,17977,17978]
+        _ice_comp = [28433,28443,28434,28436,28435,28437,28438,28442,28439,28440,28444,28441]
+        _moon_raw = [45490,45491,45492,45493, 46280,46282,46284,46286, 46281,46283,46285,46287,
+                     45494,45495,45496,45497, 46288,46290,46292,46294, 46289,46291,46293,46295,
+                     45498,45499,45500,45501, 46296,46298,46300,46302, 46297,46299,46301,46303,
+                     45502,45503,45504,45506, 46304,46306,46308,46310, 46305,46307,46309,46311,
+                     45510,45511,45512,45513, 46312,46314,46316,46318, 46313,46315,46317,46319]
+        _moon_comp = [62454,62457,62455,62458,62461,62464, 62456,62459,62466,62467,62460,62463,
+                      62474,62471,62468,62477, 62475,62472,62469,62478, 62476,62473,62470,62479,
+                      62480,62483,62486,62489, 62481,62484,62487,62490, 62482,62485,62488,62491,
+                      62492,62501,62498,62495, 62493,62502,62499,62496, 62494,62503,62500,62497,
+                      62504,62510,62507,62513, 62505,62511,62508,62514, 62506,62512,62509,62515]
+
+        compressed_set   = set(_std_comp + _ice_comp + _moon_comp)
+        all_ore_ids = _std_raw + _std_comp + _ice_raw + _ice_comp + _moon_raw + _moon_comp
         all_product_ids = [t for t in self.ore_product_pct]
 
         all_ids = list(set(all_ore_ids + all_product_ids))
@@ -2870,15 +2902,10 @@ class AdminDashboard:
                 text='\u26a0 No price data \u2014 click Fetch first',
                 foreground='#ffaa44')
 
-        # Ore category classification
-        std_ids  = set([1230,17470,17471,46689, 1228,17463,17464,46687, 1224,17459,17460,46686,
-                        18,17455,17456,46685, 1227,17867,17868,46684, 20,17452,17453,46683,
-                        21,17440,17441,46680, 1231,17444,17445,46681, 1226,17448,17449,46682,
-                        1229,17865,17866,46679, 1232,17436,17437,46675, 1225,17432,17433,46677,
-                        19,17466,17467,46688, 1223,17428,17429,46676, 22,17425,17426,46678,
-                        11396,17869,17870])
-        ice_ids  = set([16262,16263,16264,16265,16266,16267,16268,16269,17975,17976,17977,17978])
-        moon_ids = set(all_ore_ids) - std_ids - ice_ids
+        # Ore category classification (uses the pre-built sets from above)
+        std_ids  = set(_std_raw  + _std_comp)
+        ice_ids  = set(_ice_raw  + _ice_comp)
+        moon_ids = set(_moon_raw + _moon_comp)
 
         def _ore_buy_price(type_id):
             bb, bs = prices.get(type_id, (None, None))
@@ -2938,6 +2965,7 @@ class AdminDashboard:
                 ore_cat = 'ice'
             else:
                 ore_cat = 'moon'
+            is_compressed = type_id in compressed_set
 
             self._ore_all_rows.append({
                 'type_id':  type_id,
@@ -2949,9 +2977,10 @@ class AdminDashboard:
                 'landed':   total_cost,
                 'value':    prod_value,
                 'profit':   profit,
-                'margin':   margin,
-                'isk_m3':   isk_m3,
-                'ore_cat':  ore_cat,
+                'margin':      margin,
+                'isk_m3':      isk_m3,
+                'ore_cat':     ore_cat,
+                'compressed':  is_compressed,
             })
 
         self._filter_ore_tree()
@@ -2968,6 +2997,11 @@ class AdminDashboard:
         rows = self._ore_all_rows
         if type_filter != 'all':
             rows = [r for r in rows if r['ore_cat'] == type_filter]
+        comp_filter = self._ore_comp_filter.get()
+        if comp_filter == 'compressed':
+            rows = [r for r in rows if r['compressed']]
+        elif comp_filter == 'uncompressed':
+            rows = [r for r in rows if not r['compressed']]
         if search:
             rows = [r for r in rows if search in r['name'].lower()]
         if show == 'Profitable':

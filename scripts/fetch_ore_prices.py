@@ -68,6 +68,42 @@ STD_ORE_IDS = [
     11396, 17869, 17870,
 ]
 
+# Standard ores — compressed (same yields as uncompressed, ~100x smaller volume)
+COMPRESSED_STD_ORE_IDS = [
+    # Veldspar
+    62516, 62517, 62518, 62519,
+    # Scordite
+    62520, 62521, 62522, 62523,
+    # Pyroxeres
+    62524, 62525, 62526, 62527,
+    # Plagioclase
+    62528, 62529, 62530, 62531,
+    # Omber
+    62532, 62533, 62534, 62535,
+    # Kernite
+    62536, 62537, 62538, 62539,
+    # Jaspet
+    62540, 62541, 62542, 62543,
+    # Hemorphite
+    62544, 62545, 62546, 62547,
+    # Hedbergite
+    62548, 62549, 62550, 62551,
+    # Gneiss
+    62552, 62553, 62554, 62555,
+    # Dark Ochre
+    62556, 62557, 62558, 62559,
+    # Crokite
+    62560, 62561, 62562, 62563,
+    # Bistot
+    62564, 62565, 62566, 62567,
+    # Arkonor
+    62568, 62569, 62570, 62571,
+    # Spodumain
+    62572, 62573, 62574, 62575,
+    # Mercoxit (no IV grade)
+    62586, 62587, 62588,
+]
+
 # Ice — base types + IV-grade variants
 ICE_IDS = [
     16262,  # Clear Icicle
@@ -82,6 +118,22 @@ ICE_IDS = [
     17976,  # White Glaze IV-Grade
     17977,  # Glacial Mass IV-Grade
     17978,  # Clear Icicle IV-Grade
+]
+
+# Ice — compressed variants
+COMPRESSED_ICE_IDS = [
+    28433,  # Compressed Blue Ice
+    28443,  # Compressed Blue Ice IV-Grade
+    28434,  # Compressed Clear Icicle
+    28436,  # Compressed Clear Icicle IV-Grade
+    28435,  # Compressed Dark Glitter
+    28437,  # Compressed Gelidus
+    28438,  # Compressed Glacial Mass
+    28442,  # Compressed Glacial Mass IV-Grade
+    28439,  # Compressed Glare Crust
+    28440,  # Compressed Krystallos
+    28444,  # Compressed White Glaze
+    28441,  # Compressed White Glaze IV-Grade
 ]
 
 # Moon ores — base + grade variants (Brimful/Glistening, Copious/Twinkling, etc.)
@@ -116,6 +168,30 @@ MOON_ORE_IDS = [
     46312, 46314, 46316, 46318,
     # Exceptional — Shining (+100%)
     46313, 46315, 46317, 46319,
+]
+
+# Moon ores — compressed variants
+COMPRESSED_MOON_ORE_IDS = [
+    # Ubiquitous
+    62454, 62457, 62455, 62458, 62461, 62464,  # Bitumens/Coesite/Sylvite/Zeolites + grades
+    62456, 62459, 62466, 62467,                 # Glistening variants
+    62460, 62463,                               # Sylvite/Zeolites base compressed
+    # Common
+    62474, 62471, 62468, 62477,                 # Cobaltite/Euxenite/Scheelite/Titanite
+    62475, 62472, 62469, 62478,                 # Copious variants
+    62476, 62473, 62470, 62479,                 # Twinkling variants
+    # Uncommon
+    62480, 62483, 62486, 62489,                 # Chromite/Otavite/Sperrylite/Vanadinite
+    62481, 62484, 62487, 62490,                 # Lavish variants
+    62482, 62485, 62488, 62491,                 # Shimmering variants
+    # Rare
+    62492, 62501, 62498, 62495,                 # Carnotite/Zircon/Pollucite/Cinnabar
+    62493, 62502, 62499, 62496,                 # Replete variants
+    62494, 62503, 62500, 62497,                 # Glowing variants
+    # Exceptional
+    62504, 62510, 62507, 62513,                 # Loparite/Xenotime/Monazite/Ytterbite
+    62505, 62511, 62508, 62514,                 # Bountiful variants
+    62506, 62512, 62509, 62515,                 # Shining variants
 ]
 
 # Refined products — standard minerals
@@ -171,7 +247,9 @@ MOON_MATERIAL_IDS = [
 ]
 
 ALL_TYPE_IDS = (
-    STD_ORE_IDS + ICE_IDS + MOON_ORE_IDS +
+    STD_ORE_IDS + COMPRESSED_STD_ORE_IDS +
+    ICE_IDS + COMPRESSED_ICE_IDS +
+    MOON_ORE_IDS + COMPRESSED_MOON_ORE_IDS +
     MINERAL_IDS + ICE_PRODUCT_IDS + MOON_MATERIAL_IDS
 )
 
@@ -219,8 +297,8 @@ def main():
 
     print(f'Fetching Jita 4-4 prices for {total} type IDs '
           f'({MAX_WORKERS} parallel workers)...')
-    print(f'  Ores: {len(STD_ORE_IDS)} std + {len(ICE_IDS)} ice + '
-          f'{len(MOON_ORE_IDS)} moon')
+    print(f'  Uncompressed: {len(STD_ORE_IDS)} std + {len(ICE_IDS)} ice + {len(MOON_ORE_IDS)} moon')
+    print(f'  Compressed:   {len(COMPRESSED_STD_ORE_IDS)} std + {len(COMPRESSED_ICE_IDS)} ice + {len(COMPRESSED_MOON_ORE_IDS)} moon')
     print(f'  Products: {len(MINERAL_IDS)} minerals + '
           f'{len(ICE_PRODUCT_IDS)} ice + {len(MOON_MATERIAL_IDS)} moon mats')
 
