@@ -8,7 +8,7 @@ ice products, moon materials) using parallel ESI requests.
 Stores results in market_price_snapshots.  Run on-demand from the
 Ore Import Analysis tab in admin_dashboard.py.
 
-Typical runtime: 10-20 seconds with 20 worker threads.
+Typical runtime: 5-15 seconds with 50 worker threads.
 """
 
 import os
@@ -27,8 +27,8 @@ DB_PATH     = os.path.join(PROJECT_DIR, 'mydatabase.db')
 ESI_BASE           = 'https://esi.evetech.net/latest'
 THE_FORGE_REGION   = 10000002
 JITA_STATION_ID    = 60003760   # Jita IV - Moon 4 - Caldari Navy Assembly Plant
-MAX_WORKERS        = 20
-REQUEST_TIMEOUT    = 12  # seconds per call
+MAX_WORKERS        = 50         # more parallel → fewer rounds → faster total
+REQUEST_TIMEOUT    = 8          # seconds per call; fail fast rather than hang
 
 # ── Type IDs to fetch ──────────────────────────────────────────────────────
 

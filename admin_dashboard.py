@@ -2814,7 +2814,7 @@ class AdminDashboard:
             try:
                 import subprocess
                 result = subprocess.run([python_exe, fetch_script], cwd=PROJECT_DIR,
-                                        capture_output=True, timeout=120, text=True)
+                                        capture_output=True, timeout=300, text=True)
                 if result.returncode != 0:
                     fetch_error[0] = (result.stderr or result.stdout or 'unknown error').strip()[-200:]
             except Exception as e:
