@@ -2642,7 +2642,7 @@ class AdminDashboard:
 
         col_defs = [
             ('name',      'Ore Name',             210, 'w'),
-            ('jita_buy',  'Jita Buy (ISK)',        115, 'e'),
+            ('jita_buy',  'Jita/Unit (ISK)',        130, 'e'),
             ('logistics', 'Ship+Collat (ISK)',     120, 'e'),
             ('landed',    'Landed (ISK)',          115, 'e'),
             ('value',     'Product Value (ISK)',   130, 'e'),
@@ -3008,7 +3008,7 @@ class AdminDashboard:
             self._ore_all_rows.append({
                 'type_id':    type_id,
                 'name':       name,
-                'jita_buy':   ore_cost,
+                'jita_buy':   raw_price,
                 'logistics':  ship_cost + collat,
                 'landed':     total_cost,
                 'value':      prod_value,
@@ -3052,9 +3052,7 @@ class AdminDashboard:
         def fmt_isk(v):
             if v is None:
                 return '—'
-            if abs(v) >= 1_000_000:
-                return f'{v:,.0f}'
-            return f'{v:,.0f}'
+            return f'{v:,.2f}'
 
         profitable = sum(1 for r in rows if r['profit'] > 0)
         best_r  = max(rows, key=lambda r: r['margin'],  default=None)
@@ -3110,11 +3108,11 @@ class AdminDashboard:
             tags = tuple(t for t in (tag, alt, dev_tag) if t)
             self.ore_tree.insert('', 'end', tags=tags, values=(
                 r['name'],
-                f"{r['jita_buy']:,.0f}",
-                f"{r['logistics']:,.0f}",
-                f"{r['landed']:,.0f}",
-                f"{r['value']:,.0f}",
-                f"{r['profit']:+,.0f}",
+                f"{r['jita_buy']:,.2f}",
+                f"{r['logistics']:,.2f}",
+                f"{r['landed']:,.2f}",
+                f"{r['value']:,.2f}",
+                f"{r['profit']:+,.2f}",
                 f"{r['margin']:+.1f}%",
                 dev_str,
             ))
