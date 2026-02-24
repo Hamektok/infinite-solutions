@@ -2532,7 +2532,7 @@ class AdminDashboard:
             font=('Segoe UI', 8))
         self.ore_price_age_lbl.pack(anchor='e', pady=(4, 0))
 
-        # ── Product sell prices card (sub-notebook) ─────────────────────
+        # ── Product sell prices card (collapsible sections) ─────────────
         prices_card = ttk.Frame(outer, style='Card.TFrame')
         prices_card.pack(fill='x', pady=(0, 8))
 
@@ -2543,12 +2543,11 @@ class AdminDashboard:
 
         self.ore_product_pct = {}  # type_id (int) -> StringVar
 
-        price_nb = ttk.Notebook(prices_card)
-        price_nb.pack(fill='x', padx=12, pady=(0, 10))
+        self._build_mineral_price_section(prices_card, expanded=True)
+        self._build_ice_product_price_section(prices_card, expanded=True)
+        self._build_moon_material_price_section(prices_card, expanded=False)
 
-        self._build_mineral_price_tab(price_nb)
-        self._build_ice_product_price_tab(price_nb)
-        self._build_moon_material_price_tab(price_nb)
+        tk.Frame(prices_card, background='#1a3040', height=1).pack(fill='x', padx=12, pady=(2, 6))
 
         # ── Ore type filter ──────────────────────────────────────────────
         type_row = ttk.Frame(outer)
@@ -2651,32 +2650,59 @@ class AdminDashboard:
         self._ore_sort_col = 'margin'
         self._ore_sort_asc = False
 
-    def _build_mineral_price_tab(self, nb):
-        """Sub-tab: Standard Minerals (8 inputs)."""
-        frame = ttk.Frame(nb, style='Card.TFrame')
-        nb.add(frame, text=' Standard Minerals ')
-        inner = ttk.Frame(frame, style='Card.TFrame')
-        inner.pack(padx=10, pady=8)
+    def _make_collapsible_section(self, parent, title, fg_color, expanded=True):
+        """Create a collapsible section header + content frame. Returns content frame."""
+        section = ttk.Frame(parent, style='Card.TFrame')
+        section.pack(fill='x', padx=12, pady=(0, 2))
+
+        content = ttk.Frame(section, style='Card.TFrame')
+
+        def toggle(btn=None, c=content, state={'open': expanded}):
+            if state['open']:
+                c.pack_forget()
+                state['open'] = False
+                hdr_btn.configure(text=f'\u25b6  {title}')
+            else:
+                c.pack(fill='x', pady=(0, 4))
+                state['open'] = True
+                hdr_btn.configure(text=f'\u25bc  {title}')
+
+        arrow = '\u25bc' if expanded else '\u25b6'
+        hdr_btn = tk.Button(section, text=f'{arrow}  {title}',
+                            background='#0a2030', foreground=fg_color,
+                            activebackground='#0d2535', activeforeground=fg_color,
+                            font=('Segoe UI', 9, 'bold'), relief='flat',
+                            cursor='hand2', anchor='w', command=toggle)
+        hdr_btn.pack(fill='x', pady=(2, 0))
+
+        if expanded:
+            content.pack(fill='x', pady=(0, 4))
+
+        return content
+
+    def _build_mineral_price_section(self, parent, expanded=True):
+        """Collapsible: Standard Minerals (8 inputs)."""
+        content = self._make_collapsible_section(
+            parent, 'Standard Minerals', '#00d9ff', expanded)
+        inner = ttk.Frame(content, style='Card.TFrame')
+        inner.pack(padx=16, pady=(4, 6))
         lbl_cfg = dict(background='#0a2030', foreground='#00d9ff', font=('Segoe UI', 9))
         for col, (tid, name, default) in enumerate(self._ORE_MINERALS):
             key = f'ore_pct_{tid}'
             var = tk.StringVar(value=self._get_config(key, default))
             var.trace_add('write', lambda *_, k=key, v=var: self._set_config(k, v.get()))
             self.ore_product_pct[tid] = var
-            lbl_text = name if tid != 11399 else f'{name}\n(Mercoxit)'
-            tk.Label(inner, text=lbl_text, **lbl_cfg, justify='center').grid(
+            lbl_text = name if tid != 11399 else f'{name} (Mercoxit)'
+            tk.Label(inner, text=lbl_text, **lbl_cfg).grid(
                      row=0, column=col, padx=6, sticky='s')
             ttk.Entry(inner, textvariable=var, width=7).grid(row=1, column=col, padx=6)
-        tk.Label(inner, text="% of Jita JBV per unit", background='#0a2030',
-                 foreground='#446688', font=('Segoe UI', 8)).grid(
-                 row=2, column=0, columnspan=8, pady=(4, 0), sticky='w')
 
-    def _build_ice_product_price_tab(self, nb):
-        """Sub-tab: Ice Products (7 inputs)."""
-        frame = ttk.Frame(nb, style='Card.TFrame')
-        nb.add(frame, text=' Ice Products ')
-        inner = ttk.Frame(frame, style='Card.TFrame')
-        inner.pack(padx=10, pady=8)
+    def _build_ice_product_price_section(self, parent, expanded=True):
+        """Collapsible: Ice Products (7 inputs)."""
+        content = self._make_collapsible_section(
+            parent, 'Ice Products', '#aaddff', expanded)
+        inner = ttk.Frame(content, style='Card.TFrame')
+        inner.pack(padx=16, pady=(4, 6))
         lbl_cfg = dict(background='#0a2030', foreground='#aaddff', font=('Segoe UI', 9))
         for col, (tid, name, default) in enumerate(self._ORE_ICE_PRODUCTS):
             key = f'ore_pct_{tid}'
@@ -2685,16 +2711,13 @@ class AdminDashboard:
             self.ore_product_pct[tid] = var
             tk.Label(inner, text=name, **lbl_cfg).grid(row=0, column=col, padx=6, sticky='s')
             ttk.Entry(inner, textvariable=var, width=7).grid(row=1, column=col, padx=6)
-        tk.Label(inner, text="% of Jita JBV per unit", background='#0a2030',
-                 foreground='#446688', font=('Segoe UI', 8)).grid(
-                 row=2, column=0, columnspan=7, pady=(4, 0), sticky='w')
 
-    def _build_moon_material_price_tab(self, nb):
-        """Sub-tab: Moon Materials (20 inputs across R4-R64 tiers)."""
-        frame = ttk.Frame(nb, style='Card.TFrame')
-        nb.add(frame, text=' Moon Materials ')
-        inner = ttk.Frame(frame, style='Card.TFrame')
-        inner.pack(padx=10, pady=8)
+    def _build_moon_material_price_section(self, parent, expanded=False):
+        """Collapsible: Moon Materials (20 inputs, R4-R64 tiers)."""
+        content = self._make_collapsible_section(
+            parent, 'Moon Materials', '#cc88ff', expanded)
+        inner = ttk.Frame(content, style='Card.TFrame')
+        inner.pack(padx=16, pady=(4, 6))
 
         tier_colors = {'R4': '#888888', 'R8': '#00ff88', 'R16': '#44aaff',
                        'R32': '#cc88ff', 'R64': '#ffcc44'}
@@ -2705,7 +2728,6 @@ class AdminDashboard:
         grid_row = 0
         current_tier = None
         items_in_row = 0
-        # Each row holds 4 items: (label, entry) × 4 = 8 grid columns
         for tid, name, default, tier in self._ORE_MOON_MATERIALS:
             if tier != current_tier:
                 current_tier = tier
@@ -2723,7 +2745,7 @@ class AdminDashboard:
             var.trace_add('write', lambda *_, k=key, v=var: self._set_config(k, v.get()))
             self.ore_product_pct[tid] = var
 
-            gc = items_in_row * 2  # grid column: 0,2,4,6
+            gc = items_in_row * 2
             tk.Label(inner, text=name,
                      background='#0a2030', foreground='#88d0e8',
                      font=('Segoe UI', 9)).grid(row=grid_row, column=gc, padx=(6, 2), sticky='e')
@@ -2734,12 +2756,6 @@ class AdminDashboard:
             if items_in_row >= 4:
                 items_in_row = 0
                 grid_row += 1
-
-        if items_in_row > 0:
-            grid_row += 1
-        tk.Label(inner, text="% of Jita JBV per unit", background='#0a2030',
-                 foreground='#446688', font=('Segoe UI', 8)).grid(
-                 row=grid_row, column=0, columnspan=8, pady=(6, 0), sticky='w')
 
     def _set_ore_type_filter(self, val):
         """Switch the ore type filter and refresh the tree."""
