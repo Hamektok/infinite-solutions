@@ -135,7 +135,12 @@ class AdminDashboard:
         self.notebook.add(self.import_frame, text='  Import Analysis  ')
         self.build_import_tab()
 
-        # Tab 7: Quick Actions
+        # Tab 7: Ore Import Analysis
+        self.ore_import_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.ore_import_frame, text='  Ore Import  ')
+        self.build_ore_import_tab()
+
+        # Tab 8: Quick Actions
         self.actions_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
@@ -2385,6 +2390,649 @@ class AdminDashboard:
             self._import_sort_col = col
             self._import_sort_asc = col in ('category', 'item')
         self._filter_import_tree()
+
+    # ===== ORE IMPORT ANALYSIS =====
+
+    # Product definitions: (type_id, display_name, config_default)
+    _ORE_MINERALS = [
+        (34,    'Tritanium',  '95'),
+        (35,    'Pyerite',   '95'),
+        (36,    'Mexallon',  '98'),
+        (37,    'Isogen',   '100'),
+        (38,    'Nocxium',  '105'),
+        (39,    'Zydrine',  '110'),
+        (40,    'Megacyte', '115'),
+        (11399, 'Morphite', '120'),
+    ]
+    _ORE_ICE_PRODUCTS = [
+        (16272, 'Heavy Water',        '90'),
+        (16273, 'Liquid Ozone',       '95'),
+        (16274, 'Helium Isotopes',   '100'),
+        (16275, 'Strontium Clath.', '100'),
+        (17887, 'Oxygen Isotopes',   '100'),
+        (17888, 'Nitrogen Isotopes', '100'),
+        (17889, 'Hydrogen Isotopes', '100'),
+    ]
+    _ORE_MOON_MATERIALS = [
+        # R4
+        (16633, 'Hydrocarbons',      '95',  'R4'),
+        (16634, 'Atmo. Gases',       '95',  'R4'),
+        (16635, 'Evaporite Dep.',    '95',  'R4'),
+        (16636, 'Silicates',         '95',  'R4'),
+        # R8
+        (16637, 'Tungsten',         '100',  'R8'),
+        (16638, 'Titanium',         '100',  'R8'),
+        (16639, 'Scandium',         '100',  'R8'),
+        (16640, 'Cobalt',           '100',  'R8'),
+        # R16
+        (16641, 'Chromium',         '105', 'R16'),
+        (16642, 'Vanadium',         '105', 'R16'),
+        (16643, 'Cadmium',          '105', 'R16'),
+        (16644, 'Platinum',         '105', 'R16'),
+        # R32
+        (16646, 'Mercury',          '110', 'R32'),
+        (16647, 'Caesium',          '110', 'R32'),
+        (16648, 'Hafnium',          '110', 'R32'),
+        (16649, 'Technetium',       '115', 'R32'),
+        # R64
+        (16650, 'Dysprosium',       '120', 'R64'),
+        (16651, 'Neodymium',        '120', 'R64'),
+        (16652, 'Promethium',       '125', 'R64'),
+        (16653, 'Thulium',          '125', 'R64'),
+    ]
+
+    def build_ore_import_tab(self):
+        """Build the Ore Import Analysis tab."""
+        import threading as _threading
+        self._ore_threading = _threading
+
+        outer = ttk.Frame(self.ore_import_frame)
+        outer.pack(fill='both', expand=True, padx=15, pady=(15, 10))
+
+        ttk.Label(outer,
+                  text="Buy raw ore / ice / moon ore at Jita 4-4  \u2192  Ship to null-sec  \u2192  Refine at 100%  \u2192  Sell products locally.",
+                  style='SubHeader.TLabel').pack(anchor='w', pady=(0, 8))
+
+        # ── Fetch + params card ──────────────────────────────────────────
+        fetch_card = ttk.Frame(outer, style='Card.TFrame')
+        fetch_card.pack(fill='x', pady=(0, 8))
+        fetch_inner = ttk.Frame(fetch_card, style='Card.TFrame')
+        fetch_inner.pack(fill='x', padx=12, pady=10)
+
+        param_inner = ttk.Frame(fetch_inner, style='Card.TFrame')
+        param_inner.pack(side='left', fill='x', expand=True)
+
+        lbl_cfg = dict(background='#0a2030', foreground='#88d0e8', font=('Segoe UI', 10))
+        hdr_cfg = dict(background='#0a2030', font=('Segoe UI', 8, 'bold'))
+
+        tk.Label(param_inner, text="BUY SIDE", foreground='#66d9ff', **hdr_cfg).grid(
+                 row=0, column=0, columnspan=3, sticky='w', pady=(0, 4))
+        tk.Label(param_inner, text="LOGISTICS", foreground='#ffcc44', **hdr_cfg).grid(
+                 row=0, column=4, columnspan=2, sticky='w', padx=(12, 0), pady=(0, 4))
+
+        tk.Frame(param_inner, background='#1a3040', height=1).grid(
+                 row=1, column=0, columnspan=7, sticky='ew', pady=(0, 6))
+
+        # Buy From
+        tk.Label(param_inner, text="Buy From", **lbl_cfg).grid(row=2, column=0, sticky='w', padx=(0, 4))
+        self.ore_buy_var = tk.StringVar(value=self._get_config('ore_param_buy_basis', 'JSV  (instant)'))
+        self.ore_buy_var.trace_add('write', lambda *_: self._set_config('ore_param_buy_basis', self.ore_buy_var.get()))
+        ttk.Combobox(param_inner, textvariable=self.ore_buy_var, width=18,
+                     values=['JSV  (instant)', 'JBV  (place order)'],
+                     state='readonly').grid(row=3, column=0, sticky='w', padx=(0, 10))
+
+        # Buy %
+        tk.Label(param_inner, text="Buy %", **lbl_cfg).grid(row=2, column=1, sticky='w', padx=(0, 4))
+        self.ore_buy_pct_var = tk.StringVar(value=self._get_config('ore_param_buy_pct', '100'))
+        self.ore_buy_pct_var.trace_add('write', lambda *_: self._set_config('ore_param_buy_pct', self.ore_buy_pct_var.get()))
+        ttk.Entry(param_inner, textvariable=self.ore_buy_pct_var, width=8).grid(
+                  row=3, column=1, sticky='w', padx=(0, 10))
+
+        # Broker fee
+        tk.Label(param_inner, text="Broker Fee %", **lbl_cfg).grid(row=2, column=2, sticky='w', padx=(0, 4))
+        self.ore_broker_var = tk.StringVar(value=self._get_config('ore_param_broker_pct', '0.0'))
+        self.ore_broker_var.trace_add('write', lambda *_: self._set_config('ore_param_broker_pct', self.ore_broker_var.get()))
+        ttk.Entry(param_inner, textvariable=self.ore_broker_var, width=8).grid(
+                  row=3, column=2, sticky='w', padx=(0, 16))
+
+        # Divider
+        tk.Frame(param_inner, background='#1a3040', width=1).grid(
+                 row=2, column=3, rowspan=2, sticky='ns', padx=(0, 12))
+
+        # Shipping
+        tk.Label(param_inner, text="Shipping (ISK/m\u00b3)", **lbl_cfg).grid(row=2, column=4, sticky='w', padx=(0, 4))
+        self.ore_ship_var = tk.StringVar(value=self._get_config('ore_param_ship_rate', '125'))
+        self.ore_ship_var.trace_add('write', lambda *_: self._set_config('ore_param_ship_rate', self.ore_ship_var.get()))
+        ttk.Entry(param_inner, textvariable=self.ore_ship_var, width=10).grid(
+                  row=3, column=4, sticky='w', padx=(0, 10))
+
+        # Collateral
+        tk.Label(param_inner, text="Collateral %", **lbl_cfg).grid(row=2, column=5, sticky='w', padx=(0, 4))
+        self.ore_collat_var = tk.StringVar(value=self._get_config('ore_param_collat_pct', '1.0'))
+        self.ore_collat_var.trace_add('write', lambda *_: self._set_config('ore_param_collat_pct', self.ore_collat_var.get()))
+        ttk.Entry(param_inner, textvariable=self.ore_collat_var, width=8).grid(
+                  row=3, column=5, sticky='w', padx=(0, 10))
+
+        # Recalculate
+        ttk.Button(param_inner, text='\u27f3  Recalculate', style='Action.TButton',
+                   command=self.load_ore_import_data).grid(row=3, column=6, sticky='w', padx=(8, 0))
+
+        # Fetch button + status (right side)
+        fetch_right = ttk.Frame(fetch_inner, style='Card.TFrame')
+        fetch_right.pack(side='right', anchor='ne', padx=(20, 0))
+
+        self.ore_fetch_btn = ttk.Button(fetch_right, text='\u27f3  Fetch Live Jita Prices',
+                                         style='Action.TButton',
+                                         command=self._run_ore_fetch)
+        self.ore_fetch_btn.pack(anchor='e')
+
+        self.ore_price_age_lbl = tk.Label(fetch_right,
+            text='\u26a0 Not loaded \u2014 click Fetch to begin',
+            background='#0a2030', foreground='#ffcc44',
+            font=('Segoe UI', 8))
+        self.ore_price_age_lbl.pack(anchor='e', pady=(4, 0))
+
+        # ── Product sell prices card (sub-notebook) ─────────────────────
+        prices_card = ttk.Frame(outer, style='Card.TFrame')
+        prices_card.pack(fill='x', pady=(0, 8))
+
+        tk.Label(prices_card,
+                 text="PRODUCT SELL PRICES  (% of Jita JBV \u2014 adjust each product to match your local buyback rates)",
+                 background='#0a2030', foreground='#00d9ff',
+                 font=('Segoe UI', 9, 'bold')).pack(anchor='w', padx=12, pady=(8, 4))
+
+        self.ore_product_pct = {}  # type_id (int) -> StringVar
+
+        price_nb = ttk.Notebook(prices_card)
+        price_nb.pack(fill='x', padx=12, pady=(0, 10))
+
+        self._build_mineral_price_tab(price_nb)
+        self._build_ice_product_price_tab(price_nb)
+        self._build_moon_material_price_tab(price_nb)
+
+        # ── Ore type filter ──────────────────────────────────────────────
+        type_row = ttk.Frame(outer)
+        type_row.pack(fill='x', pady=(0, 6))
+
+        tk.Label(type_row, text="Filter:", background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 10)).pack(side='left', padx=(0, 8))
+
+        self._ore_type_filter_val = 'all'
+        self._ore_type_btns = {}
+        for label, val in [('All', 'all'), ('Standard', 'standard'), ('Ice', 'ice'), ('Moon', 'moon')]:
+            btn = ttk.Button(type_row, text=label,
+                             command=lambda v=val: self._set_ore_type_filter(v))
+            btn.pack(side='left', padx=3)
+            self._ore_type_btns[val] = btn
+
+        self._ore_type_lbl = tk.Label(type_row, text='Showing: All',
+            background='#0a1520', foreground='#00ff88', font=('Segoe UI', 9))
+        self._ore_type_lbl.pack(side='left', padx=(12, 0))
+
+        # ── Summary cards ────────────────────────────────────────────────
+        self.ore_summary_frame = ttk.Frame(outer)
+        self.ore_summary_frame.pack(fill='x', pady=(0, 6))
+        self._ore_summary_labels = {}
+        for key, title in [('total', 'ORES ANALYSED'), ('profitable', 'PROFITABLE'),
+                            ('best', 'BEST MARGIN'), ('best_isk', 'BEST ISK/BATCH'),
+                            ('worst', 'WORST MARGIN')]:
+            card = ttk.Frame(self.ore_summary_frame, style='Card.TFrame')
+            card.pack(side='left', fill='both', expand=True, padx=3)
+            tk.Label(card, text=title, background='#0a2030', foreground='#66d9ff',
+                     font=('Segoe UI', 9)).pack(anchor='w', padx=8, pady=(6, 0))
+            val_lbl = tk.Label(card, text='\u2014', background='#0a2030',
+                               foreground='#c8e8f0', font=('Segoe UI', 12, 'bold'))
+            val_lbl.pack(anchor='w', padx=8, pady=(0, 6))
+            self._ore_summary_labels[key] = val_lbl
+
+        # ── Filter/sort row ──────────────────────────────────────────────
+        frow = ttk.Frame(outer)
+        frow.pack(fill='x', pady=(0, 4))
+
+        ttk.Label(frow, text="Search:").pack(side='left', padx=(0, 4))
+        self.ore_search_var = tk.StringVar()
+        self.ore_search_var.trace_add('write', lambda *_: self._filter_ore_tree())
+        ttk.Entry(frow, textvariable=self.ore_search_var, width=20).pack(side='left', padx=(0, 12))
+
+        ttk.Label(frow, text="Show:").pack(side='left', padx=(0, 4))
+        self.ore_show_var = tk.StringVar(value='All')
+        ttk.Combobox(frow, textvariable=self.ore_show_var, width=14,
+                     values=['All', 'Profitable', 'Loss Only'], state='readonly').pack(side='left', padx=(0, 12))
+        self.ore_show_var.trace_add('write', lambda *_: self._filter_ore_tree())
+
+        ttk.Label(frow, text="Sort:").pack(side='left', padx=(0, 4))
+        self.ore_sort_display_var = tk.StringVar(value='Margin %')
+        ttk.Combobox(frow, textvariable=self.ore_sort_display_var, width=16,
+                     values=['Margin %', 'Profit ISK', 'Landed Cost', 'Product Value', 'ISK/m\u00b3'],
+                     state='readonly').pack(side='left')
+        self.ore_sort_display_var.trace_add('write', lambda *_: self._filter_ore_tree())
+
+        # ── Treeview ─────────────────────────────────────────────────────
+        tree_frame = ttk.Frame(outer)
+        tree_frame.pack(fill='both', expand=True)
+
+        cols = ('name', 'batch', 'vol', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'isk_m3')
+        self.ore_tree = ttk.Treeview(tree_frame, columns=cols, show='headings', selectmode='browse')
+
+        col_defs = [
+            ('name',      'Ore Name',             200, 'w'),
+            ('batch',     'Batch',                 55, 'e'),
+            ('vol',       'Vol/Batch m\u00b3',     90, 'e'),
+            ('jita_buy',  'Jita Buy (ISK)',        115, 'e'),
+            ('logistics', 'Ship+Collat (ISK)',     115, 'e'),
+            ('landed',    'Landed (ISK)',          115, 'e'),
+            ('value',     'Product Value (ISK)',   120, 'e'),
+            ('profit',    'Profit (ISK)',          110, 'e'),
+            ('margin',    'Margin %',               80, 'e'),
+            ('isk_m3',    'ISK/m\u00b3',            85, 'e'),
+        ]
+        for cid, heading, width, anchor in col_defs:
+            self.ore_tree.heading(cid, text=heading,
+                                  command=lambda c=cid: self._sort_ore_tree(c))
+            self.ore_tree.column(cid, width=width, minwidth=50, anchor=anchor)
+
+        self.ore_tree.tag_configure('profitable', foreground='#00ff88')
+        self.ore_tree.tag_configure('marginal',   foreground='#ffcc44')
+        self.ore_tree.tag_configure('loss',       foreground='#ff4444')
+        self.ore_tree.tag_configure('group_hdr',  background='#070e18',
+                                                  foreground='#446688',
+                                                  font=('Segoe UI', 8, 'italic'))
+        self.ore_tree.tag_configure('row_a', background='#0a2030')
+        self.ore_tree.tag_configure('row_b', background='#0d2535')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical',   command=self.ore_tree.yview)
+        hsb = ttk.Scrollbar(tree_frame, orient='horizontal', command=self.ore_tree.xview)
+        self.ore_tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+        vsb.pack(side='right',  fill='y')
+        hsb.pack(side='bottom', fill='x')
+        self.ore_tree.pack(fill='both', expand=True)
+
+        self._ore_all_rows = []
+        self._ore_sort_col = 'margin'
+        self._ore_sort_asc = False
+
+    def _build_mineral_price_tab(self, nb):
+        """Sub-tab: Standard Minerals (8 inputs)."""
+        frame = ttk.Frame(nb, style='Card.TFrame')
+        nb.add(frame, text=' Standard Minerals ')
+        inner = ttk.Frame(frame, style='Card.TFrame')
+        inner.pack(padx=10, pady=8)
+        lbl_cfg = dict(background='#0a2030', foreground='#00d9ff', font=('Segoe UI', 9))
+        for col, (tid, name, default) in enumerate(self._ORE_MINERALS):
+            key = f'ore_pct_{tid}'
+            var = tk.StringVar(value=self._get_config(key, default))
+            var.trace_add('write', lambda *_, k=key, v=var: self._set_config(k, v.get()))
+            self.ore_product_pct[tid] = var
+            lbl_text = name if tid != 11399 else f'{name}\n(Mercoxit)'
+            tk.Label(inner, text=lbl_text, **lbl_cfg, justify='center').grid(
+                     row=0, column=col, padx=6, sticky='s')
+            ttk.Entry(inner, textvariable=var, width=7).grid(row=1, column=col, padx=6)
+        tk.Label(inner, text="% of Jita JBV per unit", background='#0a2030',
+                 foreground='#446688', font=('Segoe UI', 8)).grid(
+                 row=2, column=0, columnspan=8, pady=(4, 0), sticky='w')
+
+    def _build_ice_product_price_tab(self, nb):
+        """Sub-tab: Ice Products (7 inputs)."""
+        frame = ttk.Frame(nb, style='Card.TFrame')
+        nb.add(frame, text=' Ice Products ')
+        inner = ttk.Frame(frame, style='Card.TFrame')
+        inner.pack(padx=10, pady=8)
+        lbl_cfg = dict(background='#0a2030', foreground='#aaddff', font=('Segoe UI', 9))
+        for col, (tid, name, default) in enumerate(self._ORE_ICE_PRODUCTS):
+            key = f'ore_pct_{tid}'
+            var = tk.StringVar(value=self._get_config(key, default))
+            var.trace_add('write', lambda *_, k=key, v=var: self._set_config(k, v.get()))
+            self.ore_product_pct[tid] = var
+            tk.Label(inner, text=name, **lbl_cfg).grid(row=0, column=col, padx=6, sticky='s')
+            ttk.Entry(inner, textvariable=var, width=7).grid(row=1, column=col, padx=6)
+        tk.Label(inner, text="% of Jita JBV per unit", background='#0a2030',
+                 foreground='#446688', font=('Segoe UI', 8)).grid(
+                 row=2, column=0, columnspan=7, pady=(4, 0), sticky='w')
+
+    def _build_moon_material_price_tab(self, nb):
+        """Sub-tab: Moon Materials (20 inputs across R4-R64 tiers)."""
+        frame = ttk.Frame(nb, style='Card.TFrame')
+        nb.add(frame, text=' Moon Materials ')
+        inner = ttk.Frame(frame, style='Card.TFrame')
+        inner.pack(padx=10, pady=8)
+
+        tier_colors = {'R4': '#888888', 'R8': '#00ff88', 'R16': '#44aaff',
+                       'R32': '#cc88ff', 'R64': '#ffcc44'}
+        tier_labels = {'R4': 'R4 \u2014 Ubiquitous', 'R8': 'R8 \u2014 Common',
+                       'R16': 'R16 \u2014 Uncommon', 'R32': 'R32 \u2014 Rare',
+                       'R64': 'R64 \u2014 Exceptional'}
+
+        grid_row = 0
+        current_tier = None
+        items_in_row = 0
+        # Each row holds 4 items: (label, entry) × 4 = 8 grid columns
+        for tid, name, default, tier in self._ORE_MOON_MATERIALS:
+            if tier != current_tier:
+                current_tier = tier
+                if items_in_row > 0:
+                    grid_row += 1
+                    items_in_row = 0
+                tk.Label(inner, text=tier_labels[tier],
+                         background='#0a2030', foreground=tier_colors[tier],
+                         font=('Segoe UI', 8, 'bold')).grid(
+                         row=grid_row, column=0, columnspan=8, sticky='w', pady=(6, 2))
+                grid_row += 1
+
+            key = f'ore_pct_{tid}'
+            var = tk.StringVar(value=self._get_config(key, default))
+            var.trace_add('write', lambda *_, k=key, v=var: self._set_config(k, v.get()))
+            self.ore_product_pct[tid] = var
+
+            gc = items_in_row * 2  # grid column: 0,2,4,6
+            tk.Label(inner, text=name,
+                     background='#0a2030', foreground='#88d0e8',
+                     font=('Segoe UI', 9)).grid(row=grid_row, column=gc, padx=(6, 2), sticky='e')
+            ttk.Entry(inner, textvariable=var, width=6).grid(
+                      row=grid_row, column=gc + 1, padx=(0, 10), sticky='w')
+
+            items_in_row += 1
+            if items_in_row >= 4:
+                items_in_row = 0
+                grid_row += 1
+
+        if items_in_row > 0:
+            grid_row += 1
+        tk.Label(inner, text="% of Jita JBV per unit", background='#0a2030',
+                 foreground='#446688', font=('Segoe UI', 8)).grid(
+                 row=grid_row, column=0, columnspan=8, pady=(6, 0), sticky='w')
+
+    def _set_ore_type_filter(self, val):
+        """Switch the ore type filter and refresh the tree."""
+        self._ore_type_filter_val = val
+        labels = {'all': 'All', 'standard': 'Standard Ores', 'ice': 'Ice', 'moon': 'Moon Ores'}
+        self._ore_type_lbl.configure(text=f'Showing: {labels[val]}')
+        self._filter_ore_tree()
+
+    def _run_ore_fetch(self):
+        """Run fetch_ore_prices.py in a background thread."""
+        import threading
+        self.ore_fetch_btn.configure(state='disabled', text='Fetching...')
+        self.ore_price_age_lbl.configure(text='Fetching Jita 4-4 prices...', foreground='#ffcc44')
+        self.root.update()
+
+        python_exe = r'C:\Users\lsant\AppData\Local\Python\pythoncore-3.14-64\python.exe'
+        fetch_script = os.path.join(SCRIPT_DIR, 'scripts', 'fetch_ore_prices.py')
+
+        def _worker():
+            try:
+                import subprocess
+                subprocess.run([python_exe, fetch_script], cwd=PROJECT_DIR,
+                               capture_output=True, timeout=120)
+            except Exception:
+                pass
+            self.root.after(0, _done)
+
+        def _done():
+            self.ore_fetch_btn.configure(state='normal', text='\u27f3  Fetch Live Jita Prices')
+            self.load_ore_import_data()
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def load_ore_import_data(self):
+        """Query DB, calculate ore import margins, and populate the treeview."""
+        try:
+            buy_pct    = float(self.ore_buy_pct_var.get()) / 100.0
+            broker_pct = float(self.ore_broker_var.get()) / 100.0
+            ship_rate  = float(self.ore_ship_var.get())
+            collat_pct = float(self.ore_collat_var.get()) / 100.0
+        except ValueError:
+            messagebox.showerror("Invalid Input", "All parameters must be numeric.")
+            return
+
+        buy_basis = self.ore_buy_var.get()
+        # Broker only applies when placing buy orders (JBV)
+        effective_broker = broker_pct if 'JBV' in buy_basis else 0.0
+
+        conn   = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        # Collect all type IDs we need prices for
+        all_ore_ids = (
+            # Standard
+            [1230,17470,17471,46689, 1228,17463,17464,46687, 1224,17459,17460,46686,
+             18,17455,17456,46685, 1227,17867,17868,46684, 20,17452,17453,46683,
+             21,17440,17441,46680, 1231,17444,17445,46681, 1226,17448,17449,46682,
+             1229,17865,17866,46679, 1232,17436,17437,46675, 1225,17432,17433,46677,
+             19,17466,17467,46688, 1223,17428,17429,46676, 22,17425,17426,46678,
+             11396,17869,17870] +
+            # Ice
+            [16262,16263,16264,16265,16266,16267,16268,16269,17975,17976,17977,17978] +
+            # Moon ores
+            [45490,45491,45492,45493, 46280,46282,46284,46286, 46281,46283,46285,46287,
+             45494,45495,45496,45497, 46288,46290,46292,46294, 46289,46291,46293,46295,
+             45498,45499,45500,45501, 46296,46298,46300,46302, 46297,46299,46301,46303,
+             45502,45503,45504,45506, 46304,46306,46308,46310, 46305,46307,46309,46311,
+             45510,45511,45512,45513, 46312,46314,46316,46318, 46313,46315,46317,46319]
+        )
+        all_product_ids = [t for t in self.ore_product_pct]
+
+        all_ids = list(set(all_ore_ids + all_product_ids))
+        placeholders = ','.join('?' * len(all_ids))
+
+        # Latest price per type_id
+        cursor.execute(f"""
+            SELECT type_id, best_buy, best_sell
+            FROM market_price_snapshots mps
+            WHERE type_id IN ({placeholders})
+              AND timestamp = (
+                  SELECT MAX(timestamp) FROM market_price_snapshots
+                  WHERE type_id = mps.type_id
+              )
+        """, all_ids)
+        prices = {r[0]: (r[1], r[2]) for r in cursor.fetchall()}
+
+        # Latest overall snapshot timestamp
+        cursor.execute("SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id IN (%s)" % placeholders, all_ids)
+        snap_ts = cursor.fetchone()[0]
+
+        # Volume + portion size for all ore type IDs
+        ore_ph = ','.join('?' * len(all_ore_ids))
+        cursor.execute(f"SELECT type_id, type_name, volume, portion_size FROM inv_types WHERE type_id IN ({ore_ph})",
+                       all_ore_ids)
+        ore_meta = {r[0]: (r[1], r[2], r[3]) for r in cursor.fetchall()}
+
+        # Refining yields from type_materials
+        import json as _json
+        cursor.execute(f"SELECT type_id, materials_json FROM type_materials WHERE type_id IN ({ore_ph})",
+                       all_ore_ids)
+        yields = {r[0]: _json.loads(r[1]) for r in cursor.fetchall()}
+
+        conn.close()
+
+        # Update price age label
+        if snap_ts:
+            self.ore_price_age_lbl.configure(
+                text=f'Price data: {snap_ts[:19].replace("T", " ")} UTC',
+                foreground='#00ff88')
+        else:
+            self.ore_price_age_lbl.configure(
+                text='\u26a0 No price data \u2014 click Fetch first',
+                foreground='#ffaa44')
+
+        # Ore category classification
+        std_ids  = set([1230,17470,17471,46689, 1228,17463,17464,46687, 1224,17459,17460,46686,
+                        18,17455,17456,46685, 1227,17867,17868,46684, 20,17452,17453,46683,
+                        21,17440,17441,46680, 1231,17444,17445,46681, 1226,17448,17449,46682,
+                        1229,17865,17866,46679, 1232,17436,17437,46675, 1225,17432,17433,46677,
+                        19,17466,17467,46688, 1223,17428,17429,46676, 22,17425,17426,46678,
+                        11396,17869,17870])
+        ice_ids  = set([16262,16263,16264,16265,16266,16267,16268,16269,17975,17976,17977,17978])
+        moon_ids = set(all_ore_ids) - std_ids - ice_ids
+
+        def _ore_buy_price(type_id):
+            bb, bs = prices.get(type_id, (None, None))
+            if bb is None and bs is None:
+                return None
+            if 'JBV' in buy_basis:
+                return bb
+            return bs  # JSV
+
+        self._ore_all_rows = []
+
+        for type_id in all_ore_ids:
+            if type_id not in ore_meta:
+                continue
+            name, volume, portion = ore_meta[type_id]
+            ore_yields = yields.get(type_id, [])
+            if not ore_yields:
+                continue
+
+            raw_price = _ore_buy_price(type_id)
+            if raw_price is None or raw_price <= 0:
+                continue
+
+            # Per-batch costs
+            ore_cost   = raw_price * buy_pct * portion
+            broker     = ore_cost * effective_broker
+            ship_cost  = volume * portion * ship_rate
+            collat     = ore_cost * collat_pct
+            total_cost = ore_cost + broker + ship_cost + collat
+
+            # Per-batch product value
+            prod_value = 0.0
+            for mat in ore_yields:
+                mat_id = mat['materialTypeID']
+                qty    = mat['quantity']
+                if mat_id not in self.ore_product_pct:
+                    continue
+                try:
+                    pct = float(self.ore_product_pct[mat_id].get()) / 100.0
+                except ValueError:
+                    pct = 1.0
+                mat_bb = prices.get(mat_id, (None, None))[0]  # JBV for sell side
+                if mat_bb and mat_bb > 0:
+                    prod_value += qty * mat_bb * pct
+
+            if prod_value <= 0:
+                continue
+
+            profit  = prod_value - total_cost
+            margin  = (profit / total_cost * 100) if total_cost > 0 else 0
+            vol_tot = volume * portion
+            isk_m3  = (profit / vol_tot) if vol_tot > 0 else 0
+
+            if type_id in std_ids:
+                ore_cat = 'standard'
+            elif type_id in ice_ids:
+                ore_cat = 'ice'
+            else:
+                ore_cat = 'moon'
+
+            self._ore_all_rows.append({
+                'type_id':  type_id,
+                'name':     name,
+                'batch':    portion,
+                'vol':      vol_tot,
+                'jita_buy': ore_cost,
+                'logistics':ship_cost + collat,
+                'landed':   total_cost,
+                'value':    prod_value,
+                'profit':   profit,
+                'margin':   margin,
+                'isk_m3':   isk_m3,
+                'ore_cat':  ore_cat,
+            })
+
+        self._filter_ore_tree()
+
+    def _filter_ore_tree(self):
+        """Apply search/show/sort/type filters and repopulate the treeview."""
+        search   = self.ore_search_var.get().lower()
+        show     = self.ore_show_var.get()
+        sort_map = {'Margin %': 'margin', 'Profit ISK': 'profit',
+                    'Landed Cost': 'landed', 'Product Value': 'value', 'ISK/m\u00b3': 'isk_m3'}
+        sort_key = sort_map.get(self.ore_sort_display_var.get(), 'margin')
+        type_filter = self._ore_type_filter_val
+
+        rows = self._ore_all_rows
+        if type_filter != 'all':
+            rows = [r for r in rows if r['ore_cat'] == type_filter]
+        if search:
+            rows = [r for r in rows if search in r['name'].lower()]
+        if show == 'Profitable':
+            rows = [r for r in rows if r['profit'] > 0]
+        elif show == 'Loss Only':
+            rows = [r for r in rows if r['profit'] <= 0]
+
+        rows = sorted(rows, key=lambda r: r[sort_key], reverse=True)
+
+        self.ore_tree.delete(*self.ore_tree.get_children())
+
+        def fmt_isk(v):
+            if v is None:
+                return '—'
+            if abs(v) >= 1_000_000:
+                return f'{v:,.0f}'
+            return f'{v:,.0f}'
+
+        profitable = sum(1 for r in rows if r['profit'] > 0)
+        best_r  = max(rows, key=lambda r: r['margin'],  default=None)
+        best_i  = max(rows, key=lambda r: r['profit'],  default=None)
+        worst_r = min(rows, key=lambda r: r['margin'],  default=None)
+
+        self._ore_summary_labels['total'].configure(text=str(len(rows)))
+        self._ore_summary_labels['profitable'].configure(
+            text=f'{profitable}  ({profitable/len(rows)*100:.0f}%)' if rows else '—')
+        self._ore_summary_labels['best'].configure(
+            text=f'+{best_r["margin"]:.1f}%  {best_r["name"]}' if best_r else '—',
+            foreground='#00ff88' if best_r and best_r['margin'] > 0 else '#ff4444')
+        self._ore_summary_labels['best_isk'].configure(
+            text=f'+{fmt_isk(best_i["profit"])} ISK  {best_i["name"]}' if best_i else '—')
+        self._ore_summary_labels['worst'].configure(
+            text=f'{worst_r["margin"]:.1f}%  {worst_r["name"]}' if worst_r else '—',
+            foreground='#ff4444' if worst_r and worst_r['margin'] < 0 else '#00ff88')
+
+        # Insert rows with group headers when not searching/filtering
+        show_groups = not search and type_filter in ('all', 'standard', 'ice', 'moon')
+        current_cat = None
+        row_idx = 0
+
+        for r in rows:
+            cat = r['ore_cat']
+            if show_groups and cat != current_cat:
+                current_cat = cat
+                cat_label = {'standard': '── Standard Ores ──',
+                             'ice':      '── Ice ──',
+                             'moon':     '── Moon Ores ──'}.get(cat, cat)
+                self.ore_tree.insert('', 'end',
+                    values=(cat_label, '', '', '', '', '', '', '', '', ''),
+                    tags=('group_hdr',))
+
+            m = r['margin']
+            if m >= 5:
+                tag = 'profitable'
+            elif m >= 0:
+                tag = 'marginal'
+            else:
+                tag = 'loss'
+
+            alt = 'row_a' if row_idx % 2 == 0 else 'row_b'
+
+            self.ore_tree.insert('', 'end', tags=(tag, alt), values=(
+                r['name'],
+                r['batch'],
+                f"{r['vol']:,.1f}",
+                f"{r['jita_buy']:,.0f}",
+                f"{r['logistics']:,.0f}",
+                f"{r['landed']:,.0f}",
+                f"{r['value']:,.0f}",
+                f"{r['profit']:+,.0f}",
+                f"{r['margin']:+.1f}%",
+                f"{r['isk_m3']:+,.0f}",
+            ))
+            row_idx += 1
+
+    def _sort_ore_tree(self, col):
+        sort_map = {'margin': 'Margin %', 'profit': 'Profit ISK', 'landed': 'Landed Cost',
+                    'value': 'Product Value', 'isk_m3': 'ISK/m\u00b3'}
+        if col in sort_map:
+            self.ore_sort_display_var.set(sort_map[col])
+        self._filter_ore_tree()
 
     def update_status(self, text):
         """Update the status indicator."""
