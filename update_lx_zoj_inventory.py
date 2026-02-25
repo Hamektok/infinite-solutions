@@ -293,7 +293,8 @@ def commit_and_push_to_github(snapshot_time):
 # ============================================
 
 def ensure_main_branch():
-    """Switch to main branch before making any changes (GitHub Pages builds from main)."""
+    """Switch to main branch before making any changes (GitHub Pages builds from main).
+    Returns the original branch name so the caller can restore it afterward."""
     import subprocess
     try:
         current_branch = subprocess.run(
@@ -315,8 +316,26 @@ def ensure_main_branch():
             print("[OK] Switched to main branch")
         else:
             print("[OK] Already on main branch")
+        return branch_name
     except Exception as e:
         print(f"[ERROR] Could not switch to main branch: {e}")
+        return 'main'
+
+
+def restore_branch(original_branch):
+    """Switch back to the branch that was active before ensure_main_branch()."""
+    import subprocess
+    if original_branch and original_branch != 'main':
+        try:
+            subprocess.run(
+                ['git', 'checkout', original_branch],
+                cwd=PROJECT_DIR,
+                check=True,
+                capture_output=True
+            )
+            print(f"[OK] Restored to '{original_branch}' branch")
+        except Exception as e:
+            print(f"[WARN] Could not restore branch '{original_branch}': {e}")
 
 def main():
     """
@@ -330,7 +349,7 @@ def main():
     print("=" * 60)
 
     # Switch to main branch FIRST (before modifying any files)
-    ensure_main_branch()
+    original_branch = ensure_main_branch()
 
     print(f"\nCharacter ID: {CHARACTER_ID}")
     print(f"Structure: LX-ZOJ ({LX_ZOJ_STRUCTURE_ID})")
@@ -388,12 +407,14 @@ def main():
 
         print(f"\n[OK] Inventory update completed!")
         print(f"Finished: {datetime.now().strftime('%I:%M:%S %p')}")
+        restore_branch(original_branch)
 
     except Exception as e:
         print(f"\n[ERROR] FATAL ERROR: {e}")
         import traceback
         traceback.print_exc()
         conn.close()
+        restore_branch(original_branch)
         raise
 
 if __name__ == '__main__':
