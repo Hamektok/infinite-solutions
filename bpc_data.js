@@ -193,26 +193,6 @@ const BPC_DATA = [
     "subcategory": "Capital Ship"
   },
   {
-    "typeId": 997,
-    "name": "Armageddon Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 1,
-    "quantity": 2,
-    "category": "Ships",
-    "subcategory": "Battleship"
-  },
-  {
-    "typeId": 997,
-    "name": "Armageddon Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 10,
-    "quantity": 1,
-    "category": "Ships",
-    "subcategory": "Battleship"
-  },
-  {
     "typeId": 955,
     "name": "Atron Blueprint",
     "me": 10,
