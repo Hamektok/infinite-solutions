@@ -246,10 +246,62 @@ MOON_MATERIAL_IDS = [
     16653,  # Thulium
 ]
 
+# ── Anomaly ores (found in ore anomalies) ─────────────────────────────────
+ANOMALY_ORE_IDS = [
+    # Kylixium
+    81900, 81901, 81902, 81903,
+    # Nocxite
+    82016, 82017, 82018, 82019,
+    # Ueganite
+    82205, 82206, 82207, 82208,
+    # Hezorime
+    82163, 82164, 82165, 82166,
+    # Griemeer
+    81975, 81976, 81977, 81978,
+]
+
+COMPRESSED_ANOMALY_ORE_IDS = [
+    # Compressed Kylixium
+    82300, 82301, 82302, 82303,
+    # Compressed Nocxite
+    82304, 82305, 82306, 82307,
+    # Compressed Ueganite
+    82308, 82309, 82310, 82311,
+    # Compressed Hezorime
+    82312, 82313, 82314, 82315,
+    # Compressed Griemeer
+    82316, 82317, 82318, 82319,
+]
+
+# ── A0 rare ores (rare asteroid belt / anomaly ores) ──────────────────────
+A0_RARE_ORE_IDS = [
+    # Mordunium — yields Pyerite
+    74521, 74522, 74523, 74524,
+    # Ytirium — yields Isogen
+    74525, 74526, 74527, 74528,
+    # Eifyrium — yields Zydrine
+    74529, 74530, 74531, 74532,
+    # Ducinium — yields Megacyte
+    74533, 74534, 74535, 74536,
+]
+
+COMPRESSED_A0_RARE_ORE_IDS = [
+    # Compressed Mordunium
+    75275, 75276, 75277, 75278,
+    # Compressed Ytirium
+    75279, 75280, 75281, 75282,
+    # Compressed Eifyrium
+    75283, 75284, 75285, 75286,
+    # Compressed Ducinium
+    75287, 75288, 75289, 75290,
+]
+
 ALL_TYPE_IDS = (
     STD_ORE_IDS + COMPRESSED_STD_ORE_IDS +
     ICE_IDS + COMPRESSED_ICE_IDS +
     MOON_ORE_IDS + COMPRESSED_MOON_ORE_IDS +
+    ANOMALY_ORE_IDS + COMPRESSED_ANOMALY_ORE_IDS +
+    A0_RARE_ORE_IDS + COMPRESSED_A0_RARE_ORE_IDS +
     MINERAL_IDS + ICE_PRODUCT_IDS + MOON_MATERIAL_IDS
 )
 
@@ -293,6 +345,8 @@ CATEGORY_IDS = {
     'standard': STD_ORE_IDS + COMPRESSED_STD_ORE_IDS + MINERAL_IDS,
     'ice':      ICE_IDS + COMPRESSED_ICE_IDS + ICE_PRODUCT_IDS,
     'moon':     MOON_ORE_IDS + COMPRESSED_MOON_ORE_IDS + MOON_MATERIAL_IDS,
+    'anomaly':  ANOMALY_ORE_IDS + COMPRESSED_ANOMALY_ORE_IDS + MINERAL_IDS,
+    'a0rare':   A0_RARE_ORE_IDS + COMPRESSED_A0_RARE_ORE_IDS + MINERAL_IDS,
     'all':      list(ALL_TYPE_IDS),
 }
 
@@ -300,7 +354,7 @@ CATEGORY_IDS = {
 def main():
     category = sys.argv[1].lower() if len(sys.argv) > 1 else 'all'
     if category not in CATEGORY_IDS:
-        print(f'Unknown category "{category}". Use: standard | ice | moon | all')
+        print(f'Unknown category "{category}". Use: standard | ice | moon | anomaly | a0rare | all')
         sys.exit(1)
 
     type_ids = CATEGORY_IDS[category]

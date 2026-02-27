@@ -2540,8 +2540,8 @@ class AdminDashboard:
         tk.Label(btn_row, text='Fetch:', background='#0a2030',
                  foreground='#88d0e8', font=('Segoe UI', 9)).pack(side='left', padx=(0, 6))
         self._ore_fetch_btns = {}
-        for label, cat in [('All', 'all'), ('Standard', 'standard'),
-                            ('Ice', 'ice'), ('Moon', 'moon')]:
+        for label, cat in [('All', 'all'), ('Standard', 'standard'), ('Ice', 'ice'),
+                            ('Moon', 'moon'), ('Anomaly', 'anomaly'), ('A0 Rare', 'a0rare')]:
             btn = ttk.Button(btn_row, text=f'\u27f3 {label}',
                              style='Action.TButton',
                              command=lambda c=cat: self._run_ore_fetch(c))
@@ -2580,7 +2580,8 @@ class AdminDashboard:
 
         self._ore_type_filter_val = 'all'
         self._ore_type_btns = {}
-        for label, val in [('All', 'all'), ('Standard', 'standard'), ('Ice', 'ice'), ('Moon', 'moon')]:
+        for label, val in [('All', 'all'), ('Standard', 'standard'), ('Ice', 'ice'),
+                            ('Moon', 'moon'), ('Anomaly', 'anomaly'), ('A0 Rare', 'a0rare')]:
             btn = ttk.Button(type_row, text=label,
                              command=lambda v=val: self._set_ore_type_filter(v))
             btn.pack(side='left', padx=3)
@@ -2795,8 +2796,9 @@ class AdminDashboard:
     def _set_ore_type_filter(self, val):
         """Switch the ore type filter and refresh the tree."""
         self._ore_type_filter_val = val
-        labels = {'all': 'All', 'standard': 'Standard Ores', 'ice': 'Ice', 'moon': 'Moon Ores'}
-        self._ore_type_lbl.configure(text=f'Showing: {labels[val]}')
+        labels = {'all': 'All', 'standard': 'Standard Ores', 'ice': 'Ice',
+                  'moon': 'Moon Ores', 'anomaly': 'Anomaly Ores', 'a0rare': 'A0 Rare Ores'}
+        self._ore_type_lbl.configure(text=f'Showing: {labels.get(val, val)}')
         self._filter_ore_tree()
 
     def _set_ore_comp_filter(self, val):
@@ -2809,7 +2811,8 @@ class AdminDashboard:
     def _run_ore_fetch(self, category='all'):
         """Run fetch_ore_prices.py for the given category in a background thread."""
         import threading
-        label_map = {'all': 'All', 'standard': 'Standard', 'ice': 'Ice', 'moon': 'Moon'}
+        label_map = {'all': 'All', 'standard': 'Standard', 'ice': 'Ice',
+                     'moon': 'Moon', 'anomaly': 'Anomaly', 'a0rare': 'A0 Rare'}
         for cat, btn in self._ore_fetch_btns.items():
             btn.configure(state='disabled')
         self.ore_price_age_lbl.configure(
@@ -2892,9 +2895,22 @@ class AdminDashboard:
                       62480,62483,62486,62489, 62481,62484,62487,62490, 62482,62485,62488,62491,
                       62492,62501,62498,62495, 62493,62502,62499,62496, 62494,62503,62500,62497,
                       62504,62510,62507,62513, 62505,62511,62508,62514, 62506,62512,62509,62515]
+        _anomaly_raw  = [81900,81901,81902,81903, 82016,82017,82018,82019,
+                         82205,82206,82207,82208, 82163,82164,82165,82166,
+                         81975,81976,81977,81978]
+        _anomaly_comp = [82300,82301,82302,82303, 82304,82305,82306,82307,
+                         82308,82309,82310,82311, 82312,82313,82314,82315,
+                         82316,82317,82318,82319]
+        _a0rare_raw   = [74521,74522,74523,74524, 74525,74526,74527,74528,
+                         74529,74530,74531,74532, 74533,74534,74535,74536]
+        _a0rare_comp  = [75275,75276,75277,75278, 75279,75280,75281,75282,
+                         75283,75284,75285,75286, 75287,75288,75289,75290]
 
-        compressed_set   = set(_std_comp + _ice_comp + _moon_comp)
-        all_ore_ids = _std_raw + _std_comp + _ice_raw + _ice_comp + _moon_raw + _moon_comp
+        compressed_set = set(_std_comp + _ice_comp + _moon_comp +
+                              _anomaly_comp + _a0rare_comp)
+        all_ore_ids = (_std_raw + _std_comp + _ice_raw + _ice_comp +
+                       _moon_raw + _moon_comp + _anomaly_raw + _anomaly_comp +
+                       _a0rare_raw + _a0rare_comp)
         all_product_ids = [t for t in self.ore_product_pct]
 
         all_ids = list(set(all_ore_ids + all_product_ids))
@@ -2952,9 +2968,11 @@ class AdminDashboard:
                 foreground='#ffaa44')
 
         # Ore category classification (uses the pre-built sets from above)
-        std_ids  = set(_std_raw  + _std_comp)
-        ice_ids  = set(_ice_raw  + _ice_comp)
-        moon_ids = set(_moon_raw + _moon_comp)
+        std_ids     = set(_std_raw     + _std_comp)
+        ice_ids     = set(_ice_raw     + _ice_comp)
+        moon_ids    = set(_moon_raw    + _moon_comp)
+        anomaly_ids = set(_anomaly_raw + _anomaly_comp)
+        a0rare_ids  = set(_a0rare_raw  + _a0rare_comp)
 
         def _ore_buy_price(type_id):
             bb, bs = prices.get(type_id, (None, None))
@@ -3015,8 +3033,12 @@ class AdminDashboard:
                 ore_cat = 'standard'
             elif type_id in ice_ids:
                 ore_cat = 'ice'
-            else:
+            elif type_id in moon_ids:
                 ore_cat = 'moon'
+            elif type_id in anomaly_ids:
+                ore_cat = 'anomaly'
+            else:
+                ore_cat = 'a0rare'
             is_compressed = type_id in compressed_set
 
             self._ore_all_rows.append({
@@ -3086,7 +3108,7 @@ class AdminDashboard:
             foreground='#ff4444' if worst_r and worst_r['margin'] < 0 else '#00ff88')
 
         # Insert rows with group headers when not searching/filtering
-        show_groups = not search and type_filter in ('all', 'standard', 'ice', 'moon')
+        show_groups = not search and type_filter in ('all', 'standard', 'ice', 'moon', 'anomaly', 'a0rare')
         current_cat = None
         row_idx = 0
 
@@ -3096,7 +3118,9 @@ class AdminDashboard:
                 current_cat = cat
                 cat_label = {'standard': '── Standard Ores ──',
                              'ice':      '── Ice ──',
-                             'moon':     '── Moon Ores ──'}.get(cat, cat)
+                             'moon':     '── Moon Ores ──',
+                             'anomaly':  '── Anomaly Ores ──',
+                             'a0rare':   '── A0 Rare Ores ──'}.get(cat, cat)
                 self.ore_tree.insert('', 'end',
                     values=(cat_label, '', '', '', '', '', '', ''),
                     tags=('group_hdr',))
