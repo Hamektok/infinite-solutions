@@ -19,11 +19,8 @@ CATEGORY_DISPLAY = {
     'moon_materials': 'Reaction Materials',
     'salvaged_materials': 'Salvaged Materials',
     'standard_ore': 'Standard Ore',
-    'compressed_ore': 'Compressed Ore',
     'ice_ore': 'Ice Ore',
-    'compressed_ice_ore': 'Compressed Ice Ore',
     'moon_ore': 'Moon Ore',
-    'compressed_moon_ore': 'Compressed Moon Ore',
 }
 # Reverse lookup: display name -> DB category key
 CATEGORY_DB_KEY = {v: k for k, v in CATEGORY_DISPLAY.items()}
@@ -268,13 +265,9 @@ class AdminDashboard:
         self.buyback_categories = [
             'Minerals', 'Ice Products', 'Reaction Materials',
             'Salvaged Materials', 'Gas Clouds Materials', 'Planetary Materials',
-            'Standard Ore', 'Compressed Ore', 'Ice Ore',
-            'Compressed Ice Ore', 'Moon Ore', 'Compressed Moon Ore',
+            'Standard Ore', 'Ice Ore', 'Moon Ore',
         ]
-        self._ore_categories = {
-            'Standard Ore', 'Compressed Ore', 'Ice Ore',
-            'Compressed Ice Ore', 'Moon Ore', 'Compressed Moon Ore',
-        }
+        self._ore_categories = {'Standard Ore', 'Ice Ore', 'Moon Ore'}
         self.buyback_category_vars = {}  # BooleanVar per category (True = visible)
 
         # Top controls

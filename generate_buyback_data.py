@@ -22,18 +22,13 @@ CATEGORY_DISPLAY = {
     'moon_materials': 'Reaction Materials',
     'salvaged_materials': 'Salvaged Materials',
     'standard_ore': 'Standard Ore',
-    'compressed_ore': 'Compressed Ore',
     'ice_ore': 'Ice Ore',
-    'compressed_ice_ore': 'Compressed Ice Ore',
     'moon_ore': 'Moon Ore',
-    'compressed_moon_ore': 'Compressed Moon Ore',
 }
 
 # Ore categories that use mineral-value pricing instead of Jita ore spot price
 ORE_CATEGORIES = {
-    'standard_ore', 'compressed_ore',
-    'ice_ore', 'compressed_ice_ore',
-    'moon_ore', 'compressed_moon_ore',
+    'standard_ore', 'ice_ore', 'moon_ore',
 }
 
 # Default refining efficiency (90.63% = typical Tatara with max skills/rigs)

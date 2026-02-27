@@ -5612,13 +5612,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
             // Render each category card
             const categoryOrder = [
                 'minerals', 'ice_products', 'moon_materials', 'salvaged_materials',
-                'standard_ore', 'compressed_ore', 'ice_ore', 'compressed_ice_ore',
-                'moon_ore', 'compressed_moon_ore',
+                'standard_ore', 'ice_ore', 'moon_ore',
             ];
-            const oreCategories = new Set([
-                'standard_ore', 'compressed_ore', 'ice_ore',
-                'compressed_ice_ore', 'moon_ore', 'compressed_moon_ore',
-            ]);
+            const oreCategories = new Set(['standard_ore', 'ice_ore', 'moon_ore']);
             categoryOrder.forEach(catKey => {
                 const catConfig = BUYBACK_DATA.categories[catKey];
                 const items = categoryGroups[catKey];
