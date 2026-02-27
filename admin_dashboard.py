@@ -2540,8 +2540,8 @@ class AdminDashboard:
         tk.Label(btn_row, text='Fetch:', background='#0a2030',
                  foreground='#88d0e8', font=('Segoe UI', 9)).pack(side='left', padx=(0, 6))
         self._ore_fetch_btns = {}
-        for label, cat in [('All', 'all'), ('Standard', 'standard'), ('Ice', 'ice'),
-                            ('Moon', 'moon'), ('Anomaly', 'anomaly'), ('A0 Rare', 'a0rare')]:
+        for label, cat in [('All', 'all'), ('Standard', 'standard'),
+                            ('Ice', 'ice'), ('Moon', 'moon')]:
             btn = ttk.Button(btn_row, text=f'\u27f3 {label}',
                              style='Action.TButton',
                              command=lambda c=cat: self._run_ore_fetch(c))
@@ -2580,8 +2580,8 @@ class AdminDashboard:
 
         self._ore_type_filter_val = 'all'
         self._ore_type_btns = {}
-        for label, val in [('All', 'all'), ('Standard', 'standard'), ('Ice', 'ice'),
-                            ('Moon', 'moon'), ('Anomaly', 'anomaly'), ('A0 Rare', 'a0rare')]:
+        for label, val in [('All', 'all'), ('Standard', 'standard'),
+                            ('Ice', 'ice'), ('Moon', 'moon')]:
             btn = ttk.Button(type_row, text=label,
                              command=lambda v=val: self._set_ore_type_filter(v))
             btn.pack(side='left', padx=3)
@@ -2796,8 +2796,7 @@ class AdminDashboard:
     def _set_ore_type_filter(self, val):
         """Switch the ore type filter and refresh the tree."""
         self._ore_type_filter_val = val
-        labels = {'all': 'All', 'standard': 'Standard Ores', 'ice': 'Ice',
-                  'moon': 'Moon Ores', 'anomaly': 'Anomaly Ores', 'a0rare': 'A0 Rare Ores'}
+        labels = {'all': 'All', 'standard': 'Standard Ores', 'ice': 'Ice', 'moon': 'Moon Ores'}
         self._ore_type_lbl.configure(text=f'Showing: {labels.get(val, val)}')
         self._filter_ore_tree()
 
@@ -2811,8 +2810,7 @@ class AdminDashboard:
     def _run_ore_fetch(self, category='all'):
         """Run fetch_ore_prices.py for the given category in a background thread."""
         import threading
-        label_map = {'all': 'All', 'standard': 'Standard', 'ice': 'Ice',
-                     'moon': 'Moon', 'anomaly': 'Anomaly', 'a0rare': 'A0 Rare'}
+        label_map = {'all': 'All', 'standard': 'Standard', 'ice': 'Ice', 'moon': 'Moon'}
         for cat, btn in self._ore_fetch_btns.items():
             btn.configure(state='disabled')
         self.ore_price_age_lbl.configure(
@@ -2967,12 +2965,10 @@ class AdminDashboard:
                 text='\u26a0 No price data \u2014 click Fetch first',
                 foreground='#ffaa44')
 
-        # Ore category classification (uses the pre-built sets from above)
-        std_ids     = set(_std_raw     + _std_comp)
-        ice_ids     = set(_ice_raw     + _ice_comp)
-        moon_ids    = set(_moon_raw    + _moon_comp)
-        anomaly_ids = set(_anomaly_raw + _anomaly_comp)
-        a0rare_ids  = set(_a0rare_raw  + _a0rare_comp)
+        # Ore category classification
+        ice_ids  = set(_ice_raw  + _ice_comp)
+        moon_ids = set(_moon_raw + _moon_comp)
+        # everything else (std, anomaly, A0 rare) is 'standard'
 
         def _ore_buy_price(type_id):
             bb, bs = prices.get(type_id, (None, None))
@@ -3029,16 +3025,12 @@ class AdminDashboard:
             avg_bb     = avg_prices.get(type_id)
             dev_pct    = ((current_bb - avg_bb) / avg_bb * 100) if (current_bb and avg_bb and avg_bb > 0) else None
 
-            if type_id in std_ids:
-                ore_cat = 'standard'
-            elif type_id in ice_ids:
+            if type_id in ice_ids:
                 ore_cat = 'ice'
             elif type_id in moon_ids:
                 ore_cat = 'moon'
-            elif type_id in anomaly_ids:
-                ore_cat = 'anomaly'
             else:
-                ore_cat = 'a0rare'
+                ore_cat = 'standard'  # std, anomaly, and A0 rare all under standard
             is_compressed = type_id in compressed_set
 
             self._ore_all_rows.append({
@@ -3108,7 +3100,7 @@ class AdminDashboard:
             foreground='#ff4444' if worst_r and worst_r['margin'] < 0 else '#00ff88')
 
         # Insert rows with group headers when not searching/filtering
-        show_groups = not search and type_filter in ('all', 'standard', 'ice', 'moon', 'anomaly', 'a0rare')
+        show_groups = not search and type_filter in ('all', 'standard', 'ice', 'moon')
         current_cat = None
         row_idx = 0
 
@@ -3118,9 +3110,7 @@ class AdminDashboard:
                 current_cat = cat
                 cat_label = {'standard': '── Standard Ores ──',
                              'ice':      '── Ice ──',
-                             'moon':     '── Moon Ores ──',
-                             'anomaly':  '── Anomaly Ores ──',
-                             'a0rare':   '── A0 Rare Ores ──'}.get(cat, cat)
+                             'moon':     '── Moon Ores ──'}.get(cat, cat)
                 self.ore_tree.insert('', 'end',
                     values=(cat_label, '', '', '', '', '', '', ''),
                     tags=('group_hdr',))

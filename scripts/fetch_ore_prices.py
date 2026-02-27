@@ -342,11 +342,12 @@ def fetch_jita_price(type_id):
 # ── Main ───────────────────────────────────────────────────────────────────
 
 CATEGORY_IDS = {
-    'standard': STD_ORE_IDS + COMPRESSED_STD_ORE_IDS + MINERAL_IDS,
+    'standard': (STD_ORE_IDS + COMPRESSED_STD_ORE_IDS +
+                 ANOMALY_ORE_IDS + COMPRESSED_ANOMALY_ORE_IDS +
+                 A0_RARE_ORE_IDS + COMPRESSED_A0_RARE_ORE_IDS +
+                 MINERAL_IDS),
     'ice':      ICE_IDS + COMPRESSED_ICE_IDS + ICE_PRODUCT_IDS,
     'moon':     MOON_ORE_IDS + COMPRESSED_MOON_ORE_IDS + MOON_MATERIAL_IDS,
-    'anomaly':  ANOMALY_ORE_IDS + COMPRESSED_ANOMALY_ORE_IDS + MINERAL_IDS,
-    'a0rare':   A0_RARE_ORE_IDS + COMPRESSED_A0_RARE_ORE_IDS + MINERAL_IDS,
     'all':      list(ALL_TYPE_IDS),
 }
 
@@ -354,7 +355,7 @@ CATEGORY_IDS = {
 def main():
     category = sys.argv[1].lower() if len(sys.argv) > 1 else 'all'
     if category not in CATEGORY_IDS:
-        print(f'Unknown category "{category}". Use: standard | ice | moon | anomaly | a0rare | all')
+        print(f'Unknown category "{category}". Use: standard | ice | moon | all')
         sys.exit(1)
 
     type_ids = CATEGORY_IDS[category]
