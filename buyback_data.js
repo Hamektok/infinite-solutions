@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-02-27 18:27 UTC
+// Generated: 2026-02-27 18:32 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -1980,7 +1980,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8528.86
+      "avgJitaBuy": 8845.53
     },
     {
       "typeId": 2345,
@@ -1991,7 +1991,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 80020.91
+      "avgJitaBuy": 90992.57
     },
     {
       "typeId": 2348,
@@ -2002,7 +2002,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 113368.18
+      "avgJitaBuy": 115932.17
     },
     {
       "typeId": 2349,
@@ -2013,7 +2013,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 88409.55
+      "avgJitaBuy": 94265.16
     },
     {
       "typeId": 2351,
@@ -2024,7 +2024,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 68812.27
+      "avgJitaBuy": 71212.62
     },
     {
       "typeId": 2352,
@@ -2035,7 +2035,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 86270.0
+      "avgJitaBuy": 89890.77
     },
     {
       "typeId": 2354,
@@ -2046,7 +2046,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 81282.73
+      "avgJitaBuy": 85790.79
     },
     {
       "typeId": 2360,
@@ -2057,7 +2057,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 47928.18
+      "avgJitaBuy": 56114.51
     },
     {
       "typeId": 2361,
@@ -2068,7 +2068,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 94910.91
+      "avgJitaBuy": 98831.45
     },
     {
       "typeId": 2367,
@@ -2079,7 +2079,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 114436.36
+      "avgJitaBuy": 118597.81
     },
     {
       "typeId": 2401,
@@ -2090,7 +2090,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 670.39
+      "avgJitaBuy": 693.85
     },
     {
       "typeId": 2463,
@@ -2101,7 +2101,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8395.77
+      "avgJitaBuy": 8652.89
     },
     {
       "typeId": 2867,
@@ -2112,7 +2112,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1861545.45
+      "avgJitaBuy": 1905043.56
     },
     {
       "typeId": 2868,
@@ -2123,7 +2123,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2108000.0
+      "avgJitaBuy": 2213055.56
     },
     {
       "typeId": 2869,
@@ -2134,7 +2134,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 965604.55
+      "avgJitaBuy": 995763.81
     },
     {
       "typeId": 2870,
@@ -2145,7 +2145,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 905090.91
+      "avgJitaBuy": 931808.42
     },
     {
       "typeId": 2871,
@@ -2156,7 +2156,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1190136.36
+      "avgJitaBuy": 1240179.29
     },
     {
       "typeId": 2872,
@@ -2167,7 +2167,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1931090.91
+      "avgJitaBuy": 1972506.99
     },
     {
       "typeId": 2875,
@@ -2178,7 +2178,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1026409.09
+      "avgJitaBuy": 1056519.36
     },
     {
       "typeId": 2876,
@@ -2189,7 +2189,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1914272.73
+      "avgJitaBuy": 1964963.29
     },
     {
       "typeId": 3645,
@@ -2200,7 +2200,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 445.24
+      "avgJitaBuy": 457.15
     },
     {
       "typeId": 3775,
@@ -2211,7 +2211,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 10972.73
+      "avgJitaBuy": 11526.36
     },
     {
       "typeId": 3779,
@@ -2222,7 +2222,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 849.61
+      "avgJitaBuy": 874.43
     },
     {
       "typeId": 3828,
@@ -2233,7 +2233,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8285.86
+      "avgJitaBuy": 8690.69
     },
     {
       "typeId": 9838,
@@ -2244,7 +2244,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 9732.27
+      "avgJitaBuy": 10212.8
     },
     {
       "typeId": 9842,
@@ -2255,7 +2255,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 11719.55
+      "avgJitaBuy": 12186.44
     },
     {
       "typeId": 9846,
@@ -2266,7 +2266,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 113290.91
+      "avgJitaBuy": 119976.94
     },
     {
       "typeId": 2358,
@@ -2277,7 +2277,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 86344.12
+      "avgJitaBuy": 99124.56
     },
     {
       "typeId": 2344,
@@ -2288,7 +2288,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 46945.88
+      "avgJitaBuy": 51732.19
     },
     {
       "typeId": 17392,
@@ -2299,7 +2299,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 88589.41
+      "avgJitaBuy": 92551.37
     },
     {
       "typeId": 2366,
@@ -2310,7 +2310,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 103258.82
+      "avgJitaBuy": 109788.24
     },
     {
       "typeId": 17898,
@@ -2321,7 +2321,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 84601.18
+      "avgJitaBuy": 92954.75
     },
     {
       "typeId": 2346,
@@ -2332,7 +2332,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 77450.0
+      "avgJitaBuy": 82777.86
     },
     {
       "typeId": 12836,
@@ -2343,7 +2343,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 68821.18
+      "avgJitaBuy": 70498.92
     },
     {
       "typeId": 17136,
@@ -2354,7 +2354,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 74780.0
+      "avgJitaBuy": 77431.67
     },
     {
       "typeId": 28974,
@@ -2365,7 +2365,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 70000.0
+      "avgJitaBuy": 74703.53
     },
     {
       "typeId": 15317,
@@ -2376,7 +2376,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 11486.47
+      "avgJitaBuy": 12080.74
     },
     {
       "typeId": 2327,
@@ -2387,7 +2387,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 14517.06
+      "avgJitaBuy": 15407.53
     },
     {
       "typeId": 2321,
@@ -2398,7 +2398,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 16025.88
+      "avgJitaBuy": 16527.41
     },
     {
       "typeId": 3695,
@@ -2409,7 +2409,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5097.35
+      "avgJitaBuy": 5362.9
     },
     {
       "typeId": 3697,
@@ -2420,7 +2420,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13262.94
+      "avgJitaBuy": 14432.86
     },
     {
       "typeId": 3691,
@@ -2431,7 +2431,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 9446.82
+      "avgJitaBuy": 9765.46
     },
     {
       "typeId": 2319,
@@ -2442,7 +2442,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 9030.71
+      "avgJitaBuy": 9485.69
     },
     {
       "typeId": 2393,
@@ -2453,7 +2453,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 421.45
+      "avgJitaBuy": 429.87
     },
     {
       "typeId": 2396,
@@ -2464,7 +2464,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 226.01
+      "avgJitaBuy": 235.67
     },
     {
       "typeId": 2390,
@@ -2475,7 +2475,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 585.08
+      "avgJitaBuy": 597.66
     },
     {
       "typeId": 2397,
@@ -2486,7 +2486,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 786.91
+      "avgJitaBuy": 810.46
     },
     {
       "typeId": 2392,
@@ -2497,7 +2497,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 684.47
+      "avgJitaBuy": 698.57
     },
     {
       "typeId": 2389,
@@ -2508,7 +2508,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 503.37
+      "avgJitaBuy": 520.6
     },
     {
       "typeId": 2399,
@@ -2519,7 +2519,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 582.18
+      "avgJitaBuy": 620.96
     },
     {
       "typeId": 2395,
@@ -2530,7 +2530,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 779.79
+      "avgJitaBuy": 817.11
     },
     {
       "typeId": 2398,
@@ -2541,7 +2541,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 410.79
+      "avgJitaBuy": 426.37
     },
     {
       "typeId": 9828,
@@ -2552,7 +2552,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 790.97
+      "avgJitaBuy": 812.45
     },
     {
       "typeId": 2400,
@@ -2563,7 +2563,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 315.5
+      "avgJitaBuy": 323.0
     },
     {
       "typeId": 44,
@@ -2574,7 +2574,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 10856.09
+      "avgJitaBuy": 11217.3
     },
     {
       "typeId": 3683,
@@ -2585,7 +2585,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 396.53
+      "avgJitaBuy": 410.15
     },
     {
       "typeId": 3689,
@@ -2596,7 +2596,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 9813.57
+      "avgJitaBuy": 10087.89
     },
     {
       "typeId": 9832,
@@ -2607,7 +2607,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 9640.74
+      "avgJitaBuy": 9979.26
     },
     {
       "typeId": 9848,
@@ -2618,7 +2618,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 76942.61
+      "avgJitaBuy": 78772.02
     },
     {
       "typeId": 9830,
@@ -2629,7 +2629,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 10943.91
+      "avgJitaBuy": 11432.49
     },
     {
       "typeId": 9834,
@@ -2640,7 +2640,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 76491.74
+      "avgJitaBuy": 77682.3
     },
     {
       "typeId": 9836,
@@ -2651,7 +2651,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8507.09
+      "avgJitaBuy": 8786.32
     },
     {
       "typeId": 9840,
@@ -2662,7 +2662,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 10306.09
+      "avgJitaBuy": 10695.19
     },
     {
       "typeId": 2312,
@@ -2673,7 +2673,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13440.87
+      "avgJitaBuy": 13839.9
     },
     {
       "typeId": 2317,
@@ -2684,7 +2684,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8619.74
+      "avgJitaBuy": 8831.0
     },
     {
       "typeId": 3812,
@@ -2695,7 +2695,7 @@ const BUYBACK_DATA = {
       "sellRate": 98,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 186.95
+      "avgJitaBuy": 263.0
     },
     {
       "typeId": 25588,
@@ -5471,5 +5471,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-02-27 18:27 UTC"
+  "generated": "2026-02-27 18:32 UTC"
 };
