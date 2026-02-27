@@ -137,15 +137,28 @@ def get_buyback_data():
     """)
     items = cursor.fetchall()
 
-    # Get 7-day average Jita buy prices from snapshots
+    # Get 7-day average Jita buy and sell prices from snapshots
     seven_days_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
     cursor.execute("""
-        SELECT type_id, AVG(best_buy) as avg_buy
+        SELECT type_id, AVG(best_buy) as avg_buy, AVG(best_sell) as avg_sell
         FROM market_price_snapshots
         WHERE timestamp >= ?
         GROUP BY type_id
     """, (seven_days_ago,))
-    avg_prices = {row[0]: round(row[1], 2) for row in cursor.fetchall() if row[1] is not None}
+    avg_buy_prices = {}
+    avg_sell_prices = {}
+    avg_split_prices = {}
+    for row in cursor.fetchall():
+        tid, buy, sell = row
+        if buy is not None:
+            avg_buy_prices[tid] = round(buy, 2)
+        if sell is not None:
+            avg_sell_prices[tid] = round(sell, 2)
+        if buy is not None and sell is not None:
+            avg_split_prices[tid] = round((buy + sell) / 2, 2)
+        elif buy is not None:
+            avg_split_prices[tid] = round(buy, 2)
+    avg_prices = avg_buy_prices  # used by ore mineral value calculation
 
     # Get category visibility from site_config
     cursor.execute("""
@@ -186,11 +199,17 @@ def get_buyback_data():
         effective_rate = rate if rate is not None else price_pct
 
         # For ore categories: use mineral value per unit (at refining efficiency)
-        # For everything else: use Jita buy spot price
+        # For everything else: use price based on category pricing method
         if category in ORE_CATEGORIES:
             price = ore_mineral_values.get(type_id, 0)
         else:
-            price = avg_prices.get(type_id, 0)
+            method = category_pricing.get(category, 'Jita Buy')
+            if method == 'Jita Sell':
+                price = avg_sell_prices.get(type_id, 0)
+            elif method == 'Jita Split':
+                price = avg_split_prices.get(type_id, 0)
+            else:
+                price = avg_buy_prices.get(type_id, 0)
 
         item = {
             'typeId': type_id,

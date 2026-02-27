@@ -6002,7 +6002,11 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                     const isSpecial = String(item.rate) !== String(defaultRate);
                     const pctClass = isSpecial ? 'rate-item-pct special' : 'rate-item-pct';
-                    const rateLabel = oreCategories.has(catKey) ? 'MV' : 'JBV';
+                    const pricingMethod = catConfig.pricingMethod || 'Jita Buy';
+                    const rateLabel = oreCategories.has(catKey) ? 'MV'
+                        : pricingMethod === 'Jita Sell' ? 'JSV'
+                        : pricingMethod === 'Jita Split' ? 'Split'
+                        : 'JBV';
 
                     let quotaHtml = '';
                     if (item.quota > 0) {
