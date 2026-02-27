@@ -1452,9 +1452,16 @@
             color: #00d9ff;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
+            margin-bottom: 4px;
+            padding-bottom: 6px;
             border-bottom: 1px solid rgba(0, 217, 255, 0.15);
+        }
+
+        .rate-card-subtitle {
+            font-size: 10px;
+            color: #6fb3d0;
+            margin-bottom: 8px;
+            font-style: italic;
         }
 
         .rate-card-items {
@@ -5603,7 +5610,15 @@ Tip: Copy directly from EVE inventory window"></textarea>
             const defaultRate = Object.entries(rateCount).sort((a, b) => b[1] - a[1])[0][0];
 
             // Render each category card
-            const categoryOrder = ['minerals', 'ice_products', 'moon_materials', 'salvaged_materials'];
+            const categoryOrder = [
+                'minerals', 'ice_products', 'moon_materials', 'salvaged_materials',
+                'standard_ore', 'compressed_ore', 'ice_ore', 'compressed_ice_ore',
+                'moon_ore', 'compressed_moon_ore',
+            ];
+            const oreCategories = new Set([
+                'standard_ore', 'compressed_ore', 'ice_ore',
+                'compressed_ice_ore', 'moon_ore', 'compressed_moon_ore',
+            ]);
             categoryOrder.forEach(catKey => {
                 const catConfig = BUYBACK_DATA.categories[catKey];
                 const items = categoryGroups[catKey];
@@ -5626,6 +5641,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                     const isSpecial = String(item.rate) !== String(defaultRate);
                     const pctClass = isSpecial ? 'rate-item-pct special' : 'rate-item-pct';
+                    const rateLabel = oreCategories.has(catKey) ? 'MV' : 'JBV';
 
                     let quotaHtml = '';
                     if (item.quota > 0) {
@@ -5648,14 +5664,18 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <div class="rate-item">
                             <div class="rate-item-header">
                                 <span class="rate-item-name">${item.name}</span>
-                                <span class="${pctClass}">${item.rate}% JBV</span>
+                                <span class="${pctClass}">${item.rate}% ${rateLabel}</span>
                             </div>
                             ${quotaHtml}
                         </div>`;
                 });
 
+                const oreNote = oreCategories.has(catKey) && BUYBACK_DATA.refiningEfficiency
+                    ? `<div class="rate-card-subtitle">Mineral value @ ${BUYBACK_DATA.refiningEfficiency}% refine</div>`
+                    : '';
                 card.innerHTML = `
                     <div class="rate-card-title">${catConfig.displayName}</div>
+                    ${oreNote}
                     <div class="rate-card-items">${itemsHtml}</div>`;
 
                 grid.appendChild(card);
