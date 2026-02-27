@@ -78,15 +78,37 @@ def get_character_assets(headers):
     return all_assets
 
 def filter_lx_zoj_items(assets):
-    """Filter assets to only LX-ZOJ structure hangar."""
-    lx_zoj_items = [
-        asset for asset in assets
-        if asset.get('location_id') == LX_ZOJ_STRUCTURE_ID
-        and asset.get('location_flag') == 'Hangar'
-    ]
+    """Filter assets to LX-ZOJ structure hangar, including contents of containers."""
+    # Build a fast lookup: location_id -> [assets at that location]
+    by_location = {}
+    for asset in assets:
+        loc = asset.get('location_id')
+        if loc not in by_location:
+            by_location[loc] = []
+        by_location[loc].append(asset)
 
-    print(f"[OK] Filtered to LX-ZOJ hangar: {len(lx_zoj_items)} items")
-    return lx_zoj_items
+    # Start with items directly in the LX-ZOJ hangar
+    result = []
+    visited_ids = set()
+    queue = [a for a in by_location.get(LX_ZOJ_STRUCTURE_ID, [])
+             if a.get('location_flag') == 'Hangar']
+
+    # BFS: walk into any containers found in the hangar
+    while queue:
+        batch, queue = queue, []
+        for item in batch:
+            item_id = item.get('item_id')
+            if item_id in visited_ids:
+                continue
+            visited_ids.add(item_id)
+            result.append(item)
+            # If this item is a container, add its contents to the queue
+            queue.extend(by_location.get(item_id, []))
+
+    direct = sum(1 for a in result if a.get('location_id') == LX_ZOJ_STRUCTURE_ID)
+    in_containers = len(result) - direct
+    print(f"[OK] LX-ZOJ hangar: {direct} direct, {in_containers} in containers ({len(result)} total)")
+    return result
 
 def get_tracked_items(conn):
     """Get list of tracked item type_ids from database."""
