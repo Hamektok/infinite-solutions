@@ -5856,7 +5856,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             if (quotaWarnings > 0) acceptedText += ` — ${quotaWarnings} capped at quota`;
             document.getElementById('contractAcceptedDisplay').textContent = acceptedText;
 
-            // Build share link — auto-shorten via is.gd
+            // Build share link — auto-shorten via is.gd with tinyurl fallback
             const acceptedItems = results.filter(r => r.accepted);
             const itemPairs = acceptedItems.map(r => `${r.typeId}:${r.quantity}`).join(',');
             const shareUrl = `${window.location.origin}${window.location.pathname}#buyback=${itemPairs}`;
@@ -5865,14 +5865,22 @@ Tip: Copy directly from EVE inventory window"></textarea>
             linkInput.value = 'Shortening...';
             copyBtn.disabled = true;
             (async () => {
+                const encoded = encodeURIComponent(shareUrl);
+                const tryShorten = async (url) => {
+                    const resp = await fetch(url, { signal: AbortSignal.timeout(5000) });
+                    if (!resp.ok) throw new Error('non-200');
+                    const text = (await resp.text()).trim();
+                    if (!text.startsWith('http')) throw new Error('bad response');
+                    return text;
+                };
                 try {
-                    const resp = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(shareUrl)}`);
-                    if (!resp.ok) throw new Error();
-                    const short = (await resp.text()).trim();
-                    if (!short.startsWith('https://')) throw new Error();
-                    linkInput.value = short;
+                    linkInput.value = await tryShorten(`https://is.gd/create.php?format=simple&url=${encoded}`);
                 } catch {
-                    linkInput.value = shareUrl;
+                    try {
+                        linkInput.value = await tryShorten(`https://tinyurl.com/api-create.php?url=${encoded}`);
+                    } catch {
+                        linkInput.value = shareUrl;
+                    }
                 } finally {
                     copyBtn.disabled = false;
                 }
