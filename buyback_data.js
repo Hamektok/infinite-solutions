@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-02-27 18:24 UTC
+// Generated: 2026-02-27 18:27 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -5447,7 +5447,7 @@ const BUYBACK_DATA = {
     "pi_materials": {
       "displayName": "Planetary Materials",
       "visible": true,
-      "pricingMethod": "Jita Sell"
+      "pricingMethod": "Jita Split"
     },
     "salvaged_materials": {
       "displayName": "Salvaged Materials",
@@ -5471,5 +5471,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-02-27 18:24 UTC"
+  "generated": "2026-02-27 18:27 UTC"
 };
