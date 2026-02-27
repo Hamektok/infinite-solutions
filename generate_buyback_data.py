@@ -20,6 +20,7 @@ CATEGORY_DISPLAY = {
     'minerals': 'Minerals',
     'ice_products': 'Ice Products',
     'moon_materials': 'Reaction Materials',
+    'pi_materials': 'Planetary Materials',
     'salvaged_materials': 'Salvaged Materials',
     'standard_ore': 'Standard Ore',
     'ice_ore': 'Ice Ore',
@@ -48,6 +49,7 @@ SALVAGE_TIERS = {
 # e.g. "Reaction Materials" -> buyback_category_reaction_materials
 CONFIG_TO_DB_CATEGORY = {
     'reaction_materials': 'moon_materials',
+    'planetary_materials': 'pi_materials',
 }
 
 
