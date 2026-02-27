@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-02-27 18:35 UTC
+// Generated: 2026-02-27 18:42 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -1318,7 +1318,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1551.6386
     },
@@ -1329,7 +1329,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 785.9402
     },
@@ -1340,7 +1340,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1785.7078
     },
@@ -1351,7 +1351,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 904.6845
     },
@@ -1362,7 +1362,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1216.5514
     },
@@ -1373,7 +1373,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1917.4816
     },
@@ -1384,7 +1384,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 3103.2772
     },
@@ -1395,7 +1395,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1571.8804
     },
@@ -1406,7 +1406,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 2114.5946
     },
@@ -1417,7 +1417,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 3333.83
     },
@@ -1428,7 +1428,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1057.2973
     },
@@ -1439,7 +1439,7 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
-      "accepted": true,
+      "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1666.915
     },
@@ -5471,5 +5471,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-02-27 18:35 UTC"
+  "generated": "2026-02-27 18:42 UTC"
 };
