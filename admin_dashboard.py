@@ -18,6 +18,9 @@ CATEGORY_DISPLAY = {
     'ice_products': 'Ice Products',
     'moon_materials': 'Reaction Materials',
     'salvaged_materials': 'Salvaged Materials',
+    'standard_ore': 'Standard Ore',
+    'ice_ore': 'Ice Ore',
+    'moon_ore': 'Moon Ore',
 }
 # Reverse lookup: display name -> DB category key
 CATEGORY_DB_KEY = {v: k for k, v in CATEGORY_DISPLAY.items()}
@@ -261,8 +264,10 @@ class AdminDashboard:
         # Buyback category names (must match what the website uses)
         self.buyback_categories = [
             'Minerals', 'Ice Products', 'Reaction Materials',
-            'Salvaged Materials', 'Gas Clouds Materials', 'Planetary Materials'
+            'Salvaged Materials', 'Gas Clouds Materials', 'Planetary Materials',
+            'Standard Ore', 'Ice Ore', 'Moon Ore',
         ]
+        self._ore_categories = {'Standard Ore', 'Ice Ore', 'Moon Ore'}
         self.buyback_category_vars = {}  # BooleanVar per category (True = visible)
 
         # Top controls
@@ -299,57 +304,62 @@ class AdminDashboard:
                                             foreground='#00d9ff')
         self.bb_accepted_label.pack(side='right')
 
-        # Category visibility toggles
+        # Category visibility toggles (two rows: materials + ores)
         cat_frame = ttk.Frame(self.buyback_frame, style='Card.TFrame')
         cat_frame.pack(fill='x', padx=15, pady=(0, 10))
 
-        cat_inner = ttk.Frame(cat_frame)
-        cat_inner.pack(fill='x', padx=15, pady=10)
-
-        ttk.Label(cat_inner, text="Category Visibility:",
-                  font=('Segoe UI', 11, 'bold'),
-                  foreground='#00d9ff').pack(side='left', padx=(0, 15))
-
         self.category_toggle_btns = {}
-        for cat_name in self.buyback_categories:
-            var = tk.BooleanVar(value=True)
-            self.buyback_category_vars[cat_name] = var
-            btn = tk.Checkbutton(cat_inner, text=cat_name,
-                                  variable=var,
-                                  font=('Segoe UI', 10, 'bold'),
-                                  bg='#0d1117', fg='#00ff88',
-                                  selectcolor='#0a2030',
-                                  activebackground='#0d1117',
-                                  activeforeground='#00ffff',
-                                  indicatoron=False,
-                                  width=18, height=1,
-                                  relief='flat', bd=1,
-                                  command=lambda c=cat_name: self._on_category_toggle(c))
-            btn.pack(side='left', padx=3)
-            self.category_toggle_btns[cat_name] = btn
+        for row_cats, label_text, pady_args in [
+            ([c for c in self.buyback_categories if c not in self._ore_categories],
+             "Category Visibility:", (10, 4)),
+            ([c for c in self.buyback_categories if c in self._ore_categories],
+             "Ore Visibility:", (4, 10)),
+        ]:
+            cat_inner = ttk.Frame(cat_frame)
+            cat_inner.pack(fill='x', padx=15, pady=pady_args)
+            ttk.Label(cat_inner, text=label_text,
+                      font=('Segoe UI', 11, 'bold'),
+                      foreground='#00d9ff').pack(side='left', padx=(0, 15))
+            for cat_name in row_cats:
+                var = tk.BooleanVar(value=True)
+                self.buyback_category_vars[cat_name] = var
+                btn = tk.Checkbutton(cat_inner, text=cat_name,
+                                      variable=var,
+                                      font=('Segoe UI', 10, 'bold'),
+                                      bg='#0d1117', fg='#00ff88',
+                                      selectcolor='#0a2030',
+                                      activebackground='#0d1117',
+                                      activeforeground='#00ffff',
+                                      indicatoron=False,
+                                      width=16, height=1,
+                                      relief='flat', bd=1,
+                                      command=lambda c=cat_name: self._on_category_toggle(c))
+                btn.pack(side='left', padx=3)
+                self.category_toggle_btns[cat_name] = btn
 
         # Pricing method per category
         price_frame = ttk.Frame(self.buyback_frame, style='Card.TFrame')
         price_frame.pack(fill='x', padx=15, pady=(0, 10))
 
-        price_inner = ttk.Frame(price_frame)
-        price_inner.pack(fill='x', padx=15, pady=10)
-
-        ttk.Label(price_inner, text="Pricing Method:",
-                  font=('Segoe UI', 11, 'bold'),
-                  foreground='#00d9ff').pack(side='left', padx=(0, 15))
-
         self.pricing_method_vars = {}
         self.pricing_method_combos = {}
         pricing_methods = ['Jita Buy', 'Jita Sell', 'Jita Split']
-        for cat_name in self.buyback_categories:
-            frame = ttk.Frame(price_inner)
-            frame.pack(side='left', padx=5)
 
+        non_ore_cats = [c for c in self.buyback_categories if c not in self._ore_categories]
+        ore_cats = [c for c in self.buyback_categories if c in self._ore_categories]
+
+        # Row 1: non-ore pricing methods
+        price_inner1 = ttk.Frame(price_frame)
+        price_inner1.pack(fill='x', padx=15, pady=(10, 4))
+        ttk.Label(price_inner1, text="Pricing Method:",
+                  font=('Segoe UI', 11, 'bold'),
+                  foreground='#00d9ff').pack(side='left', padx=(0, 15))
+        for cat_name in non_ore_cats:
+            frame = ttk.Frame(price_inner1)
+            frame.pack(side='left', padx=5)
             ttk.Label(frame, text=cat_name + ":",
                       font=('Segoe UI', 9),
                       foreground='#6fb3d0').pack(side='left', padx=(0, 3))
-
             var = tk.StringVar(value='Jita Buy')
             self.pricing_method_vars[cat_name] = var
             combo = ttk.Combobox(frame, textvariable=var,
@@ -359,6 +369,47 @@ class AdminDashboard:
             combo.bind('<<ComboboxSelected>>',
                        lambda e, c=cat_name: self._on_pricing_method_change(c))
             self.pricing_method_combos[cat_name] = combo
+
+        # Row 2: ore pricing methods + refining efficiency
+        price_inner2 = ttk.Frame(price_frame)
+        price_inner2.pack(fill='x', padx=15, pady=(4, 10))
+        ttk.Label(price_inner2, text="Ore Pricing:",
+                  font=('Segoe UI', 11, 'bold'),
+                  foreground='#00d9ff').pack(side='left', padx=(0, 15))
+        for cat_name in ore_cats:
+            frame = ttk.Frame(price_inner2)
+            frame.pack(side='left', padx=5)
+            ttk.Label(frame, text=cat_name + ":",
+                      font=('Segoe UI', 9),
+                      foreground='#6fb3d0').pack(side='left', padx=(0, 3))
+            var = tk.StringVar(value='Jita Buy')
+            self.pricing_method_vars[cat_name] = var
+            combo = ttk.Combobox(frame, textvariable=var,
+                                  values=pricing_methods, state='readonly',
+                                  width=9, font=('Segoe UI', 9))
+            combo.pack(side='left')
+            combo.bind('<<ComboboxSelected>>',
+                       lambda e, c=cat_name: self._on_pricing_method_change(c))
+            self.pricing_method_combos[cat_name] = combo
+
+        # Refining efficiency (ore mineral value calculation)
+        eff_frame = ttk.Frame(price_inner2)
+        eff_frame.pack(side='right', padx=(20, 0))
+        ttk.Label(eff_frame, text="Refining Efficiency %:",
+                  font=('Segoe UI', 9),
+                  foreground='#6fb3d0').pack(side='left', padx=(0, 5))
+        self.bb_refining_eff_var = tk.DoubleVar(value=90.63)
+        eff_spin = tk.Spinbox(eff_frame, from_=50.0, to=100.0, increment=0.01,
+                              textvariable=self.bb_refining_eff_var,
+                              width=6, font=('Segoe UI', 9, 'bold'),
+                              bg='#0a2030', fg='#00ff88',
+                              buttonbackground='#1a3040',
+                              insertbackground='#00ff88',
+                              justify='center',
+                              format='%.2f')
+        eff_spin.pack(side='left')
+        eff_spin.bind('<FocusOut>', lambda e: self._check_bb_category_unsaved())
+        eff_spin.bind('<Return>', lambda e: self._check_bb_category_unsaved())
 
         # Buyback items treeview
         tree_frame = ttk.Frame(self.buyback_frame)
@@ -863,6 +914,14 @@ class AdminDashboard:
                 if var.get() != original:
                     has_cat_changes = True
                     break
+        if not has_cat_changes:
+            try:
+                orig_eff = getattr(self, '_original_refining_eff', 90.63)
+                cur_eff = float(self.bb_refining_eff_var.get())
+                if abs(cur_eff - orig_eff) > 0.001:
+                    has_cat_changes = True
+            except (ValueError, AttributeError, tk.TclError):
+                pass
         if has_cat_changes:
             total_unsaved += 1
         if total_unsaved > 0:
@@ -911,6 +970,12 @@ class AdminDashboard:
             method = row[0] if row else 'Jita Buy'
             self._original_pricing_methods[cat_name] = method
             self.pricing_method_vars[cat_name].set(method)
+
+        # Load refining efficiency
+        cursor.execute("SELECT value FROM site_config WHERE key = 'buyback_ore_refining_efficiency'")
+        row = cursor.fetchone()
+        self._original_refining_eff = float(row[0]) if row else 90.63
+        self.bb_refining_eff_var.set(self._original_refining_eff)
 
         # Check if buyback_accepted column exists, create if not
         cursor.execute("PRAGMA table_info(tracked_market_items)")
@@ -1130,7 +1195,14 @@ class AdminDashboard:
             if var.get() != original:
                 pricing_changes[cat_name] = var.get()
 
-        if not self.unsaved_buyback_changes and not cat_changes and not pricing_changes:
+        # Check for refining efficiency change
+        try:
+            new_eff = round(float(self.bb_refining_eff_var.get()), 2)
+        except (ValueError, tk.TclError):
+            new_eff = self._original_refining_eff
+        eff_changed = abs(new_eff - self._original_refining_eff) > 0.001
+
+        if not self.unsaved_buyback_changes and not cat_changes and not pricing_changes and not eff_changed:
             messagebox.showinfo("No Changes", "Nothing to save.")
             return
 
@@ -1158,6 +1230,9 @@ class AdminDashboard:
         for cat_name, method in pricing_changes.items():
             old_method = self._original_pricing_methods.get(cat_name, 'Jita Buy')
             lines.append(f"  Category '{cat_name}' pricing: {old_method} -> {method}")
+
+        if eff_changed:
+            lines.append(f"  Ore refining efficiency: {self._original_refining_eff}% -> {new_eff}%")
 
         changes_text = "\n".join(lines)
         if not messagebox.askyesno("Confirm Changes",
@@ -1197,6 +1272,12 @@ class AdminDashboard:
                 "INSERT OR REPLACE INTO site_config (key, value) VALUES (?, ?)",
                 (config_key, method)
             )
+
+        # Save refining efficiency
+        cursor.execute(
+            "INSERT OR REPLACE INTO site_config (key, value) VALUES (?, ?)",
+            ('buyback_ore_refining_efficiency', str(new_eff))
+        )
 
         conn.commit()
         conn.close()
@@ -2580,7 +2661,8 @@ class AdminDashboard:
 
         self._ore_type_filter_val = 'all'
         self._ore_type_btns = {}
-        for label, val in [('All', 'all'), ('Standard', 'standard'), ('Ice', 'ice'), ('Moon', 'moon')]:
+        for label, val in [('All', 'all'), ('Standard', 'standard'),
+                            ('Ice', 'ice'), ('Moon', 'moon')]:
             btn = ttk.Button(type_row, text=label,
                              command=lambda v=val: self._set_ore_type_filter(v))
             btn.pack(side='left', padx=3)
@@ -2796,7 +2878,7 @@ class AdminDashboard:
         """Switch the ore type filter and refresh the tree."""
         self._ore_type_filter_val = val
         labels = {'all': 'All', 'standard': 'Standard Ores', 'ice': 'Ice', 'moon': 'Moon Ores'}
-        self._ore_type_lbl.configure(text=f'Showing: {labels[val]}')
+        self._ore_type_lbl.configure(text=f'Showing: {labels.get(val, val)}')
         self._filter_ore_tree()
 
     def _set_ore_comp_filter(self, val):
@@ -2892,9 +2974,22 @@ class AdminDashboard:
                       62480,62483,62486,62489, 62481,62484,62487,62490, 62482,62485,62488,62491,
                       62492,62501,62498,62495, 62493,62502,62499,62496, 62494,62503,62500,62497,
                       62504,62510,62507,62513, 62505,62511,62508,62514, 62506,62512,62509,62515]
+        _anomaly_raw  = [81900,81901,81902,81903, 82016,82017,82018,82019,
+                         82205,82206,82207,82208, 82163,82164,82165,82166,
+                         81975,81976,81977,81978]
+        _anomaly_comp = [82300,82301,82302,82303, 82304,82305,82306,82307,
+                         82308,82309,82310,82311, 82312,82313,82314,82315,
+                         82316,82317,82318,82319]
+        _a0rare_raw   = [74521,74522,74523,74524, 74525,74526,74527,74528,
+                         74529,74530,74531,74532, 74533,74534,74535,74536]
+        _a0rare_comp  = [75275,75276,75277,75278, 75279,75280,75281,75282,
+                         75283,75284,75285,75286, 75287,75288,75289,75290]
 
-        compressed_set   = set(_std_comp + _ice_comp + _moon_comp)
-        all_ore_ids = _std_raw + _std_comp + _ice_raw + _ice_comp + _moon_raw + _moon_comp
+        compressed_set = set(_std_comp + _ice_comp + _moon_comp +
+                              _anomaly_comp + _a0rare_comp)
+        all_ore_ids = (_std_raw + _std_comp + _ice_raw + _ice_comp +
+                       _moon_raw + _moon_comp + _anomaly_raw + _anomaly_comp +
+                       _a0rare_raw + _a0rare_comp)
         all_product_ids = [t for t in self.ore_product_pct]
 
         all_ids = list(set(all_ore_ids + all_product_ids))
@@ -2951,10 +3046,10 @@ class AdminDashboard:
                 text='\u26a0 No price data \u2014 click Fetch first',
                 foreground='#ffaa44')
 
-        # Ore category classification (uses the pre-built sets from above)
-        std_ids  = set(_std_raw  + _std_comp)
+        # Ore category classification
         ice_ids  = set(_ice_raw  + _ice_comp)
         moon_ids = set(_moon_raw + _moon_comp)
+        # everything else (std, anomaly, A0 rare) is 'standard'
 
         def _ore_buy_price(type_id):
             bb, bs = prices.get(type_id, (None, None))
@@ -3011,12 +3106,12 @@ class AdminDashboard:
             avg_bb     = avg_prices.get(type_id)
             dev_pct    = ((current_bb - avg_bb) / avg_bb * 100) if (current_bb and avg_bb and avg_bb > 0) else None
 
-            if type_id in std_ids:
-                ore_cat = 'standard'
-            elif type_id in ice_ids:
+            if type_id in ice_ids:
                 ore_cat = 'ice'
-            else:
+            elif type_id in moon_ids:
                 ore_cat = 'moon'
+            else:
+                ore_cat = 'standard'  # std, anomaly, and A0 rare all under standard
             is_compressed = type_id in compressed_set
 
             self._ore_all_rows.append({

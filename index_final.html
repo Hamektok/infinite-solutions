@@ -1452,9 +1452,16 @@
             color: #00d9ff;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
+            margin-bottom: 4px;
+            padding-bottom: 6px;
             border-bottom: 1px solid rgba(0, 217, 255, 0.15);
+        }
+
+        .rate-card-subtitle {
+            font-size: 10px;
+            color: #6fb3d0;
+            margin-bottom: 8px;
+            font-style: italic;
         }
 
         .rate-card-items {
@@ -5626,7 +5633,11 @@ Tip: Copy directly from EVE inventory window"></textarea>
             const defaultRate = Object.entries(rateCount).sort((a, b) => b[1] - a[1])[0][0];
 
             // Render each category card
-            const categoryOrder = ['minerals', 'ice_products', 'moon_materials', 'salvaged_materials'];
+            const categoryOrder = [
+                'minerals', 'ice_products', 'moon_materials', 'salvaged_materials',
+                'standard_ore', 'ice_ore', 'moon_ore',
+            ];
+            const oreCategories = new Set(['standard_ore', 'ice_ore', 'moon_ore']);
             categoryOrder.forEach(catKey => {
                 const catConfig = BUYBACK_DATA.categories[catKey];
                 const items = categoryGroups[catKey];
@@ -5649,6 +5660,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                     const isSpecial = String(item.rate) !== String(defaultRate);
                     const pctClass = isSpecial ? 'rate-item-pct special' : 'rate-item-pct';
+                    const rateLabel = oreCategories.has(catKey) ? 'MV' : 'JBV';
 
                     let quotaHtml = '';
                     if (item.quota > 0) {
@@ -5671,14 +5683,18 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <div class="rate-item">
                             <div class="rate-item-header">
                                 <span class="rate-item-name">${item.name}</span>
-                                <span class="${pctClass}">${item.rate}% JBV</span>
+                                <span class="${pctClass}">${item.rate}% ${rateLabel}</span>
                             </div>
                             ${quotaHtml}
                         </div>`;
                 });
 
+                const oreNote = oreCategories.has(catKey) && BUYBACK_DATA.refiningEfficiency
+                    ? `<div class="rate-card-subtitle">Mineral value @ ${BUYBACK_DATA.refiningEfficiency}% refine</div>`
+                    : '';
                 card.innerHTML = `
                     <div class="rate-card-title">${catConfig.displayName}</div>
+                    ${oreNote}
                     <div class="rate-card-items">${itemsHtml}</div>`;
 
                 grid.appendChild(card);
@@ -5863,7 +5879,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             if (quotaWarnings > 0) acceptedText += ` — ${quotaWarnings} capped at quota`;
             document.getElementById('contractAcceptedDisplay').textContent = acceptedText;
 
-            // Build share link — auto-shorten via is.gd
+            // Build share link — auto-shorten via is.gd with tinyurl fallback
             const acceptedItems = results.filter(r => r.accepted);
             const itemPairs = acceptedItems.map(r => `${r.typeId}:${r.quantity}`).join(',');
             const shareUrl = `${window.location.origin}${window.location.pathname}#buyback=${itemPairs}`;
@@ -5872,14 +5888,22 @@ Tip: Copy directly from EVE inventory window"></textarea>
             linkInput.value = 'Shortening...';
             copyBtn.disabled = true;
             (async () => {
+                const encoded = encodeURIComponent(shareUrl);
+                const tryShorten = async (url) => {
+                    const resp = await fetch(url, { signal: AbortSignal.timeout(5000) });
+                    if (!resp.ok) throw new Error('non-200');
+                    const text = (await resp.text()).trim();
+                    if (!text.startsWith('http')) throw new Error('bad response');
+                    return text;
+                };
                 try {
-                    const resp = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(shareUrl)}`);
-                    if (!resp.ok) throw new Error();
-                    const short = (await resp.text()).trim();
-                    if (!short.startsWith('https://')) throw new Error();
-                    linkInput.value = short;
+                    linkInput.value = await tryShorten(`https://is.gd/create.php?format=simple&url=${encoded}`);
                 } catch {
-                    linkInput.value = shareUrl;
+                    try {
+                        linkInput.value = await tryShorten(`https://tinyurl.com/api-create.php?url=${encoded}`);
+                    } catch {
+                        linkInput.value = shareUrl;
+                    }
                 } finally {
                     copyBtn.disabled = false;
                 }
