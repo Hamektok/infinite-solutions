@@ -20,6 +20,7 @@ CATEGORY_DISPLAY = {
     'minerals': 'Minerals',
     'ice_products': 'Ice Products',
     'moon_materials': 'Reaction Materials',
+    'pi_materials': 'Planetary Materials',
     'salvaged_materials': 'Salvaged Materials',
     'standard_ore': 'Standard Ore',
     'ice_ore': 'Ice Ore',
@@ -48,6 +49,7 @@ SALVAGE_TIERS = {
 # e.g. "Reaction Materials" -> buyback_category_reaction_materials
 CONFIG_TO_DB_CATEGORY = {
     'reaction_materials': 'moon_materials',
+    'planetary_materials': 'pi_materials',
 }
 
 
@@ -196,6 +198,7 @@ def get_buyback_data():
             'category': category,
             'displayCategory': CATEGORY_DISPLAY.get(category, category),
             'rate': effective_rate,
+            'sellRate': price_pct,
             'accepted': bool(accepted),
             'quota': quota or 0,
             'avgJitaBuy': price,

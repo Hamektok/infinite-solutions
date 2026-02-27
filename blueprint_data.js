@@ -1271,7 +1271,7 @@ BLUEPRINT_DATA = [
   {
     "name": "Oxygen Fuel Block Blueprint",
     "me": 10,
-    "te": 0,
+    "te": 20,
     "category": "Components",
     "subcategory": "Fuel Blocks"
   },
@@ -1550,7 +1550,7 @@ BLUEPRINT_DATA = [
   },
   {
     "name": "Sigil Blueprint",
-    "me": 5,
+    "me": 10,
     "te": 0,
     "category": "Ships",
     "subcategory": "Hauler"
@@ -1761,7 +1761,7 @@ BLUEPRINT_DATA = [
   {
     "name": "Thrasher Blueprint",
     "me": 10,
-    "te": 0,
+    "te": 20,
     "category": "Ships",
     "subcategory": "Destroyer"
   },

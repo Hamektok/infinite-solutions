@@ -193,26 +193,6 @@ const BPC_DATA = [
     "subcategory": "Capital Ship"
   },
   {
-    "typeId": 997,
-    "name": "Armageddon Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 1,
-    "quantity": 2,
-    "category": "Ships",
-    "subcategory": "Battleship"
-  },
-  {
-    "typeId": 997,
-    "name": "Armageddon Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 10,
-    "quantity": 1,
-    "category": "Ships",
-    "subcategory": "Battleship"
-  },
-  {
     "typeId": 955,
     "name": "Atron Blueprint",
     "me": 10,
@@ -1283,6 +1263,16 @@ const BPC_DATA = [
     "subcategory": "Ship Components"
   },
   {
+    "typeId": 17349,
+    "name": "Fusion Thruster Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 11,
+    "quantity": 10,
+    "category": "Components",
+    "subcategory": "Ship Components"
+  },
+  {
     "typeId": 17340,
     "name": "Gravimetric Sensor Cluster Blueprint",
     "me": 10,
@@ -1851,6 +1841,16 @@ const BPC_DATA = [
     "quantity": 1,
     "category": "Ships",
     "subcategory": "Frigate"
+  },
+  {
+    "typeId": 17336,
+    "name": "Radar Sensor Cluster Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 113,
+    "quantity": 4,
+    "category": "Components",
+    "subcategory": "Ship Components"
   },
   {
     "typeId": 688,
