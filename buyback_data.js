@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-02-27 17:36 UTC
+// Generated: 2026-02-27 17:46 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -4942,7 +4942,7 @@ const BUYBACK_DATA = {
   "categories": {
     "minerals": {
       "displayName": "Minerals",
-      "visible": true,
+      "visible": false,
       "pricingMethod": "Jita Buy"
     },
     "ice_products": {
@@ -4977,5 +4977,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-02-27 17:36 UTC"
+  "generated": "2026-02-27 17:46 UTC"
 };
