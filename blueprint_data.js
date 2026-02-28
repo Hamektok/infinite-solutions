@@ -4,7 +4,7 @@ BLUEPRINT_DATA = [
   {
     "name": "720mm Howitzer Artillery I Blueprint",
     "me": 10,
-    "te": 0,
+    "te": 20,
     "category": "Modules",
     "subcategory": "Weapon Modules"
   },

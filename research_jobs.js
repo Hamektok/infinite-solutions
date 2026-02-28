@@ -18,14 +18,6 @@ RESEARCH_JOBS = [
     "job_id": 642908449
   },
   {
-    "name": "720mm Howitzer Artillery I Blueprint",
-    "research_type": "TE",
-    "current_level": 0,
-    "target_level": 2,
-    "end_date": "2026-02-25T17:22:26+00:00",
-    "job_id": 642908120
-  },
-  {
     "name": "Sigil Blueprint",
     "research_type": "TE",
     "current_level": 0,
