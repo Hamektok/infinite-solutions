@@ -2706,30 +2706,45 @@ class AdminDashboard:
         frow = ttk.Frame(outer)
         frow.pack(fill='x', pady=(0, 4))
 
+        # View toggle
+        tk.Label(frow, text="View:", background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 10)).pack(side='left', padx=(0, 4))
+        self._ore_view_btn_ore = ttk.Button(frow, text='By Ore',
+                                            command=lambda: self._set_ore_view('ore'))
+        self._ore_view_btn_ore.pack(side='left', padx=(0, 3))
+        self._ore_view_btn_product = ttk.Button(frow, text='By Product',
+                                                command=lambda: self._set_ore_view('product'))
+        self._ore_view_btn_product.pack(side='left', padx=(0, 12))
+        tk.Frame(frow, background='#1a3040', width=1).pack(side='left', fill='y', padx=(0, 10))
+
         ttk.Label(frow, text="Search:").pack(side='left', padx=(0, 4))
         self.ore_search_var = tk.StringVar()
-        self.ore_search_var.trace_add('write', lambda *_: self._filter_ore_tree())
+        self.ore_search_var.trace_add('write', lambda *_: self._filter_active_ore_view())
         ttk.Entry(frow, textvariable=self.ore_search_var, width=20).pack(side='left', padx=(0, 12))
 
         ttk.Label(frow, text="Show:").pack(side='left', padx=(0, 4))
         self.ore_show_var = tk.StringVar(value='All')
         ttk.Combobox(frow, textvariable=self.ore_show_var, width=14,
                      values=['All', 'Profitable', 'Loss Only'], state='readonly').pack(side='left', padx=(0, 12))
-        self.ore_show_var.trace_add('write', lambda *_: self._filter_ore_tree())
+        self.ore_show_var.trace_add('write', lambda *_: self._filter_active_ore_view())
 
         ttk.Label(frow, text="Sort:").pack(side='left', padx=(0, 4))
         self.ore_sort_display_var = tk.StringVar(value='Margin %')
         ttk.Combobox(frow, textvariable=self.ore_sort_display_var, width=16,
                      values=['Margin %', 'Profit ISK', 'Landed Cost', 'Product Value', 'Deviation %'],
                      state='readonly').pack(side='left')
-        self.ore_sort_display_var.trace_add('write', lambda *_: self._filter_ore_tree())
+        self.ore_sort_display_var.trace_add('write', lambda *_: self._filter_active_ore_view())
 
-        # ── Treeview ─────────────────────────────────────────────────────
+        # ── Treeview container ───────────────────────────────────────────
         tree_frame = ttk.Frame(outer)
         tree_frame.pack(fill='both', expand=True)
 
+        # ── Ore view sub-frame ───────────────────────────────────────────
+        self.ore_tree_frame = ttk.Frame(tree_frame)
+        self.ore_tree_frame.pack(fill='both', expand=True)
+
         cols = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
-        self.ore_tree = ttk.Treeview(tree_frame, columns=cols, show='headings', selectmode='browse')
+        self.ore_tree = ttk.Treeview(self.ore_tree_frame, columns=cols, show='headings', selectmode='browse')
 
         col_defs = [
             ('name',      'Ore Name',             210, 'w'),
@@ -2754,19 +2769,67 @@ class AdminDashboard:
                                                   font=('Segoe UI', 8, 'italic'))
         self.ore_tree.tag_configure('row_a', background='#0a2030')
         self.ore_tree.tag_configure('row_b', background='#0d2535')
-        self.ore_tree.tag_configure('dev_high', foreground='#ff7744')   # above avg — pricier
-        self.ore_tree.tag_configure('dev_low',  foreground='#44ddaa')   # below avg — cheaper
+        self.ore_tree.tag_configure('dev_high', foreground='#ff7744')
+        self.ore_tree.tag_configure('dev_low',  foreground='#44ddaa')
 
-        vsb = ttk.Scrollbar(tree_frame, orient='vertical',   command=self.ore_tree.yview)
-        hsb = ttk.Scrollbar(tree_frame, orient='horizontal', command=self.ore_tree.xview)
+        vsb = ttk.Scrollbar(self.ore_tree_frame, orient='vertical',   command=self.ore_tree.yview)
+        hsb = ttk.Scrollbar(self.ore_tree_frame, orient='horizontal', command=self.ore_tree.xview)
         self.ore_tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
         vsb.pack(side='right',  fill='y')
         hsb.pack(side='bottom', fill='x')
         self.ore_tree.pack(fill='both', expand=True)
 
-        self._ore_all_rows = []
-        self._ore_sort_col = 'margin'
-        self._ore_sort_asc = False
+        # ── Product view sub-frame (hidden by default) ───────────────────
+        self.product_tree_frame = ttk.Frame(tree_frame)
+
+        prod_cols = ('product', 'category', 'source', 'cost_unit',
+                     'sell_price', 'jita_jbv', 'profit_unit', 'margin')
+        self.product_tree = ttk.Treeview(self.product_tree_frame, columns=prod_cols,
+                                         show='headings', selectmode='browse')
+        prod_col_defs = [
+            ('product',     'Product',          200, 'w'),
+            ('category',    'Category',         115, 'w'),
+            ('source',      'Best Source Ore',  210, 'w'),
+            ('cost_unit',   'Cost / Unit',      120, 'e'),
+            ('sell_price',  'Your Sell Price',  120, 'e'),
+            ('jita_jbv',    'Jita JBV',         110, 'e'),
+            ('profit_unit', 'Profit / Unit',    115, 'e'),
+            ('margin',      'Margin %',          90, 'e'),
+        ]
+        for cid, heading, width, anchor in prod_col_defs:
+            self.product_tree.heading(cid, text=heading,
+                                      command=lambda c=cid: self._sort_product_tree(c))
+            self.product_tree.column(cid, width=width, minwidth=50, anchor=anchor)
+
+        self.product_tree.tag_configure('profitable', foreground='#00ff88')
+        self.product_tree.tag_configure('marginal',   foreground='#ffcc44')
+        self.product_tree.tag_configure('loss',       foreground='#ff4444')
+        self.product_tree.tag_configure('group_hdr',  background='#070e18',
+                                                      foreground='#446688',
+                                                      font=('Segoe UI', 8, 'italic'))
+        self.product_tree.tag_configure('row_a',    background='#0a2030')
+        self.product_tree.tag_configure('row_b',    background='#0d2535')
+        self.product_tree.tag_configure('row_ice',  background='#0a1828')
+        self.product_tree.tag_configure('row_moon', background='#110a20')
+
+        prod_vsb = ttk.Scrollbar(self.product_tree_frame, orient='vertical',
+                                  command=self.product_tree.yview)
+        prod_hsb = ttk.Scrollbar(self.product_tree_frame, orient='horizontal',
+                                  command=self.product_tree.xview)
+        self.product_tree.configure(yscrollcommand=prod_vsb.set, xscrollcommand=prod_hsb.set)
+        prod_vsb.pack(side='right',  fill='y')
+        prod_hsb.pack(side='bottom', fill='x')
+        self.product_tree.pack(fill='both', expand=True)
+
+        self._ore_all_rows     = []
+        self._product_all_rows = []
+        self._ore_sort_col     = 'margin'
+        self._ore_sort_asc     = False
+        self._product_sort_col = 'margin'
+        self._product_sort_asc = False
+        self._ore_view         = 'ore'
+        self._ore_prices_snap  = {}
+        self._ore_refine_eff   = 1.0
 
     def _make_collapsible_section(self, parent, title, fg_color, expanded=True):
         """Create a collapsible section header + content frame. Returns content frame."""
@@ -2876,18 +2939,18 @@ class AdminDashboard:
                 grid_row += 1
 
     def _set_ore_type_filter(self, val):
-        """Switch the ore type filter and refresh the tree."""
+        """Switch the ore type filter and refresh the active view."""
         self._ore_type_filter_val = val
         labels = {'all': 'All', 'standard': 'Standard Ores', 'ice': 'Ice', 'moon': 'Moon Ores'}
         self._ore_type_lbl.configure(text=f'Showing: {labels.get(val, val)}')
-        self._filter_ore_tree()
+        self._filter_active_ore_view()
 
     def _set_ore_comp_filter(self, val):
-        """Switch compressed/uncompressed/both filter and refresh tree."""
+        """Switch compressed/uncompressed/both filter and refresh the ore view."""
         self._ore_comp_filter.set(val)
         labels = {'compressed': 'Compressed only', 'uncompressed': 'Uncompressed only', 'both': 'Both forms'}
         self._ore_comp_lbl.configure(text=labels[val])
-        self._filter_ore_tree()
+        self._filter_ore_tree()  # comp filter only applies to ore view
 
     def _run_ore_fetch(self, category='all'):
         """Run fetch_ore_prices.py for the given category in a background thread."""
@@ -3083,6 +3146,7 @@ class AdminDashboard:
 
             # Per-batch product value
             prod_value = 0.0
+            raw_value  = 0.0   # unweighted by sell% — used for cost allocation in product view
             for mat in ore_yields:
                 mat_id = mat['materialTypeID']
                 qty    = mat['quantity']
@@ -3094,6 +3158,7 @@ class AdminDashboard:
                     pct = 1.0
                 mat_bb = prices.get(mat_id, (None, None))[0]  # JBV for sell side
                 if mat_bb and mat_bb > 0:
+                    raw_value  += qty * refine_eff * mat_bb
                     prod_value += qty * refine_eff * mat_bb * pct
 
             if prod_value <= 0:
@@ -3122,6 +3187,8 @@ class AdminDashboard:
                 'logistics':  ship_cost + collat,
                 'landed':     total_cost,
                 'value':      prod_value,
+                'raw_value':  raw_value,
+                'ore_yields': ore_yields,
                 'profit':     profit,
                 'margin':     margin,
                 'dev':        dev_pct,
@@ -3129,7 +3196,17 @@ class AdminDashboard:
                 'compressed': is_compressed,
             })
 
-        self._filter_ore_tree()
+        self._ore_prices_snap = prices
+        self._ore_refine_eff  = refine_eff
+        self._compute_product_rows()
+        self._filter_active_ore_view()
+
+    def _filter_active_ore_view(self):
+        """Route to the correct filter function based on current view."""
+        if getattr(self, '_ore_view', 'ore') == 'product':
+            self._filter_product_tree()
+        else:
+            self._filter_ore_tree()
 
     def _filter_ore_tree(self):
         """Apply search/show/sort/type filters and repopulate the treeview."""
@@ -3234,6 +3311,186 @@ class AdminDashboard:
         if col in sort_map:
             self.ore_sort_display_var.set(sort_map[col])
         self._filter_ore_tree()
+
+    def _set_ore_view(self, view):
+        """Switch between By Ore and By Product views."""
+        self._ore_view = view
+        if view == 'product':
+            self.ore_tree_frame.pack_forget()
+            self.product_tree_frame.pack(fill='both', expand=True)
+            if self._ore_all_rows and not self._product_all_rows:
+                self._compute_product_rows()
+            self._filter_product_tree()
+        else:
+            self.product_tree_frame.pack_forget()
+            self.ore_tree_frame.pack(fill='both', expand=True)
+            self._filter_ore_tree()
+
+    def _compute_product_rows(self):
+        """Build per-product cost/margin rows from current ore row data."""
+        prices     = self._ore_prices_snap
+        refine_eff = self._ore_refine_eff
+
+        # Build product metadata lookup: type_id -> (display_name, category, tier)
+        product_meta = {}
+        for tid, name, _ in self._ORE_MINERALS:
+            product_meta[tid] = (name, 'Mineral', None)
+        for tid, name, _ in self._ORE_ICE_PRODUCTS:
+            product_meta[tid] = (name, 'Ice Product', None)
+        for tid, name, _, tier in self._ORE_MOON_MATERIALS:
+            product_meta[tid] = (name, f'Moon Mat ({tier})', tier)
+
+        # For each product, find the ore that yields it at the lowest cost per unit.
+        # Value-weighted allocation: cost_per_unit = landed × jbv_P / raw_total
+        # (The qty terms cancel in the value-weighted formula.)
+        best = {}  # type_id -> {cost_unit, source_name}
+
+        for ore_row in self._ore_all_rows:
+            landed    = ore_row['landed']
+            raw_value = ore_row.get('raw_value', 0)
+            if raw_value <= 0:
+                continue
+            for mat in ore_row.get('ore_yields', []):
+                mat_id = mat['materialTypeID']
+                if mat_id not in product_meta:
+                    continue
+                mat_bb = prices.get(mat_id, (None, None))[0]
+                if not mat_bb or mat_bb <= 0:
+                    continue
+                cost_unit = landed * mat_bb / raw_value
+                if mat_id not in best or cost_unit < best[mat_id]['cost_unit']:
+                    best[mat_id] = {'cost_unit': cost_unit, 'source': ore_row['name']}
+
+        self._product_all_rows = []
+        for mat_id, b in best.items():
+            name, category, tier = product_meta[mat_id]
+            mat_bb = prices.get(mat_id, (None, None))[0]
+            if not mat_bb or mat_bb <= 0:
+                continue
+            try:
+                pct = float(self.ore_product_pct[mat_id].get()) / 100.0
+            except (ValueError, KeyError):
+                pct = 1.0
+
+            sell_price  = mat_bb * pct
+            cost_unit   = b['cost_unit']
+            profit_unit = sell_price - cost_unit
+            margin      = (profit_unit / cost_unit * 100) if cost_unit > 0 else 0
+
+            prod_cat = 'mineral' if category == 'Mineral' else (
+                       'ice'     if category == 'Ice Product' else 'moon')
+
+            self._product_all_rows.append({
+                'type_id':    mat_id,
+                'product':    name,
+                'category':   category,
+                'tier':       tier,
+                'source':     b['source'],
+                'cost_unit':  cost_unit,
+                'sell_price': sell_price,
+                'jita_jbv':   mat_bb,
+                'profit_unit': profit_unit,
+                'margin':     margin,
+                'prod_cat':   prod_cat,
+            })
+
+    def _filter_product_tree(self):
+        """Filter/sort product rows and populate the product treeview."""
+        if not self._product_all_rows:
+            self.product_tree.delete(*self.product_tree.get_children())
+            return
+
+        search      = self.ore_search_var.get().lower()
+        show        = self.ore_show_var.get()
+        type_filter = self._ore_type_filter_val
+        cat_map     = {'all': None, 'standard': 'mineral', 'ice': 'ice', 'moon': 'moon'}
+        cat_filter  = cat_map.get(type_filter)
+
+        rows = list(self._product_all_rows)
+        if cat_filter:
+            rows = [r for r in rows if r['prod_cat'] == cat_filter]
+        if search:
+            rows = [r for r in rows if search in r['product'].lower()
+                                    or search in r['source'].lower()]
+        if show == 'Profitable':
+            rows = [r for r in rows if r['profit_unit'] > 0]
+        elif show == 'Loss Only':
+            rows = [r for r in rows if r['profit_unit'] <= 0]
+
+        sort_key = self._product_sort_col
+        sort_asc = self._product_sort_asc
+        rows.sort(key=lambda r: r.get(sort_key) or 0, reverse=not sort_asc)
+
+        # Update summary cards
+        profitable = sum(1 for r in rows if r['profit_unit'] > 0)
+        best_r  = max(rows, key=lambda r: r['margin'],      default=None)
+        best_i  = max(rows, key=lambda r: r['profit_unit'], default=None)
+        worst_r = min(rows, key=lambda r: r['margin'],      default=None)
+
+        self._ore_summary_labels['total'].configure(text=str(len(rows)))
+        self._ore_summary_labels['profitable'].configure(
+            text=f'{profitable}  ({profitable/len(rows)*100:.0f}%)' if rows else '—')
+        self._ore_summary_labels['best'].configure(
+            text=f'+{best_r["margin"]:.1f}%  {best_r["product"]}' if best_r else '—',
+            foreground='#00ff88' if best_r and best_r['margin'] > 0 else '#ff4444')
+        self._ore_summary_labels['best_isk'].configure(
+            text=f'+{best_i["profit_unit"]:,.2f} ISK  {best_i["product"]}' if best_i else '—')
+        self._ore_summary_labels['worst'].configure(
+            text=f'{worst_r["margin"]:.1f}%  {worst_r["product"]}' if worst_r else '—',
+            foreground='#ff4444' if worst_r and worst_r['margin'] < 0 else '#00ff88')
+
+        self.product_tree.delete(*self.product_tree.get_children())
+
+        show_groups = not search and not cat_filter
+        cat_order   = {'mineral': 0, 'ice': 1, 'moon': 2}
+        if show_groups:
+            rows.sort(key=lambda r: (
+                cat_order.get(r['prod_cat'], 3),
+                -(r.get(sort_key) or 0) if not sort_asc else (r.get(sort_key) or 0)
+            ))
+
+        current_cat = None
+        row_idx     = 0
+        for r in rows:
+            cat = r['prod_cat']
+            if show_groups and cat != current_cat:
+                current_cat = cat
+                label = {'mineral': '── Minerals ──',
+                         'ice':     '── Ice Products ──',
+                         'moon':    '── Moon Materials ──'}.get(cat, cat)
+                self.product_tree.insert('', 'end',
+                    values=(label, '', '', '', '', '', '', ''),
+                    tags=('group_hdr',))
+
+            m   = r['margin']
+            tag = 'profitable' if m >= 5 else ('marginal' if m >= 0 else 'loss')
+            bg  = ('row_ice' if cat == 'ice' else
+                   'row_moon' if cat == 'moon' else
+                   ('row_a' if row_idx % 2 == 0 else 'row_b'))
+
+            tier_str     = f' ({r["tier"]})' if r.get('tier') else ''
+            cat_display  = r['category'] + tier_str
+
+            self.product_tree.insert('', 'end', tags=(tag, bg), values=(
+                r['product'],
+                cat_display,
+                r['source'],
+                f"{r['cost_unit']:,.2f}",
+                f"{r['sell_price']:,.2f}",
+                f"{r['jita_jbv']:,.2f}",
+                f"{r['profit_unit']:+,.2f}",
+                f"{r['margin']:+.1f}%",
+            ))
+            row_idx += 1
+
+    def _sort_product_tree(self, col):
+        """Toggle sort on a product tree column header click."""
+        if self._product_sort_col == col:
+            self._product_sort_asc = not self._product_sort_asc
+        else:
+            self._product_sort_col = col
+            self._product_sort_asc = col in ('product', 'source', 'category')
+        self._filter_product_tree()
 
     def update_status(self, text):
         """Update the status indicator."""
