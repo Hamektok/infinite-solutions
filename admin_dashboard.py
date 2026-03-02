@@ -2743,18 +2743,21 @@ class AdminDashboard:
         self.ore_tree_frame = ttk.Frame(tree_frame)
         self.ore_tree_frame.pack(fill='both', expand=True)
 
-        cols = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
-        self.ore_tree = ttk.Treeview(self.ore_tree_frame, columns=cols, show='headings', selectmode='browse')
+        cols = ('jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
+        self.ore_tree = ttk.Treeview(self.ore_tree_frame, columns=cols, show='tree headings', selectmode='browse')
+
+        # #0 = tree/name column (shows expand arrow)
+        self.ore_tree.heading('#0', text='Ore / Mineral')
+        self.ore_tree.column('#0', width=210, minwidth=80, anchor='w', stretch=True)
 
         col_defs = [
-            ('name',      'Ore Name',             210, 'w'),
-            ('jita_buy',  'Jita/Unit (ISK)',        130, 'e'),
-            ('logistics', 'Ship+Collat (ISK)',     120, 'e'),
-            ('landed',    'Landed (ISK)',          115, 'e'),
-            ('value',     'Product Value (ISK)',   130, 'e'),
-            ('profit',    'Profit (ISK)',          110, 'e'),
+            ('jita_buy',  'Jita Buy / JBV',         130, 'e'),
+            ('logistics', 'Ship+Collat / Sell%',   120, 'e'),
+            ('landed',    'Landed / Alloc Cost',   115, 'e'),
+            ('value',     'Product Value / Rev',   130, 'e'),
+            ('profit',    'Profit / Batch',        110, 'e'),
             ('margin',    'Margin %',               85, 'e'),
-            ('dev',       'vs N-Day Avg %',        105, 'e'),
+            ('dev',       'vs N-Day / Qty',        105, 'e'),
         ]
         for cid, heading, width, anchor in col_defs:
             self.ore_tree.heading(cid, text=heading,
@@ -2771,6 +2774,7 @@ class AdminDashboard:
         self.ore_tree.tag_configure('row_b', background='#0d2535')
         self.ore_tree.tag_configure('dev_high', foreground='#ff7744')
         self.ore_tree.tag_configure('dev_low',  foreground='#44ddaa')
+        self.ore_tree.tag_configure('child_row', foreground='#7ab8cc', font=('Segoe UI', 8))
 
         vsb = ttk.Scrollbar(self.ore_tree_frame, orient='vertical',   command=self.ore_tree.yview)
         hsb = ttk.Scrollbar(self.ore_tree_frame, orient='horizontal', command=self.ore_tree.xview)
@@ -3258,6 +3262,15 @@ class AdminDashboard:
             text=f'{worst_r["margin"]:.1f}%  {worst_r["name"]}' if worst_r else '—',
             foreground='#ff4444' if worst_r and worst_r['margin'] < 0 else '#00ff88')
 
+        # Product name lookup for child rows
+        pname = {}
+        for tid, name, *_ in (self._ORE_MINERALS + self._ORE_ICE_PRODUCTS +
+                               self._ORE_MOON_MATERIALS):
+            pname[tid] = name
+
+        prices     = getattr(self, '_ore_prices_snap', {})
+        refine_eff = getattr(self, '_ore_refine_eff', 1.0)
+
         # Insert rows with group headers when not searching/filtering
         show_groups = not search and type_filter in ('all', 'standard', 'ice', 'moon')
         current_cat = None
@@ -3270,8 +3283,8 @@ class AdminDashboard:
                 cat_label = {'standard': '── Standard Ores ──',
                              'ice':      '── Ice ──',
                              'moon':     '── Moon Ores ──'}.get(cat, cat)
-                self.ore_tree.insert('', 'end',
-                    values=(cat_label, '', '', '', '', '', '', ''),
+                self.ore_tree.insert('', 'end', text=cat_label,
+                    values=('', '', '', '', '', '', ''),
                     tags=('group_hdr',))
 
             m = r['margin']
@@ -3293,8 +3306,7 @@ class AdminDashboard:
                 dev_tag = ''
 
             tags = tuple(t for t in (tag, alt, dev_tag) if t)
-            self.ore_tree.insert('', 'end', tags=tags, values=(
-                r['name'],
+            parent_iid = self.ore_tree.insert('', 'end', text=r['name'], tags=tags, values=(
                 f"{r['jita_buy']:,.2f}",
                 f"{r['logistics']:,.2f}",
                 f"{r['landed']:,.2f}",
@@ -3304,6 +3316,40 @@ class AdminDashboard:
                 dev_str,
             ))
             row_idx += 1
+
+            # ── Mineral child rows ─────────────────────────────────────────
+            raw_value = r.get('raw_value', 0.0)
+            if raw_value > 0 and prices:
+                for mat in r.get('ore_yields', []):
+                    mat_id  = mat['materialTypeID']
+                    qty     = mat['quantity']
+                    act_qty = qty * refine_eff
+                    mat_jbv = prices.get(mat_id, (None, None))[0]
+                    if not mat_jbv or mat_jbv <= 0:
+                        continue
+                    try:
+                        sell_pct = float(self.ore_product_pct[mat_id].get()) / 100.0
+                    except (KeyError, ValueError):
+                        sell_pct = 1.0
+                    revenue    = act_qty * mat_jbv * sell_pct
+                    alloc_cost = r['landed'] * (act_qty * mat_jbv) / raw_value
+                    mat_profit = revenue - alloc_cost
+                    mat_margin = (mat_profit / alloc_cost * 100) if alloc_cost > 0 else 0.0
+                    mat_name   = pname.get(mat_id, f'Type {mat_id}')
+                    m_tag = ('profitable' if mat_margin >= 5
+                             else 'marginal' if mat_margin >= 0 else 'loss')
+                    self.ore_tree.insert(parent_iid, 'end',
+                        text=f'  {mat_name}',
+                        tags=(m_tag, 'child_row'),
+                        values=(
+                            f"{mat_jbv:,.2f}",           # JBV
+                            f"{sell_pct*100:.0f}%",      # Sell%  (reuses Ship+Collat col)
+                            f"{alloc_cost:,.2f}",         # Allocated cost
+                            f"{revenue:,.2f}",            # Revenue
+                            f"{mat_profit:+,.2f}",        # Profit
+                            f"{mat_margin:+.1f}%",        # Margin%
+                            f"{act_qty:,.1f} u",          # Qty/batch (reuses Dev col)
+                        ))
 
     def _sort_ore_tree(self, col):
         sort_map = {'margin': 'Margin %', 'profit': 'Profit ISK', 'landed': 'Landed Cost',
