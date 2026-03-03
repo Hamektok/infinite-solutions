@@ -2774,6 +2774,13 @@ class AdminDashboard:
         ttk.Entry(param_inner, textvariable=self.ore_dev_days_var, width=6).grid(
                   row=3, column=7, sticky='w', padx=(0, 10))
 
+        # Target Margin % (buy order analysis)
+        tk.Label(param_inner, text="Target Margin %", **lbl_cfg).grid(row=2, column=9, sticky='w', padx=(8, 4))
+        self.ore_target_margin_var = tk.StringVar(value=self._get_config('ore_param_target_margin', '5.0'))
+        self.ore_target_margin_var.trace_add('write', lambda *_: self._set_config('ore_param_target_margin', self.ore_target_margin_var.get()))
+        ttk.Entry(param_inner, textvariable=self.ore_target_margin_var, width=6).grid(
+                  row=3, column=9, sticky='w', padx=(8, 10))
+
         # Recalculate
         ttk.Button(param_inner, text='\u27f3  Recalculate', style='Action.TButton',
                    command=self.load_ore_import_data).grid(row=3, column=8, sticky='w', padx=(8, 0))
@@ -2896,7 +2903,8 @@ class AdminDashboard:
         ttk.Label(frow, text="Sort:").pack(side='left', padx=(0, 4))
         self.ore_sort_display_var = tk.StringVar(value='Margin %')
         ttk.Combobox(frow, textvariable=self.ore_sort_display_var, width=16,
-                     values=['Margin %', 'Profit/Unit', 'Landed/Unit', 'Value/Unit', 'Deviation %'],
+                     values=['Margin %', 'Profit/Unit', 'Landed/Unit', 'Value/Unit', 'Deviation %',
+                             'Max Bid', 'Sug Bid', 'Bid Headroom', 'Volatility %'],
                      state='readonly').pack(side='left')
         self.ore_sort_display_var.trace_add('write', lambda *_: self._filter_active_ore_view())
 
@@ -2908,18 +2916,24 @@ class AdminDashboard:
         self.ore_tree_frame = ttk.Frame(tree_frame)
         self.ore_tree_frame.pack(fill='both', expand=True)
 
-        cols = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
+        cols = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev',
+                'max_bid', 'sug_bid', 'bid_room', 'volatility')
         self.ore_tree = ttk.Treeview(self.ore_tree_frame, columns=cols, show='headings', selectmode='browse')
 
         col_defs = [
-            ('name',      'Ore Name',             210, 'w'),
-            ('jita_buy',  'Jita/Unit (ISK)',        130, 'e'),
-            ('logistics', 'Logistics/Unit',        120, 'e'),
-            ('landed',    'Landed/Unit (ISK)',     125, 'e'),
-            ('value',     'Value/Unit (ISK)',      125, 'e'),
-            ('profit',    'Profit/Unit (ISK)',     115, 'e'),
-            ('margin',    'Margin %',               85, 'e'),
-            ('dev',       'vs N-Day Avg %',        105, 'e'),
+            ('name',       'Ore Name',             200, 'w'),
+            ('jita_buy',   'Jita/Unit (ISK)',       120, 'e'),
+            ('logistics',  'Logistics/Unit',        110, 'e'),
+            ('landed',     'Landed/Unit (ISK)',     115, 'e'),
+            ('value',      'Value/Unit (ISK)',      115, 'e'),
+            ('profit',     'Profit/Unit (ISK)',     110, 'e'),
+            ('margin',     'Margin %',               80, 'e'),
+            ('dev',        'vs N-Day Avg %',        100, 'e'),
+            # ── Buy order analysis ──────────────────────────
+            ('max_bid',    'Max Bid/Unit',          115, 'e'),
+            ('sug_bid',    'Sug Bid/Unit',          110, 'e'),
+            ('bid_room',   'Bid Headroom %',         95, 'e'),
+            ('volatility', '7d Volatility %',        90, 'e'),
         ]
         for cid, heading, width, anchor in col_defs:
             self.ore_tree.heading(cid, text=heading,
@@ -3261,6 +3275,26 @@ class AdminDashboard:
         """, all_ore_ids)
         avg_prices = {r[0]: r[1] for r in cursor.fetchall()}
 
+        # 7-day price range (high/low) for volatility column — same basis as avg
+        if 'JSV' in buy_basis:
+            rng_col    = 'best_sell'
+            rng_filter = 'AND best_sell IS NOT NULL'
+        elif 'Split' in buy_basis:
+            rng_col    = '(best_buy + best_sell) / 2.0'
+            rng_filter = 'AND best_buy IS NOT NULL AND best_sell IS NOT NULL'
+        else:
+            rng_col    = 'best_buy'
+            rng_filter = 'AND best_buy IS NOT NULL'
+        cursor.execute(f"""
+            SELECT type_id, MIN({rng_col}), MAX({rng_col})
+            FROM market_price_snapshots
+            WHERE type_id IN ({ore_ph})
+              {rng_filter}
+              AND timestamp >= datetime('now', '-{dev_days} days')
+            GROUP BY type_id
+        """, all_ore_ids)
+        price_ranges = {r[0]: (r[1], r[2]) for r in cursor.fetchall()}
+
         # Volume + portion size for all ore type IDs
         cursor.execute(f"SELECT type_id, type_name, volume, portion_size FROM inv_types WHERE type_id IN ({ore_ph})",
                        all_ore_ids)
@@ -3345,6 +3379,46 @@ class AdminDashboard:
             avg_bb  = avg_prices.get(type_id)
             dev_pct = ((raw_price - avg_bb) / avg_bb * 100) if (raw_price and avg_bb and avg_bb > 0) else None
 
+            # ── Buy order analysis metrics ────────────────────────────────
+            try:
+                target_margin_rate = float(self.ore_target_margin_var.get()) / 100.0
+            except (ValueError, AttributeError):
+                target_margin_rate = 0.05
+
+            value_pu = prod_value / portion          # refine value per unit
+            ship_pu  = volume * ship_rate            # fixed shipping per unit (doesn't scale with price)
+
+            # max_bid: max market price per unit to hit target_margin
+            #   value_pu = (price * buy_pct * (1+broker+collat) + ship_pu) * (1+target_margin)
+            #   => price = (value_pu/(1+target_margin) - ship_pu) / (buy_pct*(1+broker+collat))
+            price_factor = buy_pct * (1.0 + effective_broker + collat_pct)
+            if price_factor > 0:
+                _mb = (value_pu / (1.0 + target_margin_rate) - ship_pu) / price_factor
+                max_bid = round(_mb, 2) if _mb > 0 else None
+            else:
+                max_bid = None
+
+            # sug_bid: conservative entry — stay at or slightly below N-day avg, capped at max_bid
+            if max_bid is not None and avg_bb is not None and avg_bb > 0:
+                sug_bid = round(min(max_bid, avg_bb * 0.99), 2)
+            elif max_bid is not None:
+                sug_bid = max_bid
+            else:
+                sug_bid = None
+
+            # bid_room: how far below max_bid the current market sits (positive = room to pay more)
+            if max_bid is not None and raw_price > 0:
+                bid_room = round((max_bid - raw_price) / raw_price * 100, 2)
+            else:
+                bid_room = None
+
+            # volatility: 7-day price swing as % of N-day avg
+            rng = price_ranges.get(type_id)
+            if rng and rng[0] is not None and rng[1] is not None and avg_bb and avg_bb > 0:
+                volatility = round((rng[1] - rng[0]) / avg_bb * 100, 2)
+            else:
+                volatility = None
+
             if type_id in ice_ids:
                 ore_cat = 'ice'
             elif type_id in moon_ids:
@@ -3367,6 +3441,11 @@ class AdminDashboard:
                 'dev':        dev_pct,                                  # % unchanged
                 'ore_cat':    ore_cat,
                 'compressed': is_compressed,
+                # Buy order analysis
+                'max_bid':    max_bid,
+                'sug_bid':    sug_bid,
+                'bid_room':   bid_room,
+                'volatility': volatility,
             })
 
         self._ore_prices_snap = prices
@@ -3386,7 +3465,9 @@ class AdminDashboard:
         search   = self.ore_search_var.get().lower()
         show     = self.ore_show_var.get()
         sort_map = {'Margin %': 'margin', 'Profit/Unit': 'profit',
-                    'Landed/Unit': 'landed', 'Value/Unit': 'value', 'Deviation %': 'dev'}
+                    'Landed/Unit': 'landed', 'Value/Unit': 'value', 'Deviation %': 'dev',
+                    'Max Bid': 'max_bid', 'Sug Bid': 'sug_bid',
+                    'Bid Headroom': 'bid_room', 'Volatility %': 'volatility'}
         sort_key = sort_map.get(self.ore_sort_display_var.get(), 'margin')
         type_filter = self._ore_type_filter_val
 
@@ -3444,7 +3525,7 @@ class AdminDashboard:
                              'ice':      '── Ice ──',
                              'moon':     '── Moon Ores ──'}.get(cat, cat)
                 self.ore_tree.insert('', 'end',
-                    values=(cat_label, '', '', '', '', '', '', ''),
+                    values=(cat_label, '', '', '', '', '', '', '', '', '', '', ''),
                     tags=('group_hdr',))
 
             m = r['margin']
@@ -3465,6 +3546,21 @@ class AdminDashboard:
                 dev_str = '—'
                 dev_tag = ''
 
+            # Buy order column formatting
+            max_bid    = r.get('max_bid')
+            sug_bid    = r.get('sug_bid')
+            bid_room   = r.get('bid_room')
+            volatility = r.get('volatility')
+
+            max_bid_str  = f"{max_bid:,.2f}"    if max_bid    is not None else '—'
+            sug_bid_str  = f"{sug_bid:,.2f}"    if sug_bid    is not None else '—'
+            bid_room_str = f"{bid_room:+.1f}%"  if bid_room   is not None else '—'
+            volat_str    = f"{volatility:.1f}%" if volatility is not None else '—'
+
+            # Flag if current market price is already above max bid (can't hit target margin)
+            if max_bid is not None and r['jita_buy'] > max_bid:
+                max_bid_str = f'OVER ({max_bid:,.2f})'
+
             tags = tuple(t for t in (tag, alt, dev_tag) if t)
             self.ore_tree.insert('', 'end', tags=tags, values=(
                 r['name'],
@@ -3475,12 +3571,18 @@ class AdminDashboard:
                 f"{r['profit']:+,.2f}",
                 f"{r['margin']:+.1f}%",
                 dev_str,
+                max_bid_str,
+                sug_bid_str,
+                bid_room_str,
+                volat_str,
             ))
             row_idx += 1
 
     def _sort_ore_tree(self, col):
         sort_map = {'margin': 'Margin %', 'profit': 'Profit/Unit', 'landed': 'Landed/Unit',
-                    'value': 'Value/Unit', 'dev': 'Deviation %'}
+                    'value': 'Value/Unit', 'dev': 'Deviation %',
+                    'max_bid': 'Max Bid', 'sug_bid': 'Sug Bid',
+                    'bid_room': 'Bid Headroom', 'volatility': 'Volatility %'}
         if col in sort_map:
             self.ore_sort_display_var.set(sort_map[col])
         self._filter_ore_tree()
