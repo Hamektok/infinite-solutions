@@ -768,8 +768,11 @@ class AdminDashboard:
                       foreground='#6fb3d0').pack(anchor='w')
 
             style = 'Deploy.TButton' if 'Deploy' in title else 'Action.TButton'
-            ttk.Button(inner, text="Run", style=style,
-                      command=cmd).pack(side='right', padx=10)
+            btn = ttk.Button(inner, text="Run", style=style,
+                             command=cmd)
+            btn.pack(side='right', padx=10)
+            if title == "Update Inventory":
+                self._inv_action_btn = btn
 
         # Last updated info
         self.last_updated_label = ttk.Label(container, text="",
@@ -1691,8 +1694,43 @@ class AdminDashboard:
     # ===== ACTIONS =====
 
     def action_update_inventory(self):
-        """Run the inventory update script."""
-        self.run_script('update_lx_zoj_inventory.py', 'Inventory Update')
+        """Run the inventory update script in a background thread."""
+        import threading, sys as _sys
+
+        script_path = os.path.join(PROJECT_DIR, 'update_lx_zoj_inventory.py')
+        if not os.path.exists(script_path):
+            messagebox.showerror("Not Found", f"Script not found:\n{script_path}")
+            return
+
+        self._inv_action_btn.configure(state='disabled', text='Running...')
+        self.update_status('Updating inventory...')
+        error_holder = [None]
+
+        def _worker():
+            try:
+                result = subprocess.run(
+                    [_sys.executable, script_path],
+                    cwd=PROJECT_DIR,
+                    capture_output=True, text=True, timeout=120
+                )
+                if result.returncode != 0:
+                    error_holder[0] = (result.stderr or result.stdout or 'Unknown error').strip()[-300:]
+            except Exception as e:
+                error_holder[0] = str(e)
+            self.root.after(0, _done)
+
+        def _done():
+            self._inv_action_btn.configure(state='normal', text='Run')
+            if error_holder[0]:
+                self.update_status('Inventory update failed')
+                messagebox.showerror("Update Failed", f"Inventory update failed:\n\n{error_holder[0]}")
+            else:
+                self.update_status('Inventory updated successfully')
+                self.load_inventory()
+                messagebox.showinfo("Done", "Inventory updated and site pushed to GitHub.\n"
+                                            "Live site will reflect changes in 1-2 minutes.")
+
+        threading.Thread(target=_worker, daemon=True).start()
 
     def action_update_blueprints(self):
         """Run the blueprint update script."""
