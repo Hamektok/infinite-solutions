@@ -144,7 +144,12 @@ class AdminDashboard:
         self.notebook.add(self.ore_import_frame, text='  Ore Import  ')
         self.build_ore_import_tab()
 
-        # Tab 8: Quick Actions
+        # Tab 8: Purchase P&L
+        self.pnl_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.pnl_frame, text='  Purchase P&L  ')
+        self.build_pnl_tab()
+
+        # Tab 9: Quick Actions
         self.actions_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
@@ -732,6 +737,304 @@ class AdminDashboard:
 
         self.inv_tree.pack(side='left', fill='both', expand=True)
         scrollbar.pack(side='right', fill='y')
+
+    # ── Purchase P&L Tab ──────────────────────────────────────────────────────
+
+    def build_pnl_tab(self):
+        """Build the Purchase P&L tracking tab."""
+        import subprocess as _sp
+        import threading as _threading
+
+        outer = ttk.Frame(self.pnl_frame, style='Card.TFrame')
+        outer.pack(fill='both', expand=True, padx=10, pady=8)
+
+        # ── Summary cards ────────────────────────────────────────────────────
+        card_row = ttk.Frame(outer, style='Card.TFrame')
+        card_row.pack(fill='x', padx=6, pady=(6, 4))
+
+        def _make_card(parent, label):
+            f = tk.Frame(parent, background='#0a1c2e',
+                         highlightbackground='#1a3a50', highlightthickness=1)
+            f.pack(side='left', padx=4, pady=2, ipadx=10, ipady=6)
+            tk.Label(f, text=label, background='#0a1c2e', foreground='#5a8aaa',
+                     font=('Segoe UI', 8)).pack(anchor='w')
+            v = tk.Label(f, text='—', background='#0a1c2e', foreground='#c8dce8',
+                         font=('Segoe UI', 12, 'bold'))
+            v.pack(anchor='w')
+            return v
+
+        self._pnl_cards = {
+            'deployed':  _make_card(card_row, 'Total Deployed'),
+            'revenue':   _make_card(card_row, 'Expected Revenue'),
+            'profit':    _make_card(card_row, 'Expected Profit'),
+            'margin':    _make_card(card_row, 'Avg Margin %'),
+            'coverage':  _make_card(card_row, 'Priced Lots'),
+        }
+
+        # ── Controls ─────────────────────────────────────────────────────────
+        ctrl = tk.Frame(outer, background='#0a1520')
+        ctrl.pack(fill='x', padx=6, pady=(0, 4))
+
+        lbl = dict(background='#0a1520', foreground='#6a9ab8',
+                   font=('Segoe UI', 9))
+
+        tk.Label(ctrl, text='Category:', **lbl).pack(side='left', padx=(0, 2))
+        self._pnl_cat_var = tk.StringVar(value='All')
+        cat_opts = ['All', 'standard_ore', 'ice_ore', 'moon_ore',
+                    'minerals', 'ice_products', 'moon_materials',
+                    'pi_materials', 'salvaged_materials']
+        ttk.Combobox(ctrl, textvariable=self._pnl_cat_var, values=cat_opts,
+                     width=18, state='readonly').pack(side='left', padx=(0, 8))
+
+        tk.Label(ctrl, text='Show:', **lbl).pack(side='left', padx=(0, 2))
+        self._pnl_show_var = tk.StringVar(value='All')
+        ttk.Combobox(ctrl, textvariable=self._pnl_show_var,
+                     values=['All', 'Profitable', 'Loss', 'No Price Data'],
+                     width=14, state='readonly').pack(side='left', padx=(0, 8))
+
+        tk.Label(ctrl, text='From:', **lbl).pack(side='left', padx=(0, 2))
+        self._pnl_from_var = tk.StringVar()
+        ttk.Entry(ctrl, textvariable=self._pnl_from_var,
+                  width=11).pack(side='left', padx=(0, 4))
+
+        tk.Label(ctrl, text='To:', **lbl).pack(side='left', padx=(0, 2))
+        self._pnl_to_var = tk.StringVar()
+        ttk.Entry(ctrl, textvariable=self._pnl_to_var,
+                  width=11).pack(side='left', padx=(0, 8))
+
+        tk.Label(ctrl, text='Search:', **lbl).pack(side='left', padx=(0, 2))
+        self._pnl_search_var = tk.StringVar()
+        ttk.Entry(ctrl, textvariable=self._pnl_search_var,
+                  width=16).pack(side='left', padx=(0, 8))
+
+        ttk.Button(ctrl, text='Load',
+                   command=self._load_pnl_data).pack(side='left', padx=(0, 4))
+
+        self._pnl_update_btn = ttk.Button(
+            ctrl, text='Run Update',
+            command=lambda: _threading.Thread(
+                target=self._run_pnl_update, daemon=True).start())
+        self._pnl_update_btn.pack(side='left', padx=(0, 8))
+
+        self._pnl_status_lbl = tk.Label(
+            ctrl, text='', background='#0a1520',
+            foreground='#5a8aaa', font=('Segoe UI', 9))
+        self._pnl_status_lbl.pack(side='left')
+
+        # Bind filter controls to auto-reload
+        for v in (self._pnl_cat_var, self._pnl_show_var):
+            v.trace_add('write', lambda *_: self._filter_pnl_tree())
+
+        # ── Treeview ─────────────────────────────────────────────────────────
+        tree_frame = ttk.Frame(outer, style='Card.TFrame')
+        tree_frame.pack(fill='both', expand=True, padx=6, pady=(0, 6))
+
+        cols = ('date', 'item', 'category', 'qty',
+                'paid_u', 'total_cost', 'exp_rev', 'exp_profit', 'margin')
+        self.pnl_tree = ttk.Treeview(tree_frame, columns=cols,
+                                      show='headings', selectmode='browse')
+
+        col_defs = [
+            ('date',       'Date',              100, 'w'),
+            ('item',       'Item',              210, 'w'),
+            ('category',   'Category',          120, 'w'),
+            ('qty',        'Quantity',           90, 'e'),
+            ('paid_u',     'Paid / Unit',        95, 'e'),
+            ('total_cost', 'Total Cost',        110, 'e'),
+            ('exp_rev',    'Exp Revenue',       110, 'e'),
+            ('exp_profit', 'Exp Profit',        110, 'e'),
+            ('margin',     'Margin %',           80, 'e'),
+        ]
+        for cid, heading, width, anchor in col_defs:
+            self.pnl_tree.heading(cid, text=heading,
+                                   command=lambda c=cid: self._sort_pnl_tree(c))
+            self.pnl_tree.column(cid, width=width, minwidth=40, anchor=anchor)
+
+        self.pnl_tree.tag_configure('profitable', foreground='#00ff88')
+        self.pnl_tree.tag_configure('marginal',   foreground='#ffcc44')
+        self.pnl_tree.tag_configure('loss',       foreground='#ff4444')
+        self.pnl_tree.tag_configure('no_data',    foreground='#4a7a9a')
+        self.pnl_tree.tag_configure('row_a',      background='#0a2030')
+        self.pnl_tree.tag_configure('row_b',      background='#0d2535')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical',
+                             command=self.pnl_tree.yview)
+        hsb = ttk.Scrollbar(tree_frame, orient='horizontal',
+                             command=self.pnl_tree.xview)
+        self.pnl_tree.configure(yscrollcommand=vsb.set,
+                                 xscrollcommand=hsb.set)
+        vsb.pack(side='right',  fill='y')
+        hsb.pack(side='bottom', fill='x')
+        self.pnl_tree.pack(fill='both', expand=True)
+
+        # State
+        self._pnl_all_rows  = []
+        self._pnl_sort_col  = 'date'
+        self._pnl_sort_asc  = False  # newest first by default
+
+        self._load_pnl_data()
+
+    def _run_pnl_update(self):
+        """Run update_purchase_lots.py in background, then reload."""
+        import subprocess as _sp
+        import sys as _sys
+        self.root.after(0, lambda: self._pnl_status_lbl.configure(
+            text='Running update...', foreground='#ffcc44'))
+        script = os.path.join(os.path.dirname(DB_PATH), 'scripts',
+                              'update_purchase_lots.py')
+        result = _sp.run([_sys.executable, script],
+                         capture_output=True, text=True)
+        if result.returncode == 0:
+            self.root.after(0, lambda: self._pnl_status_lbl.configure(
+                text='Update complete', foreground='#00ff88'))
+            self.root.after(0, self._load_pnl_data)
+        else:
+            self.root.after(0, lambda: self._pnl_status_lbl.configure(
+                text='Update failed — see console', foreground='#ff4444'))
+            print(result.stderr)
+
+    def _load_pnl_data(self):
+        """Query purchase_lots and populate internal row list."""
+        conn   = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT date, type_name, category, quantity, price_paid,
+                   total_cost, expected_revenue, expected_profit, margin_pct
+            FROM purchase_lots
+            ORDER BY date DESC
+        """)
+        rows = cursor.fetchall()
+        conn.close()
+
+        self._pnl_all_rows = [{
+            'date':       r[0][:10],
+            'item':       r[1],
+            'category':   r[2],
+            'qty':        r[3],
+            'paid_u':     r[4],
+            'total_cost': r[5],
+            'exp_rev':    r[6],
+            'exp_profit': r[7],
+            'margin':     r[8],
+        } for r in rows]
+
+        self._filter_pnl_tree()
+
+    def _filter_pnl_tree(self):
+        """Apply filters/sort and repopulate the treeview."""
+        cat_filter  = self._pnl_cat_var.get()
+        show_filter = self._pnl_show_var.get()
+        search      = self._pnl_search_var.get().lower()
+        from_date   = self._pnl_from_var.get().strip()
+        to_date     = self._pnl_to_var.get().strip()
+
+        rows = self._pnl_all_rows
+
+        if cat_filter != 'All':
+            rows = [r for r in rows if r['category'] == cat_filter]
+        if show_filter == 'Profitable':
+            rows = [r for r in rows if r['exp_profit'] is not None
+                    and r['exp_profit'] > 0]
+        elif show_filter == 'Loss':
+            rows = [r for r in rows if r['exp_profit'] is not None
+                    and r['exp_profit'] <= 0]
+        elif show_filter == 'No Price Data':
+            rows = [r for r in rows if r['exp_profit'] is None]
+        if search:
+            rows = [r for r in rows
+                    if search in r['item'].lower()
+                    or search in r['category'].lower()]
+        if from_date:
+            rows = [r for r in rows if r['date'] >= from_date]
+        if to_date:
+            rows = [r for r in rows if r['date'] <= to_date]
+
+        # Sort
+        col = self._pnl_sort_col
+        rev = not self._pnl_sort_asc
+        rows = sorted(rows,
+                      key=lambda r: (r[col] is None, r[col] or ''),
+                      reverse=rev)
+
+        # Update summary cards
+        priced = [r for r in rows if r['exp_profit'] is not None]
+        total_cost   = sum(r['total_cost']  for r in rows)
+        total_rev    = sum(r['exp_rev']     for r in priced)
+        total_profit = sum(r['exp_profit']  for r in priced)
+        avg_margin   = (total_profit / sum(r['total_cost'] for r in priced) * 100
+                        if priced else None)
+
+        def _fmt(v, prefix='', suffix=''):
+            if v is None:
+                return '—'
+            if abs(v) >= 1e9:
+                return f'{prefix}{v/1e9:+.2f}B{suffix}'
+            if abs(v) >= 1e6:
+                return f'{prefix}{v/1e6:+.2f}M{suffix}'
+            return f'{prefix}{v:+,.0f}{suffix}'
+
+        self._pnl_cards['deployed'].configure(
+            text=_fmt(total_cost, suffix=' ISK').replace('+', ''),
+            foreground='#00d9ff')
+        self._pnl_cards['revenue'].configure(
+            text=_fmt(total_rev, suffix=' ISK').replace('+', ''),
+            foreground='#c8dce8')
+
+        profit_color = '#00ff88' if total_profit > 0 else '#ff4444'
+        self._pnl_cards['profit'].configure(
+            text=_fmt(total_profit, suffix=' ISK'),
+            foreground=profit_color)
+
+        margin_color = ('#00ff88' if avg_margin and avg_margin > 5
+                        else '#ffcc44' if avg_margin and avg_margin >= 0
+                        else '#ff4444')
+        self._pnl_cards['margin'].configure(
+            text=f'{avg_margin:+.1f}%' if avg_margin is not None else '—',
+            foreground=margin_color)
+
+        self._pnl_cards['coverage'].configure(
+            text=f'{len(priced):,} / {len(rows):,}',
+            foreground='#c8dce8')
+
+        # Populate tree
+        self.pnl_tree.delete(*self.pnl_tree.get_children())
+        for i, r in enumerate(rows):
+            alt = 'row_a' if i % 2 == 0 else 'row_b'
+            m   = r['margin']
+            if m is None:
+                mtag = 'no_data'
+            elif m >= 5:
+                mtag = 'profitable'
+            elif m >= 0:
+                mtag = 'marginal'
+            else:
+                mtag = 'loss'
+
+            self.pnl_tree.insert('', 'end', tags=(mtag, alt), values=(
+                r['date'],
+                r['item'],
+                r['category'],
+                f"{r['qty']:,.0f}",
+                f"{r['paid_u']:,.2f}",
+                f"{r['total_cost']:,.0f}",
+                f"{r['exp_rev']:,.0f}" if r['exp_rev'] is not None else '—',
+                f"{r['exp_profit']:+,.0f}" if r['exp_profit'] is not None else 'cost only',
+                f"{m:+.1f}%" if m is not None else '—',
+            ))
+
+    def _sort_pnl_tree(self, col):
+        col_map = {
+            'date': 'date', 'item': 'item', 'category': 'category',
+            'qty': 'qty', 'paid_u': 'paid_u', 'total_cost': 'total_cost',
+            'exp_rev': 'exp_rev', 'exp_profit': 'exp_profit', 'margin': 'margin',
+        }
+        key = col_map.get(col, 'date')
+        if self._pnl_sort_col == key:
+            self._pnl_sort_asc = not self._pnl_sort_asc
+        else:
+            self._pnl_sort_col = key
+            self._pnl_sort_asc = False
+        self._filter_pnl_tree()
 
     def build_actions_tab(self):
         """Build the Quick Actions tab."""
@@ -2743,21 +3046,18 @@ class AdminDashboard:
         self.ore_tree_frame = ttk.Frame(tree_frame)
         self.ore_tree_frame.pack(fill='both', expand=True)
 
-        cols = ('jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
-        self.ore_tree = ttk.Treeview(self.ore_tree_frame, columns=cols, show='tree headings', selectmode='browse')
-
-        # #0 = tree/name column (shows expand arrow)
-        self.ore_tree.heading('#0', text='Ore / Mineral')
-        self.ore_tree.column('#0', width=210, minwidth=80, anchor='w', stretch=True)
+        cols = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
+        self.ore_tree = ttk.Treeview(self.ore_tree_frame, columns=cols, show='headings', selectmode='browse')
 
         col_defs = [
-            ('jita_buy',  'Jita Buy / JBV',         130, 'e'),
-            ('logistics', 'Ship+Collat / Sell%',   120, 'e'),
-            ('landed',    'Landed / Alloc Cost',   115, 'e'),
-            ('value',     'Product Value / Rev',   130, 'e'),
-            ('profit',    'Profit / Batch',        110, 'e'),
+            ('name',      'Ore Name',             210, 'w'),
+            ('jita_buy',  'Jita/Unit (ISK)',        130, 'e'),
+            ('logistics', 'Ship+Collat (ISK)',     120, 'e'),
+            ('landed',    'Landed (ISK)',          115, 'e'),
+            ('value',     'Product Value (ISK)',   130, 'e'),
+            ('profit',    'Profit (ISK)',          110, 'e'),
             ('margin',    'Margin %',               85, 'e'),
-            ('dev',       'vs N-Day / Qty',        105, 'e'),
+            ('dev',       'vs N-Day Avg %',        105, 'e'),
         ]
         for cid, heading, width, anchor in col_defs:
             self.ore_tree.heading(cid, text=heading,
@@ -2774,7 +3074,6 @@ class AdminDashboard:
         self.ore_tree.tag_configure('row_b', background='#0d2535')
         self.ore_tree.tag_configure('dev_high', foreground='#ff7744')
         self.ore_tree.tag_configure('dev_low',  foreground='#44ddaa')
-        self.ore_tree.tag_configure('child_row', foreground='#7ab8cc', font=('Segoe UI', 8))
 
         vsb = ttk.Scrollbar(self.ore_tree_frame, orient='vertical',   command=self.ore_tree.yview)
         hsb = ttk.Scrollbar(self.ore_tree_frame, orient='horizontal', command=self.ore_tree.xview)
@@ -3262,15 +3561,6 @@ class AdminDashboard:
             text=f'{worst_r["margin"]:.1f}%  {worst_r["name"]}' if worst_r else '—',
             foreground='#ff4444' if worst_r and worst_r['margin'] < 0 else '#00ff88')
 
-        # Product name lookup for child rows
-        pname = {}
-        for tid, name, *_ in (self._ORE_MINERALS + self._ORE_ICE_PRODUCTS +
-                               self._ORE_MOON_MATERIALS):
-            pname[tid] = name
-
-        prices     = getattr(self, '_ore_prices_snap', {})
-        refine_eff = getattr(self, '_ore_refine_eff', 1.0)
-
         # Insert rows with group headers when not searching/filtering
         show_groups = not search and type_filter in ('all', 'standard', 'ice', 'moon')
         current_cat = None
@@ -3283,8 +3573,8 @@ class AdminDashboard:
                 cat_label = {'standard': '── Standard Ores ──',
                              'ice':      '── Ice ──',
                              'moon':     '── Moon Ores ──'}.get(cat, cat)
-                self.ore_tree.insert('', 'end', text=cat_label,
-                    values=('', '', '', '', '', '', ''),
+                self.ore_tree.insert('', 'end',
+                    values=(cat_label, '', '', '', '', '', '', ''),
                     tags=('group_hdr',))
 
             m = r['margin']
@@ -3306,7 +3596,8 @@ class AdminDashboard:
                 dev_tag = ''
 
             tags = tuple(t for t in (tag, alt, dev_tag) if t)
-            parent_iid = self.ore_tree.insert('', 'end', text=r['name'], tags=tags, values=(
+            self.ore_tree.insert('', 'end', tags=tags, values=(
+                r['name'],
                 f"{r['jita_buy']:,.2f}",
                 f"{r['logistics']:,.2f}",
                 f"{r['landed']:,.2f}",
@@ -3316,40 +3607,6 @@ class AdminDashboard:
                 dev_str,
             ))
             row_idx += 1
-
-            # ── Mineral child rows ─────────────────────────────────────────
-            raw_value = r.get('raw_value', 0.0)
-            if raw_value > 0 and prices:
-                for mat in r.get('ore_yields', []):
-                    mat_id  = mat['materialTypeID']
-                    qty     = mat['quantity']
-                    act_qty = qty * refine_eff
-                    mat_jbv = prices.get(mat_id, (None, None))[0]
-                    if not mat_jbv or mat_jbv <= 0:
-                        continue
-                    try:
-                        sell_pct = float(self.ore_product_pct[mat_id].get()) / 100.0
-                    except (KeyError, ValueError):
-                        sell_pct = 1.0
-                    revenue    = act_qty * mat_jbv * sell_pct
-                    alloc_cost = r['landed'] * (act_qty * mat_jbv) / raw_value
-                    mat_profit = revenue - alloc_cost
-                    mat_margin = (mat_profit / alloc_cost * 100) if alloc_cost > 0 else 0.0
-                    mat_name   = pname.get(mat_id, f'Type {mat_id}')
-                    m_tag = ('profitable' if mat_margin >= 5
-                             else 'marginal' if mat_margin >= 0 else 'loss')
-                    self.ore_tree.insert(parent_iid, 'end',
-                        text=f'  {mat_name}',
-                        tags=(m_tag, 'child_row'),
-                        values=(
-                            f"{mat_jbv:,.2f}",           # JBV
-                            f"{sell_pct*100:.0f}%",      # Sell%  (reuses Ship+Collat col)
-                            f"{alloc_cost:,.2f}",         # Allocated cost
-                            f"{revenue:,.2f}",            # Revenue
-                            f"{mat_profit:+,.2f}",        # Profit
-                            f"{mat_margin:+.1f}%",        # Margin%
-                            f"{act_qty:,.1f} u",          # Qty/batch (reuses Dev col)
-                        ))
 
     def _sort_ore_tree(self, col):
         sort_map = {'margin': 'Margin %', 'profit': 'Profit ISK', 'landed': 'Landed Cost',
