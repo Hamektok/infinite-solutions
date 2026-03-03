@@ -3240,13 +3240,22 @@ class AdminDashboard:
         cursor.execute("SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id IN (%s)" % placeholders, all_ids)
         snap_ts = cursor.fetchone()[0]
 
-        # N-day average best_buy per ore type (for deviation column)
+        # N-day average per ore type — use same price column as the buy basis
         ore_ph = ','.join('?' * len(all_ore_ids))
+        if 'JSV' in buy_basis:
+            avg_col    = 'AVG(best_sell)'
+            avg_filter = 'AND best_sell IS NOT NULL'
+        elif 'Split' in buy_basis:
+            avg_col    = 'AVG((best_buy + best_sell) / 2.0)'
+            avg_filter = 'AND best_buy IS NOT NULL AND best_sell IS NOT NULL'
+        else:  # JBV (default)
+            avg_col    = 'AVG(best_buy)'
+            avg_filter = 'AND best_buy IS NOT NULL'
         cursor.execute(f"""
-            SELECT type_id, AVG(best_buy)
+            SELECT type_id, {avg_col}
             FROM market_price_snapshots
             WHERE type_id IN ({ore_ph})
-              AND best_buy IS NOT NULL
+              {avg_filter}
               AND timestamp >= datetime('now', '-{dev_days} days')
             GROUP BY type_id
         """, all_ore_ids)
@@ -3332,10 +3341,9 @@ class AdminDashboard:
             profit  = prod_value - total_cost
             margin  = (profit / total_cost * 100) if total_cost > 0 else 0
 
-            # Deviation vs N-day average buy price
-            current_bb = prices.get(type_id, (None, None))[0]
-            avg_bb     = avg_prices.get(type_id)
-            dev_pct    = ((current_bb - avg_bb) / avg_bb * 100) if (current_bb and avg_bb and avg_bb > 0) else None
+            # Deviation vs N-day average — both sides use the configured buy basis
+            avg_bb  = avg_prices.get(type_id)
+            dev_pct = ((raw_price - avg_bb) / avg_bb * 100) if (raw_price and avg_bb and avg_bb > 0) else None
 
             if type_id in ice_ids:
                 ore_cat = 'ice'
