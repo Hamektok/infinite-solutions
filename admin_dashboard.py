@@ -144,7 +144,12 @@ class AdminDashboard:
         self.notebook.add(self.ore_import_frame, text='  Ore Import  ')
         self.build_ore_import_tab()
 
-        # Tab 8: Quick Actions
+        # Tab 8: Consignments
+        self.consign_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.consign_frame, text='  Consignments  ')
+        self._build_consignment_tab()
+
+        # Tab 9: Quick Actions
         self.actions_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
@@ -3785,6 +3790,416 @@ class AdminDashboard:
             self._product_sort_col = col
             self._product_sort_asc = col in ('product', 'source', 'category')
         self._filter_product_tree()
+
+    # ──────────────────────────────────────────────────────────────────────
+    #  CONSIGNMENT TAB
+    # ──────────────────────────────────────────────────────────────────────
+
+    def _consign_init_db(self):
+        """Create consignment tables if they don't exist."""
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS consignors (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                character_name TEXT    NOT NULL,
+                item_name      TEXT    NOT NULL,
+                list_price     REAL,
+                consignor_pct  REAL    NOT NULL,
+                start_date     TEXT    NOT NULL,
+                active         INTEGER DEFAULT 1,
+                notes          TEXT
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS consignment_sales (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                consignor_id   INTEGER NOT NULL REFERENCES consignors(id),
+                sale_date      TEXT    NOT NULL,
+                quantity       INTEGER NOT NULL,
+                price_per_unit REAL    NOT NULL,
+                total_isk      REAL    NOT NULL,
+                consignor_isk  REAL    NOT NULL,
+                broker_isk     REAL    NOT NULL,
+                paid           INTEGER DEFAULT 0,
+                paid_date      TEXT,
+                notes          TEXT
+            )
+        """)
+        conn.commit()
+        conn.close()
+
+    def _build_consignment_tab(self):
+        """Build the Consignment tracking tab."""
+        self._consign_init_db()
+
+        outer = tk.Frame(self.consign_frame, background='#0a1520')
+        outer.pack(fill='both', expand=True, padx=15, pady=10)
+
+        tk.Label(outer, text='Consignment Program', background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 13, 'bold')).pack(anchor='w', pady=(0, 8))
+
+        # Paned layout — consignors top, sales log bottom
+        pane = tk.PanedWindow(outer, orient='vertical', background='#1a3040',
+                              sashrelief='flat', sashwidth=6, sashpad=2)
+        pane.pack(fill='both', expand=True)
+
+        # ── TOP: Consignors ───────────────────────────────────────────────
+        top_card = ttk.Frame(pane, style='Card.TFrame')
+        pane.add(top_card, minsize=160)
+
+        top_inner = ttk.Frame(top_card, style='Card.TFrame')
+        top_inner.pack(fill='both', expand=True, padx=10, pady=8)
+
+        ctb = ttk.Frame(top_inner, style='Card.TFrame')
+        ctb.pack(fill='x', pady=(0, 6))
+        tk.Label(ctb, text='Consignors', background='#0a2030',
+                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
+        ttk.Button(ctb, text='+ Add Consignor',
+                   command=self._consign_add_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(ctb, text='Edit',
+                   command=self._consign_edit_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(ctb, text='Toggle Active',
+                   command=self._consign_toggle_active).pack(side='left', padx=(0, 4))
+
+        c_cols = ('name', 'item', 'list_price', 'their_pct', 'my_pct', 'start_date', 'status', 'owed')
+        self.consign_tree = ttk.Treeview(top_inner, columns=c_cols, show='headings',
+                                         selectmode='browse', height=6)
+        for cid, hd, w, a in [
+            ('name',       'Consignor',       150, 'w'),
+            ('item',       'Item',            180, 'w'),
+            ('list_price', 'List Price/Unit', 120, 'e'),
+            ('their_pct',  'Their %',          75, 'e'),
+            ('my_pct',     'My %',             65, 'e'),
+            ('start_date', 'Since',           100, 'c'),
+            ('status',     'Status',           75, 'c'),
+            ('owed',       'ISK Owed',        130, 'e'),
+        ]:
+            self.consign_tree.heading(cid, text=hd)
+            self.consign_tree.column(cid, width=w, minwidth=40, anchor=a)
+        self.consign_tree.tag_configure('active',   foreground='#00ff88')
+        self.consign_tree.tag_configure('inactive', foreground='#888888')
+        self.consign_tree.bind('<<TreeviewSelect>>', lambda _: self._consign_load_sales())
+
+        c_vsb = ttk.Scrollbar(top_inner, orient='vertical', command=self.consign_tree.yview)
+        self.consign_tree.configure(yscrollcommand=c_vsb.set)
+        c_vsb.pack(side='right', fill='y')
+        self.consign_tree.pack(fill='both', expand=True)
+
+        # ── BOTTOM: Sales Log ─────────────────────────────────────────────
+        bot_card = ttk.Frame(pane, style='Card.TFrame')
+        pane.add(bot_card, minsize=200)
+
+        bot_inner = ttk.Frame(bot_card, style='Card.TFrame')
+        bot_inner.pack(fill='both', expand=True, padx=10, pady=8)
+
+        stb = ttk.Frame(bot_inner, style='Card.TFrame')
+        stb.pack(fill='x', pady=(0, 6))
+        self._consign_log_title = tk.Label(stb, text='Sales Log', background='#0a2030',
+                                           foreground='#66d9ff', font=('Segoe UI', 10, 'bold'))
+        self._consign_log_title.pack(side='left', padx=(0, 12))
+        ttk.Button(stb, text='Log Sale', style='Action.TButton',
+                   command=self._consign_log_sale_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(stb, text='Mark Selected Paid',
+                   command=self._consign_mark_paid).pack(side='left', padx=(0, 16))
+        self._consign_owed_lbl = tk.Label(stb, text='Owed: —', background='#0a2030',
+                                          foreground='#ffcc44', font=('Segoe UI', 9, 'bold'))
+        self._consign_owed_lbl.pack(side='left', padx=(0, 16))
+        self._consign_paid_lbl = tk.Label(stb, text='Total Paid Out: —', background='#0a2030',
+                                          foreground='#66d9ff', font=('Segoe UI', 9))
+        self._consign_paid_lbl.pack(side='left')
+
+        s_cols = ('date', 'qty', 'price_unit', 'total', 'their_isk', 'my_isk', 'paid', 'notes')
+        self.sales_tree = ttk.Treeview(bot_inner, columns=s_cols, show='headings',
+                                        selectmode='extended', height=10)
+        for cid, hd, w, a in [
+            ('date',       'Sale Date',      110, 'c'),
+            ('qty',        'Qty',             55, 'e'),
+            ('price_unit', 'Price/Unit',     125, 'e'),
+            ('total',      'Total ISK',      135, 'e'),
+            ('their_isk',  'Their Share',    135, 'e'),
+            ('my_isk',     'My Share',       120, 'e'),
+            ('paid',       'Paid',            90, 'c'),
+            ('notes',      'Notes',          220, 'w'),
+        ]:
+            self.sales_tree.heading(cid, text=hd)
+            self.sales_tree.column(cid, width=w, minwidth=40, anchor=a)
+        self.sales_tree.tag_configure('paid',   foreground='#00ff88')
+        self.sales_tree.tag_configure('unpaid', foreground='#ffcc44')
+        self.sales_tree.tag_configure('row_a',  background='#0a2030')
+        self.sales_tree.tag_configure('row_b',  background='#0d2535')
+
+        s_vsb = ttk.Scrollbar(bot_inner, orient='vertical',   command=self.sales_tree.yview)
+        s_hsb = ttk.Scrollbar(bot_inner, orient='horizontal', command=self.sales_tree.xview)
+        self.sales_tree.configure(yscrollcommand=s_vsb.set, xscrollcommand=s_hsb.set)
+        s_vsb.pack(side='right',  fill='y')
+        s_hsb.pack(side='bottom', fill='x')
+        self.sales_tree.pack(fill='both', expand=True)
+
+        self._consign_load_consignors()
+
+    def _consign_load_consignors(self):
+        """Load consignors into the treeview."""
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute("""
+            SELECT c.id, c.character_name, c.item_name, c.list_price,
+                   c.consignor_pct, c.start_date, c.active,
+                   COALESCE(SUM(CASE WHEN s.paid=0 THEN s.consignor_isk ELSE 0 END), 0)
+            FROM consignors c
+            LEFT JOIN consignment_sales s ON s.consignor_id = c.id
+            GROUP BY c.id
+            ORDER BY c.active DESC, c.character_name
+        """).fetchall()
+        conn.close()
+
+        sel = self.consign_tree.selection()
+        self.consign_tree.delete(*self.consign_tree.get_children())
+        for cid, name, item, price, their_pct, start, active, owed in rows:
+            my_pct    = round(100.0 - their_pct, 1)
+            price_str = f"{price:,.2f}" if price is not None else '—'
+            owed_str  = f"{owed:,.2f}" if owed else '—'
+            tag       = 'active' if active else 'inactive'
+            self.consign_tree.insert('', 'end', iid=str(cid), tags=(tag,), values=(
+                name, item, price_str,
+                f"{their_pct:.1f}%", f"{my_pct:.1f}%",
+                start, 'Active' if active else 'Inactive',
+                owed_str,
+            ))
+        if sel and self.consign_tree.exists(sel[0]):
+            self.consign_tree.selection_set(sel[0])
+
+    def _consign_load_sales(self):
+        """Load the sales log for the selected consignor."""
+        sel = self.consign_tree.selection()
+        if not sel:
+            return
+        cid  = int(sel[0])
+        name = self.consign_tree.set(sel[0], 'name')
+        self._consign_log_title.configure(text=f'Sales Log \u2014 {name}')
+
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute("""
+            SELECT id, sale_date, quantity, price_per_unit,
+                   total_isk, consignor_isk, broker_isk, paid, paid_date, notes
+            FROM consignment_sales
+            WHERE consignor_id = ?
+            ORDER BY sale_date DESC, id DESC
+        """, (cid,)).fetchall()
+        owed = conn.execute(
+            "SELECT COALESCE(SUM(consignor_isk),0) FROM consignment_sales WHERE consignor_id=? AND paid=0",
+            (cid,)).fetchone()[0]
+        paid_total = conn.execute(
+            "SELECT COALESCE(SUM(consignor_isk),0) FROM consignment_sales WHERE consignor_id=? AND paid=1",
+            (cid,)).fetchone()[0]
+        conn.close()
+
+        self.sales_tree.delete(*self.sales_tree.get_children())
+        for idx, (sid, date, qty, ppu, total, their_isk, my_isk, paid, paid_date, notes) in enumerate(rows):
+            alt      = 'row_a' if idx % 2 == 0 else 'row_b'
+            paid_tag = 'paid' if paid else 'unpaid'
+            paid_str = f"\u2713 {paid_date[:10] if paid_date else ''}" if paid else '\u2014'
+            self.sales_tree.insert('', 'end', iid=str(sid), tags=(paid_tag, alt), values=(
+                date[:10], qty,
+                f"{ppu:,.2f}", f"{total:,.2f}",
+                f"{their_isk:,.2f}", f"{my_isk:,.2f}",
+                paid_str, notes or '',
+            ))
+
+        self._consign_owed_lbl.configure(
+            text=f"Owed: {owed:,.2f} ISK" if owed else "Owed: 0 ISK")
+        self._consign_paid_lbl.configure(
+            text=f"Total Paid Out: {paid_total:,.2f} ISK" if paid_total else "Total Paid Out: 0 ISK")
+        self._consign_load_consignors()
+
+    def _consign_add_dialog(self, consignor_id=None):
+        """Add or edit a consignor record."""
+        existing = None
+        if consignor_id:
+            conn = sqlite3.connect(DB_PATH)
+            existing = conn.execute(
+                "SELECT character_name, item_name, list_price, consignor_pct, start_date, notes "
+                "FROM consignors WHERE id=?", (consignor_id,)).fetchone()
+            conn.close()
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title('Edit Consignor' if existing else 'Add Consignor')
+        dlg.geometry('420x370')
+        dlg.configure(background='#0a1520')
+        dlg.resizable(False, False)
+        dlg.grab_set()
+
+        lbl_cfg = dict(background='#0a1520', foreground='#88d0e8', font=('Segoe UI', 10))
+
+        def labeled_entry(label, default='', width=32):
+            tk.Label(dlg, text=label, **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+            var = tk.StringVar(value=default)
+            ttk.Entry(dlg, textvariable=var, width=width).pack(anchor='w', padx=16)
+            return var
+
+        name_var  = labeled_entry('Character Name',              existing[0] if existing else '')
+        item_var  = labeled_entry('Item Being Consigned',        existing[1] if existing else '')
+        price_var = labeled_entry('Agreed List Price / Unit',    f"{existing[2]:.2f}" if existing and existing[2] is not None else '')
+        pct_var   = labeled_entry('Consignor % (their share)',   f"{existing[3]:.1f}" if existing else '85.0')
+        date_var  = labeled_entry('Start Date (YYYY-MM-DD)',     existing[4] if existing else datetime.now().strftime('%Y-%m-%d'))
+
+        tk.Label(dlg, text='Notes', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+        notes_txt = tk.Text(dlg, width=44, height=3, background='#0d2535',
+                            foreground='#ccddee', insertbackground='white',
+                            font=('Segoe UI', 9), relief='flat')
+        notes_txt.pack(anchor='w', padx=16)
+        if existing and existing[5]:
+            notes_txt.insert('1.0', existing[5])
+
+        def save():
+            try:
+                name  = name_var.get().strip()
+                item  = item_var.get().strip()
+                price = float(price_var.get()) if price_var.get().strip() else None
+                pct   = float(pct_var.get())
+                date  = date_var.get().strip()
+                notes = notes_txt.get('1.0', 'end').strip()
+                if not name or not item:
+                    messagebox.showerror('Error', 'Character Name and Item are required.', parent=dlg)
+                    return
+                conn = sqlite3.connect(DB_PATH)
+                if consignor_id:
+                    conn.execute(
+                        "UPDATE consignors SET character_name=?, item_name=?, list_price=?, "
+                        "consignor_pct=?, start_date=?, notes=? WHERE id=?",
+                        (name, item, price, pct, date, notes, consignor_id))
+                else:
+                    conn.execute(
+                        "INSERT INTO consignors (character_name, item_name, list_price, "
+                        "consignor_pct, start_date, notes) VALUES (?,?,?,?,?,?)",
+                        (name, item, price, pct, date, notes))
+                conn.commit()
+                conn.close()
+                dlg.destroy()
+                self._consign_load_consignors()
+            except ValueError as e:
+                messagebox.showerror('Error', f'Invalid value: {e}', parent=dlg)
+
+        btn_row = tk.Frame(dlg, background='#0a1520')
+        btn_row.pack(pady=10)
+        ttk.Button(btn_row, text='Save', style='Action.TButton', command=save).pack(side='left', padx=6)
+        ttk.Button(btn_row, text='Cancel', command=dlg.destroy).pack(side='left', padx=6)
+
+    def _consign_edit_dialog(self):
+        """Open the edit dialog for the selected consignor."""
+        sel = self.consign_tree.selection()
+        if not sel:
+            return
+        self._consign_add_dialog(consignor_id=int(sel[0]))
+
+    def _consign_toggle_active(self):
+        """Toggle the active/inactive status of the selected consignor."""
+        sel = self.consign_tree.selection()
+        if not sel:
+            return
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(
+            "UPDATE consignors SET active = CASE WHEN active=1 THEN 0 ELSE 1 END WHERE id=?",
+            (int(sel[0]),))
+        conn.commit()
+        conn.close()
+        self._consign_load_consignors()
+
+    def _consign_log_sale_dialog(self):
+        """Dialog to log a new sale for the selected consignor."""
+        sel = self.consign_tree.selection()
+        if not sel:
+            messagebox.showinfo('Select Consignor', 'Select a consignor first.')
+            return
+        cid       = int(sel[0])
+        vals      = self.consign_tree.item(sel[0])['values']
+        name      = vals[0]
+        item      = vals[1]
+        their_pct = str(vals[3]).replace('%', '').strip()
+        raw_price = str(vals[2]).replace(',', '').strip()
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title(f'Log Sale \u2014 {name}')
+        dlg.geometry('400x310')
+        dlg.configure(background='#0a1520')
+        dlg.resizable(False, False)
+        dlg.grab_set()
+
+        lbl_cfg = dict(background='#0a1520', foreground='#88d0e8', font=('Segoe UI', 10))
+        tk.Label(dlg, text=f'Item: {item}', background='#0a1520',
+                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=16, pady=(12, 6))
+
+        def labeled_entry(label, default='', width=24):
+            tk.Label(dlg, text=label, **lbl_cfg).pack(anchor='w', padx=16, pady=(4, 2))
+            var = tk.StringVar(value=default)
+            ttk.Entry(dlg, textvariable=var, width=width).pack(anchor='w', padx=16)
+            return var
+
+        qty_var   = labeled_entry('Quantity Sold')
+        price_var = labeled_entry('Sale Price / Unit (ISK)', raw_price if raw_price != '\u2014' else '')
+        date_var  = labeled_entry('Sale Date (YYYY-MM-DD)',  datetime.now().strftime('%Y-%m-%d'))
+        notes_var = labeled_entry('Notes (optional)', '', width=40)
+
+        preview = tk.Label(dlg, text='', background='#0a1520',
+                           foreground='#ffcc44', font=('Segoe UI', 9))
+        preview.pack(padx=16, pady=(6, 0))
+
+        def update_preview(*_):
+            try:
+                qty       = int(qty_var.get())
+                price     = float(price_var.get())
+                their_f   = float(their_pct) / 100.0
+                total     = qty * price
+                their_isk = total * their_f
+                my_isk    = total * (1.0 - their_f)
+                preview.configure(
+                    text=f"Total: {total:,.2f}  \u2192  {name}: {their_isk:,.2f}  |  Me: {my_isk:,.2f}")
+            except ValueError:
+                preview.configure(text='')
+
+        qty_var.trace_add('write', update_preview)
+        price_var.trace_add('write', update_preview)
+
+        def save():
+            try:
+                qty       = int(qty_var.get())
+                price     = float(price_var.get())
+                date      = date_var.get().strip()
+                notes     = notes_var.get().strip()
+                their_f   = float(their_pct) / 100.0
+                total     = round(qty * price, 2)
+                their_isk = round(total * their_f, 2)
+                my_isk    = round(total * (1.0 - their_f), 2)
+                conn = sqlite3.connect(DB_PATH)
+                conn.execute(
+                    "INSERT INTO consignment_sales "
+                    "(consignor_id, sale_date, quantity, price_per_unit, total_isk, "
+                    "consignor_isk, broker_isk, paid, notes) VALUES (?,?,?,?,?,?,?,0,?)",
+                    (cid, date, qty, price, total, their_isk, my_isk, notes))
+                conn.commit()
+                conn.close()
+                dlg.destroy()
+                self._consign_load_sales()
+            except ValueError as e:
+                messagebox.showerror('Error', f'Invalid value: {e}', parent=dlg)
+
+        btn_row = tk.Frame(dlg, background='#0a1520')
+        btn_row.pack(pady=10)
+        ttk.Button(btn_row, text='Log Sale', style='Action.TButton', command=save).pack(side='left', padx=6)
+        ttk.Button(btn_row, text='Cancel', command=dlg.destroy).pack(side='left', padx=6)
+
+    def _consign_mark_paid(self):
+        """Mark all selected sales rows as paid."""
+        selected = self.sales_tree.selection()
+        if not selected:
+            return
+        today    = datetime.now().strftime('%Y-%m-%d')
+        sale_ids = [int(iid) for iid in selected]
+        conn = sqlite3.connect(DB_PATH)
+        conn.executemany(
+            "UPDATE consignment_sales SET paid=1, paid_date=? WHERE id=? AND paid=0",
+            [(today, sid) for sid in sale_ids])
+        conn.commit()
+        conn.close()
+        self._consign_load_sales()
 
     def update_status(self, text):
         """Update the status indicator."""
