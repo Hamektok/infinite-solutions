@@ -172,21 +172,21 @@ class AdminDashboard:
         tree_frame = ttk.Frame(self.rates_frame)
         tree_frame.pack(fill='both', expand=True, padx=15, pady=(0, 10))
 
-        columns = ('category', 'item', 'current_rate', 'new_rate', 'alliance_discount')
+        columns = ('category', 'item', 'current_rate', 'new_rate', 'corp_discount')
         self.rates_tree = ttk.Treeview(tree_frame, columns=columns, show='headings',
                                         selectmode='extended')
 
         self.rates_tree.heading('category', text='Category')
         self.rates_tree.heading('item', text='Item Name')
-        self.rates_tree.heading('current_rate', text='Current Rate')
-        self.rates_tree.heading('new_rate', text='New Rate (%)')
-        self.rates_tree.heading('alliance_discount', text='Discount %')
+        self.rates_tree.heading('current_rate', text='Alliance %')
+        self.rates_tree.heading('new_rate', text='New Alliance %')
+        self.rates_tree.heading('corp_discount', text='Corp Discount  →  Corp Rate')
 
         self.rates_tree.column('category', width=130, anchor='center')
-        self.rates_tree.column('item', width=250)
-        self.rates_tree.column('current_rate', width=120, anchor='center')
+        self.rates_tree.column('item', width=230)
+        self.rates_tree.column('current_rate', width=100, anchor='center')
         self.rates_tree.column('new_rate', width=120, anchor='center')
-        self.rates_tree.column('alliance_discount', width=150, anchor='center')
+        self.rates_tree.column('corp_discount', width=200, anchor='center')
 
         scrollbar = ttk.Scrollbar(tree_frame, orient='vertical',
                                    command=self.rates_tree.yview)
@@ -195,64 +195,88 @@ class AdminDashboard:
         self.rates_tree.pack(side='left', fill='both', expand=True)
         scrollbar.pack(side='right', fill='y')
 
-        # Rate editor panel (bottom)
+        # Rate editor panel (bottom) — two rows
         editor = ttk.Frame(self.rates_frame, style='Card.TFrame')
         editor.pack(fill='x', padx=15, pady=(0, 15))
 
-        inner = ttk.Frame(editor)
-        inner.pack(padx=20, pady=15)
+        # ── Row 1: item label + Alliance Rate controls ─────────────────────
+        row1 = ttk.Frame(editor)
+        row1.pack(fill='x', padx=20, pady=(12, 4))
 
-        ttk.Label(inner, text="Selected Item:",
-                  font=('Segoe UI', 11)).pack(side='left', padx=(0, 10))
+        ttk.Label(row1, text="Selected Item:",
+                  font=('Segoe UI', 11)).pack(side='left', padx=(0, 8))
 
-        self.selected_item_label = ttk.Label(inner, text="(click a row above)",
+        self.selected_item_label = ttk.Label(row1, text="(click a row above)",
                                               style='Value.TLabel')
-        self.selected_item_label.pack(side='left', padx=(0, 30))
+        self.selected_item_label.pack(side='left', padx=(0, 28))
 
-        ttk.Label(inner, text="Set Rate %:",
-                  font=('Segoe UI', 11)).pack(side='left', padx=(0, 5))
+        ttk.Label(row1, text="Alliance %:",
+                  font=('Segoe UI', 11, 'bold')).pack(side='left', padx=(0, 5))
 
         self.rate_var = tk.IntVar(value=98)
-        self.rate_spinbox = tk.Spinbox(inner, from_=80, to=100,
+        self.rate_spinbox = tk.Spinbox(row1, from_=80, to=110,
                                         textvariable=self.rate_var,
                                         width=5, font=('Segoe UI', 14, 'bold'),
                                         bg='#0a2030', fg='#00ffff',
                                         buttonbackground='#1a3040',
                                         insertbackground='#00ffff',
                                         justify='center')
-        self.rate_spinbox.pack(side='left', padx=(0, 10))
+        self.rate_spinbox.pack(side='left', padx=(0, 8))
 
-        ttk.Button(inner, text="Apply", style='Action.TButton',
+        ttk.Button(row1, text="Apply", style='Action.TButton',
                    command=self.apply_rate_change).pack(side='left', padx=5)
 
-        # Preset buttons
-        ttk.Label(inner, text="Presets:",
-                  font=('Segoe UI', 11)).pack(side='left', padx=(20, 5))
-
-        for pct in [95, 96, 97, 98, 99]:
-            btn = tk.Button(inner, text=f"{pct}%", width=4,
+        ttk.Label(row1, text="Quick:",
+                  font=('Segoe UI', 10)).pack(side='left', padx=(18, 4))
+        for pct in [95, 96, 97, 98, 99, 100, 101]:
+            btn = tk.Button(row1, text=f"{pct}%", width=4,
                            font=('Segoe UI', 10, 'bold'),
                            bg='#1a3040', fg='#00d9ff', relief='flat',
                            activebackground='#2a4050', activeforeground='#00ffff',
                            command=lambda p=pct: self.quick_set_rate(p))
             btn.pack(side='left', padx=2)
 
-        # Discount adjustment
-        ttk.Label(inner, text="Discount %:",
-                  font=('Segoe UI', 11)).pack(side='left', padx=(25, 5))
+        # ── Row 2: Corp Discount controls + live Corp Rate readout ─────────
+        row2 = ttk.Frame(editor)
+        row2.pack(fill='x', padx=20, pady=(0, 12))
+
+        ttk.Label(row2, text="Corp Discount %:",
+                  font=('Segoe UI', 11, 'bold')).pack(side='left', padx=(0, 5))
 
         self.discount_var = tk.IntVar(value=2)
-        self.discount_spinbox = tk.Spinbox(inner, from_=0, to=20,
+        self.discount_spinbox = tk.Spinbox(row2, from_=0, to=20,
                                             textvariable=self.discount_var,
                                             width=5, font=('Segoe UI', 14, 'bold'),
-                                            bg='#0a2030', fg='#00ff88',
+                                            bg='#0a2030', fg='#ffd700',
                                             buttonbackground='#1a3040',
-                                            insertbackground='#00ff88',
+                                            insertbackground='#ffd700',
                                             justify='center')
-        self.discount_spinbox.pack(side='left', padx=(0, 10))
+        self.discount_spinbox.pack(side='left', padx=(0, 8))
 
-        ttk.Button(inner, text="Apply Discount", style='Action.TButton',
+        ttk.Button(row2, text="Apply", style='Action.TButton',
                    command=self.apply_discount_change).pack(side='left', padx=5)
+
+        ttk.Label(row2, text="Quick:",
+                  font=('Segoe UI', 10)).pack(side='left', padx=(18, 4))
+        for d in [0, 1, 2, 3, 4, 5]:
+            btn = tk.Button(row2, text=f"{d}%", width=4,
+                           font=('Segoe UI', 10, 'bold'),
+                           bg='#1a3040', fg='#ffd700', relief='flat',
+                           activebackground='#2a4050', activeforeground='#ffee88',
+                           command=lambda dd=d: self.quick_set_discount(dd))
+            btn.pack(side='left', padx=2)
+
+        # Live corp rate readout
+        ttk.Label(row2, text="→  Corp Rate:",
+                  font=('Segoe UI', 11)).pack(side='left', padx=(22, 5))
+        self.corp_rate_label = ttk.Label(row2, text="—",
+                                          font=('Segoe UI', 13, 'bold'),
+                                          foreground='#ffd700')
+        self.corp_rate_label.pack(side='left')
+
+        # Update corp rate label whenever either spinbox changes
+        self.rate_var.trace_add('write', lambda *_: self._refresh_corp_rate_label())
+        self.discount_var.trace_add('write', lambda *_: self._refresh_corp_rate_label())
 
         # Bind selection
         self.rates_tree.bind('<<TreeviewSelect>>', self.on_rate_select)
@@ -843,8 +867,10 @@ class AdminDashboard:
         self.rate_items = {}
         for row_id, type_id, name, category, pct, discount in rows:
             cat_display = category.replace('_', ' ').title()
+            corp_rate = (pct or 0) - (discount or 0)
             iid = self.rates_tree.insert('', 'end', values=(
-                cat_display, name, f"{pct}%", f"{pct}%", f"{discount}%"
+                cat_display, name, f"{pct}%", f"{pct}%",
+                f"-{discount}%  →  {corp_rate}%"
             ))
             self.rate_items[iid] = {
                 'id': row_id, 'type_id': type_id, 'name': name,
@@ -1572,11 +1598,27 @@ class AdminDashboard:
                 self.discount_var.set(item['discount'])
         else:
             self.selected_item_label.configure(text=f"{len(selection)} items selected")
+        # corp_rate_label is updated by trace on rate_var/discount_var
+
+    def _refresh_corp_rate_label(self):
+        """Update the live Corp Rate readout label."""
+        try:
+            alliance = int(self.rate_var.get())
+            discount = int(self.discount_var.get())
+            corp = alliance - discount
+            self.corp_rate_label.configure(text=f"{corp}% JBV")
+        except (ValueError, AttributeError):
+            pass
 
     def quick_set_rate(self, pct):
-        """Set the spinbox to a preset value."""
+        """Set the alliance rate spinbox to a preset and apply."""
         self.rate_var.set(pct)
         self.apply_rate_change()
+
+    def quick_set_discount(self, d):
+        """Set the corp discount spinbox to a preset and apply."""
+        self.discount_var.set(d)
+        self.apply_discount_change()
 
     def apply_rate_change(self):
         """Apply the rate change to all selected items."""
@@ -1589,15 +1631,22 @@ class AdminDashboard:
 
         for iid in selection:
             item = self.rate_items[iid]
+            existing = self.unsaved_changes.get(iid, {})
+
+            # Determine current effective discount (pending or saved)
+            cur_discount = existing.get('new_discount', item['discount'])
+            corp_rate = new_rate - cur_discount
+            changed = new_rate != item['rate']
 
             # Update tree display
             values = list(self.rates_tree.item(iid, 'values'))
-            values[3] = f"{new_rate}% *" if new_rate != item['rate'] else f"{new_rate}%"
+            values[3] = f"{new_rate}% *" if changed else f"{new_rate}%"
+            disc_star = ' *' if (changed or 'new_discount' in existing) else ''
+            values[4] = f"-{cur_discount}%  →  {corp_rate}%{disc_star}"
             self.rates_tree.item(iid, values=values)
 
             # Track change (merge with existing discount change if any)
-            existing = self.unsaved_changes.get(iid, {})
-            if new_rate != item['rate'] or 'new_discount' in existing:
+            if changed or 'new_discount' in existing:
                 self.unsaved_changes[iid] = {'id': item['id'], 'name': item['name'],
                                               'old': item['rate'], 'new': new_rate}
                 if 'new_discount' in existing:
@@ -1623,17 +1672,24 @@ class AdminDashboard:
 
         for iid in selection:
             item = self.rate_items[iid]
+            existing = self.unsaved_changes.get(iid, {})
+
+            # Determine current effective alliance rate (pending or saved)
+            cur_alliance = existing.get('new', item['rate'])
+            corp_rate = cur_alliance - new_discount
+            changed = new_discount != item['discount']
 
             # Update tree display
             values = list(self.rates_tree.item(iid, 'values'))
-            values[4] = f"{new_discount}% *" if new_discount != item['discount'] else f"{new_discount}%"
+            disc_star = ' *' if (changed or existing.get('new', item['rate']) != item['rate']) else ''
+            values[4] = f"-{new_discount}%  →  {corp_rate}%{disc_star}"
             self.rates_tree.item(iid, values=values)
 
             # Track change (merge with existing rate change if any)
             if iid in self.unsaved_changes:
                 self.unsaved_changes[iid]['new_discount'] = new_discount
                 self.unsaved_changes[iid]['old_discount'] = self.unsaved_changes[iid].get('old_discount', item['discount'])
-            elif new_discount != item['discount']:
+            elif changed:
                 self.unsaved_changes[iid] = {'id': item['id'], 'name': item['name'],
                                               'old': item['rate'], 'new': item['rate'],
                                               'old_discount': item['discount'],
