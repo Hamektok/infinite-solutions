@@ -3115,7 +3115,7 @@ class AdminDashboard:
         self._ore_comp_filter.set(val)
         labels = {'compressed': 'Compressed only', 'uncompressed': 'Uncompressed only', 'both': 'Both forms'}
         self._ore_comp_lbl.configure(text=labels[val])
-        self._filter_ore_tree()  # comp filter only applies to ore view
+        self._filter_active_ore_view()
 
     def _run_ore_fetch(self, category='all'):
         """Run fetch_ore_prices.py for the given category in a background thread."""
@@ -3371,12 +3371,12 @@ class AdminDashboard:
 
         self._ore_prices_snap = prices
         self._ore_refine_eff  = refine_eff
-        self._compute_product_rows()
         self._filter_active_ore_view()
 
     def _filter_active_ore_view(self):
         """Route to the correct filter function based on current view."""
         if getattr(self, '_ore_view', 'ore') == 'product':
+            self._compute_product_rows()   # recompute best sources with current comp filter
             self._filter_product_tree()
         else:
             self._filter_ore_tree()
@@ -3491,7 +3491,7 @@ class AdminDashboard:
         if view == 'product':
             self.ore_tree_frame.pack_forget()
             self.product_tree_frame.pack(fill='both', expand=True)
-            if self._ore_all_rows and not self._product_all_rows:
+            if self._ore_all_rows:
                 self._compute_product_rows()
             self._filter_product_tree()
         else:
@@ -3518,7 +3518,26 @@ class AdminDashboard:
         # (The qty terms cancel in the value-weighted formula.)
         best = {}  # type_id -> {cost_unit, source_name}
 
-        for ore_row in self._ore_all_rows:
+        # Apply comp filter and ore type filter to source rows
+        comp_filter = getattr(self, '_ore_comp_filter', None)
+        comp_val    = comp_filter.get() if comp_filter else 'both'
+        type_val    = getattr(self, '_ore_type_filter_val', 'all')
+
+        def _source_passes(row):
+            if comp_val == 'compressed'   and not row.get('compressed'):
+                return False
+            if comp_val == 'uncompressed' and     row.get('compressed'):
+                return False
+            cat = row.get('ore_cat', 'standard')
+            if type_val == 'standard' and cat != 'standard':
+                return False
+            if type_val == 'ice'      and cat != 'ice':
+                return False
+            if type_val == 'moon'     and cat != 'moon':
+                return False
+            return True
+
+        for ore_row in (r for r in self._ore_all_rows if _source_passes(r)):
             landed    = ore_row['landed']
             raw_value = ore_row.get('raw_value', 0)
             if raw_value <= 0:
