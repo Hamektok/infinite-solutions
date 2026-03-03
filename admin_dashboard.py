@@ -7,6 +7,7 @@ from tkinter import ttk, messagebox
 import sqlite3
 import subprocess
 import os
+import json
 from datetime import datetime, timezone
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mydatabase.db')
@@ -3796,13 +3797,14 @@ class AdminDashboard:
     # ──────────────────────────────────────────────────────────────────────
 
     def _consign_init_db(self):
-        """Create consignment tables if they don't exist."""
+        """Create consignment tables if they don't exist, and migrate existing ones."""
         conn = sqlite3.connect(DB_PATH)
         conn.execute("""
             CREATE TABLE IF NOT EXISTS consignors (
                 id             INTEGER PRIMARY KEY AUTOINCREMENT,
                 character_name TEXT    NOT NULL,
                 item_name      TEXT    NOT NULL,
+                item_type_id   INTEGER,
                 list_price     REAL,
                 consignor_pct  REAL    NOT NULL,
                 start_date     TEXT    NOT NULL,
@@ -3812,19 +3814,31 @@ class AdminDashboard:
         """)
         conn.execute("""
             CREATE TABLE IF NOT EXISTS consignment_sales (
-                id             INTEGER PRIMARY KEY AUTOINCREMENT,
-                consignor_id   INTEGER NOT NULL REFERENCES consignors(id),
-                sale_date      TEXT    NOT NULL,
-                quantity       INTEGER NOT NULL,
-                price_per_unit REAL    NOT NULL,
-                total_isk      REAL    NOT NULL,
-                consignor_isk  REAL    NOT NULL,
-                broker_isk     REAL    NOT NULL,
-                paid           INTEGER DEFAULT 0,
-                paid_date      TEXT,
-                notes          TEXT
+                id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+                consignor_id       INTEGER NOT NULL REFERENCES consignors(id),
+                sale_date          TEXT    NOT NULL,
+                quantity           INTEGER NOT NULL,
+                price_per_unit     REAL    NOT NULL,
+                total_isk          REAL    NOT NULL,
+                consignor_isk      REAL    NOT NULL,
+                broker_isk         REAL    NOT NULL,
+                paid               INTEGER DEFAULT 0,
+                paid_date          TEXT,
+                notes              TEXT,
+                source_contract_id INTEGER,
+                auto_logged        INTEGER DEFAULT 0
             )
         """)
+        # Safe migrations for existing installs
+        for sql in [
+            "ALTER TABLE consignors ADD COLUMN item_type_id INTEGER",
+            "ALTER TABLE consignment_sales ADD COLUMN source_contract_id INTEGER",
+            "ALTER TABLE consignment_sales ADD COLUMN auto_logged INTEGER DEFAULT 0",
+        ]:
+            try:
+                conn.execute(sql)
+            except Exception:
+                pass  # Column already exists
         conn.commit()
         conn.close()
 
@@ -3900,7 +3914,11 @@ class AdminDashboard:
         ttk.Button(stb, text='Log Sale', style='Action.TButton',
                    command=self._consign_log_sale_dialog).pack(side='left', padx=(0, 4))
         ttk.Button(stb, text='Mark Selected Paid',
-                   command=self._consign_mark_paid).pack(side='left', padx=(0, 16))
+                   command=self._consign_mark_paid).pack(side='left', padx=(0, 4))
+        ttk.Button(stb, text='Delete Selected',
+                   command=self._consign_delete_sales).pack(side='left', padx=(0, 4))
+        ttk.Button(stb, text='\u21ba Sync Contracts',
+                   command=self._consign_sync_contracts).pack(side='left', padx=(0, 16))
         self._consign_owed_lbl = tk.Label(stb, text='Owed: —', background='#0a2030',
                                           foreground='#ffcc44', font=('Segoe UI', 9, 'bold'))
         self._consign_owed_lbl.pack(side='left', padx=(0, 16))
@@ -4016,13 +4034,14 @@ class AdminDashboard:
         if consignor_id:
             conn = sqlite3.connect(DB_PATH)
             existing = conn.execute(
-                "SELECT character_name, item_name, list_price, consignor_pct, start_date, notes "
-                "FROM consignors WHERE id=?", (consignor_id,)).fetchone()
+                "SELECT character_name, item_name, item_type_id, list_price, "
+                "consignor_pct, start_date, notes FROM consignors WHERE id=?",
+                (consignor_id,)).fetchone()
             conn.close()
 
         dlg = tk.Toplevel(self.root)
         dlg.title('Edit Consignor' if existing else 'Add Consignor')
-        dlg.geometry('420x370')
+        dlg.geometry('440x440')
         dlg.configure(background='#0a1520')
         dlg.resizable(False, False)
         dlg.grab_set()
@@ -4035,42 +4054,72 @@ class AdminDashboard:
             ttk.Entry(dlg, textvariable=var, width=width).pack(anchor='w', padx=16)
             return var
 
-        name_var  = labeled_entry('Character Name',              existing[0] if existing else '')
-        item_var  = labeled_entry('Item Being Consigned',        existing[1] if existing else '')
-        price_var = labeled_entry('Agreed List Price / Unit',    f"{existing[2]:.2f}" if existing and existing[2] is not None else '')
-        pct_var   = labeled_entry('Consignor % (their share)',   f"{existing[3]:.1f}" if existing else '85.0')
-        date_var  = labeled_entry('Start Date (YYYY-MM-DD)',     existing[4] if existing else datetime.now().strftime('%Y-%m-%d'))
+        name_var  = labeled_entry('Character Name',            existing[0] if existing else '')
+        item_var  = labeled_entry('Item Being Consigned',      existing[1] if existing else '')
+
+        # Type ID row with live name preview
+        tk.Label(dlg, text='Item Type ID  (for contract sync)', **lbl_cfg).pack(
+            anchor='w', padx=16, pady=(6, 2))
+        tid_row = tk.Frame(dlg, background='#0a1520')
+        tid_row.pack(anchor='w', padx=16)
+        tid_var = tk.StringVar(value=str(existing[2]) if existing and existing[2] else '')
+        ttk.Entry(tid_row, textvariable=tid_var, width=12).pack(side='left', padx=(0, 8))
+        tid_name_lbl = tk.Label(tid_row, text='', background='#0a1520',
+                                foreground='#44ddaa', font=('Segoe UI', 9, 'italic'))
+        tid_name_lbl.pack(side='left')
+
+        def _lookup_type_name(*_):
+            raw = tid_var.get().strip()
+            if not raw.isdigit():
+                tid_name_lbl.configure(text='')
+                return
+            conn2 = sqlite3.connect(DB_PATH)
+            row = conn2.execute(
+                "SELECT type_name FROM inv_types WHERE type_id=?", (int(raw),)).fetchone()
+            conn2.close()
+            tid_name_lbl.configure(text=row[0] if row else '(not found)')
+        tid_var.trace_add('write', _lookup_type_name)
+        _lookup_type_name()  # populate on load if editing
+
+        price_var = labeled_entry('Agreed List Price / Unit',
+                                  f"{existing[3]:.2f}" if existing and existing[3] is not None else '')
+        pct_var   = labeled_entry('Consignor % (their share)',
+                                  f"{existing[4]:.1f}" if existing else '85.0')
+        date_var  = labeled_entry('Start Date (YYYY-MM-DD)',
+                                  existing[5] if existing else datetime.now().strftime('%Y-%m-%d'))
 
         tk.Label(dlg, text='Notes', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
         notes_txt = tk.Text(dlg, width=44, height=3, background='#0d2535',
                             foreground='#ccddee', insertbackground='white',
                             font=('Segoe UI', 9), relief='flat')
         notes_txt.pack(anchor='w', padx=16)
-        if existing and existing[5]:
-            notes_txt.insert('1.0', existing[5])
+        if existing and existing[6]:
+            notes_txt.insert('1.0', existing[6])
 
         def save():
             try:
-                name  = name_var.get().strip()
-                item  = item_var.get().strip()
-                price = float(price_var.get()) if price_var.get().strip() else None
-                pct   = float(pct_var.get())
-                date  = date_var.get().strip()
-                notes = notes_txt.get('1.0', 'end').strip()
+                name     = name_var.get().strip()
+                item     = item_var.get().strip()
+                tid_raw  = tid_var.get().strip()
+                type_id  = int(tid_raw) if tid_raw.isdigit() else None
+                price    = float(price_var.get()) if price_var.get().strip() else None
+                pct      = float(pct_var.get())
+                date     = date_var.get().strip()
+                notes    = notes_txt.get('1.0', 'end').strip()
                 if not name or not item:
                     messagebox.showerror('Error', 'Character Name and Item are required.', parent=dlg)
                     return
                 conn = sqlite3.connect(DB_PATH)
                 if consignor_id:
                     conn.execute(
-                        "UPDATE consignors SET character_name=?, item_name=?, list_price=?, "
-                        "consignor_pct=?, start_date=?, notes=? WHERE id=?",
-                        (name, item, price, pct, date, notes, consignor_id))
+                        "UPDATE consignors SET character_name=?, item_name=?, item_type_id=?, "
+                        "list_price=?, consignor_pct=?, start_date=?, notes=? WHERE id=?",
+                        (name, item, type_id, price, pct, date, notes, consignor_id))
                 else:
                     conn.execute(
-                        "INSERT INTO consignors (character_name, item_name, list_price, "
-                        "consignor_pct, start_date, notes) VALUES (?,?,?,?,?,?)",
-                        (name, item, price, pct, date, notes))
+                        "INSERT INTO consignors (character_name, item_name, item_type_id, "
+                        "list_price, consignor_pct, start_date, notes) VALUES (?,?,?,?,?,?,?)",
+                        (name, item, type_id, price, pct, date, notes))
                 conn.commit()
                 conn.close()
                 dlg.destroy()
@@ -4199,6 +4248,132 @@ class AdminDashboard:
             [(today, sid) for sid in sale_ids])
         conn.commit()
         conn.close()
+        self._consign_load_sales()
+
+    def _consign_delete_sales(self):
+        """Delete selected sales log entries after confirmation."""
+        selected = self.sales_tree.selection()
+        if not selected:
+            return
+        n = len(selected)
+        if not messagebox.askyesno(
+                'Confirm Delete',
+                f'Permanently delete {n} sale entr{"y" if n == 1 else "ies"}?\nThis cannot be undone.',
+                parent=self.root):
+            return
+        sale_ids = [int(iid) for iid in selected]
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(
+            f"DELETE FROM consignment_sales WHERE id IN ({','.join('?' * n)})",
+            sale_ids)
+        conn.commit()
+        conn.close()
+        self._consign_load_sales()
+
+    def _consign_sync_contracts(self):
+        """
+        Scan contract_profits table for finished contracts containing consigned items
+        and auto-log any new sales entries using value-weighted price attribution.
+
+        Attribution method: each consigned item gets a share of the contract price
+        proportional to its estimated cost (unit_cost * qty) vs the total contract
+        estimated cost. This uses the cost data already stored in items_json by
+        fetch_contract_profits.py — no extra ESI calls required.
+        """
+        conn = sqlite3.connect(DB_PATH)
+
+        # Get active consignors that have a type_id set
+        consignors = conn.execute(
+            "SELECT id, character_name, item_type_id, consignor_pct "
+            "FROM consignors WHERE item_type_id IS NOT NULL AND active=1"
+        ).fetchall()
+        if not consignors:
+            conn.close()
+            messagebox.showinfo('Sync Contracts',
+                                'No active consignors with Item Type IDs set.\n'
+                                'Edit a consignor to add their item\'s Type ID first.',
+                                parent=self.root)
+            return
+
+        type_to_consignor = {c[2]: c for c in consignors}
+
+        # Contracts already synced
+        synced_ids = set(
+            r[0] for r in conn.execute(
+                "SELECT DISTINCT source_contract_id FROM consignment_sales "
+                "WHERE source_contract_id IS NOT NULL").fetchall()
+        )
+
+        # All finished contracts with item data
+        contracts = conn.execute(
+            "SELECT contract_id, date_completed, contract_price, items_json "
+            "FROM contract_profits WHERE contract_price > 0 AND items_json IS NOT NULL"
+        ).fetchall()
+
+        new_entries = 0
+        skipped     = 0
+
+        for contract_id, date_completed, contract_price, items_json_str in contracts:
+            if contract_id in synced_ids:
+                continue
+            try:
+                items = json.loads(items_json_str)
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+            # Find any consigned items in this contract
+            consign_hits = [
+                i for i in items if i.get('type_id') in type_to_consignor
+            ]
+            if not consign_hits:
+                continue
+
+            # Value-weighted attribution: use unit_cost * qty as the weighting proxy
+            total_weighted = sum(
+                i.get('qty', 0) * i.get('unit_cost', 0) for i in items
+            )
+
+            for ci in consign_hits:
+                type_id  = ci['type_id']
+                consignor = type_to_consignor[type_id]
+                c_id, c_name, _, c_pct = consignor
+                qty      = ci.get('qty', 0)
+                if qty <= 0:
+                    continue
+
+                item_weighted = qty * ci.get('unit_cost', 0)
+                if total_weighted > 0:
+                    attributed = contract_price * (item_weighted / total_weighted)
+                else:
+                    # Fallback: equal split across all items if no cost data
+                    attributed = contract_price / max(len(items), 1)
+                    skipped += 1
+
+                per_unit  = round(attributed / qty, 2)
+                total_isk = round(attributed, 2)
+                their_isk = round(total_isk * c_pct / 100.0, 2)
+                my_isk    = round(total_isk - their_isk, 2)
+                sale_date = (date_completed or '')[:10]
+
+                conn.execute(
+                    "INSERT INTO consignment_sales "
+                    "(consignor_id, sale_date, quantity, price_per_unit, total_isk, "
+                    "consignor_isk, broker_isk, paid, notes, source_contract_id, auto_logged) "
+                    "VALUES (?,?,?,?,?,?,?,0,?,?,1)",
+                    (c_id, sale_date, qty, per_unit, total_isk,
+                     their_isk, my_isk,
+                     f"Auto | contract {contract_id}", contract_id))
+                new_entries += 1
+
+        conn.commit()
+        conn.close()
+
+        msg = f'Synced {new_entries} new sale entr{"y" if new_entries == 1 else "ies"}.'
+        if skipped:
+            msg += f'\n{skipped} item(s) used equal-split fallback (no cost data).'
+        if new_entries == 0:
+            msg = 'No new contracts found to sync.'
+        messagebox.showinfo('Sync Contracts', msg, parent=self.root)
         self._consign_load_sales()
 
     def update_status(self, text):
