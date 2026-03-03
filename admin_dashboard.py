@@ -2896,7 +2896,7 @@ class AdminDashboard:
         ttk.Label(frow, text="Sort:").pack(side='left', padx=(0, 4))
         self.ore_sort_display_var = tk.StringVar(value='Margin %')
         ttk.Combobox(frow, textvariable=self.ore_sort_display_var, width=16,
-                     values=['Margin %', 'Profit ISK', 'Landed Cost', 'Product Value', 'Deviation %'],
+                     values=['Margin %', 'Profit/Unit', 'Landed/Unit', 'Value/Unit', 'Deviation %'],
                      state='readonly').pack(side='left')
         self.ore_sort_display_var.trace_add('write', lambda *_: self._filter_active_ore_view())
 
@@ -2914,10 +2914,10 @@ class AdminDashboard:
         col_defs = [
             ('name',      'Ore Name',             210, 'w'),
             ('jita_buy',  'Jita/Unit (ISK)',        130, 'e'),
-            ('logistics', 'Ship+Collat (ISK)',     120, 'e'),
-            ('landed',    'Landed (ISK)',          115, 'e'),
-            ('value',     'Product Value (ISK)',   130, 'e'),
-            ('profit',    'Profit (ISK)',          110, 'e'),
+            ('logistics', 'Logistics/Unit',        120, 'e'),
+            ('landed',    'Landed/Unit (ISK)',     125, 'e'),
+            ('value',     'Value/Unit (ISK)',      125, 'e'),
+            ('profit',    'Profit/Unit (ISK)',     115, 'e'),
             ('margin',    'Margin %',               85, 'e'),
             ('dev',       'vs N-Day Avg %',        105, 'e'),
         ]
@@ -3356,15 +3356,15 @@ class AdminDashboard:
             self._ore_all_rows.append({
                 'type_id':    type_id,
                 'name':       name,
-                'jita_buy':   raw_price,
-                'logistics':  ship_cost + collat,
-                'landed':     total_cost,
-                'value':      prod_value,
-                'raw_value':  raw_value,
+                'jita_buy':   raw_price,                              # already per-unit
+                'logistics':  (ship_cost + collat + broker) / portion, # per-unit, includes broker
+                'landed':     total_cost / portion,                    # per-unit
+                'value':      prod_value / portion,                    # per-unit
+                'raw_value':  raw_value / portion,                     # per-unit (ratio preserved)
                 'ore_yields': ore_yields,
-                'profit':     profit,
-                'margin':     margin,
-                'dev':        dev_pct,
+                'profit':     profit / portion,                        # per-unit
+                'margin':     margin,                                   # % unchanged
+                'dev':        dev_pct,                                  # % unchanged
                 'ore_cat':    ore_cat,
                 'compressed': is_compressed,
             })
@@ -3385,8 +3385,8 @@ class AdminDashboard:
         """Apply search/show/sort/type filters and repopulate the treeview."""
         search   = self.ore_search_var.get().lower()
         show     = self.ore_show_var.get()
-        sort_map = {'Margin %': 'margin', 'Profit ISK': 'profit',
-                    'Landed Cost': 'landed', 'Product Value': 'value', 'Deviation %': 'dev'}
+        sort_map = {'Margin %': 'margin', 'Profit/Unit': 'profit',
+                    'Landed/Unit': 'landed', 'Value/Unit': 'value', 'Deviation %': 'dev'}
         sort_key = sort_map.get(self.ore_sort_display_var.get(), 'margin')
         type_filter = self._ore_type_filter_val
 
@@ -3479,8 +3479,8 @@ class AdminDashboard:
             row_idx += 1
 
     def _sort_ore_tree(self, col):
-        sort_map = {'margin': 'Margin %', 'profit': 'Profit ISK', 'landed': 'Landed Cost',
-                    'value': 'Product Value', 'dev': 'Deviation %'}
+        sort_map = {'margin': 'Margin %', 'profit': 'Profit/Unit', 'landed': 'Landed/Unit',
+                    'value': 'Value/Unit', 'dev': 'Deviation %'}
         if col in sort_map:
             self.ore_sort_display_var.set(sort_map[col])
         self._filter_ore_tree()
