@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ore Import Analysis — EVE Online</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0a1520;
+    --card:       #0a2030;
+    --border:     #1a3040;
+    --cyan:       #00ffff;
+    --green:      #00ff88;
+    --gold:       #ffcc44;
+    --blue-lbl:   #88d0e8;
+    --hdr-lbl:    #66d9ff;
+    --red:        #ff4444;
+    --text:       #c8e8f0;
+    --purple:     #cc88ff;
+    --ice-bg:     #0a1828;
+    --moon-bg:    #110a20;
+    --ore-bg-a:   #0a2030;
+    --ore-bg-b:   #0d2535;
+    --divider-bg: #070e18;
+    --divider-txt:#446688;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ─── SCROLLBAR ─────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #060f18; }
+  ::-webkit-scrollbar-thumb { background: #1a3040; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2a4858; }
+
+  /* ─── LAYOUT WRAPPER ─────────────────────────────────────── */
+  .app-wrap {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 10px 14px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ─── CARD ───────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+
+  /* ─── SECTION 1: HEADER ──────────────────────────────────── */
+  .header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    border-left: 3px solid var(--cyan);
+  }
+
+  .header-left .title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-left .subtitle {
+    font-size: 11px;
+    color: var(--blue-lbl);
+    margin-top: 3px;
+    letter-spacing: 0.4px;
+  }
+
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+  }
+
+  .btn-fetch {
+    background: linear-gradient(135deg, #004428 0%, #006638 100%);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 26px;
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    text-shadow: 0 0 8px rgba(0,255,136,0.4);
+    box-shadow: 0 0 12px rgba(0,255,136,0.15);
+    min-width: 330px;
+    text-align: center;
+  }
+  .btn-fetch:hover {
+    background: linear-gradient(135deg, #005533 0%, #008844 100%);
+    box-shadow: 0 0 22px rgba(0,255,136,0.35);
+  }
+  .btn-fetch:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+
+  .price-status  { font-size: 11px; color: var(--blue-lbl); }
+  .price-warning { font-size: 11px; color: var(--gold); }
+  .recalc-hint   { font-size: 11px; color: var(--gold); display: none; }
+  .recalc-hint.visible { display: block; }
+
+  /* ─── SECTION 2: BUY / LOGISTICS ─────────────────────────── */
+  .params-card {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .params-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+  }
+  .params-group:first-child { padding-left: 0; }
+
+  .params-divider {
+    width: 1px;
+    height: 50px;
+    background: var(--border);
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  .group-header {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    align-self: center;
+    padding-bottom: 2px;
+  }
+  .group-header.blue { color: var(--hdr-lbl); }
+  .group-header.gold { color: var(--gold); }
+
+  .param-field { display: flex; flex-direction: column; gap: 3px; }
+
+  .param-field label {
+    font-size: 10px;
+    color: var(--blue-lbl);
+    white-space: nowrap;
+  }
+
+  .param-input {
+    background: #051018;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--cyan);
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    padding: 5px 8px;
+    width: 84px;
+    transition: border-color 0.2s;
+  }
+  .param-input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,255,255,0.08); }
+
+  .param-select {
+    background: #051018;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--cyan);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+    padding: 5px 8px;
+    width: 165px;
+    cursor: pointer;
+  }
+  .param-select:focus { outline: none; border-color: var(--cyan); }
+
+  .btn-recalc {
+    background: #051830;
+    border: 1px solid var(--border);
+    color: var(--blue-lbl);
+    font-size: 12px;
+    padding: 7px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: auto;
+    transition: all 0.2s;
+    white-space: nowrap;
+    align-self: flex-end;
+  }
+  .btn-recalc:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* ─── SECTION 3: PRODUCT SELL PRICES ─────────────────────── */
+  .prices-card-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .prices-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hdr-lbl);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .prices-card-note {
+    font-size: 11px;
+    color: #4a6070;
+    font-style: italic;
+  }
+
+  /* Collapsible sub-panels */
+  .sub-panel {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .sub-panel:last-child { margin-bottom: 0; }
+
+  .sub-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    background: #060f18;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .sub-panel-header:hover { background: #0c1e2c; }
+
+  .collapse-arrow {
+    font-size: 10px;
+    color: #446688;
+    transition: transform 0.25s ease;
+    display: inline-block;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .sub-panel.expanded .collapse-arrow { transform: rotate(90deg); }
+
+  .sub-panel-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .sub-panel-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.2s ease;
+    padding: 0 12px;
+  }
+  .sub-panel.expanded .sub-panel-body {
+    max-height: 500px;
+    padding: 10px 12px;
+  }
+
+  /* Mineral input grid */
+  .mineral-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .mineral-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .mineral-label {
+    font-size: 10px;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+
+  .mineral-note {
+    font-size: 9px;
+    color: #3a5560;
+    font-style: italic;
+    text-align: center;
+    height: 12px;
+  }
+
+  .mineral-pct-lbl {
+    font-size: 9px;
+    color: #446688;
+    line-height: 1;
+  }
+
+  .mineral-input {
+    background: #051018;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--cyan);
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    padding: 3px 4px;
+    width: 60px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .mineral-input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,255,255,0.08); }
+
+  /* Moon tier rows */
+  .moon-tier-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .moon-tier-row:last-child { margin-bottom: 0; }
+
+  .tier-label {
+    font-size: 10px;
+    font-weight: 700;
+    width: 132px;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+    padding-bottom: 6px;
+  }
+
+  .moon-fields { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+
+  .ice-note {
+    font-size: 10px;
+    color: #3a5560;
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  /* ─── SECTION 4: TABS ────────────────────────────────────── */
+  .tab-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .ore-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: #060f18;
+    color: #4a6070;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.4px;
+  }
+  .ore-tab:hover { border-color: #2a4050; color: var(--text); }
+
+  .ore-tab.active-ore  { border-color: var(--cyan);   background: rgba(0,255,255,0.07);   color: var(--cyan);   box-shadow: 0 0 10px rgba(0,255,255,0.14); }
+  .ore-tab.active-ice  { border-color: #aaddff;        background: rgba(170,221,255,0.07); color: #aaddff;        box-shadow: 0 0 10px rgba(170,221,255,0.14); }
+  .ore-tab.active-moon { border-color: var(--purple);  background: rgba(204,136,255,0.07); color: var(--purple);  box-shadow: 0 0 10px rgba(204,136,255,0.14); }
+  .ore-tab.active-all  { border-color: var(--gold);    background: rgba(255,204,68,0.07);  color: var(--gold);    box-shadow: 0 0 10px rgba(255,204,68,0.14); }
+
+  /* ─── SECTION 5: SUMMARY CARDS ──────────────────────────── */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 900px) { .summary-row { grid-template-columns: repeat(3,1fr); } }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+  }
+
+  .summary-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--blue-lbl);
+    margin-bottom: 5px;
+  }
+
+  .summary-value {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cyan);
+    line-height: 1;
+  }
+  .summary-sub {
+    font-size: 10px;
+    color: #3a5068;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sv-green { color: var(--green) !important; }
+  .sv-gold  { color: var(--gold)  !important; }
+  .sv-red   { color: var(--red)   !important; }
+  .sv-cyan  { color: var(--cyan)  !important; }
+  .sv-dim   { color: #2a3d4d      !important; }
+
+  /* ─── SECTION 6: FILTER ROW ─────────────────────────────── */
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-size: 10px;
+    color: var(--blue-lbl);
+    white-space: nowrap;
+  }
+
+  .filter-input {
+    background: #051018;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+    padding: 5px 10px;
+    width: 190px;
+    transition: border-color 0.2s;
+  }
+  .filter-input:focus { outline: none; border-color: var(--cyan); }
+  .filter-input::placeholder { color: #223344; }
+
+  .filter-select {
+    background: #051018;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+    padding: 5px 8px;
+    cursor: pointer;
+  }
+  .filter-select:focus { outline: none; border-color: var(--cyan); }
+
+  .filter-spacer { flex: 1; }
+
+  .row-count-lbl { font-size: 10px; color: #2a3d4d; font-family: 'Consolas', monospace; }
+
+  /* ─── SECTION 7: RESULTS TABLE ───────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 920px;
+  }
+
+  thead tr {
+    background: #05111d;
+    border-bottom: 2px solid var(--border);
+  }
+
+  th {
+    padding: 8px 10px;
+    text-align: right;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--blue-lbl);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+    line-height: 1.35;
+  }
+  th:first-child { text-align: left; }
+  th:hover { color: var(--cyan); }
+
+  .th-unit { font-weight: 400; color: #2a4050; font-size: 9px; }
+
+  .sort-icon { margin-left: 4px; font-size: 9px; }
+  th:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: '\21C5'; color: #2a3d4d; }
+  th.sort-asc  .sort-icon::after { content: '\25B2'; color: var(--cyan); }
+  th.sort-desc .sort-icon::after { content: '\25BC'; color: var(--cyan); }
+
+  td {
+    padding: 5px 10px;
+    text-align: right;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    border-bottom: 1px solid #091820;
+    white-space: nowrap;
+  }
+  td:first-child {
+    text-align: left;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+  }
+
+  /* Row backgrounds */
+  tr.row-ore-a  { background: var(--ore-bg-a); }
+  tr.row-ore-b  { background: var(--ore-bg-b); }
+  tr.row-ice    { background: var(--ice-bg); }
+  tr.row-moon   { background: var(--moon-bg); }
+  tr.row-divider{ background: var(--divider-bg); }
+
+  tr.row-ore-a:hover,
+  tr.row-ore-b:hover { background: #112a3a; }
+  tr.row-ice:hover   { background: #0f2238; }
+  tr.row-moon:hover  { background: #1c1030; }
+
+  .divider-cell {
+    text-align: center !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    font-style: italic;
+    color: var(--divider-txt);
+    font-size: 11px;
+    padding: 4px 10px !important;
+    letter-spacing: 1px;
+  }
+
+  /* Ore name / grade */
+  .ore-name-wrap { display: flex; align-items: center; gap: 7px; }
+
+  .grade-dot { font-size: 10px; flex-shrink: 0; }
+  .gd-base   { color: #777; }
+  .gd-ii     { color: var(--green); }
+  .gd-iii    { color: #44aaff; }
+  .gd-iv     { color: var(--gold); }
+
+  /* Value colouring */
+  .vc-green  { color: var(--green); }
+  .vc-red    { color: var(--red); }
+  .vc-yellow { color: var(--gold); }
+  .vc-cyan   { color: var(--cyan); }
+  .vc-dim    { color: #2a3d4d; }
+
+  /* Empty / loading states */
+  .state-row td {
+    text-align: center !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    padding: 48px 20px !important;
+    border: none !important;
+  }
+
+  .empty-icon  { font-size: 34px; color: #1a3040; margin-bottom: 10px; }
+  .empty-text  { font-size: 14px; color: #2a4050; letter-spacing: 1px; margin-bottom: 6px; }
+  .empty-sub   { font-size: 11px; color: #1a2e3a; }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    display: inline-block;
+    width: 13px; height: 13px;
+    border: 2px solid #1a3040;
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+    vertical-align: middle;
+    margin-right: 7px;
+  }
+
+  /* Fetch button pulse */
+  @keyframes pulse-btn {
+    0%,100% { box-shadow: 0 0 12px rgba(0,255,136,0.15); }
+    50%      { box-shadow: 0 0 30px rgba(0,255,136,0.5); }
+  }
+  .btn-fetch.pulsing { animation: pulse-btn 1.1s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div class="app-wrap">
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 1 — HEADER
+  ═══════════════════════════════════════════════════════ -->
+  <div class="header-bar">
+    <div class="header-left">
+      <div class="title">Ore Import Analysis</div>
+      <div class="subtitle">Buy raw ore / ice / moon ore at Jita &nbsp;&#x2192;&nbsp; Ship &nbsp;&#x2192;&nbsp; Refine &nbsp;&#x2192;&nbsp; Sell products locally</div>
+    </div>
+    <div class="header-right">
+      <button class="btn-fetch" id="btnFetch" onclick="doFetch()">&#x27F3;&nbsp;&nbsp;FETCH LIVE PRICES &amp; CALCULATE</button>
+      <div style="display:flex;gap:16px;align-items:center;justify-content:flex-end;">
+        <span class="price-status" id="priceStatus">Price data: &#8212;</span>
+        <span class="price-warning" id="priceWarning">&#9888; Click Fetch to load live Jita prices</span>
+        <span class="recalc-hint" id="recalcHint">&#9888; Recalculate needed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 2 — BUY / LOGISTICS PARAMETERS
+  ═══════════════════════════════════════════════════════ -->
+  <div class="card params-card">
+    <div class="params-group">
+      <span class="group-header blue">Buy Side</span>
+      <div class="param-field">
+        <label>Buy From</label>
+        <select class="param-select" id="buyFrom" onchange="onParamChange();toggleBrokerFee();">
+          <option value="jsv">JSV (instant)</option>
+          <option value="jbv" selected>JBV (place order)</option>
+        </select>
+      </div>
+      <div class="param-field">
+        <label>Buy %</label>
+        <input class="param-input" id="buyPct" type="number" value="100" min="1" max="300" step="0.1" onchange="onParamChange()">
+      </div>
+      <div class="param-field" id="brokerFeeField">
+        <label>Broker Fee % <span style="font-size:9px;color:#3a5060;">(JBV only)</span></label>
+        <input class="param-input" id="brokerFee" type="number" value="0.0" min="0" max="10" step="0.1" onchange="onParamChange()">
+      </div>
+    </div>
+
+    <div class="params-divider"></div>
+
+    <div class="params-group">
+      <span class="group-header gold">Logistics</span>
+      <div class="param-field">
+        <label>Shipping (ISK/m&#179;)</label>
+        <input class="param-input" id="shipRate" type="number" value="125" min="0" max="99999" step="1" onchange="onParamChange()" style="width:92px;">
+      </div>
+      <div class="param-field">
+        <label>Collateral %</label>
+        <input class="param-input" id="collatPct" type="number" value="1.0" min="0" max="20" step="0.1" onchange="onParamChange()">
+      </div>
+    </div>
+
+    <button class="btn-recalc" onclick="doRecalc()">&#8635; Recalculate</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 3 — PRODUCT SELL PRICES
+  ═══════════════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="prices-card-header">
+      <span class="prices-card-title">Product Sell Prices &nbsp;<span style="color:#3a5060;font-weight:400;">(% of Jita JBV)</span></span>
+      <span class="prices-card-note">Each product priced independently &#8212; adjust to match your local buyback rates</span>
+    </div>
+
+    <!-- Sub-panel A: Standard Minerals — default EXPANDED -->
+    <div class="sub-panel expanded" id="panelMinerals">
+      <div class="sub-panel-header" onclick="togglePanel('panelMinerals')">
+        <span class="collapse-arrow">&#9654;</span>
+        <span class="sub-panel-title" style="color:var(--cyan);">Standard Minerals</span>
+      </div>
+      <div class="sub-panel-body">
+        <div class="mineral-row">
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Tritanium</span>
+            <input class="mineral-input" id="pTrit"  type="number" value="95"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Pyerite</span>
+            <input class="mineral-input" id="pPyer"  type="number" value="95"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Mexallon</span>
+            <input class="mineral-input" id="pMex"   type="number" value="98"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Isogen</span>
+            <input class="mineral-input" id="pIso"   type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Nocxium</span>
+            <input class="mineral-input" id="pNoc"   type="number" value="105" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Zydrine</span>
+            <input class="mineral-input" id="pZyd"   type="number" value="110" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Megacyte</span>
+            <input class="mineral-input" id="pMega"  type="number" value="115" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:var(--cyan);">Morphite</span>
+            <input class="mineral-input" id="pMorph" type="number" value="120" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+            <span class="mineral-note">(Mercoxit)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-panel B: Ice Products — default EXPANDED -->
+    <div class="sub-panel expanded" id="panelIce">
+      <div class="sub-panel-header" onclick="togglePanel('panelIce')">
+        <span class="collapse-arrow">&#9654;</span>
+        <span class="sub-panel-title" style="color:#aaddff;">Ice Products</span>
+      </div>
+      <div class="sub-panel-body">
+        <div class="mineral-row">
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:#aaddff;">Heavy Water</span>
+            <input class="mineral-input" id="pHW"  type="number" value="90"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:#aaddff;">Liquid Ozone</span>
+            <input class="mineral-input" id="pLO"  type="number" value="95"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:#aaddff;">Stront. Clath.</span>
+            <input class="mineral-input" id="pSC"  type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:#aaddff;">Helium Iso.</span>
+            <input class="mineral-input" id="pHeI" type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:#aaddff;">Oxygen Iso.</span>
+            <input class="mineral-input" id="pOxI" type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:#aaddff;">Nitrogen Iso.</span>
+            <input class="mineral-input" id="pNiI" type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+          <div class="mineral-field">
+            <span class="mineral-label" style="color:#aaddff;">Hydrogen Iso.</span>
+            <input class="mineral-input" id="pHyI" type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+            <span class="mineral-pct-lbl">%</span>
+          </div>
+        </div>
+        <div class="ice-note">&#9432;&nbsp; Isotopes vary by local demand &#8212; adjust per type</div>
+      </div>
+    </div>
+
+    <!-- Sub-panel C: Moon Materials — default COLLAPSED -->
+    <div class="sub-panel" id="panelMoon">
+      <div class="sub-panel-header" onclick="togglePanel('panelMoon')">
+        <span class="collapse-arrow">&#9654;</span>
+        <span class="sub-panel-title" style="color:var(--purple);">Moon Materials</span>
+        <span id="moonHint" style="font-size:10px;color:#2a4050;margin-left:8px;">(click to expand)</span>
+      </div>
+      <div class="sub-panel-body">
+
+        <!-- R4 -->
+        <div class="moon-tier-row">
+          <span class="tier-label" style="color:#777;">R4 &#8212; Ubiquitous</span>
+          <div class="moon-fields">
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#999;">Hydrocarbons</span>
+              <input class="mineral-input" id="pHydro" type="number" value="95"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#999;">Atm. Gases</span>
+              <input class="mineral-input" id="pAtm"   type="number" value="95"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#999;">Evaporite Dep.</span>
+              <input class="mineral-input" id="pEvap"  type="number" value="95"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#999;">Silicates</span>
+              <input class="mineral-input" id="pSil"   type="number" value="95"  min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- R8 -->
+        <div class="moon-tier-row">
+          <span class="tier-label" style="color:var(--green);">R8 &#8212; Common</span>
+          <div class="moon-fields">
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88cc88;">Cobalt</span>
+              <input class="mineral-input" id="pCobalt" type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88cc88;">Scandium</span>
+              <input class="mineral-input" id="pScand"  type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88cc88;">Titanium</span>
+              <input class="mineral-input" id="pTitan"  type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88cc88;">Tungsten</span>
+              <input class="mineral-input" id="pTung"   type="number" value="100" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- R16 -->
+        <div class="moon-tier-row">
+          <span class="tier-label" style="color:#44aaff;">R16 &#8212; Uncommon</span>
+          <div class="moon-fields">
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88aaff;">Chromium</span>
+              <input class="mineral-input" id="pChrom" type="number" value="105" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88aaff;">Cadmium</span>
+              <input class="mineral-input" id="pCadm"  type="number" value="105" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88aaff;">Platinum</span>
+              <input class="mineral-input" id="pPlat"  type="number" value="105" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#88aaff;">Vanadium</span>
+              <input class="mineral-input" id="pVana"  type="number" value="105" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- R32 -->
+        <div class="moon-tier-row">
+          <span class="tier-label" style="color:var(--purple);">R32 &#8212; Rare</span>
+          <div class="moon-fields">
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#cc88ff;">Caesium</span>
+              <input class="mineral-input" id="pCaes" type="number" value="110" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#cc88ff;">Hafnium</span>
+              <input class="mineral-input" id="pHafn" type="number" value="110" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#cc88ff;">Mercury</span>
+              <input class="mineral-input" id="pMerc" type="number" value="110" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#cc88ff;">Technetium</span>
+              <input class="mineral-input" id="pTech" type="number" value="115" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- R64 -->
+        <div class="moon-tier-row">
+          <span class="tier-label" style="color:var(--gold);">R64 &#8212; Exceptional</span>
+          <div class="moon-fields">
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#ffcc44;">Dysprosium</span>
+              <input class="mineral-input" id="pDysp" type="number" value="120" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#ffcc44;">Neodymium</span>
+              <input class="mineral-input" id="pNeod" type="number" value="120" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#ffcc44;">Promethium</span>
+              <input class="mineral-input" id="pProm" type="number" value="125" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+            <div class="mineral-field">
+              <span class="mineral-label" style="color:#ffcc44;">Thulium</span>
+              <input class="mineral-input" id="pThul" type="number" value="125" min="0" max="500" step="0.5" onchange="onPriceChange()">
+              <span class="mineral-pct-lbl">%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 4 — ORE TYPE FILTER TABS
+  ═══════════════════════════════════════════════════════ -->
+  <div class="tab-row">
+    <button class="ore-tab" id="tabOre"  onclick="setTab('ore')">&#9679;&nbsp; Standard Ores</button>
+    <button class="ore-tab" id="tabIce"  onclick="setTab('ice')">&#9670;&nbsp; Ice</button>
+    <button class="ore-tab" id="tabMoon" onclick="setTab('moon')">&#9650;&nbsp; Moon Ores</button>
+    <button class="ore-tab" id="tabAll"  onclick="setTab('all')">&#9632;&nbsp; Show All</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 5 — SUMMARY CARDS
+  ═══════════════════════════════════════════════════════ -->
+  <div class="summary-row">
+    <div class="summary-card">
+      <div class="summary-label">Ores Analysed</div>
+      <div class="summary-value sv-dim" id="sumTotal">&#8212;</div>
+      <div class="summary-sub" id="sumTotalSub">No data loaded</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Profitable</div>
+      <div class="summary-value sv-dim" id="sumProfit">&#8212;</div>
+      <div class="summary-sub" id="sumProfitSub">of total analysed</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Best Margin</div>
+      <div class="summary-value sv-gold" id="sumBestMargin">&#8212;</div>
+      <div class="summary-sub" id="sumBestMarginSub">&#8212;</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Best ISK/Batch</div>
+      <div class="summary-value sv-green" id="sumBestISK">&#8212;</div>
+      <div class="summary-sub" id="sumBestISKSub">&#8212;</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Worst Margin</div>
+      <div class="summary-value sv-red" id="sumWorst">&#8212;</div>
+      <div class="summary-sub" id="sumWorstSub">&#8212;</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 6 — FILTER ROW
+  ═══════════════════════════════════════════════════════ -->
+  <div class="card" style="padding:8px 12px;">
+    <div class="filter-row">
+      <span class="filter-label">Search:</span>
+      <input class="filter-input" id="fSearch" type="text" placeholder="Filter ore name..." oninput="applyFilters()">
+
+      <span class="filter-label" style="margin-left:6px;">Category:</span>
+      <select class="filter-select" id="fCat" onchange="applyFilters()">
+        <option value="">All</option>
+      </select>
+
+      <span class="filter-label" style="margin-left:6px;">Show:</span>
+      <select class="filter-select" id="fShow" onchange="applyFilters()">
+        <option value="all">All</option>
+        <option value="profit">Profitable Only</option>
+        <option value="loss">Loss Only</option>
+      </select>
+
+      <span class="filter-label" style="margin-left:6px;">Sort by:</span>
+      <select class="filter-select" id="fSort" onchange="applyFilters()">
+        <option value="margin">Margin %</option>
+        <option value="profit">Profit ISK</option>
+        <option value="landed">Landed Cost</option>
+        <option value="value">Product Value</option>
+        <option value="iskm3">ISK per m&#179;</option>
+      </select>
+
+      <div class="filter-spacer"></div>
+      <span class="row-count-lbl" id="rowCountLbl">0 rows shown</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 7 — RESULTS TABLE
+  ═══════════════════════════════════════════════════════ -->
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th onclick="headerSort('name')"   data-col="name">
+            Ore Name <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('batch')"  data-col="batch">
+            Batch<br><span class="th-unit">(units)</span> <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('vol')"    data-col="vol">
+            Vol/Batch<br><span class="th-unit">(m&#179;)</span> <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('buy')"    data-col="buy">
+            Jita Buy<br><span class="th-unit">(ISK)</span> <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('ship')"   data-col="ship">
+            Ship+Collat<br><span class="th-unit">(ISK)</span> <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('landed')" data-col="landed">
+            Total Landed<br><span class="th-unit">(ISK)</span> <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('value')"  data-col="value">
+            Product Value<br><span class="th-unit">(ISK)</span> <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('profit')" data-col="profit">
+            Profit<br><span class="th-unit">(ISK)</span> <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('margin')" data-col="margin">
+            Margin <span class="sort-icon"></span>
+          </th>
+          <th onclick="headerSort('iskm3')"  data-col="iskm3">
+            ISK/m&#179; <span class="sort-icon"></span>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr class="state-row" id="emptyRow">
+          <td colspan="10">
+            <div class="empty-icon">&#9711;</div>
+            <div class="empty-text">NO DATA LOADED</div>
+            <div class="empty-sub">Click &#8220;FETCH LIVE PRICES &amp; CALCULATE&#8221; to load Jita market data</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end .app-wrap -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ─────────────────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────────────────── */
+let g_loaded = false;
+let g_tab    = 'all';
+let g_sort   = { col: 'margin', dir: 'desc' };
+
+/* ─────────────────────────────────────────────────────────
+   SAMPLE DATA
+   type: 'ore'|'ice'|'moon'|'divider'
+   category: 'ore'|'ice'|'moon'   (used for tab filter)
+   family: string                 (used for category dropdown + dividers)
+───────────────────────────────────────────────────────── */
+const DATA = [
+  // ══ STANDARD ORES ══════════════════════════════════════════
+  { type:'D', cat:'ore',  family:'Veldspar',    label:'── Veldspar ──' },
+  { type:'ore', name:'Veldspar',           grade:'base', batch:100, vol:10,   buy:48000,    ship:6730,   landed:54730,    value:38200,    profit:-16530,  margin:-30.2, iskm3:-1653,  cat:'ore',  family:'Veldspar'    },
+  { type:'ore', name:'Concentrated Vel.',  grade:'ii',   batch:100, vol:10,   buy:51000,    ship:6730,   landed:57730,    value:42000,    profit:-15730,  margin:-27.2, iskm3:-1573,  cat:'ore',  family:'Veldspar'    },
+  { type:'ore', name:'Dense Veldspar',     grade:'iii',  batch:100, vol:10,   buy:54000,    ship:6730,   landed:60730,    value:45000,    profit:-15730,  margin:-25.9, iskm3:-1573,  cat:'ore',  family:'Veldspar'    },
+
+  { type:'D', cat:'ore',  family:'Scordite',    label:'── Scordite ──' },
+  { type:'ore', name:'Scordite',           grade:'base', batch:100, vol:15,   buy:32000,    ship:8210,   landed:40210,    value:31900,    profit:-8310,   margin:-20.7, iskm3:-554,   cat:'ore',  family:'Scordite'    },
+  { type:'ore', name:'Condensed Scordite', grade:'ii',   batch:100, vol:15,   buy:35000,    ship:8210,   landed:43210,    value:35100,    profit:-8110,   margin:-18.8, iskm3:-541,   cat:'ore',  family:'Scordite'    },
+
+  { type:'D', cat:'ore',  family:'Pyroxeres',   label:'── Pyroxeres ──' },
+  { type:'ore', name:'Pyroxeres',          grade:'base', batch:100, vol:30,   buy:62000,    ship:11250,  landed:73250,    value:71800,    profit:-1450,   margin:-2.0,  iskm3:-48,    cat:'ore',  family:'Pyroxeres'   },
+  { type:'ore', name:'Solid Pyroxeres',    grade:'ii',   batch:100, vol:30,   buy:67000,    ship:11250,  landed:78250,    value:79000,    profit:750,     margin:0.9,   iskm3:25,     cat:'ore',  family:'Pyroxeres'   },
+
+  { type:'D', cat:'ore',  family:'Plagioclase', label:'── Plagioclase ──' },
+  { type:'ore', name:'Plagioclase',        grade:'base', batch:100, vol:35,   buy:88000,    ship:12060,  landed:100060,   value:97600,    profit:-2460,   margin:-2.5,  iskm3:-70,    cat:'ore',  family:'Plagioclase' },
+  { type:'ore', name:'Azure Plagioclase',  grade:'ii',   batch:100, vol:35,   buy:95000,    ship:12060,  landed:107060,   value:107400,   profit:340,     margin:0.3,   iskm3:10,     cat:'ore',  family:'Plagioclase' },
+
+  { type:'D', cat:'ore',  family:'Kernite',     label:'── Kernite ──' },
+  { type:'ore', name:'Kernite',            grade:'base', batch:100, vol:120,  buy:195000,   ship:18120,  landed:213120,   value:228400,   profit:15280,   margin:7.2,   iskm3:127,    cat:'ore',  family:'Kernite'     },
+  { type:'ore', name:'Luminous Kernite',   grade:'ii',   batch:100, vol:120,  buy:210000,   ship:18120,  landed:228120,   value:251200,   profit:23080,   margin:10.1,  iskm3:192,    cat:'ore',  family:'Kernite'     },
+  { type:'ore', name:'Fiery Kernite',      grade:'iii',  batch:100, vol:120,  buy:226000,   ship:18120,  landed:244120,   value:274000,   profit:29880,   margin:12.2,  iskm3:249,    cat:'ore',  family:'Kernite'     },
+
+  { type:'D', cat:'ore',  family:'Omber',       label:'── Omber ──' },
+  { type:'ore', name:'Omber',              grade:'base', batch:100, vol:60,   buy:112000,   ship:13830,  landed:125830,   value:141200,   profit:15370,   margin:12.2,  iskm3:256,    cat:'ore',  family:'Omber'       },
+  { type:'ore', name:'Silvery Omber',      grade:'ii',   batch:100, vol:60,   buy:121000,   ship:13830,  landed:134830,   value:155300,   profit:20470,   margin:15.2,  iskm3:341,    cat:'ore',  family:'Omber'       },
+
+  { type:'D', cat:'ore',  family:'Jaspet',      label:'── Jaspet ──' },
+  { type:'ore', name:'Jaspet',             grade:'base', batch:100, vol:200,  buy:380000,   ship:28000,  landed:408000,   value:452000,   profit:44000,   margin:10.8,  iskm3:220,    cat:'ore',  family:'Jaspet'      },
+  { type:'ore', name:'Pure Jaspet',        grade:'ii',   batch:100, vol:200,  buy:410000,   ship:28000,  landed:438000,   value:497200,   profit:59200,   margin:13.5,  iskm3:296,    cat:'ore',  family:'Jaspet'      },
+
+  { type:'D', cat:'ore',  family:'Hemorphite',  label:'── Hemorphite ──' },
+  { type:'ore', name:'Hemorphite',         grade:'base', batch:100, vol:300,  buy:610000,   ship:43500,  landed:653500,   value:712000,   profit:58500,   margin:8.9,   iskm3:195,    cat:'ore',  family:'Hemorphite'  },
+  { type:'ore', name:'Vivid Hemorphite',   grade:'ii',   batch:100, vol:300,  buy:660000,   ship:43500,  landed:703500,   value:783200,   profit:79700,   margin:11.3,  iskm3:266,    cat:'ore',  family:'Hemorphite'  },
+
+  { type:'D', cat:'ore',  family:'Hedbergite',  label:'── Hedbergite ──' },
+  { type:'ore', name:'Hedbergite',         grade:'base', batch:100, vol:300,  buy:820000,   ship:43500,  landed:863500,   value:945000,   profit:81500,   margin:9.4,   iskm3:272,    cat:'ore',  family:'Hedbergite'  },
+  { type:'ore', name:'Glazed Hedbergite',  grade:'ii',   batch:100, vol:300,  buy:885000,   ship:43500,  landed:928500,   value:1039500,  profit:111000,  margin:12.0,  iskm3:370,    cat:'ore',  family:'Hedbergite'  },
+
+  { type:'D', cat:'ore',  family:'Gneiss',      label:'── Gneiss ──' },
+  { type:'ore', name:'Gneiss',             grade:'base', batch:100, vol:1400, buy:1240000,  ship:186900, landed:1426900,  value:1489000,  profit:62100,   margin:4.3,   iskm3:44,     cat:'ore',  family:'Gneiss'      },
+  { type:'ore', name:'Iridescent Gneiss',  grade:'ii',   batch:100, vol:1400, buy:1340000,  ship:186900, landed:1526900,  value:1638000,  profit:111100,  margin:7.3,   iskm3:79,     cat:'ore',  family:'Gneiss'      },
+
+  { type:'D', cat:'ore',  family:'Dark Ochre',  label:'── Dark Ochre ──' },
+  { type:'ore', name:'Dark Ochre',         grade:'base', batch:100, vol:800,  buy:1920000,  ship:108000, landed:2028000,  value:2240000,  profit:212000,  margin:10.5,  iskm3:265,    cat:'ore',  family:'Dark Ochre'  },
+  { type:'ore', name:'Onyx Ochre',         grade:'ii',   batch:100, vol:800,  buy:2080000,  ship:108000, landed:2188000,  value:2464000,  profit:276000,  margin:12.6,  iskm3:345,    cat:'ore',  family:'Dark Ochre'  },
+
+  { type:'D', cat:'ore',  family:'Crokite',     label:'── Crokite ──' },
+  { type:'ore', name:'Crokite',            grade:'base', batch:100, vol:1600, buy:2960000,  ship:214720, landed:3174720,  value:3580000,  profit:405280,  margin:12.8,  iskm3:253,    cat:'ore',  family:'Crokite'     },
+  { type:'ore', name:'Sharp Crokite',      grade:'ii',   batch:100, vol:1600, buy:3200000,  ship:214720, landed:3414720,  value:3938000,  profit:523280,  margin:15.3,  iskm3:327,    cat:'ore',  family:'Crokite'     },
+
+  { type:'D', cat:'ore',  family:'Spodumain',   label:'── Spodumain ──' },
+  { type:'ore', name:'Spodumain',          grade:'base', batch:100, vol:1600, buy:3480000,  ship:214720, landed:3694720,  value:4120000,  profit:425280,  margin:11.5,  iskm3:266,    cat:'ore',  family:'Spodumain'   },
+  { type:'ore', name:'Bright Spodumain',   grade:'ii',   batch:100, vol:1600, buy:3760000,  ship:214720, landed:3974720,  value:4532000,  profit:557280,  margin:14.0,  iskm3:348,    cat:'ore',  family:'Spodumain'   },
+
+  { type:'D', cat:'ore',  family:'Bistot',      label:'── Bistot ──' },
+  { type:'ore', name:'Bistot',             grade:'base', batch:100, vol:3600, buy:8240000,  ship:535200, landed:8775200,  value:10287000, profit:1511800, margin:17.2,  iskm3:419,    cat:'ore',  family:'Bistot'      },
+  { type:'ore', name:'Triclinic Bistot',   grade:'ii',   batch:100, vol:3600, buy:8900000,  ship:535200, landed:9435200,  value:11316000, profit:1880800, margin:19.9,  iskm3:522,    cat:'ore',  family:'Bistot'      },
+
+  { type:'D', cat:'ore',  family:'Arkonor',     label:'── Arkonor ──' },
+  { type:'ore', name:'Arkonor',            grade:'base', batch:100, vol:1600, buy:4120000,  ship:214720, landed:4334720,  value:4891000,  profit:556280,  margin:12.8,  iskm3:347,    cat:'ore',  family:'Arkonor'     },
+  { type:'ore', name:'Crimson Arkonor',    grade:'ii',   batch:100, vol:1600, buy:4450000,  ship:214720, landed:4664720,  value:5380000,  profit:715280,  margin:15.3,  iskm3:447,    cat:'ore',  family:'Arkonor'     },
+  { type:'ore', name:'Prime Arkonor',      grade:'iii',  batch:100, vol:1600, buy:4800000,  ship:214720, landed:5014720,  value:5869000,  profit:854280,  margin:17.0,  iskm3:534,    cat:'ore',  family:'Arkonor'     },
+
+  { type:'D', cat:'ore',  family:'Mercoxit',    label:'── Mercoxit ──' },
+  { type:'ore', name:'Mercoxit',           grade:'base', batch:100, vol:1600, buy:6800000,  ship:214720, landed:7014720,  value:8640000,  profit:1625280, margin:23.2,  iskm3:1016,   cat:'ore',  family:'Mercoxit'    },
+  { type:'ore', name:'Magma Mercoxit',     grade:'ii',   batch:100, vol:1600, buy:7350000,  ship:214720, landed:7564720,  value:9504000,  profit:1939280, margin:25.6,  iskm3:1212,   cat:'ore',  family:'Mercoxit'    },
+
+  // ══ ICE ════════════════════════════════════════════════════
+  { type:'D', cat:'ice',  family:'High-Sec Ice',  label:'── High-Sec Ice ──' },
+  { type:'ice', name:'Clear Icicle',         grade:'base', batch:1, vol:1000, buy:48000,   ship:125000, landed:173000,  value:134500,  profit:-38500,  margin:-22.3, iskm3:-38.5,  cat:'ice',  family:'High-Sec Ice' },
+  { type:'ice', name:'Enriched Clear Icicle',grade:'ii',   batch:1, vol:1000, buy:52000,   ship:125000, landed:177000,  value:148000,  profit:-29000,  margin:-16.4, iskm3:-29.0,  cat:'ice',  family:'High-Sec Ice' },
+  { type:'ice', name:'Glacial Mass',         grade:'base', batch:1, vol:1000, buy:52000,   ship:125000, landed:177000,  value:162000,  profit:-15000,  margin:-8.5,  iskm3:-15.0,  cat:'ice',  family:'High-Sec Ice' },
+  { type:'ice', name:'Smooth Glacial Mass',  grade:'ii',   batch:1, vol:1000, buy:56000,   ship:125000, landed:181000,  value:178000,  profit:-3000,   margin:-1.7,  iskm3:-3.0,   cat:'ice',  family:'High-Sec Ice' },
+  { type:'ice', name:'Blue Ice',             grade:'base', batch:1, vol:1000, buy:71000,   ship:125000, landed:196000,  value:211500,  profit:15500,   margin:7.9,   iskm3:15.5,   cat:'ice',  family:'High-Sec Ice' },
+  { type:'ice', name:'Thick Blue Ice',       grade:'ii',   batch:1, vol:1000, buy:77000,   ship:125000, landed:202000,  value:232600,  profit:30600,   margin:15.1,  iskm3:30.6,   cat:'ice',  family:'High-Sec Ice' },
+  { type:'ice', name:'White Glaze',          grade:'base', batch:1, vol:1000, buy:63000,   ship:125000, landed:188000,  value:198000,  profit:10000,   margin:5.3,   iskm3:10.0,   cat:'ice',  family:'High-Sec Ice' },
+  { type:'ice', name:'Pristine White Glaze', grade:'ii',   batch:1, vol:1000, buy:68000,   ship:125000, landed:193000,  value:217800,  profit:24800,   margin:12.8,  iskm3:24.8,   cat:'ice',  family:'High-Sec Ice' },
+
+  { type:'D', cat:'ice',  family:'Null-Sec Ice',  label:'── Low/Null-Sec Ice ──' },
+  { type:'ice', name:'Glare Crust',          grade:'base', batch:1, vol:1000, buy:280000,  ship:125000, landed:405000,  value:524000,  profit:119000,  margin:29.4,  iskm3:119,    cat:'ice',  family:'Null-Sec Ice' },
+  { type:'ice', name:'Dark Glitter',         grade:'base', batch:1, vol:1000, buy:310000,  ship:125000, landed:435000,  value:612000,  profit:177000,  margin:40.7,  iskm3:177,    cat:'ice',  family:'Null-Sec Ice' },
+  { type:'ice', name:'Gelidus',              grade:'base', batch:1, vol:1000, buy:340000,  ship:125000, landed:465000,  value:698000,  profit:233000,  margin:50.1,  iskm3:233,    cat:'ice',  family:'Null-Sec Ice' },
+  { type:'ice', name:'Krystallos',           grade:'base', batch:1, vol:1000, buy:390000,  ship:125000, landed:515000,  value:812000,  profit:297000,  margin:57.7,  iskm3:297,    cat:'ice',  family:'Null-Sec Ice' },
+
+  // ══ MOON ORES ══════════════════════════════════════════════
+  { type:'D', cat:'moon', family:'Ubiquitous',  label:'── Ubiquitous ──' },
+  { type:'moon', name:'Zeolites',    grade:'base', batch:100, vol:40, buy:85000,    ship:10500, landed:95500,    value:92000,    profit:-3500,   margin:-3.7,  iskm3:-88,    cat:'moon', family:'Ubiquitous'  },
+  { type:'moon', name:'Bitumens',    grade:'base', batch:100, vol:40, buy:78000,    ship:10500, landed:88500,    value:86400,    profit:-2100,   margin:-2.4,  iskm3:-53,    cat:'moon', family:'Ubiquitous'  },
+  { type:'moon', name:'Coesite',     grade:'base', batch:100, vol:40, buy:82000,    ship:10500, landed:92500,    value:94800,    profit:2300,    margin:2.5,   iskm3:58,     cat:'moon', family:'Ubiquitous'  },
+  { type:'moon', name:'Sylvite',     grade:'base', batch:100, vol:40, buy:79000,    ship:10500, landed:89500,    value:88000,    profit:-1500,   margin:-1.7,  iskm3:-38,    cat:'moon', family:'Ubiquitous'  },
+
+  { type:'D', cat:'moon', family:'Common',      label:'── Common ──' },
+  { type:'moon', name:'Cobaltite',   grade:'base', batch:100, vol:40, buy:142000,   ship:10500, landed:152500,   value:178000,   profit:25500,   margin:16.7,  iskm3:638,    cat:'moon', family:'Common'      },
+  { type:'moon', name:'Euxenite',    grade:'base', batch:100, vol:40, buy:136000,   ship:10500, landed:146500,   value:168000,   profit:21500,   margin:14.7,  iskm3:538,    cat:'moon', family:'Common'      },
+  { type:'moon', name:'Scheelite',   grade:'base', batch:100, vol:40, buy:168000,   ship:10500, landed:178500,   value:204000,   profit:25500,   margin:14.3,  iskm3:638,    cat:'moon', family:'Common'      },
+  { type:'moon', name:'Loparite',    grade:'base', batch:100, vol:40, buy:158000,   ship:10500, landed:168500,   value:192000,   profit:23500,   margin:13.9,  iskm3:588,    cat:'moon', family:'Common'      },
+
+  { type:'D', cat:'moon', family:'Uncommon',    label:'── Uncommon ──' },
+  { type:'moon', name:'Chromite',    grade:'base', batch:100, vol:40, buy:348000,   ship:10500, landed:358500,   value:420000,   profit:61500,   margin:17.2,  iskm3:1538,   cat:'moon', family:'Uncommon'    },
+  { type:'moon', name:'Otavite',     grade:'base', batch:100, vol:40, buy:368000,   ship:10500, landed:378500,   value:444000,   profit:65500,   margin:17.3,  iskm3:1638,   cat:'moon', family:'Uncommon'    },
+  { type:'moon', name:'Sperrylite',  grade:'base', batch:100, vol:40, buy:390000,   ship:10500, landed:400500,   value:472000,   profit:71500,   margin:17.9,  iskm3:1788,   cat:'moon', family:'Uncommon'    },
+  { type:'moon', name:'Vanadinite',  grade:'base', batch:100, vol:40, buy:360000,   ship:10500, landed:370500,   value:432000,   profit:61500,   margin:16.6,  iskm3:1538,   cat:'moon', family:'Uncommon'    },
+
+  { type:'D', cat:'moon', family:'Rare',        label:'── Rare ──' },
+  { type:'moon', name:'Carnotite',   grade:'base', batch:100, vol:40, buy:1840000,  ship:10500, landed:1850500,  value:2340000,  profit:489500,  margin:26.5,  iskm3:12238,  cat:'moon', family:'Rare'        },
+  { type:'moon', name:'Cinnabar',    grade:'base', batch:100, vol:40, buy:2120000,  ship:10500, landed:2130500,  value:2780000,  profit:649500,  margin:30.5,  iskm3:16238,  cat:'moon', family:'Rare'        },
+  { type:'moon', name:'Zircon',      grade:'base', batch:100, vol:40, buy:1780000,  ship:10500, landed:1790500,  value:2240000,  profit:449500,  margin:25.1,  iskm3:11238,  cat:'moon', family:'Rare'        },
+  { type:'moon', name:'Pollucite',   grade:'base', batch:100, vol:40, buy:2240000,  ship:10500, landed:2250500,  value:2920000,  profit:669500,  margin:29.8,  iskm3:16738,  cat:'moon', family:'Rare'        },
+
+  { type:'D', cat:'moon', family:'Exceptional', label:'── Exceptional ──' },
+  { type:'moon', name:'Xenotime',    grade:'base', batch:100, vol:40, buy:8400000,  ship:10500, landed:8410500,  value:11200000, profit:2789500, margin:33.2,  iskm3:69738,  cat:'moon', family:'Exceptional' },
+  { type:'moon', name:'Monazite',    grade:'base', batch:100, vol:40, buy:7800000,  ship:10500, landed:7810500,  value:10400000, profit:2589500, margin:33.2,  iskm3:64738,  cat:'moon', family:'Exceptional' },
+  { type:'moon', name:'Ytterbite',   grade:'base', batch:100, vol:40, buy:9200000,  ship:10500, landed:9210500,  value:12400000, profit:3189500, margin:34.6,  iskm3:79738,  cat:'moon', family:'Exceptional' },
+  { type:'moon', name:'Ores Loparite',grade:'base',batch:100, vol:40, buy:8100000,  ship:10500, landed:8110500,  value:10800000, profit:2689500, margin:33.2,  iskm3:67238,  cat:'moon', family:'Exceptional' },
+];
+
+/* ─────────────────────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────────────────────── */
+function fmtN(n) {
+  if (n === null || n === undefined) return '&#8212;';
+  const a = Math.abs(n);
+  if (a >= 1e9)      return (n / 1e9).toFixed(2) + 'B';
+  if (a >= 1e6)      return (n / 1e6).toFixed(3) + 'M';
+  return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function valCls(v) {
+  if (v > 5)   return 'vc-green';
+  if (v > 0)   return 'vc-yellow';
+  if (v < 0)   return 'vc-red';
+  return 'vc-dim';
+}
+
+function profitCls(v) {
+  if (v > 0) return 'vc-green';
+  if (v < 0) return 'vc-red';
+  return 'vc-dim';
+}
+
+const GRADE_DOT_CLS = { base:'gd-base', ii:'gd-ii', iii:'gd-iii', iv:'gd-iv' };
+
+function gradeDot(g) {
+  return `<span class="grade-dot ${GRADE_DOT_CLS[g] || 'gd-base'}">&#9679;</span>`;
+}
+
+/* ─────────────────────────────────────────────────────────
+   COLLAPSIBLE PANELS
+───────────────────────────────────────────────────────── */
+function togglePanel(id) {
+  const panel = document.getElementById(id);
+  panel.classList.toggle('expanded');
+  // Hide the "(click to expand)" hint permanently once opened
+  if (id === 'panelMoon') {
+    const hint = document.getElementById('moonHint');
+    if (hint) hint.style.display = 'none';
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   CHANGE NOTIFICATIONS
+───────────────────────────────────────────────────────── */
+function onPriceChange() {
+  if (g_loaded) showRecalcHint();
+}
+function onParamChange() {
+  if (g_loaded) showRecalcHint();
+}
+function showRecalcHint() {
+  document.getElementById('recalcHint').classList.add('visible');
+}
+
+function toggleBrokerFee() {
+  const from = document.getElementById('buyFrom').value;
+  document.getElementById('brokerFeeField').style.opacity = from === 'jbv' ? '1' : '0.35';
+}
+
+/* ─────────────────────────────────────────────────────────
+   FETCH SIMULATION
+───────────────────────────────────────────────────────── */
+function doFetch() {
+  const btn = document.getElementById('btnFetch');
+  btn.disabled = true;
+  btn.classList.add('pulsing');
+  btn.innerHTML = '<span class="spinner"></span>Fetching live prices from Jita...';
+
+  // Show loading row
+  document.getElementById('tableBody').innerHTML =
+    `<tr class="state-row"><td colspan="10"><div style="color:var(--gold);letter-spacing:2px;font-size:13px;">
+      <span class="spinner"></span>Contacting market servers&hellip; please wait
+    </div></td></tr>`;
+
+  setTimeout(() => {
+    // Restore button
+    btn.disabled = false;
+    btn.classList.remove('pulsing');
+    btn.innerHTML = '&#x27F3;&nbsp;&nbsp;FETCH LIVE PRICES &amp; CALCULATE';
+
+    g_loaded = true;
+
+    // Timestamp
+    const now = new Date();
+    const ts  = now.toLocaleDateString('en-GB') + '  ' + now.toLocaleTimeString('en-GB');
+    document.getElementById('priceStatus').textContent  = 'Price data: ' + ts;
+    document.getElementById('priceWarning').style.display = 'none';
+    document.getElementById('recalcHint').classList.remove('visible');
+
+    renderTable();
+    updateSummary();
+    rebuildCatDropdown();
+  }, 1500);
+}
+
+function doRecalc() {
+  if (!g_loaded) { doFetch(); return; }
+  document.getElementById('recalcHint').classList.remove('visible');
+  renderTable();
+  updateSummary();
+}
+
+/* ─────────────────────────────────────────────────────────
+   TAB MANAGEMENT
+───────────────────────────────────────────────────────── */
+const TAB_CLS = { ore:'active-ore', ice:'active-ice', moon:'active-moon', all:'active-all' };
+const TABS    = ['ore','ice','moon','all'];
+
+function setTab(tab) {
+  g_tab = tab;
+  TABS.forEach(t => {
+    const el = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (!el) return;
+    el.className = 'ore-tab';
+    if (t === tab) el.classList.add(TAB_CLS[t]);
+  });
+  rebuildCatDropdown();
+  if (g_loaded) { renderTable(); updateSummary(); }
+}
+
+/* ─────────────────────────────────────────────────────────
+   CATEGORY DROPDOWN
+───────────────────────────────────────────────────────── */
+const CAT_GROUPS = {
+  ore:  ['Veldspar','Scordite','Pyroxeres','Plagioclase','Kernite','Omber','Jaspet','Hemorphite','Hedbergite','Gneiss','Dark Ochre','Crokite','Spodumain','Bistot','Arkonor','Mercoxit'],
+  ice:  ['High-Sec Ice','Null-Sec Ice'],
+  moon: ['Ubiquitous','Common','Uncommon','Rare','Exceptional'],
+  all:  ['Veldspar','Scordite','Pyroxeres','Plagioclase','Kernite','Omber','Jaspet','Hemorphite','Hedbergite','Gneiss','Dark Ochre','Crokite','Spodumain','Bistot','Arkonor','Mercoxit','High-Sec Ice','Null-Sec Ice','Ubiquitous','Common','Uncommon','Rare','Exceptional'],
+};
+
+function rebuildCatDropdown() {
+  const sel = document.getElementById('fCat');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All</option>';
+  (CAT_GROUPS[g_tab] || CAT_GROUPS.all).forEach(g => {
+    const o = document.createElement('option');
+    o.value = g; o.textContent = g;
+    if (g === cur) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+/* ─────────────────────────────────────────────────────────
+   COLUMN HEADER SORT
+───────────────────────────────────────────────────────── */
+function headerSort(col) {
+  if (g_sort.col === col) {
+    g_sort.dir = g_sort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    g_sort.col = col;
+    // Default direction: desc for value columns, asc for name/batch/vol
+    g_sort.dir = ['name','batch','vol'].includes(col) ? 'asc' : 'desc';
+  }
+
+  // Sync the sort dropdown if applicable
+  const colToSortOpt = { margin:'margin', profit:'profit', landed:'landed', value:'value', iskm3:'iskm3' };
+  if (colToSortOpt[col]) {
+    document.getElementById('fSort').value = colToSortOpt[col];
+  }
+
+  // Update header styling
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.dataset.col === col) {
+      th.classList.add(g_sort.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+
+  if (g_loaded) renderTable();
+}
+
+/* ─────────────────────────────────────────────────────────
+   FILTER & GET DATA
+───────────────────────────────────────────────────────── */
+function applyFilters() {
+  if (g_loaded) { renderTable(); updateSummary(); }
+}
+
+function getVisibleRows() {
+  const search = document.getElementById('fSearch').value.toLowerCase().trim();
+  const cat    = document.getElementById('fCat').value;
+  const show   = document.getElementById('fShow').value;
+  const sortK  = document.getElementById('fSort').value;
+
+  // Map sort dropdown value to data key
+  const sortKey = sortK || g_sort.col;
+  const sortDir = g_sort.dir;
+
+  let rows = DATA.filter(r => {
+    if (r.type === 'D') return false;
+    if (g_tab !== 'all' && r.cat !== g_tab)      return false;
+    if (cat && r.family !== cat)                  return false;
+    if (search && !r.name.toLowerCase().includes(search)) return false;
+    if (show === 'profit' && r.profit <= 0)       return false;
+    if (show === 'loss'   && r.profit >= 0)       return false;
+    return true;
+  });
+
+  // Sort
+  const fieldMap = { margin:'margin', profit:'profit', landed:'landed', value:'value', iskm3:'iskm3', name:'name', batch:'batch', vol:'vol', buy:'buy', ship:'ship' };
+  const field = fieldMap[sortKey] || 'margin';
+
+  rows.sort((a, b) => {
+    let av = a[field], bv = b[field];
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1  : -1;
+    return 0;
+  });
+
+  return rows;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RENDER TABLE
+───────────────────────────────────────────────────────── */
+function renderTable() {
+  const tbody  = document.getElementById('tableBody');
+  const rows   = getVisibleRows();
+  const search = document.getElementById('fSearch').value.trim();
+  const cat    = document.getElementById('fCat').value;
+
+  document.getElementById('rowCountLbl').textContent = rows.length + ' row' + (rows.length !== 1 ? 's' : '') + ' shown';
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr class="state-row"><td colspan="10">
+      <div class="empty-icon">&#9100;</div>
+      <div class="empty-text">NO RESULTS</div>
+      <div class="empty-sub">No ores match the current filter settings</div>
+    </td></tr>`;
+    return;
+  }
+
+  // We inject group dividers when no freeform search and no explicit cat filter
+  const useGroupDividers = !search && !cat;
+
+  let html      = '';
+  let lastFam   = null;
+  let altIdx    = 0;
+
+  rows.forEach(row => {
+    // Group divider
+    if (useGroupDividers && row.family !== lastFam) {
+      const divRow = DATA.find(d => d.type === 'D' && d.family === row.family && d.cat === row.cat);
+      if (divRow) {
+        const bg = row.cat === 'ice'  ? '#0a1420'
+                 : row.cat === 'moon' ? '#150a28'
+                 : '#070e18';
+        html += `<tr class="row-divider">
+          <td colspan="10" class="divider-cell" style="background:${bg};">${divRow.label}</td>
+        </tr>`;
+        altIdx = 0;
+      }
+      lastFam = row.family;
+    }
+
+    const rowCls = row.cat === 'ice'  ? 'row-ice'
+                 : row.cat === 'moon' ? 'row-moon'
+                 : (altIdx % 2 === 0  ? 'row-ore-a' : 'row-ore-b');
+    altIdx++;
+
+    const pCls  = profitCls(row.profit);
+    const mCls  = valCls(row.margin);
+    const iCls  = profitCls(row.iskm3);
+
+    const ps    = row.profit  >= 0 ? '+' : '';
+    const ms    = row.margin  >= 0 ? '+' : '';
+    const is    = row.iskm3   >= 0 ? '+' : '';
+
+    const mFmt  = row.margin.toFixed(1);
+    const iFmt  = (Math.abs(row.iskm3) < 10)
+                  ? row.iskm3.toFixed(1)
+                  : Math.round(row.iskm3).toLocaleString('en-US');
+
+    html += `<tr class="${rowCls}">
+      <td><div class="ore-name-wrap">${gradeDot(row.grade)}<span>${row.name}</span></div></td>
+      <td>${row.batch.toLocaleString()}</td>
+      <td>${row.vol.toLocaleString()}</td>
+      <td>${fmtN(row.buy)}</td>
+      <td>${fmtN(row.ship)}</td>
+      <td>${fmtN(row.landed)}</td>
+      <td class="vc-cyan">${fmtN(row.value)}</td>
+      <td class="${pCls}">${ps}${fmtN(row.profit)}</td>
+      <td class="${mCls}">${ms}${mFmt}%</td>
+      <td class="${iCls}">${is}${iFmt}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SUMMARY CARDS
+───────────────────────────────────────────────────────── */
+function updateSummary() {
+  const rows = getVisibleRows();
+
+  if (rows.length === 0) {
+    setCard('sumTotal',      '0',  'sv-dim',   'No results');
+    setCard('sumProfit',     '0',  'sv-dim',   'of 0 analysed');
+    setCard('sumBestMargin', '&#8212;', 'sv-gold',  '&#8212;');
+    setCard('sumBestISK',    '&#8212;', 'sv-green', '&#8212;');
+    setCard('sumWorst',      '&#8212;', 'sv-red',   '&#8212;');
+    return;
+  }
+
+  const profitable = rows.filter(r => r.profit > 0);
+  const byMargin   = [...rows].sort((a, b) => b.margin - a.margin);
+  const byProfit   = [...rows].sort((a, b) => b.profit - a.profit);
+  const best       = byMargin[0];
+  const worst      = byMargin[byMargin.length - 1];
+  const bestP      = byProfit[0];
+
+  const pct = Math.round(profitable.length / rows.length * 100);
+
+  setCard('sumTotal',      rows.length,                 'sv-cyan',  g_tab === 'all' ? 'all categories' : g_tab + ' ores');
+  setCard('sumProfit',     profitable.length,           profitable.length > 0 ? 'sv-green' : 'sv-dim', pct + '% of ' + rows.length + ' analysed');
+  setCard('sumBestMargin', '+' + best.margin.toFixed(1) + '%',   'sv-gold',  best.name);
+  setCard('sumBestISK',    '+' + fmtN(bestP.profit),             'sv-green', bestP.name);
+  setCard('sumWorst',      worst.margin.toFixed(1) + '%',        'sv-red',   worst.name);
+}
+
+function setCard(id, val, cls, sub) {
+  const el    = document.getElementById(id);
+  const subEl = document.getElementById(id + 'Sub');
+  el.innerHTML  = val;
+  el.className  = 'summary-value ' + cls;
+  if (subEl) subEl.innerHTML = sub;
+}
+
+/* ─────────────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  // Default sort arrow
+  const mTh = document.querySelector('th[data-col="margin"]');
+  if (mTh) mTh.classList.add('sort-desc');
+
+  // Activate "Show All" tab by default
+  setTab('all');
+
+  // Broker fee visibility
+  toggleBrokerFee();
+});
+</script>
+</body>
+</html>

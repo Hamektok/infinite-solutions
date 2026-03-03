@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Import Analysis – Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a1520; font-family: 'Segoe UI', sans-serif; color: #c0e0f0; font-size: 13px; }
+
+  .mockup-banner { background: #1a1000; border-bottom: 1px solid #ffcc4440;
+                   color: #ffcc44; text-align: center; padding: 6px;
+                   font-size: 12px; letter-spacing: 1px; }
+
+  .header { display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 24px 6px; background: #0a1520; }
+  .header-title { color: #00ffff; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+  .header-status { color: #66d9ff; font-size: 12px; }
+
+  .tab-bar { display: flex; background: #0d1117; padding: 8px 15px 0; gap: 2px; }
+  .tab { padding: 10px 20px; background: #1a2332; color: #66d9ff; font-size: 12px;
+         font-weight: bold; cursor: pointer; border-radius: 4px 4px 0 0; border: none; }
+  .tab.active { background: #0a3040; color: #00ffff; }
+
+  .tab-content { background: #0d1117; padding: 14px 16px; min-height: 660px; }
+
+  .section-desc { color: #66d9ff; font-size: 12px; margin-bottom: 10px; }
+
+  /* ── Flow indicator ── */
+  .flow-bar { display: flex; align-items: center; gap: 0; margin-bottom: 12px; }
+  .flow-node { background: #0a2030; border: 1px solid #1a5060; border-radius: 4px;
+               padding: 7px 14px; font-size: 11px; color: #00ffff; font-weight: bold;
+               text-align: center; }
+  .flow-node .sub { color: #3a7090; font-size: 10px; font-weight: normal; margin-top: 2px; }
+  .flow-arrow { color: #1a5060; font-size: 18px; padding: 0 6px; }
+  .flow-cost { background: #0a1a10; border: 1px solid #1a4030; border-radius: 4px;
+               padding: 7px 14px; font-size: 11px; color: #ffcc44; text-align: center; }
+  .flow-cost .sub { color: #3a6030; font-size: 10px; margin-top: 2px; }
+
+  /* ── Param panel ── */
+  .param-panel { background: #0a2030; border: 1px solid #1a4060; border-radius: 4px;
+                 padding: 12px 16px; margin-bottom: 12px; }
+  .param-section-title { color: #00d9ff; font-size: 10px; font-weight: bold;
+                         letter-spacing: 1px; margin-bottom: 8px; }
+
+  /* two-row grid: buy side | divider | sell side | divider | logistics */
+  .param-sections { display: flex; gap: 0; align-items: flex-start; }
+  .param-group { display: flex; flex-direction: column; gap: 10px; padding: 0 16px; }
+  .param-group:first-child { padding-left: 0; }
+  .param-divider-v { width: 1px; background: #1a3040; margin: 0 4px; align-self: stretch; }
+
+  .param-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .param-col { display: flex; flex-direction: column; gap: 4px; min-width: 110px; }
+  .param-col label { color: #88d0e8; font-size: 11px; white-space: nowrap; }
+  .param-col input, .param-col select {
+    background: #061420; border: 1px solid #1a5070; color: #00ffff;
+    font-size: 12px; padding: 5px 8px; border-radius: 3px; width: 100%;
+  }
+  .param-col .hint { color: #2a5060; font-size: 10px; font-style: italic; margin-top: 1px; }
+  .param-col.wide { min-width: 160px; }
+
+  .section-badge { display: inline-block; padding: 2px 8px; border-radius: 2px;
+                   font-size: 10px; font-weight: bold; margin-bottom: 6px; }
+  .badge-buy  { background: #0a1a30; border: 1px solid #1a5070; color: #66d9ff; }
+  .badge-ship { background: #1a1a00; border: 1px solid #4a4000; color: #ffcc44; }
+  .badge-sell { background: #0a1a10; border: 1px solid #1a5030; color: #00ff88; }
+  .badge-note { background: #1a0a00; border: 1px solid #5a3000; color: #ff9944; }
+
+  /* scenario pills */
+  .scenario-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .scenario-label { color: #66d9ff; font-size: 11px; white-space: nowrap; }
+  .scenario-pill { padding: 4px 12px; border-radius: 12px; font-size: 11px; cursor: pointer;
+                   border: 1px solid #1a4060; background: #0a2030; color: #66d9ff; }
+  .scenario-pill.active { background: #0a3040; border-color: #00ffff; color: #00ffff; }
+  .recalc-btn { background: #0a3040; border: 1px solid #00ffff55; color: #00ffff;
+                padding: 5px 16px; border-radius: 3px; font-size: 12px;
+                font-weight: bold; cursor: pointer; margin-left: auto; }
+
+  /* ── Summary cards ── */
+  .summary-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .card { background: #0a2030; border: 1px solid #1a4060; border-radius: 4px;
+          padding: 10px 16px; flex: 1; }
+  .card-label { color: #66d9ff; font-size: 10px; letter-spacing: 0.5px;
+                margin-bottom: 4px; text-transform: uppercase; }
+  .card-value { font-size: 17px; font-weight: bold; }
+  .green  { color: #00ff88; }
+  .yellow { color: #ffcc44; }
+  .red    { color: #ff6666; }
+  .cyan   { color: #00ffff; }
+  .blue   { color: #66d9ff; }
+  .orange { color: #ff9944; }
+
+  /* ── Filter row ── */
+  .filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .filter-row label { color: #88d0e8; font-size: 12px; }
+  .filter-row input, .filter-row select {
+    background: #0a2030; border: 1px solid #1a4060; color: #00ffff;
+    font-size: 12px; padding: 4px 8px; border-radius: 3px;
+  }
+  .filter-row input { width: 150px; }
+  .filter-row select { width: 155px; }
+
+  /* ── Table ── */
+  .tree-wrap { border: 1px solid #1a4060; border-radius: 3px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: #0a3040; color: #00d9ff; font-size: 11px; font-weight: bold;
+    padding: 8px 10px; text-align: left; border-bottom: 1px solid #1a5060;
+    white-space: nowrap;
+  }
+  thead th.num { text-align: right; }
+  thead th .sub { display: block; color: #3a7090; font-size: 9px;
+                  font-weight: normal; margin-top: 1px; }
+  tbody tr { background: #0d1a25; }
+  tbody tr:nth-child(even) { background: #0a1820; }
+  tbody tr:hover { background: #0a3050; }
+  tbody td { padding: 7px 10px; border-bottom: 1px solid #0f2535;
+             font-size: 12px; color: #c0e0f0; white-space: nowrap; }
+  tbody td.num { text-align: right; font-family: 'Courier New', monospace; font-size: 11px; }
+
+  .margin-cell { font-weight: bold; text-align: right;
+                 font-family: 'Courier New', monospace; font-size: 12px; }
+  .mg-great  { color: #00ff88; }
+  .mg-good   { color: #88ff66; }
+  .mg-ok     { color: #ffcc44; }
+  .mg-thin   { color: #ff9944; }
+  .mg-neg    { color: #ff6666; }
+
+  .verdict { display: inline-block; padding: 2px 8px; border-radius: 3px;
+             font-size: 10px; font-weight: bold; }
+  .v-yes { background: #003320; color: #00ff88; border: 1px solid #00ff4420; }
+  .v-ok  { background: #332200; color: #ffcc44; border: 1px solid #ffcc4420; }
+  .v-no  { background: #330000; color: #ff6666; border: 1px solid #ff666620; }
+
+  .cat-tag { display: inline-block; padding: 1px 6px; border-radius: 2px;
+             font-size: 10px; background: #0a3040; color: #66d9ff;
+             border: 1px solid #1a5060; }
+
+  .footer-note { margin-top: 10px; color: #3a6080; font-size: 11px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">&#9670;  MOCKUP PREVIEW &#8212; NOT FUNCTIONAL  &#9670;</div>
+
+<div class="header">
+  <span class="header-title">INFINITE SOLUTIONS</span>
+  <span class="header-status">All saved</span>
+</div>
+
+<div class="tab-bar">
+  <button class="tab">  Market Rates  </button>
+  <button class="tab">  Buyback Program  </button>
+  <button class="tab">  Blueprint Library  </button>
+  <button class="tab">  Inventory  </button>
+  <button class="tab">  Export Analysis  </button>
+  <button class="tab active">  Import Analysis  </button>
+  <button class="tab">  Quick Actions  </button>
+</div>
+
+<div class="tab-content">
+
+  <div class="section-desc">Model profitability of importing items from Jita to local null-sec staging, purchased via market and sold via contracts.</div>
+
+  <!-- Flow bar -->
+  <div class="flow-bar">
+    <div class="flow-node">JITA<div class="sub">Buy from market</div></div>
+    <span class="flow-arrow">&#9658;</span>
+    <div class="flow-cost">SHIPPING + COLLATERAL<div class="sub">Red Frog / Push Industries</div></div>
+    <span class="flow-arrow">&#9658;</span>
+    <div class="flow-node">NULL-SEC STAGING<div class="sub">Sell via contract</div></div>
+  </div>
+
+  <!-- Parameter panel -->
+  <div class="param-panel">
+    <div class="param-sections">
+
+      <!-- BUY SIDE -->
+      <div class="param-group">
+        <span class="section-badge badge-buy">BUY SIDE &mdash; Jita market fees apply</span>
+        <div class="param-row">
+          <div class="param-col wide">
+            <label>Buy From</label>
+            <select>
+              <option selected>Sell Orders (JSV) &mdash; instant</option>
+              <option>Buy Orders (JBV) &mdash; place order</option>
+            </select>
+            <span class="hint">JSV = instant fill, no broker fee</span>
+          </div>
+          <div class="param-col">
+            <label>Buy % of Basis</label>
+            <input type="text" value="100">
+            <span class="hint">e.g. 99 = 1% below ask</span>
+          </div>
+          <div class="param-col">
+            <label>Broker Fee %</label>
+            <input type="text" value="0.0">
+            <span class="hint">0 if buying from sell orders</span>
+          </div>
+        </div>
+        <div style="color:#3a6080;font-size:10px;font-style:italic;">
+          Note: Sales tax is paid by the seller &mdash; no tax cost on your buy side.
+        </div>
+      </div>
+
+      <div class="param-divider-v"></div>
+
+      <!-- LOGISTICS -->
+      <div class="param-group">
+        <span class="section-badge badge-ship">LOGISTICS &mdash; applied to buy cost</span>
+        <div class="param-row">
+          <div class="param-col">
+            <label>Shipping (ISK / m&#179;)</label>
+            <input type="text" value="125">
+          </div>
+          <div class="param-col">
+            <label>Collateral %</label>
+            <input type="text" value="1.0">
+            <span class="hint">% of buy price declared</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="param-divider-v"></div>
+
+      <!-- SELL SIDE -->
+      <div class="param-group">
+        <span class="section-badge badge-sell">SELL SIDE &mdash; contracts, no tax/broker</span>
+        <div class="param-row">
+          <div class="param-col wide">
+            <label>Sell Price Reference</label>
+            <select>
+              <option selected>Jita Sell Value (JSV)</option>
+              <option>Jita Split</option>
+              <option>Jita Buy Value (JBV)</option>
+            </select>
+            <span class="hint">Jita price used as markup base</span>
+          </div>
+          <div class="param-col">
+            <label>Sell Markup %</label>
+            <input type="text" value="115">
+            <span class="hint">115 = 15% above JSV</span>
+          </div>
+        </div>
+        <div style="color:#3a6080;font-size:10px;font-style:italic;">
+          Contracts: no sales tax, no broker fee on sell side.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Scenario pills -->
+    <div class="scenario-row">
+      <span class="scenario-label">Quick:</span>
+      <span class="scenario-pill active">JSV + 15%  (baseline)</span>
+      <span class="scenario-pill">JSV + 20%  (premium)</span>
+      <span class="scenario-pill">JSV + 10%  (competitive)</span>
+      <span class="scenario-pill">JBV buy + 15%  (order fill)</span>
+      <button class="recalc-btn">&#10227;  Recalculate</button>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-row">
+    <div class="card">
+      <div class="card-label">Scenario</div>
+      <div class="card-value blue" style="font-size:12px;">Buy JSV &rarr; Sell 115% JSV</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Items Analysed</div>
+      <div class="card-value cyan">147</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Worth Importing</div>
+      <div class="card-value green">143</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Marginal</div>
+      <div class="card-value yellow">0</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Avoid</div>
+      <div class="card-value red">4</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Avg Margin</div>
+      <div class="card-value green">11.8%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Prices As Of</div>
+      <div class="card-value blue" style="font-size:12px;">Today 21:12 EVE</div>
+    </div>
+  </div>
+
+  <!-- Filter row -->
+  <div class="filter-row">
+    <label>Search:</label>
+    <input type="text" placeholder="Item name&hellip;">
+    <label>Category:</label>
+    <select>
+      <option>All Categories</option>
+      <option>Minerals</option>
+      <option>Ice Products</option>
+      <option>PI Materials</option>
+      <option>Moon Materials</option>
+      <option>Salvaged Materials</option>
+    </select>
+    <label>Show:</label>
+    <select>
+      <option>All</option>
+      <option selected>Profitable only</option>
+      <option>Marginal</option>
+      <option>Avoid</option>
+    </select>
+  </div>
+
+  <!-- Table -->
+  <div class="tree-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:200px;">Item</th>
+          <th>Category</th>
+          <th class="num">Vol<span class="sub">m&#179; / unit</span></th>
+          <th class="num">Buy Cost<span class="sub">Jita market price</span></th>
+          <th class="num">Ship + Collat<span class="sub">logistics cost</span></th>
+          <th class="num">Total Cost<span class="sub">landed in null</span></th>
+          <th class="num">Contract Price<span class="sub">what you charge</span></th>
+          <th class="num">Profit / unit</th>
+          <th class="num" style="width:75px;">Margin</th>
+          <th style="width:90px;text-align:center;">Verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td>Intact Armor Plates</td>
+          <td><span class="cat-tag">Salvaged</span></td>
+          <td class="num">0.01</td>
+          <td class="num">2,128,000</td>
+          <td class="num">21,281</td>
+          <td class="num">2,149,281</td>
+          <td class="num">2,447,200</td>
+          <td class="num">297,919</td>
+          <td class="margin-cell mg-great">12.2%</td>
+          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
+        </tr>
+
+        <tr>
+          <td>Elite Drone AI</td>
+          <td><span class="cat-tag">Salvaged</span></td>
+          <td class="num">0.01</td>
+          <td class="num">2,000,000</td>
+          <td class="num">20,001</td>
+          <td class="num">2,020,001</td>
+          <td class="num">2,300,000</td>
+          <td class="num">279,999</td>
+          <td class="margin-cell mg-great">12.2%</td>
+          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
+        </tr>
+
+        <tr>
+          <td>Integrity Response Drones</td>
+          <td><span class="cat-tag">PI Mat.</span></td>
+          <td class="num">50.00</td>
+          <td class="num">2,192,000</td>
+          <td class="num">28,170</td>
+          <td class="num">2,220,170</td>
+          <td class="num">2,520,800</td>
+          <td class="num">300,630</td>
+          <td class="margin-cell mg-great">11.9%</td>
+          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
+        </tr>
+
+        <tr>
+          <td>Camera Drones</td>
+          <td><span class="cat-tag">PI Mat.</span></td>
+          <td class="num">3.00</td>
+          <td class="num">89,890</td>
+          <td class="num">1,274</td>
+          <td class="num">91,164</td>
+          <td class="num">103,374</td>
+          <td class="num">12,210</td>
+          <td class="margin-cell mg-great">11.8%</td>
+          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
+        </tr>
+
+        <tr>
+          <td>Biotech Research Reports</td>
+          <td><span class="cat-tag">PI Mat.</span></td>
+          <td class="num">3.00</td>
+          <td class="num">102,600</td>
+          <td class="num">1,401</td>
+          <td class="num">104,001</td>
+          <td class="num">117,990</td>
+          <td class="num">13,989</td>
+          <td class="margin-cell mg-great">11.9%</td>
+          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
+        </tr>
+
+        <tr>
+          <td>Tritanium</td>
+          <td><span class="cat-tag">Minerals</span></td>
+          <td class="num">0.01</td>
+          <td class="num">5.50</td>
+          <td class="num">1.31</td>
+          <td class="num">6.81</td>
+          <td class="num">6.33</td>
+          <td class="num">-0.48</td>
+          <td class="margin-cell mg-neg">-7.6%</td>
+          <td style="text-align:center;"><span class="verdict v-no">&#10007; Avoid</span></td>
+        </tr>
+
+        <tr>
+          <td>Pyerite</td>
+          <td><span class="cat-tag">Minerals</span></td>
+          <td class="num">0.01</td>
+          <td class="num">5.32</td>
+          <td class="num">1.31</td>
+          <td class="num">6.63</td>
+          <td class="num">6.12</td>
+          <td class="num">-0.51</td>
+          <td class="margin-cell mg-neg">-8.3%</td>
+          <td style="text-align:center;"><span class="verdict v-no">&#10007; Avoid</span></td>
+        </tr>
+
+        <tr>
+          <td colspan="10" style="text-align:center;color:#3a6080;padding:6px;font-style:italic;font-size:11px;">
+            &hellip; 140 more rows &hellip;
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    Buy cost = Jita market price &times; buy %. &nbsp;|&nbsp;
+    Broker fee only if placing buy orders. &nbsp;|&nbsp;
+    Sales tax paid by seller &mdash; no buyer-side tax. &nbsp;|&nbsp;
+    Contract price = Jita reference &times; markup %. &nbsp;|&nbsp;
+    No tax or broker fee on contract sales. &nbsp;|&nbsp;
+    Margin = (Contract Price &minus; Total Cost) &divide; Contract Price.
+  </div>
+
+</div>
+</body>
+</html>

@@ -10,7 +10,6 @@ SCRIPTS = [
     'update_wallet_transactions.py',
     'update_character_orders_history.py',
     'update_corporation_killmails.py',
-    'update_purchase_lots.py',   # must run after update_wallet_transactions
 ]
 
 def main():
