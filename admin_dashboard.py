@@ -746,6 +746,8 @@ class AdminDashboard:
              self.action_update_inventory),
             ("Generate Stock Image", "Create a Discord-ready PNG of current stock (stock_image.png)",
              self.action_generate_stock_image),
+            ("Generate Fuel Image", "Create a Discord-ready PNG of fuel/ice products (fuel_image.png)",
+             self.action_generate_fuel_image),
             ("Update Blueprints", "Refresh blueprint data, BPC pricing, and research jobs",
              self.action_update_blueprints),
             ("Deploy to Live", "Push current changes to GitHub (makes them live)",
@@ -1765,6 +1767,39 @@ class AdminDashboard:
                 self.update_status('Stock image saved to stock_image.png')
                 messagebox.showinfo("Done", "stock_image.png has been saved.\n"
                                             "Ready to drag into Discord.")
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def action_generate_fuel_image(self):
+        """Generate Discord fuel image in a background thread."""
+        import threading, sys as _sys
+        script_path = os.path.join(PROJECT_DIR, 'generate_fuel_image.py')
+        if not os.path.exists(script_path):
+            messagebox.showerror("Not Found", f"Script not found:\n{script_path}")
+            return
+        self.update_status('Generating fuel image...')
+        error_holder = [None]
+
+        def _worker():
+            try:
+                result = subprocess.run(
+                    [_sys.executable, script_path],
+                    cwd=PROJECT_DIR,
+                    capture_output=True, text=True, timeout=30
+                )
+                if result.returncode != 0:
+                    error_holder[0] = (result.stderr or result.stdout or 'Unknown error').strip()[-300:]
+            except Exception as e:
+                error_holder[0] = str(e)
+            self.root.after(0, _done)
+
+        def _done():
+            if error_holder[0]:
+                self.update_status('Fuel image generation failed')
+                messagebox.showerror("Failed", f"Image generation failed:\n\n{error_holder[0]}")
+            else:
+                self.update_status('Fuel image saved to fuel_image.png')
+                messagebox.showinfo("Done", "fuel_image.png has been saved.\nReady to drag into Discord.")
 
         threading.Thread(target=_worker, daemon=True).start()
 
