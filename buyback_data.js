@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-03 03:33 UTC
+// Generated: 2026-03-03 05:17 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -9,9 +9,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 315337.016
+      "avgJitaBuy": 315030.6775
     },
     {
       "typeId": 16263,
@@ -20,9 +22,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 203112.2434
+      "avgJitaBuy": 203177.361
     },
     {
       "typeId": 16264,
@@ -31,9 +35,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 292205.4305
+      "avgJitaBuy": 291827.8025
     },
     {
       "typeId": 16265,
@@ -42,9 +48,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 269756.7239
+      "avgJitaBuy": 269806.8332
     },
     {
       "typeId": 16266,
@@ -53,9 +61,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 291861.0002
+      "avgJitaBuy": 292189.1443
     },
     {
       "typeId": 16267,
@@ -64,9 +74,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 386121.8012
+      "avgJitaBuy": 386547.7712
     },
     {
       "typeId": 16268,
@@ -75,9 +87,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 403617.9045
+      "avgJitaBuy": 404184.197
     },
     {
       "typeId": 16269,
@@ -86,9 +100,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 596513.7452
+      "avgJitaBuy": 597412.1514
     },
     {
       "typeId": 17975,
@@ -97,9 +113,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 343759.0734
+      "avgJitaBuy": 343320.2158
     },
     {
       "typeId": 17976,
@@ -108,9 +126,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 317568.9157
+      "avgJitaBuy": 317629.085
     },
     {
       "typeId": 17977,
@@ -119,9 +139,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 239817.0218
+      "avgJitaBuy": 239894.7008
     },
     {
       "typeId": 17978,
@@ -130,9 +152,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 370745.9232
+      "avgJitaBuy": 370390.2367
     },
     {
       "typeId": 28433,
@@ -141,9 +165,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 292205.4305
+      "avgJitaBuy": 291827.8025
     },
     {
       "typeId": 28443,
@@ -152,9 +178,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 343759.0734
+      "avgJitaBuy": 343320.2158
     },
     {
       "typeId": 28434,
@@ -163,9 +191,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 315337.016
+      "avgJitaBuy": 315030.6775
     },
     {
       "typeId": 28436,
@@ -174,9 +204,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 370745.9232
+      "avgJitaBuy": 370390.2367
     },
     {
       "typeId": 28435,
@@ -185,9 +217,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 386121.8012
+      "avgJitaBuy": 386547.7712
     },
     {
       "typeId": 28437,
@@ -196,9 +230,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 403617.9045
+      "avgJitaBuy": 404184.197
     },
     {
       "typeId": 28438,
@@ -207,9 +243,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 203112.2434
+      "avgJitaBuy": 203177.361
     },
     {
       "typeId": 28442,
@@ -218,9 +256,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 239817.0218
+      "avgJitaBuy": 239894.7008
     },
     {
       "typeId": 28439,
@@ -229,9 +269,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 291861.0002
+      "avgJitaBuy": 292189.1443
     },
     {
       "typeId": 28440,
@@ -240,9 +282,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 596513.7452
+      "avgJitaBuy": 597412.1514
     },
     {
       "typeId": 28444,
@@ -251,9 +295,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 269756.7239
+      "avgJitaBuy": 269806.8332
     },
     {
       "typeId": 28441,
@@ -262,9 +308,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 317568.9157
+      "avgJitaBuy": 317629.085
     },
     {
       "typeId": 16272,
@@ -273,9 +321,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Products",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 94,
+      "allianceDiscount": 4,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 103.62
+      "avgJitaBuy": 103.74
     },
     {
       "typeId": 16273,
@@ -284,6 +334,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Products",
       "rate": 90,
       "sellRate": 98,
+      "corpRate": 94,
+      "allianceDiscount": 4,
       "accepted": false,
       "quota": 1000000,
       "avgJitaBuy": 89.63
@@ -295,9 +347,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Products",
       "rate": 90,
       "sellRate": 98,
+      "corpRate": 94,
+      "allianceDiscount": 4,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3342.92
+      "avgJitaBuy": 3348.53
     },
     {
       "typeId": 17887,
@@ -306,9 +360,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Products",
       "rate": 95,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 745.86
+      "avgJitaBuy": 744.82
     },
     {
       "typeId": 17889,
@@ -317,9 +373,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Products",
       "rate": 95,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 508.41
+      "avgJitaBuy": 508.55
     },
     {
       "typeId": 16274,
@@ -328,9 +386,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Products",
       "rate": 95,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 807.51
+      "avgJitaBuy": 806.66
     },
     {
       "typeId": 17888,
@@ -339,9 +399,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Ice Products",
       "rate": 90,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 686.03
+      "avgJitaBuy": 686.13
     },
     {
       "typeId": 34,
@@ -350,6 +412,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 95,
       "sellRate": 97,
+      "corpRate": 94,
+      "allianceDiscount": 3,
       "accepted": false,
       "quota": 100000000,
       "avgJitaBuy": 3.91
@@ -361,9 +425,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 95,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 100000000,
-      "avgJitaBuy": 17.62
+      "avgJitaBuy": 17.59
     },
     {
       "typeId": 37,
@@ -372,9 +438,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 1000000,
-      "avgJitaBuy": 179.14
+      "avgJitaBuy": 179.25
     },
     {
       "typeId": 36,
@@ -383,6 +451,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 1000000,
       "avgJitaBuy": 68.93
@@ -394,9 +464,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 95,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 1000000,
-      "avgJitaBuy": 675.09
+      "avgJitaBuy": 676.21
     },
     {
       "typeId": 39,
@@ -405,9 +477,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 50000,
-      "avgJitaBuy": 892.95
+      "avgJitaBuy": 895.35
     },
     {
       "typeId": 40,
@@ -416,9 +490,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 50000,
-      "avgJitaBuy": 2485.59
+      "avgJitaBuy": 2480.11
     },
     {
       "typeId": 11399,
@@ -427,9 +503,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Minerals",
       "rate": 95,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 5000,
-      "avgJitaBuy": 18917.14
+      "avgJitaBuy": 18923.64
     },
     {
       "typeId": 16634,
@@ -438,9 +516,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 98,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 237.6
+      "avgJitaBuy": 237.71
     },
     {
       "typeId": 16635,
@@ -449,9 +529,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 98,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 288.94
+      "avgJitaBuy": 289.32
     },
     {
       "typeId": 16633,
@@ -460,9 +542,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": true,
       "quota": 100000,
-      "avgJitaBuy": 571.39
+      "avgJitaBuy": 571.63
     },
     {
       "typeId": 16636,
@@ -471,9 +555,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 98,
       "sellRate": 97,
+      "corpRate": 92,
+      "allianceDiscount": 5,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 378.87
+      "avgJitaBuy": 379.07
     },
     {
       "typeId": 16640,
@@ -482,9 +568,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 98,
+      "corpRate": 94,
+      "allianceDiscount": 4,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 564.4
+      "avgJitaBuy": 566.27
     },
     {
       "typeId": 16639,
@@ -493,9 +581,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 98,
+      "corpRate": 94,
+      "allianceDiscount": 4,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 452.43
+      "avgJitaBuy": 452.69
     },
     {
       "typeId": 16637,
@@ -504,9 +594,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 98,
+      "corpRate": 94,
+      "allianceDiscount": 4,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 1419.25
+      "avgJitaBuy": 1420.34
     },
     {
       "typeId": 16638,
@@ -515,9 +607,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 98,
+      "corpRate": 94,
+      "allianceDiscount": 4,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 762.65
+      "avgJitaBuy": 762.56
     },
     {
       "typeId": 16641,
@@ -526,9 +620,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 99,
+      "corpRate": 96,
+      "allianceDiscount": 3,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 5236.34
+      "avgJitaBuy": 5242.57
     },
     {
       "typeId": 16643,
@@ -537,9 +633,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 99,
+      "corpRate": 96,
+      "allianceDiscount": 3,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 4186.96
+      "avgJitaBuy": 4187.83
     },
     {
       "typeId": 16644,
@@ -548,9 +646,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 99,
+      "corpRate": 96,
+      "allianceDiscount": 3,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 7098.86
+      "avgJitaBuy": 7102.83
     },
     {
       "typeId": 16642,
@@ -559,9 +659,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 99,
+      "corpRate": 96,
+      "allianceDiscount": 3,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 2010.5
+      "avgJitaBuy": 2011.52
     },
     {
       "typeId": 16649,
@@ -570,9 +672,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 100,
-      "accepted": false,
+      "corpRate": 98,
+      "allianceDiscount": 2,
+      "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 18554.82
+      "avgJitaBuy": 18531.38
     },
     {
       "typeId": 16646,
@@ -581,9 +685,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 100,
+      "corpRate": 98,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 3411.3
+      "avgJitaBuy": 3420.05
     },
     {
       "typeId": 16647,
@@ -592,9 +698,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 100,
+      "corpRate": 98,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 5113.59
+      "avgJitaBuy": 5108.88
     },
     {
       "typeId": 16648,
@@ -603,9 +711,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 100,
+      "corpRate": 98,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 9012.32
+      "avgJitaBuy": 9011.02
     },
     {
       "typeId": 16652,
@@ -614,9 +724,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 63810.89
+      "avgJitaBuy": 63854.31
     },
     {
       "typeId": 16651,
@@ -625,9 +737,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 63299.64
+      "avgJitaBuy": 63053.1
     },
     {
       "typeId": 16650,
@@ -636,9 +750,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 57310.18
+      "avgJitaBuy": 57260.69
     },
     {
       "typeId": 16653,
@@ -647,9 +763,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Reaction Materials",
       "rate": 96,
       "sellRate": 101,
-      "accepted": true,
+      "corpRate": 100,
+      "allianceDiscount": 1,
+      "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 33920.71
+      "avgJitaBuy": 33894.14
     },
     {
       "typeId": 45490,
@@ -658,9 +776,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1667.3745
+      "avgJitaBuy": 1665.2642
     },
     {
       "typeId": 45491,
@@ -669,9 +789,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1058.8584
+      "avgJitaBuy": 1057.9947
     },
     {
       "typeId": 45492,
@@ -680,9 +802,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1544.6284
+      "avgJitaBuy": 1543.1384
     },
     {
       "typeId": 45493,
@@ -691,9 +815,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 792.4556
+      "avgJitaBuy": 792.0296
     },
     {
       "typeId": 46280,
@@ -702,9 +828,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1918.019
+      "avgJitaBuy": 1915.5924
     },
     {
       "typeId": 46282,
@@ -713,9 +841,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1218.3418
+      "avgJitaBuy": 1217.3494
     },
     {
       "typeId": 46284,
@@ -724,9 +854,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1777.6173
+      "avgJitaBuy": 1775.9044
     },
     {
       "typeId": 46286,
@@ -735,9 +867,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 912.1823
+      "avgJitaBuy": 911.6929
     },
     {
       "typeId": 46281,
@@ -746,9 +880,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3334.749
+      "avgJitaBuy": 3330.5283
     },
     {
       "typeId": 46283,
@@ -757,9 +893,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2117.7168
+      "avgJitaBuy": 2115.9894
     },
     {
       "typeId": 46285,
@@ -768,9 +906,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3089.2568
+      "avgJitaBuy": 3086.2769
     },
     {
       "typeId": 46287,
@@ -779,9 +919,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1584.9112
+      "avgJitaBuy": 1584.0592
     },
     {
       "typeId": 45494,
@@ -790,9 +932,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 204.6063
+      "avgJitaBuy": 205.2842
     },
     {
       "typeId": 45495,
@@ -801,9 +945,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 164.0149
+      "avgJitaBuy": 164.1092
     },
     {
       "typeId": 45496,
@@ -812,9 +958,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 276.4759
+      "avgJitaBuy": 276.4433
     },
     {
       "typeId": 45497,
@@ -823,9 +971,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 514.5065
+      "avgJitaBuy": 514.9017
     },
     {
       "typeId": 46288,
@@ -834,9 +984,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 235.2972
+      "avgJitaBuy": 236.0768
     },
     {
       "typeId": 46290,
@@ -845,9 +997,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 188.6172
+      "avgJitaBuy": 188.7256
     },
     {
       "typeId": 46292,
@@ -856,9 +1010,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 317.9473
+      "avgJitaBuy": 317.9097
     },
     {
       "typeId": 46294,
@@ -867,9 +1023,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 591.6825
+      "avgJitaBuy": 592.1369
     },
     {
       "typeId": 46289,
@@ -878,9 +1036,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 409.2126
+      "avgJitaBuy": 410.5684
     },
     {
       "typeId": 46291,
@@ -889,9 +1049,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 328.0298
+      "avgJitaBuy": 328.2184
     },
     {
       "typeId": 46293,
@@ -900,9 +1062,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 552.9518
+      "avgJitaBuy": 552.8865
     },
     {
       "typeId": 46295,
@@ -911,9 +1075,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1029.013
+      "avgJitaBuy": 1029.8033
     },
     {
       "typeId": 45498,
@@ -922,9 +1088,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1539.3904
+      "avgJitaBuy": 1539.7158
     },
     {
       "typeId": 45499,
@@ -933,9 +1101,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2599.6654
+      "avgJitaBuy": 2601.139
     },
     {
       "typeId": 45500,
@@ -944,9 +1114,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 763.1834
+      "avgJitaBuy": 763.5713
     },
     {
       "typeId": 45501,
@@ -955,9 +1127,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1950.0631
+      "avgJitaBuy": 1952.3433
     },
     {
       "typeId": 46296,
@@ -966,9 +1140,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1771.3757
+      "avgJitaBuy": 1771.7503
     },
     {
       "typeId": 46298,
@@ -977,9 +1153,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2990.9245
+      "avgJitaBuy": 2992.6209
     },
     {
       "typeId": 46300,
@@ -988,9 +1166,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 879.3778
+      "avgJitaBuy": 879.8248
     },
     {
       "typeId": 46302,
@@ -999,9 +1179,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2245.1618
+      "avgJitaBuy": 2247.7851
     },
     {
       "typeId": 46297,
@@ -1010,9 +1192,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3078.7809
+      "avgJitaBuy": 3079.4316
     },
     {
       "typeId": 46299,
@@ -1021,9 +1205,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5199.3307
+      "avgJitaBuy": 5202.278
     },
     {
       "typeId": 46301,
@@ -1032,9 +1218,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1526.3669
+      "avgJitaBuy": 1527.1427
     },
     {
       "typeId": 46303,
@@ -1043,9 +1231,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3900.1261
+      "avgJitaBuy": 3904.6866
     },
     {
       "typeId": 45502,
@@ -1054,9 +1244,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8491.5688
+      "avgJitaBuy": 8481.1314
     },
     {
       "typeId": 45503,
@@ -1065,9 +1257,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4204.5573
+      "avgJitaBuy": 4203.9872
     },
     {
       "typeId": 45504,
@@ -1076,9 +1270,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2435.9047
+      "avgJitaBuy": 2433.8265
     },
     {
       "typeId": 45506,
@@ -1087,9 +1283,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1713.7372
+      "avgJitaBuy": 1717.8527
     },
     {
       "typeId": 46304,
@@ -1098,9 +1296,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 9851.4045
+      "avgJitaBuy": 9839.3035
     },
     {
       "typeId": 46306,
@@ -1109,9 +1309,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4878.6777
+      "avgJitaBuy": 4878.0154
     },
     {
       "typeId": 46308,
@@ -1120,9 +1322,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2825.2181
+      "avgJitaBuy": 2822.8076
     },
     {
       "typeId": 46310,
@@ -1131,9 +1335,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1992.0327
+      "avgJitaBuy": 1996.8093
     },
     {
       "typeId": 46305,
@@ -1142,9 +1348,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 16983.1376
+      "avgJitaBuy": 16962.2628
     },
     {
       "typeId": 46307,
@@ -1153,9 +1361,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8409.1145
+      "avgJitaBuy": 8407.9744
     },
     {
       "typeId": 46309,
@@ -1164,9 +1374,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4871.8093
+      "avgJitaBuy": 4867.653
     },
     {
       "typeId": 46311,
@@ -1175,9 +1387,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3427.4743
+      "avgJitaBuy": 3435.7054
     },
     {
       "typeId": 45510,
@@ -1186,9 +1400,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 11754.4297
+      "avgJitaBuy": 11745.0134
     },
     {
       "typeId": 45511,
@@ -1197,9 +1413,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13405.258
+      "avgJitaBuy": 13356.9325
     },
     {
       "typeId": 45512,
@@ -1208,9 +1426,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13551.9454
+      "avgJitaBuy": 13561.0532
     },
     {
       "typeId": 45513,
@@ -1219,9 +1439,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 7349.6908
+      "avgJitaBuy": 7344.4919
     },
     {
       "typeId": 46312,
@@ -1230,9 +1452,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13370.8841
+      "avgJitaBuy": 13360.1945
     },
     {
       "typeId": 46314,
@@ -1241,9 +1465,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15267.6698
+      "avgJitaBuy": 15212.794
     },
     {
       "typeId": 46316,
@@ -1252,9 +1478,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15443.4103
+      "avgJitaBuy": 15453.7841
     },
     {
       "typeId": 46318,
@@ -1263,9 +1491,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8378.8906
+      "avgJitaBuy": 8372.988
     },
     {
       "typeId": 46313,
@@ -1274,9 +1504,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 23508.8594
+      "avgJitaBuy": 23490.0268
     },
     {
       "typeId": 46315,
@@ -1285,9 +1517,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 26810.5161
+      "avgJitaBuy": 26713.865
     },
     {
       "typeId": 46317,
@@ -1296,9 +1530,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 27103.8908
+      "avgJitaBuy": 27122.1064
     },
     {
       "typeId": 46319,
@@ -1307,9 +1543,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 14699.3816
+      "avgJitaBuy": 14688.9838
     },
     {
       "typeId": 62454,
@@ -1318,9 +1556,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1544.6284
+      "avgJitaBuy": 1543.1384
     },
     {
       "typeId": 62457,
@@ -1329,9 +1569,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 792.4556
+      "avgJitaBuy": 792.0296
     },
     {
       "typeId": 62455,
@@ -1340,9 +1582,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1777.6173
+      "avgJitaBuy": 1775.9044
     },
     {
       "typeId": 62458,
@@ -1351,9 +1595,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 912.1823
+      "avgJitaBuy": 911.6929
     },
     {
       "typeId": 62461,
@@ -1362,9 +1608,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1218.3418
+      "avgJitaBuy": 1217.3494
     },
     {
       "typeId": 62464,
@@ -1373,9 +1621,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1918.019
+      "avgJitaBuy": 1915.5924
     },
     {
       "typeId": 62456,
@@ -1384,9 +1634,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3089.2568
+      "avgJitaBuy": 3086.2769
     },
     {
       "typeId": 62459,
@@ -1395,9 +1647,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1584.9112
+      "avgJitaBuy": 1584.0592
     },
     {
       "typeId": 62466,
@@ -1406,9 +1660,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2117.7168
+      "avgJitaBuy": 2115.9894
     },
     {
       "typeId": 62467,
@@ -1417,9 +1673,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3334.749
+      "avgJitaBuy": 3330.5283
     },
     {
       "typeId": 62460,
@@ -1428,9 +1686,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1058.8584
+      "avgJitaBuy": 1057.9947
     },
     {
       "typeId": 62463,
@@ -1439,9 +1699,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1667.3745
+      "avgJitaBuy": 1665.2642
     },
     {
       "typeId": 62474,
@@ -1450,9 +1712,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 204.6063
+      "avgJitaBuy": 205.2842
     },
     {
       "typeId": 62471,
@@ -1461,9 +1725,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 164.0149
+      "avgJitaBuy": 164.1092
     },
     {
       "typeId": 62468,
@@ -1472,9 +1738,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 514.5065
+      "avgJitaBuy": 514.9017
     },
     {
       "typeId": 62477,
@@ -1483,9 +1751,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 276.4759
+      "avgJitaBuy": 276.4433
     },
     {
       "typeId": 62475,
@@ -1494,9 +1764,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 235.2972
+      "avgJitaBuy": 236.0768
     },
     {
       "typeId": 62472,
@@ -1505,9 +1777,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 188.6172
+      "avgJitaBuy": 188.7256
     },
     {
       "typeId": 62469,
@@ -1516,9 +1790,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 591.6825
+      "avgJitaBuy": 592.1369
     },
     {
       "typeId": 62478,
@@ -1527,9 +1803,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 317.9473
+      "avgJitaBuy": 317.9097
     },
     {
       "typeId": 62476,
@@ -1538,9 +1816,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 409.2126
+      "avgJitaBuy": 410.5684
     },
     {
       "typeId": 62473,
@@ -1549,9 +1829,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 328.0298
+      "avgJitaBuy": 328.2184
     },
     {
       "typeId": 62470,
@@ -1560,9 +1842,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1029.013
+      "avgJitaBuy": 1029.8033
     },
     {
       "typeId": 62479,
@@ -1571,9 +1855,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 552.9518
+      "avgJitaBuy": 552.8865
     },
     {
       "typeId": 62480,
@@ -1582,9 +1868,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1950.0631
+      "avgJitaBuy": 1952.3433
     },
     {
       "typeId": 62483,
@@ -1593,9 +1881,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1539.3904
+      "avgJitaBuy": 1539.7158
     },
     {
       "typeId": 62486,
@@ -1604,9 +1894,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2599.6654
+      "avgJitaBuy": 2601.139
     },
     {
       "typeId": 62489,
@@ -1615,9 +1907,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 763.1834
+      "avgJitaBuy": 763.5713
     },
     {
       "typeId": 62481,
@@ -1626,9 +1920,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2245.1618
+      "avgJitaBuy": 2247.7851
     },
     {
       "typeId": 62484,
@@ -1637,9 +1933,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1771.3757
+      "avgJitaBuy": 1771.7503
     },
     {
       "typeId": 62487,
@@ -1648,9 +1946,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2990.9245
+      "avgJitaBuy": 2992.6209
     },
     {
       "typeId": 62490,
@@ -1659,9 +1959,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 879.3778
+      "avgJitaBuy": 879.8248
     },
     {
       "typeId": 62482,
@@ -1670,9 +1972,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3900.1261
+      "avgJitaBuy": 3904.6866
     },
     {
       "typeId": 62485,
@@ -1681,9 +1985,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3078.7809
+      "avgJitaBuy": 3079.4316
     },
     {
       "typeId": 62488,
@@ -1692,9 +1998,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5199.3307
+      "avgJitaBuy": 5202.278
     },
     {
       "typeId": 62491,
@@ -1703,9 +2011,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1526.3669
+      "avgJitaBuy": 1527.1427
     },
     {
       "typeId": 62492,
@@ -1714,9 +2024,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 8491.5688
+      "avgJitaBuy": 8481.1314
     },
     {
       "typeId": 62501,
@@ -1725,9 +2037,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4204.5573
+      "avgJitaBuy": 4203.9872
     },
     {
       "typeId": 62498,
@@ -1736,9 +2050,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2435.9047
+      "avgJitaBuy": 2433.8265
     },
     {
       "typeId": 62495,
@@ -1747,9 +2063,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1713.7372
+      "avgJitaBuy": 1717.8527
     },
     {
       "typeId": 62493,
@@ -1758,9 +2076,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 9851.4045
+      "avgJitaBuy": 9839.3035
     },
     {
       "typeId": 62502,
@@ -1769,9 +2089,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4878.6777
+      "avgJitaBuy": 4878.0154
     },
     {
       "typeId": 62499,
@@ -1780,9 +2102,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2825.2181
+      "avgJitaBuy": 2822.8076
     },
     {
       "typeId": 62496,
@@ -1791,9 +2115,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1992.0327
+      "avgJitaBuy": 1996.8093
     },
     {
       "typeId": 62494,
@@ -1802,9 +2128,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 16983.1376
+      "avgJitaBuy": 16962.2628
     },
     {
       "typeId": 62503,
@@ -1813,9 +2141,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 8409.1145
+      "avgJitaBuy": 8407.9744
     },
     {
       "typeId": 62500,
@@ -1824,9 +2154,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4871.8093
+      "avgJitaBuy": 4867.653
     },
     {
       "typeId": 62497,
@@ -1835,9 +2167,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3427.4743
+      "avgJitaBuy": 3435.7054
     },
     {
       "typeId": 62504,
@@ -1846,9 +2180,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 13551.9454
+      "avgJitaBuy": 13561.0532
     },
     {
       "typeId": 62510,
@@ -1857,9 +2193,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 11754.4297
+      "avgJitaBuy": 11745.0134
     },
     {
       "typeId": 62507,
@@ -1868,9 +2206,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 13405.258
+      "avgJitaBuy": 13356.9325
     },
     {
       "typeId": 62513,
@@ -1879,9 +2219,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 7349.6908
+      "avgJitaBuy": 7344.4919
     },
     {
       "typeId": 62505,
@@ -1890,9 +2232,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 15443.4103
+      "avgJitaBuy": 15453.7841
     },
     {
       "typeId": 62511,
@@ -1901,9 +2245,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 13370.8841
+      "avgJitaBuy": 13360.1945
     },
     {
       "typeId": 62508,
@@ -1912,9 +2258,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 15267.6698
+      "avgJitaBuy": 15212.794
     },
     {
       "typeId": 62514,
@@ -1923,9 +2271,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 8378.8906
+      "avgJitaBuy": 8372.988
     },
     {
       "typeId": 62506,
@@ -1934,9 +2284,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 27103.8908
+      "avgJitaBuy": 27122.1064
     },
     {
       "typeId": 62512,
@@ -1945,9 +2297,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 23508.8594
+      "avgJitaBuy": 23490.0268
     },
     {
       "typeId": 62509,
@@ -1956,9 +2310,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 26810.5161
+      "avgJitaBuy": 26713.865
     },
     {
       "typeId": 62515,
@@ -1967,9 +2323,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Moon Ore",
       "rate": 96,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 14699.3816
+      "avgJitaBuy": 14688.9838
     },
     {
       "typeId": 2329,
@@ -1978,6 +2336,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 8669.83
@@ -1989,6 +2349,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 92658.0
@@ -2000,6 +2362,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 113882.64
@@ -2011,6 +2375,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 95288.67
@@ -2022,6 +2388,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 70458.46
@@ -2033,6 +2401,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 90083.85
@@ -2044,6 +2414,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 86072.62
@@ -2055,6 +2427,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 60395.02
@@ -2066,6 +2440,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 96554.44
@@ -2077,6 +2453,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 117945.09
@@ -2088,6 +2466,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 688.65
@@ -2099,6 +2479,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 8337.97
@@ -2110,6 +2492,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1884920.32
@@ -2121,6 +2505,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 2161581.3
@@ -2132,6 +2518,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 976425.14
@@ -2143,6 +2531,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 918998.58
@@ -2154,6 +2544,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1251139.23
@@ -2165,6 +2557,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1962305.56
@@ -2176,6 +2570,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1062307.59
@@ -2187,6 +2583,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 1962823.61
@@ -2198,6 +2596,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 442.58
@@ -2209,6 +2609,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 11540.46
@@ -2220,6 +2622,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 861.54
@@ -2231,6 +2635,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 8824.65
@@ -2242,6 +2648,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 10121.47
@@ -2253,6 +2661,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 12246.41
@@ -2264,6 +2674,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 119566.43
@@ -2275,6 +2687,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 99713.61
@@ -2286,6 +2700,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 50232.28
@@ -2297,6 +2713,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 93378.49
@@ -2308,6 +2726,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 110130.97
@@ -2319,6 +2739,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 93958.56
@@ -2330,6 +2752,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 83608.07
@@ -2341,6 +2765,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 71174.94
@@ -2352,6 +2778,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 77155.23
@@ -2363,6 +2791,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 76560.0
@@ -2374,6 +2804,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 12063.03
@@ -2385,6 +2817,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 15493.58
@@ -2396,6 +2830,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 16796.62
@@ -2407,6 +2843,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 5237.56
@@ -2418,6 +2856,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 14672.61
@@ -2429,6 +2869,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 9824.68
@@ -2440,6 +2882,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 9487.07
@@ -2451,6 +2895,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 424.7
@@ -2462,6 +2908,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 232.6
@@ -2473,6 +2921,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 596.06
@@ -2484,6 +2934,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 811.35
@@ -2495,6 +2947,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 709.57
@@ -2506,6 +2960,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 514.4
@@ -2517,6 +2973,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 621.33
@@ -2528,6 +2986,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 824.97
@@ -2539,6 +2999,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 414.37
@@ -2550,6 +3012,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 814.18
@@ -2561,6 +3025,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 324.65
@@ -2572,6 +3038,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 11285.39
@@ -2583,6 +3051,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 407.49
@@ -2594,6 +3064,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 9974.5
@@ -2605,6 +3077,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 9906.09
@@ -2616,6 +3090,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 78066.17
@@ -2627,6 +3103,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 11326.01
@@ -2638,6 +3116,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 78203.26
@@ -2649,6 +3129,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 8918.75
@@ -2660,6 +3142,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 10728.83
@@ -2671,6 +3155,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 13854.54
@@ -2682,6 +3168,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 8844.89
@@ -2693,6 +3181,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Planetary Materials",
       "rate": 98,
       "sellRate": 98,
+      "corpRate": 96,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 236.77
@@ -2704,6 +3194,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 1990.44,
@@ -2716,6 +3208,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 351.41,
@@ -2728,6 +3222,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 8061.31,
@@ -2740,6 +3236,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 2089.56,
@@ -2752,6 +3250,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 3692.22,
@@ -2764,6 +3264,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 231.64,
@@ -2776,6 +3278,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 2663.92,
@@ -2788,6 +3292,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
       "avgJitaBuy": 226.21,
@@ -2800,6 +3306,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 76756.94,
@@ -2812,6 +3320,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 85355.28,
@@ -2824,6 +3334,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 12449.44,
@@ -2836,6 +3348,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 100275.0,
@@ -2848,6 +3362,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 25365.56,
@@ -2860,6 +3376,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 2739.97,
@@ -2872,6 +3390,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 11248.06,
@@ -2884,6 +3404,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 4911.61,
@@ -2896,6 +3418,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 19250.28,
@@ -2908,6 +3432,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 23869.44,
@@ -2920,6 +3446,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
       "avgJitaBuy": 13566.11,
@@ -2932,6 +3460,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 64065.56,
@@ -2944,6 +3474,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 54784.72,
@@ -2956,6 +3488,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 458603.33,
@@ -2968,6 +3502,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 114261.11,
@@ -2980,6 +3516,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 59567.78,
@@ -2992,6 +3530,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 857.92,
@@ -3004,6 +3544,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 2761.53,
@@ -3016,6 +3558,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 7487.61,
@@ -3028,6 +3572,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 97551.39,
@@ -3040,6 +3586,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
       "avgJitaBuy": 21732.22,
@@ -3052,6 +3600,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 436655.56,
@@ -3064,6 +3614,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 1236222.22,
@@ -3076,6 +3628,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 846886.11,
@@ -3088,6 +3642,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 991177.78,
@@ -3100,6 +3656,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 230469.44,
@@ -3112,6 +3670,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 1829027.78,
@@ -3124,6 +3684,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 223952.78,
@@ -3136,6 +3698,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 1983666.67,
@@ -3148,6 +3712,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
       "avgJitaBuy": 1155972.22,
@@ -3160,6 +3726,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 835.59,
@@ -3172,6 +3740,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 3931.5,
@@ -3184,6 +3754,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 269925.0,
@@ -3196,6 +3768,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 4112.94,
@@ -3208,6 +3782,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 1075.78,
@@ -3220,6 +3796,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 12713.47,
@@ -3232,6 +3810,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 1852944.44,
@@ -3244,6 +3824,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Salvaged Materials",
       "rate": 97,
       "sellRate": 101,
+      "corpRate": 100,
+      "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
       "avgJitaBuy": 802311.11,
@@ -3256,6 +3838,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 14.1745
@@ -3267,6 +3851,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 14.8833
@@ -3278,6 +3864,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 15.592
@@ -3289,6 +3877,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 16.3007
@@ -3300,9 +3890,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 22.8814
+      "avgJitaBuy": 22.8514
     },
     {
       "typeId": 17463,
@@ -3311,9 +3903,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 23.8036
+      "avgJitaBuy": 23.7726
     },
     {
       "typeId": 17464,
@@ -3322,9 +3916,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 24.8501
+      "avgJitaBuy": 24.8178
     },
     {
       "typeId": 46687,
@@ -3333,9 +3929,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 26.0917
+      "avgJitaBuy": 26.0578
     },
     {
       "typeId": 1224,
@@ -3344,9 +3942,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 33.1135
+      "avgJitaBuy": 33.089
     },
     {
       "typeId": 17459,
@@ -3355,9 +3955,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 35.1614
+      "avgJitaBuy": 35.1355
     },
     {
       "typeId": 17460,
@@ -3366,9 +3968,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 36.4248
+      "avgJitaBuy": 36.3979
     },
     {
       "typeId": 46686,
@@ -3377,9 +3981,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 38.4727
+      "avgJitaBuy": 38.4444
     },
     {
       "typeId": 18,
@@ -3388,6 +3994,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 49.9312
@@ -3399,6 +4007,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 52.749
@@ -3410,6 +4020,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 54.9421
@@ -3421,6 +4033,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 57.7244
@@ -3432,9 +4046,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 136.138
+      "avgJitaBuy": 136.1883
     },
     {
       "typeId": 17867,
@@ -3443,9 +4059,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 143.4307
+      "avgJitaBuy": 143.4836
     },
     {
       "typeId": 17868,
@@ -3454,9 +4072,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 150.5636
+      "avgJitaBuy": 150.6194
     },
     {
       "typeId": 46684,
@@ -3465,9 +4085,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 156.2327
+      "avgJitaBuy": 156.2902
     },
     {
       "typeId": 20,
@@ -3476,9 +4098,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 232.3083
+      "avgJitaBuy": 232.4279
     },
     {
       "typeId": 17452,
@@ -3487,9 +4111,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 243.9237
+      "avgJitaBuy": 244.0493
     },
     {
       "typeId": 17453,
@@ -3498,9 +4124,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 255.5391
+      "avgJitaBuy": 255.6707
     },
     {
       "typeId": 46683,
@@ -3509,9 +4137,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 267.1545
+      "avgJitaBuy": 267.2921
     },
     {
       "typeId": 21,
@@ -3520,9 +4150,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 806.0614
+      "avgJitaBuy": 807.1571
     },
     {
       "typeId": 17440,
@@ -3531,9 +4163,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 846.4443
+      "avgJitaBuy": 847.5947
     },
     {
       "typeId": 17441,
@@ -3542,9 +4176,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 886.6675
+      "avgJitaBuy": 887.8728
     },
     {
       "typeId": 46680,
@@ -3553,9 +4189,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 927.0505
+      "avgJitaBuy": 928.3104
     },
     {
       "typeId": 1231,
@@ -3564,9 +4202,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 940.3017
+      "avgJitaBuy": 941.4545
     },
     {
       "typeId": 17444,
@@ -3575,9 +4215,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 990.3759
+      "avgJitaBuy": 991.5914
     },
     {
       "typeId": 17445,
@@ -3586,9 +4228,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1034.3318
+      "avgJitaBuy": 1035.5999
     },
     {
       "typeId": 46681,
@@ -3597,9 +4241,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1084.4061
+      "avgJitaBuy": 1085.7369
     },
     {
       "typeId": 1226,
@@ -3608,9 +4254,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 399.6239
+      "avgJitaBuy": 400.1315
     },
     {
       "typeId": 17448,
@@ -3619,9 +4267,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 422.9766
+      "avgJitaBuy": 423.5146
     },
     {
       "typeId": 17449,
@@ -3630,9 +4280,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 439.5863
+      "avgJitaBuy": 440.1446
     },
     {
       "typeId": 46682,
@@ -3641,9 +4293,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 462.939
+      "avgJitaBuy": 463.5278
     },
     {
       "typeId": 1229,
@@ -3652,9 +4306,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2555.2857
+      "avgJitaBuy": 2555.5394
     },
     {
       "typeId": 17865,
@@ -3663,9 +4319,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2683.0499
+      "avgJitaBuy": 2683.3164
     },
     {
       "typeId": 17866,
@@ -3674,9 +4332,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2810.8142
+      "avgJitaBuy": 2811.0934
     },
     {
       "typeId": 46679,
@@ -3685,9 +4345,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2938.5785
+      "avgJitaBuy": 2938.8703
     },
     {
       "typeId": 1232,
@@ -3696,9 +4358,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4755.7331
+      "avgJitaBuy": 4760.1776
     },
     {
       "typeId": 17436,
@@ -3707,9 +4371,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4993.5198
+      "avgJitaBuy": 4998.1865
     },
     {
       "typeId": 17437,
@@ -3718,9 +4384,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5231.3064
+      "avgJitaBuy": 5236.1954
     },
     {
       "typeId": 46675,
@@ -3729,9 +4397,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5469.0931
+      "avgJitaBuy": 5474.2043
     },
     {
       "typeId": 1225,
@@ -3740,9 +4410,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6271.8498
+      "avgJitaBuy": 6279.7527
     },
     {
       "typeId": 17432,
@@ -3751,9 +4423,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6585.4423
+      "avgJitaBuy": 6593.7403
     },
     {
       "typeId": 17433,
@@ -3762,9 +4436,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6899.0347
+      "avgJitaBuy": 6907.728
     },
     {
       "typeId": 46677,
@@ -3773,9 +4449,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 7212.6272
+      "avgJitaBuy": 7221.7156
     },
     {
       "typeId": 19,
@@ -3784,9 +4462,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5851.9247
+      "avgJitaBuy": 5854.2992
     },
     {
       "typeId": 17466,
@@ -3795,9 +4475,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6144.521
+      "avgJitaBuy": 6147.0142
     },
     {
       "typeId": 17467,
@@ -3806,9 +4488,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6437.1172
+      "avgJitaBuy": 6439.7292
     },
     {
       "typeId": 46688,
@@ -3817,9 +4501,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6729.7134
+      "avgJitaBuy": 6732.4441
     },
     {
       "typeId": 1223,
@@ -3828,9 +4514,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2555.5122
+      "avgJitaBuy": 2558.1224
     },
     {
       "typeId": 17428,
@@ -3839,9 +4527,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2683.2878
+      "avgJitaBuy": 2686.0285
     },
     {
       "typeId": 17429,
@@ -3850,9 +4540,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2811.0635
+      "avgJitaBuy": 2813.9346
     },
     {
       "typeId": 46676,
@@ -3861,9 +4553,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2938.8391
+      "avgJitaBuy": 2941.8407
     },
     {
       "typeId": 22,
@@ -3872,9 +4566,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3963.8916
+      "avgJitaBuy": 3957.0617
     },
     {
       "typeId": 17425,
@@ -3883,9 +4579,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4162.0861
+      "avgJitaBuy": 4154.9148
     },
     {
       "typeId": 17426,
@@ -3894,9 +4592,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4360.2807
+      "avgJitaBuy": 4352.7679
     },
     {
       "typeId": 46678,
@@ -3905,9 +4605,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4558.4753
+      "avgJitaBuy": 4550.6209
     },
     {
       "typeId": 11396,
@@ -3916,9 +4618,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 24002.4456
+      "avgJitaBuy": 24010.6929
     },
     {
       "typeId": 17869,
@@ -3927,9 +4631,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 25202.5679
+      "avgJitaBuy": 25211.2276
     },
     {
       "typeId": 17870,
@@ -3938,9 +4644,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 26402.6901
+      "avgJitaBuy": 26411.7622
     },
     {
       "typeId": 81900,
@@ -3949,9 +4657,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 386.1608
+      "avgJitaBuy": 386.1065
     },
     {
       "typeId": 81901,
@@ -3960,9 +4670,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 405.7812
+      "avgJitaBuy": 405.7241
     },
     {
       "typeId": 81902,
@@ -3971,9 +4683,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 424.7769
+      "avgJitaBuy": 424.7171
     },
     {
       "typeId": 81903,
@@ -3982,9 +4696,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 444.3973
+      "avgJitaBuy": 444.3348
     },
     {
       "typeId": 82016,
@@ -3993,9 +4709,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 698.272
+      "avgJitaBuy": 699.297
     },
     {
       "typeId": 82017,
@@ -4004,9 +4722,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 737.8542
+      "avgJitaBuy": 738.9379
     },
     {
       "typeId": 82018,
@@ -4015,9 +4735,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 771.1583
+      "avgJitaBuy": 772.2909
     },
     {
       "typeId": 82019,
@@ -4026,9 +4748,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 804.6222
+      "avgJitaBuy": 805.8034
     },
     {
       "typeId": 82205,
@@ -4037,9 +4761,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 929.4252
+      "avgJitaBuy": 927.4385
     },
     {
       "typeId": 82206,
@@ -4048,9 +4774,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 975.8964
+      "avgJitaBuy": 973.8105
     },
     {
       "typeId": 82207,
@@ -4059,9 +4787,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1022.3677
+      "avgJitaBuy": 1020.1824
     },
     {
       "typeId": 82208,
@@ -4070,9 +4800,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1068.8389
+      "avgJitaBuy": 1066.5543
     },
     {
       "typeId": 82163,
@@ -4081,9 +4813,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 751.2665
+      "avgJitaBuy": 752.6912
     },
     {
       "typeId": 82164,
@@ -4092,9 +4826,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 788.8298
+      "avgJitaBuy": 790.3258
     },
     {
       "typeId": 82165,
@@ -4103,9 +4839,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 826.3932
+      "avgJitaBuy": 827.9603
     },
     {
       "typeId": 82166,
@@ -4114,9 +4852,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 863.9565
+      "avgJitaBuy": 865.5949
     },
     {
       "typeId": 81975,
@@ -4125,9 +4865,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 138.7427
+      "avgJitaBuy": 138.8225
     },
     {
       "typeId": 81976,
@@ -4136,9 +4878,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 145.6976
+      "avgJitaBuy": 145.7813
     },
     {
       "typeId": 81977,
@@ -4147,9 +4891,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 152.617
+      "avgJitaBuy": 152.7048
     },
     {
       "typeId": 81978,
@@ -4158,9 +4904,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 159.5719
+      "avgJitaBuy": 159.6636
     },
     {
       "typeId": 74521,
@@ -4169,9 +4917,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15.4899
+      "avgJitaBuy": 15.4636
     },
     {
       "typeId": 74522,
@@ -4180,9 +4930,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 16.1287
+      "avgJitaBuy": 16.1012
     },
     {
       "typeId": 74523,
@@ -4191,9 +4943,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 17.0868
+      "avgJitaBuy": 17.0577
     },
     {
       "typeId": 74524,
@@ -4202,9 +4956,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 17.8853
+      "avgJitaBuy": 17.8548
     },
     {
       "typeId": 74525,
@@ -4213,9 +4969,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 389.651
+      "avgJitaBuy": 389.8903
     },
     {
       "typeId": 74526,
@@ -4224,9 +4982,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 409.1335
+      "avgJitaBuy": 409.3848
     },
     {
       "typeId": 74527,
@@ -4235,9 +4995,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 428.6161
+      "avgJitaBuy": 428.8793
     },
     {
       "typeId": 74528,
@@ -4246,9 +5008,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 448.0986
+      "avgJitaBuy": 448.3738
     },
     {
       "typeId": 74529,
@@ -4257,9 +5021,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2152.6864
+      "avgJitaBuy": 2158.4722
     },
     {
       "typeId": 74530,
@@ -4268,9 +5034,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2257.8928
+      "avgJitaBuy": 2263.9614
     },
     {
       "typeId": 74531,
@@ -4279,9 +5047,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2371.1921
+      "avgJitaBuy": 2377.5652
     },
     {
       "typeId": 74532,
@@ -4290,9 +5060,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2476.3986
+      "avgJitaBuy": 2483.0545
     },
     {
       "typeId": 74533,
@@ -4301,9 +5073,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3829.5734
+      "avgJitaBuy": 3821.1303
     },
     {
       "typeId": 74534,
@@ -4312,9 +5086,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4032.3155
+      "avgJitaBuy": 4023.4254
     },
     {
       "typeId": 74535,
@@ -4323,9 +5099,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4212.5307
+      "avgJitaBuy": 4203.2433
     },
     {
       "typeId": 74536,
@@ -4334,9 +5112,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4415.2728
+      "avgJitaBuy": 4405.5384
     },
     {
       "typeId": 62516,
@@ -4345,6 +5125,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 14.1745
@@ -4356,6 +5138,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 14.8833
@@ -4367,6 +5151,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 15.592
@@ -4378,6 +5164,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 16.3007
@@ -4389,9 +5177,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 22.8814
+      "avgJitaBuy": 22.8514
     },
     {
       "typeId": 62521,
@@ -4400,9 +5190,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 23.8036
+      "avgJitaBuy": 23.7726
     },
     {
       "typeId": 62522,
@@ -4411,9 +5203,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 24.8501
+      "avgJitaBuy": 24.8178
     },
     {
       "typeId": 62523,
@@ -4422,9 +5216,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 26.0917
+      "avgJitaBuy": 26.0578
     },
     {
       "typeId": 62524,
@@ -4433,9 +5229,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 33.1135
+      "avgJitaBuy": 33.089
     },
     {
       "typeId": 62525,
@@ -4444,9 +5242,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 35.1614
+      "avgJitaBuy": 35.1355
     },
     {
       "typeId": 62526,
@@ -4455,9 +5255,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 36.4248
+      "avgJitaBuy": 36.3979
     },
     {
       "typeId": 62527,
@@ -4466,9 +5268,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 38.4727
+      "avgJitaBuy": 38.4444
     },
     {
       "typeId": 62528,
@@ -4477,6 +5281,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 49.9312
@@ -4488,6 +5294,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 52.749
@@ -4499,6 +5307,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 54.9421
@@ -4510,6 +5320,8 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 57.7244
@@ -4521,9 +5333,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 136.138
+      "avgJitaBuy": 136.1883
     },
     {
       "typeId": 62533,
@@ -4532,9 +5346,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 143.4307
+      "avgJitaBuy": 143.4836
     },
     {
       "typeId": 62534,
@@ -4543,9 +5359,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 150.5636
+      "avgJitaBuy": 150.6194
     },
     {
       "typeId": 62535,
@@ -4554,9 +5372,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 156.2327
+      "avgJitaBuy": 156.2902
     },
     {
       "typeId": 62536,
@@ -4565,9 +5385,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 232.3083
+      "avgJitaBuy": 232.4279
     },
     {
       "typeId": 62537,
@@ -4576,9 +5398,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 243.9237
+      "avgJitaBuy": 244.0493
     },
     {
       "typeId": 62538,
@@ -4587,9 +5411,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 255.5391
+      "avgJitaBuy": 255.6707
     },
     {
       "typeId": 62539,
@@ -4598,9 +5424,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 267.1545
+      "avgJitaBuy": 267.2921
     },
     {
       "typeId": 62540,
@@ -4609,9 +5437,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 399.6239
+      "avgJitaBuy": 400.1315
     },
     {
       "typeId": 62541,
@@ -4620,9 +5450,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 422.9766
+      "avgJitaBuy": 423.5146
     },
     {
       "typeId": 62542,
@@ -4631,9 +5463,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 439.5863
+      "avgJitaBuy": 440.1446
     },
     {
       "typeId": 62543,
@@ -4642,9 +5476,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 462.939
+      "avgJitaBuy": 463.5278
     },
     {
       "typeId": 62544,
@@ -4653,9 +5489,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 940.3017
+      "avgJitaBuy": 941.4545
     },
     {
       "typeId": 62545,
@@ -4664,9 +5502,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 990.3759
+      "avgJitaBuy": 991.5914
     },
     {
       "typeId": 62546,
@@ -4675,9 +5515,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1034.3318
+      "avgJitaBuy": 1035.5999
     },
     {
       "typeId": 62547,
@@ -4686,9 +5528,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1084.4061
+      "avgJitaBuy": 1085.7369
     },
     {
       "typeId": 62548,
@@ -4697,9 +5541,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 806.0614
+      "avgJitaBuy": 807.1571
     },
     {
       "typeId": 62549,
@@ -4708,9 +5554,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 846.4443
+      "avgJitaBuy": 847.5947
     },
     {
       "typeId": 62550,
@@ -4719,9 +5567,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 886.6675
+      "avgJitaBuy": 887.8728
     },
     {
       "typeId": 62551,
@@ -4730,9 +5580,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 927.0505
+      "avgJitaBuy": 928.3104
     },
     {
       "typeId": 62552,
@@ -4741,9 +5593,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2555.2857
+      "avgJitaBuy": 2555.5394
     },
     {
       "typeId": 62553,
@@ -4752,9 +5606,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2683.0499
+      "avgJitaBuy": 2683.3164
     },
     {
       "typeId": 62554,
@@ -4763,9 +5619,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2810.8142
+      "avgJitaBuy": 2811.0934
     },
     {
       "typeId": 62555,
@@ -4774,9 +5632,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2938.5785
+      "avgJitaBuy": 2938.8703
     },
     {
       "typeId": 62556,
@@ -4785,9 +5645,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4755.7331
+      "avgJitaBuy": 4760.1776
     },
     {
       "typeId": 62557,
@@ -4796,9 +5658,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4993.5198
+      "avgJitaBuy": 4998.1865
     },
     {
       "typeId": 62558,
@@ -4807,9 +5671,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5231.3064
+      "avgJitaBuy": 5236.1954
     },
     {
       "typeId": 62559,
@@ -4818,9 +5684,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5469.0931
+      "avgJitaBuy": 5474.2043
     },
     {
       "typeId": 62560,
@@ -4829,9 +5697,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6271.8498
+      "avgJitaBuy": 6279.7527
     },
     {
       "typeId": 62561,
@@ -4840,9 +5710,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6585.4423
+      "avgJitaBuy": 6593.7403
     },
     {
       "typeId": 62562,
@@ -4851,9 +5723,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6899.0347
+      "avgJitaBuy": 6907.728
     },
     {
       "typeId": 62563,
@@ -4862,9 +5736,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 7212.6272
+      "avgJitaBuy": 7221.7156
     },
     {
       "typeId": 62564,
@@ -4873,9 +5749,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2555.5122
+      "avgJitaBuy": 2558.1224
     },
     {
       "typeId": 62565,
@@ -4884,9 +5762,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2683.2878
+      "avgJitaBuy": 2686.0285
     },
     {
       "typeId": 62566,
@@ -4895,9 +5775,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2811.0635
+      "avgJitaBuy": 2813.9346
     },
     {
       "typeId": 62567,
@@ -4906,9 +5788,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2938.8391
+      "avgJitaBuy": 2941.8407
     },
     {
       "typeId": 62568,
@@ -4917,9 +5801,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3963.8916
+      "avgJitaBuy": 3957.0617
     },
     {
       "typeId": 62569,
@@ -4928,9 +5814,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4162.0861
+      "avgJitaBuy": 4154.9148
     },
     {
       "typeId": 62570,
@@ -4939,9 +5827,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4360.2807
+      "avgJitaBuy": 4352.7679
     },
     {
       "typeId": 62571,
@@ -4950,9 +5840,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4558.4753
+      "avgJitaBuy": 4550.6209
     },
     {
       "typeId": 62572,
@@ -4961,9 +5853,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5851.9247
+      "avgJitaBuy": 5854.2992
     },
     {
       "typeId": 62573,
@@ -4972,9 +5866,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6144.521
+      "avgJitaBuy": 6147.0142
     },
     {
       "typeId": 62574,
@@ -4983,9 +5879,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6437.1172
+      "avgJitaBuy": 6439.7292
     },
     {
       "typeId": 62575,
@@ -4994,9 +5892,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6729.7134
+      "avgJitaBuy": 6732.4441
     },
     {
       "typeId": 62586,
@@ -5005,9 +5905,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 24002.4456
+      "avgJitaBuy": 24010.6929
     },
     {
       "typeId": 62587,
@@ -5016,9 +5918,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 25202.5679
+      "avgJitaBuy": 25211.2276
     },
     {
       "typeId": 62588,
@@ -5027,9 +5931,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 26402.6901
+      "avgJitaBuy": 26411.7622
     },
     {
       "typeId": 82300,
@@ -5038,9 +5944,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 386.1608
+      "avgJitaBuy": 386.1065
     },
     {
       "typeId": 82301,
@@ -5049,9 +5957,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 405.7812
+      "avgJitaBuy": 405.7241
     },
     {
       "typeId": 82302,
@@ -5060,9 +5970,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 424.7769
+      "avgJitaBuy": 424.7171
     },
     {
       "typeId": 82303,
@@ -5071,9 +5983,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 444.3973
+      "avgJitaBuy": 444.3348
     },
     {
       "typeId": 82304,
@@ -5082,9 +5996,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 698.272
+      "avgJitaBuy": 699.297
     },
     {
       "typeId": 82305,
@@ -5093,9 +6009,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 737.8542
+      "avgJitaBuy": 738.9379
     },
     {
       "typeId": 82306,
@@ -5104,9 +6022,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 771.1583
+      "avgJitaBuy": 772.2909
     },
     {
       "typeId": 82307,
@@ -5115,9 +6035,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 804.6222
+      "avgJitaBuy": 805.8034
     },
     {
       "typeId": 82308,
@@ -5126,9 +6048,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 929.4252
+      "avgJitaBuy": 927.4385
     },
     {
       "typeId": 82309,
@@ -5137,9 +6061,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 975.8964
+      "avgJitaBuy": 973.8105
     },
     {
       "typeId": 82310,
@@ -5148,9 +6074,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1022.3677
+      "avgJitaBuy": 1020.1824
     },
     {
       "typeId": 82311,
@@ -5159,9 +6087,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1068.8389
+      "avgJitaBuy": 1066.5543
     },
     {
       "typeId": 82312,
@@ -5170,9 +6100,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 751.2665
+      "avgJitaBuy": 752.6912
     },
     {
       "typeId": 82313,
@@ -5181,9 +6113,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 788.8298
+      "avgJitaBuy": 790.3258
     },
     {
       "typeId": 82314,
@@ -5192,9 +6126,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 826.3932
+      "avgJitaBuy": 827.9603
     },
     {
       "typeId": 82315,
@@ -5203,9 +6139,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 863.9565
+      "avgJitaBuy": 865.5949
     },
     {
       "typeId": 82316,
@@ -5214,9 +6152,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 138.7427
+      "avgJitaBuy": 138.8225
     },
     {
       "typeId": 82317,
@@ -5225,9 +6165,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 145.6976
+      "avgJitaBuy": 145.7813
     },
     {
       "typeId": 82318,
@@ -5236,9 +6178,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 152.617
+      "avgJitaBuy": 152.7048
     },
     {
       "typeId": 82319,
@@ -5247,9 +6191,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 159.5719
+      "avgJitaBuy": 159.6636
     },
     {
       "typeId": 75275,
@@ -5258,9 +6204,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 15.4899
+      "avgJitaBuy": 15.4636
     },
     {
       "typeId": 75276,
@@ -5269,9 +6217,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 16.1287
+      "avgJitaBuy": 16.1012
     },
     {
       "typeId": 75277,
@@ -5280,9 +6230,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 17.0868
+      "avgJitaBuy": 17.0577
     },
     {
       "typeId": 75278,
@@ -5291,9 +6243,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 17.8853
+      "avgJitaBuy": 17.8548
     },
     {
       "typeId": 75279,
@@ -5302,9 +6256,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 389.651
+      "avgJitaBuy": 389.8903
     },
     {
       "typeId": 75280,
@@ -5313,9 +6269,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 409.1335
+      "avgJitaBuy": 409.3848
     },
     {
       "typeId": 75281,
@@ -5324,9 +6282,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 428.6161
+      "avgJitaBuy": 428.8793
     },
     {
       "typeId": 75282,
@@ -5335,9 +6295,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 81,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 448.0986
+      "avgJitaBuy": 448.3738
     },
     {
       "typeId": 75283,
@@ -5346,9 +6308,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2152.6864
+      "avgJitaBuy": 2158.4722
     },
     {
       "typeId": 75284,
@@ -5357,9 +6321,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2257.8928
+      "avgJitaBuy": 2263.9614
     },
     {
       "typeId": 75285,
@@ -5368,9 +6334,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2371.1921
+      "avgJitaBuy": 2377.5652
     },
     {
       "typeId": 75286,
@@ -5379,9 +6347,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2476.3986
+      "avgJitaBuy": 2483.0545
     },
     {
       "typeId": 75287,
@@ -5390,9 +6360,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3829.5734
+      "avgJitaBuy": 3821.1303
     },
     {
       "typeId": 75288,
@@ -5401,9 +6373,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4032.3155
+      "avgJitaBuy": 4023.4254
     },
     {
       "typeId": 75289,
@@ -5412,9 +6386,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4212.5307
+      "avgJitaBuy": 4203.2433
     },
     {
       "typeId": 75290,
@@ -5423,9 +6399,11 @@ const BUYBACK_DATA = {
       "displayCategory": "Standard Ore",
       "rate": 95,
       "sellRate": 95,
+      "corpRate": 93,
+      "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4415.2728
+      "avgJitaBuy": 4405.5384
     }
   ],
   "categories": {
@@ -5471,5 +6449,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-03 03:33 UTC"
+  "generated": "2026-03-03 05:17 UTC"
 };

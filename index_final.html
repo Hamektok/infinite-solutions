@@ -487,6 +487,16 @@
             color: #ff6666 !important;
         }
 
+        /* Two-tier pricing rows */
+        .price-tier {
+            font-size: 19px;
+            line-height: 1.4;
+        }
+        .corp-label  { color: #ffd700; }
+        .ally-label  { color: #6fb3d0; }
+        .corp-price  { color: #ffd700; font-weight: 700; }
+        .ally-price  { color: #00aabb; font-weight: 600; }
+
         /* ===== BLUEPRINT TABLE SECTION ===== */
         .blueprint-section {
             margin-top: 40px;
@@ -5177,16 +5187,20 @@ Tip: Copy directly from EVE inventory window"></textarea>
             document.getElementById('lastUpdated2').textContent = `Last updated: ${EMBEDDED_DATA.blueprintsLastUpdated}`;
         }
 
-        // Build name→sellRate lookup from buyback_data.js
+        // Build name→{allianceRate, corpRate} lookup from buyback_data.js
         const SELL_RATE_LOOKUP = {};
         if (typeof BUYBACK_DATA !== 'undefined' && BUYBACK_DATA.items) {
             BUYBACK_DATA.items.forEach(item => {
-                if (item.sellRate != null) SELL_RATE_LOOKUP[item.name] = item.sellRate;
+                if (item.sellRate != null) {
+                    SELL_RATE_LOOKUP[item.name] = {
+                        alliance: item.sellRate,
+                        corp: item.corpRate != null ? item.corpRate : item.sellRate,
+                    };
+                }
             });
         }
-        function getSellRateLabel(name) {
-            const r = SELL_RATE_LOOKUP[name];
-            return r != null ? `${r}% JBV` : 'N/A';
+        function getRates(name) {
+            return SELL_RATE_LOOKUP[name] || null;
         }
 
         function renderMinerals(inventory) {
@@ -5195,8 +5209,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
             MINERALS.forEach(mineral => {
                 const quantity = inventory[mineral] || 0;
-                const priceText = getSellRateLabel(mineral);
-                const item = createItemCard(mineral, quantity, priceText);
+                const item = createItemCard(mineral, quantity, getRates(mineral));
                 grid.appendChild(item);
             });
         }
@@ -5207,8 +5220,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
             ICE_PRODUCTS.forEach(product => {
                 const quantity = inventory[product] || 0;
-                const priceText = getSellRateLabel(product);
-                const item = createItemCard(product, quantity, priceText);
+                const item = createItemCard(product, quantity, getRates(product));
                 grid.appendChild(item);
             });
         }
@@ -5223,7 +5235,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                 materials.forEach(material => {
                     const quantity = inventory[material] || 0;
-                    const item = createItemCard(material, quantity, getSellRateLabel(material));
+                    const item = createItemCard(material, quantity, getRates(material));
                     groupDiv.appendChild(item);
                 });
 
@@ -5248,7 +5260,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                 materials.forEach(material => {
                     const quantity = inventory[material] || 0;
-                    const item = createItemCard(material, quantity, getSellRateLabel(material));
+                    const item = createItemCard(material, quantity, getRates(material));
                     tierGrid.appendChild(item);
                 });
 
@@ -5256,12 +5268,33 @@ Tip: Copy directly from EVE inventory window"></textarea>
             });
         }
 
-        function createItemCard(name, quantity, price) {
+        function createItemCard(name, quantity, rates) {
             const item = document.createElement('div');
             item.className = 'item';
 
             const formattedQty = quantity.toLocaleString();
             const qtyClass = quantity === 0 ? 'detail-value out-of-stock' : 'detail-value';
+
+            let priceRows = '';
+            if (rates) {
+                const corpLabel  = `${rates.corp}% JBV`;
+                const allyLabel  = `${rates.alliance}% JBV`;
+                priceRows = `
+                    <div class="detail-row price-tier">
+                        <span class="detail-label price-tier-label corp-label">Corp:</span>
+                        <span class="detail-value corp-price">${corpLabel}</span>
+                    </div>
+                    <div class="detail-row price-tier">
+                        <span class="detail-label price-tier-label ally-label">Alliance:</span>
+                        <span class="detail-value ally-price">${allyLabel}</span>
+                    </div>`;
+            } else {
+                priceRows = `
+                    <div class="detail-row">
+                        <span class="detail-label">Price:</span>
+                        <span class="detail-value">N/A</span>
+                    </div>`;
+            }
 
             item.innerHTML = `
                 <div class="item-name">${name}</div>
@@ -5270,10 +5303,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <span class="detail-label">Stock:</span>
                         <span class="${qtyClass}">${formattedQty} units</span>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Price:</span>
-                        <span class="detail-value">${price}</span>
-                    </div>
+                    ${priceRows}
                 </div>
             `;
 

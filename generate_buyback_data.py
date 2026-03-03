@@ -131,7 +131,8 @@ def get_buyback_data():
     # Get all tracked items with buyback info
     cursor.execute("""
         SELECT type_id, type_name, category, display_order,
-               price_percentage, buyback_accepted, buyback_rate, buyback_quota
+               price_percentage, buyback_accepted, buyback_rate, buyback_quota,
+               COALESCE(alliance_discount, 0)
         FROM tracked_market_items
         ORDER BY category, display_order
     """)
@@ -194,7 +195,7 @@ def get_buyback_data():
 
     # Build output data
     buyback_items = []
-    for type_id, type_name, category, display_order, price_pct, accepted, rate, quota in items:
+    for type_id, type_name, category, display_order, price_pct, accepted, rate, quota, alliance_disc in items:
         # Use buyback_rate if set, otherwise fall back to price_percentage
         effective_rate = rate if rate is not None else price_pct
 
@@ -211,6 +212,8 @@ def get_buyback_data():
             else:
                 price = avg_buy_prices.get(type_id, 0)
 
+        corp_rate = price_pct - alliance_disc if price_pct is not None else None
+
         item = {
             'typeId': type_id,
             'name': type_name,
@@ -218,6 +221,8 @@ def get_buyback_data():
             'displayCategory': CATEGORY_DISPLAY.get(category, category),
             'rate': effective_rate,
             'sellRate': price_pct,
+            'corpRate': corp_rate,
+            'allianceDiscount': alliance_disc,
             'accepted': bool(accepted),
             'quota': quota or 0,
             'avgJitaBuy': price,
