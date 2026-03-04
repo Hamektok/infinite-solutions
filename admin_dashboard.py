@@ -7,6 +7,7 @@ from tkinter import ttk, messagebox
 import sqlite3
 import subprocess
 import os
+import sys
 import json
 from datetime import datetime, timezone
 
@@ -195,7 +196,12 @@ class AdminDashboard:
         self.notebook.add(self.slot_frame, text='  Slot Pricing  ')
         self._build_slot_pricing_tab()
 
-        # Tab 10: Quick Actions
+        # Tab 10: Slot Manager
+        self.slotmgr_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.slotmgr_frame, text='  Slot Manager  ')
+        self._build_slot_manager_tab()
+
+        # Tab 11: Quick Actions
         self.actions_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
@@ -5045,6 +5051,364 @@ class AdminDashboard:
             self.root.after(0, _done)
 
         threading.Thread(target=_fetch, daemon=True).start()
+
+    # ===== SLOT MANAGER =====
+
+    _SLOTMGR_CONFIG_PATH = os.path.join(PROJECT_DIR, 'slots_config.json')
+
+    _SLOTMGR_CAT_ORDER = [
+        'minerals', 'ice_products', 'moon_materials',
+        'pi_materials', 'salvaged_materials',
+    ]
+    _SLOTMGR_CAT_LABELS = {
+        'minerals':           'Minerals',
+        'ice_products':       'Ice Products',
+        'moon_materials':     'Moon Materials',
+        'pi_materials':       'Planetary Materials',
+        'salvaged_materials': 'Salvaged Materials',
+    }
+
+    def _build_slot_manager_tab(self):
+        """Build the Slot Manager tab."""
+        # State: type_id -> {'in_program': bool, 'status': 'open'|'closed', 'lessee': str}
+        self._sm_state   = {}   # populated by _sm_load
+        self._sm_all_ids = []   # ordered list of type_ids from DB
+
+        outer = tk.Frame(self.slotmgr_frame, background='#0a1520')
+        outer.pack(fill='both', expand=True, padx=15, pady=10)
+
+        tk.Label(outer, text='Slot Manager', background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 13, 'bold')).pack(
+                 anchor='w', pady=(0, 8))
+
+        # ── Toolbar ──────────────────────────────────────────────────────────
+        toolbar = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        toolbar.pack(fill='x', pady=(0, 8))
+        tf = tk.Frame(toolbar, background='#0a2030')
+        tf.pack(fill='x', padx=10, pady=6)
+
+        # Filter controls
+        tk.Label(tf, text='Category:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).pack(side='left', padx=(0, 4))
+        self._sm_cat_var = tk.StringVar(value='All')
+        cat_options = ['All'] + [self._SLOTMGR_CAT_LABELS[c]
+                                  for c in self._SLOTMGR_CAT_ORDER]
+        cat_menu = ttk.Combobox(tf, textvariable=self._sm_cat_var,
+                                values=cat_options, state='readonly', width=20)
+        cat_menu.pack(side='left', padx=(0, 16))
+        cat_menu.bind('<<ComboboxSelected>>', lambda _: self._sm_refresh_tree())
+
+        tk.Label(tf, text='Show:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).pack(side='left', padx=(0, 4))
+        self._sm_show_var = tk.StringVar(value='All')
+        show_menu = ttk.Combobox(tf, textvariable=self._sm_show_var,
+                                 values=['All', 'In Program', 'Not in Program'],
+                                 state='readonly', width=16)
+        show_menu.pack(side='left', padx=(0, 20))
+        show_menu.bind('<<ComboboxSelected>>', lambda _: self._sm_refresh_tree())
+
+        # Action buttons
+        ttk.Button(tf, text='Include Selected',
+                   command=lambda: self._sm_set_program(True)).pack(side='left', padx=(0, 4))
+        ttk.Button(tf, text='Exclude Selected',
+                   command=lambda: self._sm_set_program(False)).pack(side='left', padx=(0, 16))
+
+        ttk.Button(tf, text='Save Config', style='Save.TButton',
+                   command=self._sm_save).pack(side='left', padx=(0, 6))
+        ttk.Button(tf, text='Generate Image', style='Deploy.TButton',
+                   command=self._sm_generate).pack(side='left', padx=(0, 6))
+
+        self._sm_status_lbl = tk.Label(tf, text='', bg='#0a2030', fg='#ffcc44',
+                                       font=('Segoe UI', 9))
+        self._sm_status_lbl.pack(side='left', padx=(10, 0))
+
+        # Counter labels (right side)
+        self._sm_count_lbl = tk.Label(tf, text='', bg='#0a2030', fg='#66d9ff',
+                                      font=('Segoe UI', 9))
+        self._sm_count_lbl.pack(side='right')
+
+        # ── Treeview ─────────────────────────────────────────────────────────
+        tree_frame = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        tree_frame.pack(fill='both', expand=True, pady=(0, 6))
+
+        cols = ('in_prog', 'category', 'sub', 'name', 'status', 'lessee')
+        self._sm_tree = ttk.Treeview(tree_frame, columns=cols, show='headings',
+                                     selectmode='extended')
+        for cid, hd, w, anchor in [
+            ('in_prog',  '\u2713 Slot?',    60,  'c'),
+            ('category', 'Category',       150,  'c'),
+            ('sub',      'Tier / Grade',   110,  'c'),
+            ('name',     'Item Name',      260,  'w'),
+            ('status',   'Status',          80,  'c'),
+            ('lessee',   'Lessee',         200,  'w'),
+        ]:
+            self._sm_tree.heading(cid, text=hd)
+            self._sm_tree.column(cid, width=w, minwidth=30, anchor=anchor)
+
+        self._sm_tree.tag_configure('in_open',   foreground='#00ff88')
+        self._sm_tree.tag_configure('in_closed', foreground='#ffcc44')
+        self._sm_tree.tag_configure('out',       foreground='#445566')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical', command=self._sm_tree.yview)
+        self._sm_tree.configure(yscrollcommand=vsb.set)
+        vsb.pack(side='right', fill='y')
+        self._sm_tree.pack(fill='both', expand=True)
+        self._sm_tree.bind('<<TreeviewSelect>>', self._sm_on_select)
+
+        # ── Edit panel (bottom) ───────────────────────────────────────────────
+        edit_card = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        edit_card.pack(fill='x')
+        ef = tk.Frame(edit_card, background='#0a2030')
+        ef.pack(fill='x', padx=12, pady=8)
+
+        self._sm_sel_lbl = tk.Label(ef, text='— select item(s) above —',
+                                    bg='#0a2030', fg='#88d0e8',
+                                    font=('Segoe UI', 9, 'italic'))
+        self._sm_sel_lbl.grid(row=0, column=0, columnspan=7, sticky='w', pady=(0, 6))
+
+        tk.Label(ef, text='Status:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).grid(row=1, column=0, padx=(0, 6), sticky='w')
+        self._sm_status_var = tk.StringVar(value='open')
+        tk.Radiobutton(ef, text='Open', variable=self._sm_status_var,
+                       value='open', bg='#0a2030', fg='#00ff88',
+                       selectcolor='#0a3040', activebackground='#0a2030',
+                       activeforeground='#00ff88',
+                       command=self._sm_status_changed).grid(
+                       row=1, column=1, padx=(0, 8), sticky='w')
+        tk.Radiobutton(ef, text='Closed', variable=self._sm_status_var,
+                       value='closed', bg='#0a2030', fg='#ffcc44',
+                       selectcolor='#0a3040', activebackground='#0a2030',
+                       activeforeground='#ffcc44',
+                       command=self._sm_status_changed).grid(
+                       row=1, column=2, padx=(0, 20), sticky='w')
+
+        tk.Label(ef, text='Lessee name:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).grid(row=1, column=3, padx=(0, 6), sticky='w')
+        self._sm_lessee_var = tk.StringVar()
+        self._sm_lessee_entry = tk.Entry(ef, textvariable=self._sm_lessee_var,
+                                         width=28, bg='#0d2030', fg='#ffcc44',
+                                         insertbackground='#ffcc44',
+                                         font=('Segoe UI', 10), state='disabled')
+        self._sm_lessee_entry.grid(row=1, column=4, padx=(0, 10), sticky='w')
+
+        ttk.Button(ef, text='Apply to Selected',
+                   command=self._sm_apply_edit).grid(row=1, column=5, padx=(0, 0))
+
+        # Load data
+        self._sm_load_all()
+
+    # ── Slot Manager helpers ──────────────────────────────────────────────────
+
+    def _sm_load_all(self):
+        """Load all market items from DB, then overlay slots_config.json."""
+        # Fetch every non-ore item + metadata from DB
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute('''
+            SELECT tmi.type_id, tmi.category, it.type_name,
+                   tmi.display_order, it.market_group_id
+            FROM tracked_market_items tmi
+            JOIN inv_types it ON tmi.type_id = it.type_id
+            WHERE tmi.category NOT IN ("standard_ore","ice_ore","moon_ore")
+            ORDER BY tmi.category, tmi.display_order
+        ''').fetchall()
+        conn.close()
+
+        PI_TIER  = {1334:'P1', 1335:'P2', 1336:'P3', 1337:'P4'}
+
+        def _sal_grade(d):
+            if d is None: return ''
+            if d <= 9:    return 'Common'
+            if d <= 21:   return 'Uncommon'
+            if d <= 32:   return 'Rare'
+            if d <= 42:   return 'Very Rare'
+            return 'Rogue Drone'
+
+        self._sm_meta = {}   # type_id -> (category, name, sub_label)
+        self._sm_all_ids = []
+        for type_id, cat, name, disp, grp in rows:
+            if cat == 'pi_materials':
+                sub = PI_TIER.get(grp, 'P2')
+            elif cat == 'salvaged_materials':
+                sub = _sal_grade(disp)
+            else:
+                sub = ''
+            self._sm_meta[type_id] = (cat, name, sub)
+            self._sm_all_ids.append(type_id)
+            # Default state: not in program
+            self._sm_state.setdefault(type_id, {
+                'in_program': False,
+                'status':     'open',
+                'lessee':     '',
+            })
+
+        # Overlay saved config
+        if os.path.exists(self._SLOTMGR_CONFIG_PATH):
+            try:
+                with open(self._SLOTMGR_CONFIG_PATH, 'r', encoding='utf-8') as f:
+                    cfg = json.load(f)
+                # Mark items that are in the config as in_program
+                in_config = {e['type_id'] for e in cfg}
+                for tid in self._sm_all_ids:
+                    self._sm_state[tid]['in_program'] = tid in in_config
+                for entry in cfg:
+                    tid = entry.get('type_id')
+                    if tid in self._sm_state:
+                        self._sm_state[tid]['status'] = entry.get('status', 'open')
+                        self._sm_state[tid]['lessee'] = entry.get('lessee') or ''
+            except Exception:
+                pass
+
+        self._sm_refresh_tree()
+
+    def _sm_refresh_tree(self):
+        """Rebuild the treeview to match current filter settings."""
+        cat_filter  = self._sm_cat_var.get()
+        show_filter = self._sm_show_var.get()
+
+        # Reverse label -> key
+        label_to_key = {v: k for k, v in self._SLOTMGR_CAT_LABELS.items()}
+
+        self._sm_tree.delete(*self._sm_tree.get_children())
+
+        in_prog_count = out_count = 0
+        for type_id in self._sm_all_ids:
+            cat, name, sub = self._sm_meta[type_id]
+            state = self._sm_state[type_id]
+
+            # Category filter
+            if cat_filter != 'All':
+                if label_to_key.get(cat_filter) != cat:
+                    continue
+
+            # Show filter
+            if show_filter == 'In Program' and not state['in_program']:
+                continue
+            if show_filter == 'Not in Program' and state['in_program']:
+                continue
+
+            in_prog  = state['in_program']
+            status   = state['status']
+            lessee   = state['lessee']
+            in_prog_count += 1 if in_prog else 0
+            out_count     += 0 if in_prog else 1
+
+            tag = ('in_open'   if in_prog and status == 'open'   else
+                   'in_closed' if in_prog and status == 'closed' else
+                   'out')
+
+            self._sm_tree.insert('', 'end', iid=str(type_id), tags=(tag,), values=(
+                '\u2713' if in_prog else '',
+                self._SLOTMGR_CAT_LABELS.get(cat, cat),
+                sub,
+                name,
+                status.capitalize() if in_prog else '—',
+                lessee if in_prog and lessee else ('—' if not in_prog else ''),
+            ))
+
+        total = len(self._sm_all_ids)
+        self._sm_count_lbl.configure(
+            text=f'{in_prog_count} in program  ·  {out_count} excluded  ·  {total} total items')
+
+    def _sm_on_select(self, _event=None):
+        """Update the edit panel when selection changes."""
+        sel = self._sm_tree.selection()
+        if not sel:
+            return
+        if len(sel) == 1:
+            tid   = int(sel[0])
+            state = self._sm_state[tid]
+            self._sm_sel_lbl.configure(text=self._sm_meta[tid][1])
+            self._sm_status_var.set(state['status'])
+            self._sm_lessee_var.set(state['lessee'])
+        else:
+            self._sm_sel_lbl.configure(text=f'{len(sel)} items selected')
+        self._sm_status_changed()
+
+    def _sm_status_changed(self):
+        """Enable lessee entry only when status is closed."""
+        if self._sm_status_var.get() == 'closed':
+            self._sm_lessee_entry.configure(state='normal')
+        else:
+            self._sm_lessee_entry.configure(state='disabled')
+
+    def _sm_set_program(self, include: bool):
+        """Include or exclude all selected items from the slot program."""
+        sel = self._sm_tree.selection()
+        if not sel:
+            return
+        for iid in sel:
+            self._sm_state[int(iid)]['in_program'] = include
+        self._sm_refresh_tree()
+        # Restore selection
+        valid = [i for i in sel if self._sm_tree.exists(i)]
+        if valid:
+            self._sm_tree.selection_set(valid)
+
+    def _sm_apply_edit(self):
+        """Apply status/lessee to all selected in-program items."""
+        sel = self._sm_tree.selection()
+        if not sel:
+            return
+        status = self._sm_status_var.get()
+        lessee = self._sm_lessee_var.get().strip() if status == 'closed' else ''
+        for iid in sel:
+            tid = int(iid)
+            self._sm_state[tid]['status'] = status
+            self._sm_state[tid]['lessee'] = lessee
+            # Auto-include if not already
+            self._sm_state[tid]['in_program'] = True
+        self._sm_refresh_tree()
+        valid = [i for i in sel if self._sm_tree.exists(i)]
+        if valid:
+            self._sm_tree.selection_set(valid)
+
+    def _sm_save(self):
+        """Write in-program items to slots_config.json."""
+        entries = []
+        for type_id in self._sm_all_ids:
+            state = self._sm_state[type_id]
+            if not state['in_program']:
+                continue
+            cat, name, _ = self._sm_meta[type_id]
+            entries.append({
+                'type_id':  type_id,
+                'category': cat,
+                'name':     name,
+                'status':   state['status'],
+                'lessee':   state['lessee'] or None,
+            })
+        try:
+            with open(self._SLOTMGR_CONFIG_PATH, 'w', encoding='utf-8') as f:
+                json.dump(entries, f, indent=2, ensure_ascii=False)
+            n = len(entries)
+            self._sm_status_lbl.configure(
+                text=f'Saved {n} slot{"s" if n != 1 else ""} \u2713', fg='#00ff88')
+            self.root.after(3000, lambda: self._sm_status_lbl.configure(text=''))
+        except Exception as e:
+            self._sm_status_lbl.configure(text=f'Error: {e}', fg='#ff6666')
+
+    def _sm_generate(self):
+        """Save config then run generate_slots_image.py in background."""
+        self._sm_save()
+        self._sm_status_lbl.configure(text='Generating\u2026', fg='#ffcc44')
+
+        import threading
+        def _run():
+            try:
+                result = subprocess.run(
+                    [sys.executable,
+                     os.path.join(PROJECT_DIR, 'generate_slots_image.py')],
+                    capture_output=True, text=True
+                )
+                msg = result.stdout.strip().split('\n')[0] if result.stdout else 'Done'
+                if result.returncode != 0:
+                    msg = result.stderr.strip()[:60]
+                self.root.after(0, lambda: self._sm_status_lbl.configure(
+                    text=msg, fg='#00ff88' if result.returncode == 0 else '#ff6666'))
+            except Exception as e:
+                self.root.after(0, lambda: self._sm_status_lbl.configure(
+                    text=str(e)[:60], fg='#ff6666'))
+        threading.Thread(target=_run, daemon=True).start()
 
     def update_status(self, text):
         """Update the status indicator."""
