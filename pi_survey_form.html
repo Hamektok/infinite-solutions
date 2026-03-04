@@ -241,6 +241,45 @@
   }
   @media (max-width: 520px) { .check-grid { grid-template-columns: repeat(2, 1fr); } }
 
+  /* ── Q5 VOLUME MATRIX ── */
+  .q5-row {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .q5-row:last-child { border-bottom: none; }
+  .q5-item-name {
+    font-size: 0.84rem;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .q5-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .q5-opts .opt-label {
+    font-size: 0.75rem;
+    padding: 4px 9px;
+  }
+  .q5-empty {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.85rem;
+    padding: 14px 0;
+    text-align: center;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+  }
+  @media (max-width: 520px) {
+    .q5-row { grid-template-columns: 1fr; }
+    .q5-item-name { margin-bottom: 2px; }
+  }
+
   /* ── TEXT INPUTS ── */
   .text-input, textarea {
     width: 100%;
@@ -625,22 +664,10 @@ STEP 4 — Paste the URL below, replacing the placeholder:
 
       <!-- Q5 -->
       <div class="question">
-        <div class="q-label"><span class="q-num">Q5</span> Roughly how much do you produce per item per month?</div>
-        <div class="radio-group">
-          <input type="radio" name="q5" id="q5a" value="Under 50K units">
-          <label class="opt-label" for="q5a"><span class="opt-indicator"></span>Under 50K units</label>
-
-          <input type="radio" name="q5" id="q5b" value="50K – 200K units">
-          <label class="opt-label" for="q5b"><span class="opt-indicator"></span>50K – 200K units</label>
-
-          <input type="radio" name="q5" id="q5c" value="200K – 500K units">
-          <label class="opt-label" for="q5c"><span class="opt-indicator"></span>200K – 500K units</label>
-
-          <input type="radio" name="q5" id="q5d" value="500K – 1M units">
-          <label class="opt-label" for="q5d"><span class="opt-indicator"></span>500K – 1M units</label>
-
-          <input type="radio" name="q5" id="q5e" value="1M+ units">
-          <label class="opt-label" for="q5e"><span class="opt-indicator"></span>1M+ units</label>
+        <div class="q-label"><span class="q-num">Q5</span> Roughly how much do you produce per item per month? <span class="opt-em">(units/mo)</span></div>
+        <div class="q-hint">Populated automatically from your Q4 selections above.</div>
+        <div id="q5-matrix">
+          <div class="q5-empty">Select items in Q4 above — a row will appear here for each one.</div>
         </div>
       </div>
 
@@ -753,6 +780,55 @@ STEP 4 — Paste the URL below, replacing the placeholder:
     document.getElementById('setup-banner').style.display = 'block';
   }
 
+  // ── Q5 dynamic volume matrix ──────────────────────────────────────────────
+  const VOL_TIERS = [
+    { id: 'a', val: 'Under 50K',  lbl: '< 50K'   },
+    { id: 'b', val: '50K–200K',   lbl: '50–200K'  },
+    { id: 'c', val: '200K–500K',  lbl: '200–500K' },
+    { id: 'd', val: '500K–1M',    lbl: '500K–1M'  },
+    { id: 'e', val: '1M+',        lbl: '1M+'      },
+  ];
+
+  function q5Key(itemName) {
+    return 'q5_' + itemName.replace(/[^a-zA-Z0-9]/g, '_');
+  }
+
+  function updateQ5Matrix() {
+    const checked = [...document.querySelectorAll('input[name=q4]:checked')];
+    const matrix  = document.getElementById('q5-matrix');
+
+    // Preserve any already-selected volume answers
+    const saved = {};
+    matrix.querySelectorAll('input[type=radio]:checked').forEach(r => { saved[r.name] = r.value; });
+
+    if (checked.length === 0) {
+      matrix.innerHTML = '<div class="q5-empty">Select items in Q4 above — a row will appear here for each one.</div>';
+      return;
+    }
+
+    let html = '';
+    for (const cb of checked) {
+      const item = cb.value;
+      const key  = q5Key(item);
+      const opts = VOL_TIERS.map(t =>
+        `<input type="radio" name="${key}" id="${key}_${t.id}" value="${t.val}">` +
+        `<label class="opt-label" for="${key}_${t.id}"><span class="opt-indicator"></span>${t.lbl}</label>`
+      ).join('');
+      html += `<div class="q5-row"><div class="q5-item-name">${item}</div><div class="q5-opts">${opts}</div></div>`;
+    }
+    matrix.innerHTML = html;
+
+    // Restore prior selections that are still valid
+    for (const [name, val] of Object.entries(saved)) {
+      const r = matrix.querySelector(`input[name="${name}"][value="${val}"]`);
+      if (r) r.checked = true;
+    }
+  }
+
+  document.querySelectorAll('input[name=q4]').forEach(cb => {
+    cb.addEventListener('change', updateQ5Matrix);
+  });
+
   // ── Q8 max-3 enforcement ──────────────────────────────────────────────────
   const q8boxes = document.querySelectorAll('.q8-cb');
   const q8note  = document.getElementById('q8-count-note');
@@ -796,7 +872,14 @@ STEP 4 — Paste the URL below, replacing the placeholder:
       q2:  document.querySelector('input[name=q2]:checked')?.value || '—',
       q3:  [...document.querySelectorAll('input[name=q3]:checked')].map(c => c.value).join(', ') || '—',
       q4:  [...document.querySelectorAll('input[name=q4]:checked')].map(c => c.value).join(', ') || '—',
-      q5:  document.querySelector('input[name=q5]:checked')?.value || '—',
+      q5:  (() => {
+             const rows = [];
+             document.querySelectorAll('input[name=q4]:checked').forEach(cb => {
+               const sel = document.querySelector(`input[name="${q5Key(cb.value)}"]:checked`);
+               if (sel) rows.push(`${cb.value}: ${sel.value}`);
+             });
+             return rows.join(' | ') || '—';
+           })(),
       q6:  document.querySelector('input[name=q6]:checked')?.value || '—',
       q7:  q7val.value,
       q8:  [...document.querySelectorAll('.q8-cb:checked')].map(c => c.value).join(' | ') || '—',
