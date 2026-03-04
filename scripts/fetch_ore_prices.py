@@ -215,6 +215,11 @@ ICE_PRODUCT_IDS = [
     17887,  # Oxygen Isotopes
     17888,  # Nitrogen Isotopes
     17889,  # Hydrogen Isotopes
+    # Fuel blocks (manufactured from ice products)
+     4051,  # Nitrogen Fuel Block
+     4246,  # Hydrogen Fuel Block
+     4247,  # Helium Fuel Block
+     4312,  # Oxygen Fuel Block
 ]
 
 # Refined products — moon materials (R4 through R64)
