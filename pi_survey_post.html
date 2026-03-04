@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI Producer Survey — Infinite Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #080e18;
+    --bg2:      #0a1520;
+    --bg3:      #0d1f30;
+    --card:     #0f2035;
+    --border:   #1a3a55;
+    --accent:   #66d9ff;
+    --gold:     #ffcc44;
+    --green:    #00ff88;
+    --orange:   #ff9944;
+    --muted:    #4a7090;
+    --text:     #c8dde8;
+    --dim:      #6a8fa8;
+    --discord:  #5865F2;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── LAYOUT ── */
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr 440px;
+    gap: 0;
+    min-height: 100vh;
+  }
+
+  /* ── LEFT: PREVIEW ── */
+  .preview-col {
+    padding: 32px 40px 60px;
+    border-right: 1px solid var(--border);
+  }
+
+  .col-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .col-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── DISCORD MOCK ── */
+  .discord-wrap {
+    background: #313338;
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 780px;
+  }
+
+  .discord-channel-bar {
+    background: #2b2d31;
+    padding: 10px 16px;
+    font-size: 0.78rem;
+    color: #949ba4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #1e1f22;
+  }
+  .discord-channel-bar span.hash {
+    color: #5865F2;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .discord-channel-bar span.name {
+    color: #e0e1e5;
+    font-weight: 600;
+  }
+
+  .discord-body {
+    padding: 20px 16px 28px;
+  }
+
+  /* avatar + header */
+  .dc-msg-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+  .dc-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5865F2, #3ba55c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .dc-meta { display: flex; align-items: baseline; gap: 8px; }
+  .dc-name { color: #f2a229; font-weight: 700; font-size: 0.95rem; }
+  .dc-badge {
+    background: #3ba55c;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 1px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .dc-ts { color: #72767d; font-size: 0.72rem; }
+
+  /* message body */
+  .dc-content {
+    margin-left: 54px;
+    color: #dcddde;
+    font-family: 'Whitney', 'Segoe UI', sans-serif;
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+  .dc-content p { margin-bottom: 6px; }
+  .dc-content strong { color: #fff; font-weight: 700; }
+  .dc-content em { color: #b8c2cc; font-style: italic; }
+
+  .dc-blockquote {
+    border-left: 4px solid #4f545c;
+    padding: 4px 0 4px 12px;
+    color: #b9bbbe;
+    font-style: italic;
+    margin: 8px 0;
+  }
+
+  .dc-h2 {
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 18px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #3f4248;
+  }
+  .dc-h3 {
+    color: #e0e1e5;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 14px 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .dc-rule {
+    border: none;
+    border-top: 1px solid #3f4248;
+    margin: 14px 0;
+  }
+
+  .dc-list {
+    margin: 4px 0 8px 20px;
+    color: #dcddde;
+  }
+  .dc-list li { margin-bottom: 2px; }
+
+  .dc-sub-list {
+    margin: 2px 0 6px 16px;
+    list-style: disc;
+    color: #b9bbbe;
+    font-size: 0.88rem;
+  }
+
+  .dc-code {
+    background: #2b2d31;
+    border: 1px solid #1e1f22;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: #b5cea8;
+    white-space: pre;
+    margin: 10px 0;
+    line-height: 1.7;
+  }
+
+  .dc-pill {
+    display: inline-block;
+    background: #383a40;
+    color: #5865F2;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 4px;
+  }
+
+  .dc-note {
+    margin-top: 14px;
+    padding: 8px 12px;
+    background: rgba(88,101,242,0.08);
+    border-left: 3px solid #5865F2;
+    border-radius: 0 6px 6px 0;
+    color: #b9bbbe;
+    font-size: 0.86rem;
+  }
+
+  .dc-footer {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #3f4248;
+    color: #72767d;
+    font-size: 0.8rem;
+  }
+
+  /* ── RIGHT: COPY PANEL ── */
+  .copy-col {
+    background: var(--bg2);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .copy-header {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .copy-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .copy-panel {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .copy-panel-header {
+    background: var(--card);
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    color: var(--dim);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .copy-panel textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.7;
+    padding: 14px;
+    resize: none;
+    height: 220px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-discord {
+    background: var(--discord);
+    color: #fff;
+  }
+  .btn-discord:hover { background: #4752c4; }
+  .btn-template {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .btn-template:hover { background: rgba(102,217,255,0.08); }
+
+  .toast {
+    display: none;
+    background: #23a55a;
+    color: #fff;
+    text-align: center;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+  }
+
+  .tip {
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    border-left: 2px solid var(--border);
+    padding-left: 12px;
+  }
+  .tip strong { color: var(--dim); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ══════════════════════ LEFT: DISCORD PREVIEW ══════════════════════ -->
+  <div class="preview-col">
+    <div class="col-label">Discord Forum Post — Preview</div>
+
+    <div class="discord-wrap">
+      <div class="discord-channel-bar">
+        <span class="hash">#</span>
+        <span class="name">corp-announcements</span>
+        <span style="margin-left:auto; font-size:0.7rem;">📌 Pinned</span>
+      </div>
+
+      <div class="discord-body">
+        <div class="dc-msg-header">
+          <div class="dc-avatar">🌐</div>
+          <div>
+            <div class="dc-meta">
+              <span class="dc-name">Hamektok Hakaari</span>
+              <span class="dc-badge">FC</span>
+              <span class="dc-ts">Today at 18:00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dc-content">
+
+          <div class="dc-h2">📊 PI Producer Survey — Infinite Solutions</div>
+
+          <div class="dc-blockquote">
+            We're building a consignment program that lets PI producers sell directly out of the citadel — no hauling, no Jita taxes, steady income. Before we finalize pricing and available slots, we want to know what the corp actually produces. <strong>Takes about 2 minutes.</strong>
+          </div>
+
+          <p>Whether you're running 10 planets or zero, your answer helps us build something actually worth using.</p>
+
+          <hr class="dc-rule">
+
+          <div class="dc-h3">🪐 Section 1 — Your Current Setup</div>
+
+          <p><strong>Q1. Are you currently running PI?</strong></p>
+          <ul class="dc-list">
+            <li>🟢 Actively (produce most months)</li>
+            <li>🟡 On and off — have the skills but haven't lately</li>
+            <li>⚪ Never / no PI skills</li>
+          </ul>
+
+          <p><strong>Q2. How many characters do you run PI on?</strong></p>
+          <ul class="dc-list">
+            <li>0 / not running</li>
+            <li>1–2</li>
+            <li>3–5</li>
+            <li>6+</li>
+          </ul>
+
+          <p><strong>Q3. What tier(s) do you produce?</strong> <em>(list all that apply)</em></p>
+          <ul class="dc-sub-list">
+            <li><strong>P1</strong> — Raw extraction (Bacteria, Electrolytes, Plasmoids…)</li>
+            <li><strong>P2</strong> — Refined commodities (Biofuels, Coolant, Supertensile Plastics…)</li>
+            <li><strong>P3</strong> — Specialized commodities (Robotics, Guidance Systems, Mechanical Parts…)</li>
+            <li><strong>P4</strong> — Advanced commodities (Broadcast Node, Wetware Mainframe…)</li>
+          </ul>
+
+          <hr class="dc-rule">
+
+          <div class="dc-h3">📦 Section 2 — What You Produce</div>
+
+          <p><strong>Q4. Which specific items do you make?</strong></p>
+          <p><em>List them out — e.g. "Robotics, Coolant, Guidance Systems"</em></p>
+
+          <p><strong>Q5. Roughly how much do you produce per item per month?</strong></p>
+          <ul class="dc-list">
+            <li>Under 50K units</li>
+            <li>50K – 200K units</li>
+            <li>200K – 500K units</li>
+            <li>500K – 1M units</li>
+            <li>1M+ units</li>
+          </ul>
+
+          <p><strong>Q6. Where are you currently selling your PI output?</strong></p>
+          <ul class="dc-list">
+            <li>🏙️ Jita / major trade hub</li>
+            <li>🏰 Alliance or corp buyback</li>
+            <li>🔀 Mix of both</li>
+            <li>❓ I stockpile / sell inconsistently</li>
+          </ul>
+
+          <hr class="dc-rule">
+
+          <div class="dc-h3">🤝 Section 3 — Interest Level</div>
+
+          <p><strong>Q7. How interested are you in consigning PI through Infinite Solutions?</strong></p>
+          <ul class="dc-list">
+            <li>✅ Very — I want to set up a slot</li>
+            <li>🤔 Interested but have questions</li>
+            <li>😐 Neutral / not sure yet</li>
+            <li>❌ Not interested right now</li>
+          </ul>
+
+          <p><strong>Q8. What would matter most to you in a consignment deal?</strong> <em>(pick up to 3)</em></p>
+          <ul class="dc-list">
+            <li>💰 Best possible ISK/unit return</li>
+            <li>📍 No hauling — sell out of the citadel directly</li>
+            <li>🔒 Predictable monthly income (exclusive slot on my item)</li>
+            <li>📋 Simple setup and low overhead</li>
+            <li>🚪 Flexible terms — easy to exit if I stop playing</li>
+          </ul>
+
+          <p><strong>Q9. Questions, concerns, or anything else we should know?</strong></p>
+          <p><em>Reply in thread or DM me directly.</em></p>
+
+          <hr class="dc-rule">
+
+          <p>Copy the template below and reply in this thread with your answers:</p>
+
+          <div class="dc-code">Q1 (Active / On-off / Never):
+Q2 (# of PI chars):
+Q3 (Tiers — P1 / P2 / P3 / P4):
+Q4 (Items I produce):
+Q5 (Monthly output per item):
+Q6 (Where I sell):
+Q7 (Interest — Very / Maybe / Neutral / No):
+Q8 (What matters most):
+Q9 (Questions / comments):
+IGN (optional, for follow-up):</div>
+
+          <div class="dc-note">
+            🛡️ <strong>Responses are just for internal planning</strong> — we use this to set slot pricing, decide which items to offer first, and figure out what buyback rates make sense for producers. No commitment required.
+          </div>
+
+          <div class="dc-footer">
+            Questions? DM or @ <strong>Hamektok Hakaari</strong> · Results shared with corp once we have enough responses.
+          </div>
+
+        </div><!-- /dc-content -->
+      </div><!-- /discord-body -->
+    </div><!-- /discord-wrap -->
+  </div><!-- /preview-col -->
+
+
+  <!-- ══════════════════════ RIGHT: COPY PANEL ══════════════════════ -->
+  <div class="copy-col">
+
+    <div class="copy-header">Copy for Discord</div>
+
+    <div class="copy-panel">
+      <div class="copy-panel-header">
+        <span>📋 Survey Post</span>
+      </div>
+      <textarea id="survey-post" readonly>## 📊 PI Producer Survey — Infinite Solutions
+
+> We're building a consignment program that lets PI producers sell directly out of the citadel — no hauling, no Jita taxes, steady income. Before we finalize pricing and available slots, we want to know what the corp actually produces. **Takes about 2 minutes.**
+
+Whether you're running 10 planets or zero, your answer helps us build something actually worth using.
+
+---
+
+### 🪐 Section 1 — Your Current Setup
+
+**Q1. Are you currently running PI?**
+🟢 Actively (produce most months)
+🟡 On and off — have the skills but haven't lately
+⚪ Never / no PI skills
+
+**Q2. How many characters do you run PI on?**
+0 / not running · 1–2 · 3–5 · 6+
+
+**Q3. What tier(s) do you produce?** *(list all that apply)*
+- **P1** — Raw extraction (Bacteria, Electrolytes, Plasmoids…)
+- **P2** — Refined commodities (Biofuels, Coolant, Supertensile Plastics…)
+- **P3** — Specialized commodities (Robotics, Guidance Systems, Mechanical Parts…)
+- **P4** — Advanced commodities (Broadcast Node, Wetware Mainframe…)
+
+---
+
+### 📦 Section 2 — What You Produce
+
+**Q4. Which specific items do you make?**
+*List them out — e.g. "Robotics, Coolant, Guidance Systems"*
+
+**Q5. Roughly how much do you produce per item per month?**
+Under 50K · 50–200K · 200–500K · 500K–1M · 1M+ units
+
+**Q6. Where are you currently selling your PI output?**
+🏙️ Jita / trade hub · 🏰 Corp/alliance buyback · 🔀 Both · ❓ Stockpile/inconsistent
+
+---
+
+### 🤝 Section 3 — Interest Level
+
+**Q7. How interested are you in consigning PI through Infinite Solutions?**
+✅ Very — I want a slot  🤔 Interested but have questions  😐 Neutral  ❌ Not right now
+
+**Q8. What matters most in a consignment deal?** *(pick up to 3)*
+💰 Best ISK/unit · 📍 No hauling · 🔒 Exclusive slot (predictable income) · 📋 Simple setup · 🚪 Flexible exit
+
+**Q9. Questions, concerns, or anything else we should know?**
+*Reply in thread or DM me.*
+
+---
+
+Copy and reply in thread:
+```
+Q1 (Active / On-off / Never):
+Q2 (# of PI chars):
+Q3 (Tiers — P1 / P2 / P3 / P4):
+Q4 (Items I produce):
+Q5 (Monthly output per item):
+Q6 (Where I sell):
+Q7 (Interest — Very / Maybe / Neutral / No):
+Q8 (What matters most):
+Q9 (Questions / comments):
+IGN (optional, for follow-up):
+```
+
+> 🛡️ **Responses are just for internal planning** — used to set slot pricing and decide which items to offer first. No commitment required.
+
+*Questions? DM or @ Hamektok Hakaari · Results shared with corp once we have enough responses.*</textarea>
+    </div>
+
+    <button class="btn btn-discord" onclick="copyPost()">⎘ Copy Survey Post</button>
+    <div class="toast" id="toast-post">Copied to clipboard!</div>
+
+    <hr style="border-color: var(--border);">
+
+    <div class="copy-panel">
+      <div class="copy-panel-header">
+        <span>📝 Response Template Only</span>
+      </div>
+      <textarea id="template-only" readonly>Q1 (Active / On-off / Never):
+Q2 (# of PI chars):
+Q3 (Tiers — P1 / P2 / P3 / P4):
+Q4 (Items I produce):
+Q5 (Monthly output per item):
+Q6 (Where I sell):
+Q7 (Interest — Very / Maybe / Neutral / No):
+Q8 (What matters most):
+Q9 (Questions / comments):
+IGN (optional, for follow-up):</textarea>
+    </div>
+
+    <button class="btn btn-template" onclick="copyTemplate()">⎘ Copy Template Only</button>
+    <div class="toast" id="toast-template">Template copied!</div>
+
+    <div class="tip">
+      <strong>Tip:</strong> Post the full survey in a pinned forum thread, then pin the response template as the first reply so members can copy it easily. A reaction poll on Q7 works well for a quick pulse check before people fill in the full template.
+    </div>
+
+  </div><!-- /copy-col -->
+</div><!-- /shell -->
+
+<script>
+  function copyPost() {
+    const text = document.getElementById('survey-post').value;
+    navigator.clipboard.writeText(text).then(() => {
+      const t = document.getElementById('toast-post');
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2500);
+    });
+  }
+
+  function copyTemplate() {
+    const text = document.getElementById('template-only').value;
+    navigator.clipboard.writeText(text).then(() => {
+      const t = document.getElementById('toast-template');
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2500);
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI Producer Survey — Infinite Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #080e18;
+    --bg2:     #0a1520;
+    --bg3:     #0d1f30;
+    --card:    #0f2035;
+    --border:  #1a3a55;
+    --border2: #224460;
+    --accent:  #66d9ff;
+    --gold:    #ffcc44;
+    --green:   #44dd88;
+    --orange:  #ff9944;
+    --red:     #ff5555;
+    --muted:   #4a7090;
+    --text:    #c8dde8;
+    --dim:     #6a8fa8;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    padding: 40px 16px 80px;
+  }
+
+  .page { max-width: 680px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .survey-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .survey-header .org {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .survey-header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .survey-header p {
+    color: var(--dim);
+    font-size: 0.92rem;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .survey-header .pill-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.75rem;
+    color: var(--dim);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.06em;
+  }
+  .pill.green { border-color: var(--green); color: var(--green); }
+
+  /* ── SECTION CARDS ── */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+  .section-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── QUESTIONS ── */
+  .question { margin-bottom: 22px; }
+  .question:last-child { margin-bottom: 0; }
+
+  .q-label {
+    font-weight: 600;
+    color: #ddeeff;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .q-label .q-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.58rem;
+    background: var(--border2);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+  }
+  .q-label .req { color: var(--orange); font-size: 0.7rem; }
+  .q-hint {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+
+  /* ── RADIO OPTIONS ── */
+  .radio-group, .check-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .radio-group.inline, .check-group.inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .opt-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: border-color 0.12s, background 0.12s;
+    user-select: none;
+    font-size: 0.88rem;
+  }
+  .opt-label:hover { border-color: var(--border2); background: #112030; }
+
+  input[type=radio], input[type=checkbox] { display: none; }
+
+  .opt-indicator {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border2);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  input[type=checkbox] ~ .opt-label .opt-indicator {
+    border-radius: 3px;
+  }
+
+  input[type=radio]:checked + .opt-label,
+  input[type=checkbox]:checked + .opt-label {
+    border-color: var(--accent);
+    background: rgba(102,217,255,0.06);
+    color: #e8f8ff;
+  }
+  input[type=radio]:checked + .opt-label .opt-indicator {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 6px rgba(102,217,255,0.5);
+  }
+  input[type=radio]:checked + .opt-label .opt-indicator::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--bg);
+    border-radius: 50%;
+  }
+  input[type=checkbox]:checked + .opt-label .opt-indicator {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+  input[type=checkbox]:checked + .opt-label .opt-indicator::after {
+    content: '✓';
+    font-size: 10px;
+    color: var(--bg);
+    font-weight: 900;
+    line-height: 1;
+  }
+  input[type=checkbox]:disabled + .opt-label {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .opt-em { color: var(--dim); font-size: 0.78rem; margin-left: 2px; }
+
+  /* ── TEXT INPUTS ── */
+  .text-input, textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.12s;
+    resize: vertical;
+  }
+  .text-input:focus, textarea:focus { border-color: var(--accent); }
+  textarea { min-height: 80px; line-height: 1.5; }
+  ::placeholder { color: var(--muted); }
+
+  /* ── SUBMIT ── */
+  .submit-wrap {
+    text-align: center;
+    margin-top: 30px;
+  }
+  .btn-submit {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 14px 48px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-submit:hover { background: #88e8ff; transform: translateY(-1px); }
+  .btn-submit:disabled {
+    background: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .submit-note {
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-top: 10px;
+  }
+
+  /* ── ERROR ── */
+  .err-msg {
+    display: none;
+    color: var(--red);
+    font-size: 0.8rem;
+    margin-top: 6px;
+    padding: 6px 12px;
+    background: rgba(255,85,85,0.07);
+    border-left: 3px solid var(--red);
+    border-radius: 0 5px 5px 0;
+  }
+  .err-msg.show { display: block; }
+
+  /* ── SUCCESS SCREEN ── */
+  #success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeIn 0.4s ease;
+  }
+  #success-screen .check-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(68,221,136,0.12);
+    border: 2px solid var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 24px;
+    animation: pop 0.3s 0.1s both;
+  }
+  #success-screen h2 {
+    font-family: 'Orbitron', monospace;
+    color: var(--green);
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  #success-screen p { color: var(--dim); max-width: 400px; margin: 0 auto; }
+
+  /* ── SETUP BANNER ── */
+  #setup-banner {
+    display: none;
+    background: rgba(255,153,68,0.1);
+    border: 1px solid var(--orange);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 24px;
+    font-size: 0.82rem;
+    color: var(--orange);
+    line-height: 1.6;
+  }
+  #setup-banner strong { color: #ffbb66; }
+  #setup-banner code {
+    background: rgba(0,0,0,0.3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.78rem;
+    color: #ffd080;
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
+  @keyframes pop { 0% { transform: scale(0.6); opacity:0; } 80% { transform: scale(1.1); } 100% { transform: scale(1); opacity:1; } }
+</style>
+</head>
+<body>
+
+<!--
+═══════════════════════════ SETUP ═══════════════════════════════
+STEP 1 — Create a Google Sheet:
+  • Go to sheets.google.com → create a new blank spreadsheet
+  • Name it anything (e.g. "PI Survey Responses")
+
+STEP 2 — Add the Apps Script:
+  • In the sheet: Extensions → Apps Script
+  • Delete any existing code and paste the ENTIRE block from the
+    <script type="text/apps-script"> section at the bottom of this file
+  • Click Save (💾), name the project anything
+
+STEP 3 — Deploy:
+  • Click Deploy → New deployment
+  • Type: Web app
+  • Execute as: Me
+  • Who has access: Anyone
+  • Click Deploy → copy the Web app URL
+
+STEP 4 — Paste the URL below, replacing the placeholder:
+═════════════════════════════════════════════════════════════════ -->
+<script>
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyqLRXwVkbo_rTaEhxJAnWUUpM6PSLtJnzCkM33HDvclOZ8DgVtaOaoAgCK5JjKvpxAkQ/exec';
+</script>
+
+<div class="page">
+
+  <!-- ── SETUP BANNER (shown if webhook not configured) ── -->
+  <div id="setup-banner">
+    <strong>⚠ Endpoint not configured.</strong> See the setup instructions at the top of this HTML file. You need to deploy a Google Apps Script and paste the web app URL into the <code>ENDPOINT</code> constant.<br>
+    Short version: Google Sheet → Extensions → Apps Script → paste script → Deploy as Web App (Anyone) → copy URL → paste below <code>ENDPOINT =</code>
+  </div>
+
+  <!-- ── HEADER ── -->
+  <div class="survey-header">
+    <div class="org">Infinite Solutions · TEST Alliance</div>
+    <h1>PI Producer Survey</h1>
+    <p>We're building a consignment program that lets PI producers sell out of LX-ZOJ directly — no Jita haul, steady monthly income. Before we open slots, we need to know what the corp actually produces.</p>
+    <div class="pill-row">
+      <span class="pill">~2 min</span>
+      <span class="pill">9 questions</span>
+      <span class="pill green">No commitment required</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════ FORM ══════════════════ -->
+  <form id="survey-form" autocomplete="off" novalidate>
+
+    <!-- ── SECTION 1: Current Setup ── -->
+    <div class="section">
+      <div class="section-label">🪐 Section 1 — Your Current Setup</div>
+
+      <!-- Q1 -->
+      <div class="question">
+        <div class="q-label">
+          <span class="q-num">Q1</span>
+          Are you currently running PI?
+          <span class="req">*</span>
+        </div>
+        <div class="radio-group">
+          <input type="radio" name="q1" id="q1a" value="Actively (most months)">
+          <label class="opt-label" for="q1a"><span class="opt-indicator"></span>🟢 Actively — I produce most months</label>
+
+          <input type="radio" name="q1" id="q1b" value="On and off — have skills but haven't lately">
+          <label class="opt-label" for="q1b"><span class="opt-indicator"></span>🟡 On and off — have the skills but haven't lately</label>
+
+          <input type="radio" name="q1" id="q1c" value="Never / no PI skills">
+          <label class="opt-label" for="q1c"><span class="opt-indicator"></span>⚪ Never / no PI skills</label>
+        </div>
+        <div class="err-msg" id="q1-err">Please select an answer.</div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question">
+        <div class="q-label"><span class="q-num">Q2</span> How many characters do you run PI on?</div>
+        <div class="radio-group inline">
+          <input type="radio" name="q2" id="q2a" value="0 / not running">
+          <label class="opt-label" for="q2a"><span class="opt-indicator"></span>0 / not running</label>
+
+          <input type="radio" name="q2" id="q2b" value="1–2">
+          <label class="opt-label" for="q2b"><span class="opt-indicator"></span>1–2</label>
+
+          <input type="radio" name="q2" id="q2c" value="3–5">
+          <label class="opt-label" for="q2c"><span class="opt-indicator"></span>3–5</label>
+
+          <input type="radio" name="q2" id="q2d" value="6+">
+          <label class="opt-label" for="q2d"><span class="opt-indicator"></span>6+</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question">
+        <div class="q-label"><span class="q-num">Q3</span> What tier(s) do you produce? <span class="opt-em">(all that apply)</span></div>
+        <div class="check-group">
+          <input type="checkbox" name="q3" id="q3p1" value="P1 — Raw extraction (Bacteria, Electrolytes, Plasmoids…)">
+          <label class="opt-label" for="q3p1"><span class="opt-indicator"></span><strong>P1</strong>&nbsp;— Raw extraction <span class="opt-em">(Bacteria, Electrolytes, Plasmoids…)</span></label>
+
+          <input type="checkbox" name="q3" id="q3p2" value="P2 — Refined commodities (Biofuels, Coolant, Supertensile Plastics…)">
+          <label class="opt-label" for="q3p2"><span class="opt-indicator"></span><strong>P2</strong>&nbsp;— Refined commodities <span class="opt-em">(Biofuels, Coolant, Supertensile Plastics…)</span></label>
+
+          <input type="checkbox" name="q3" id="q3p3" value="P3 — Specialized commodities (Robotics, Guidance Systems, Mechanical Parts…)">
+          <label class="opt-label" for="q3p3"><span class="opt-indicator"></span><strong>P3</strong>&nbsp;— Specialized commodities <span class="opt-em">(Robotics, Guidance Systems, Mechanical Parts…)</span></label>
+
+          <input type="checkbox" name="q3" id="q3p4" value="P4 — Advanced commodities (Broadcast Node, Wetware Mainframe…)">
+          <label class="opt-label" for="q3p4"><span class="opt-indicator"></span><strong>P4</strong>&nbsp;— Advanced commodities <span class="opt-em">(Broadcast Node, Wetware Mainframe…)</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: What You Produce ── -->
+    <div class="section">
+      <div class="section-label">📦 Section 2 — What You Produce</div>
+
+      <!-- Q4 -->
+      <div class="question">
+        <div class="q-label"><span class="q-num">Q4</span> Which specific items do you make?</div>
+        <div class="q-hint">List by name — e.g. "Robotics, Coolant, Guidance Systems"</div>
+        <input type="text" class="text-input" id="q4" placeholder="e.g. Robotics, Coolant, Guidance Systems">
+      </div>
+
+      <!-- Q5 -->
+      <div class="question">
+        <div class="q-label"><span class="q-num">Q5</span> Roughly how much do you produce per item per month?</div>
+        <div class="radio-group">
+          <input type="radio" name="q5" id="q5a" value="Under 50K units">
+          <label class="opt-label" for="q5a"><span class="opt-indicator"></span>Under 50K units</label>
+
+          <input type="radio" name="q5" id="q5b" value="50K – 200K units">
+          <label class="opt-label" for="q5b"><span class="opt-indicator"></span>50K – 200K units</label>
+
+          <input type="radio" name="q5" id="q5c" value="200K – 500K units">
+          <label class="opt-label" for="q5c"><span class="opt-indicator"></span>200K – 500K units</label>
+
+          <input type="radio" name="q5" id="q5d" value="500K – 1M units">
+          <label class="opt-label" for="q5d"><span class="opt-indicator"></span>500K – 1M units</label>
+
+          <input type="radio" name="q5" id="q5e" value="1M+ units">
+          <label class="opt-label" for="q5e"><span class="opt-indicator"></span>1M+ units</label>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question">
+        <div class="q-label"><span class="q-num">Q6</span> Where are you currently selling your PI output?</div>
+        <div class="radio-group">
+          <input type="radio" name="q6" id="q6a" value="Jita / major trade hub">
+          <label class="opt-label" for="q6a"><span class="opt-indicator"></span>🏙️ Jita / major trade hub</label>
+
+          <input type="radio" name="q6" id="q6b" value="Alliance or corp buyback">
+          <label class="opt-label" for="q6b"><span class="opt-indicator"></span>🏰 Alliance or corp buyback</label>
+
+          <input type="radio" name="q6" id="q6c" value="Mix of both">
+          <label class="opt-label" for="q6c"><span class="opt-indicator"></span>🔀 Mix of both</label>
+
+          <input type="radio" name="q6" id="q6d" value="I stockpile / sell inconsistently">
+          <label class="opt-label" for="q6d"><span class="opt-indicator"></span>❓ I stockpile / sell inconsistently</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: Interest Level ── -->
+    <div class="section">
+      <div class="section-label">🤝 Section 3 — Interest in the Program</div>
+
+      <!-- Q7 -->
+      <div class="question">
+        <div class="q-label">
+          <span class="q-num">Q7</span>
+          How interested are you in consigning PI through Infinite Solutions?
+          <span class="req">*</span>
+        </div>
+        <div class="radio-group">
+          <input type="radio" name="q7" id="q7a" value="Very interested — I want to set up a slot">
+          <label class="opt-label" for="q7a"><span class="opt-indicator"></span>✅ Very interested — I want to set up a slot</label>
+
+          <input type="radio" name="q7" id="q7b" value="Interested but have questions">
+          <label class="opt-label" for="q7b"><span class="opt-indicator"></span>🤔 Interested but have questions first</label>
+
+          <input type="radio" name="q7" id="q7c" value="Neutral / not sure yet">
+          <label class="opt-label" for="q7c"><span class="opt-indicator"></span>😐 Neutral / not sure yet</label>
+
+          <input type="radio" name="q7" id="q7d" value="Not interested right now">
+          <label class="opt-label" for="q7d"><span class="opt-indicator"></span>❌ Not interested right now</label>
+        </div>
+        <div class="err-msg" id="q7-err">Please select an answer.</div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question">
+        <div class="q-label"><span class="q-num">Q8</span> What would matter most to you in a consignment deal? <span class="opt-em">(pick up to 3)</span></div>
+        <div class="check-group" id="q8-group">
+          <input type="checkbox" class="q8-cb" name="q8" id="q8a" value="Best possible ISK/unit return">
+          <label class="opt-label" for="q8a"><span class="opt-indicator"></span>💰 Best possible ISK/unit return</label>
+
+          <input type="checkbox" class="q8-cb" name="q8" id="q8b" value="No hauling — sell out of the citadel directly">
+          <label class="opt-label" for="q8b"><span class="opt-indicator"></span>📍 No hauling — sell out of the citadel directly</label>
+
+          <input type="checkbox" class="q8-cb" name="q8" id="q8c" value="Exclusive slot — predictable monthly income with no item competition">
+          <label class="opt-label" for="q8c"><span class="opt-indicator"></span>🔒 Exclusive slot — predictable income, no item competition</label>
+
+          <input type="checkbox" class="q8-cb" name="q8" id="q8d" value="Simple setup and low overhead">
+          <label class="opt-label" for="q8d"><span class="opt-indicator"></span>📋 Simple setup and low overhead</label>
+
+          <input type="checkbox" class="q8-cb" name="q8" id="q8e" value="Flexible terms — easy to exit if I stop playing">
+          <label class="opt-label" for="q8e"><span class="opt-indicator"></span>🚪 Flexible terms — easy to exit if life gets busy</label>
+        </div>
+        <div id="q8-count-note" style="color:var(--muted);font-size:0.75rem;margin-top:6px;">Select up to 3</div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question">
+        <div class="q-label"><span class="q-num">Q9</span> Questions, concerns, or anything else we should know?</div>
+        <textarea id="q9" placeholder="Optional — ask anything or tell us what would make this worth your time."></textarea>
+      </div>
+    </div>
+
+    <!-- ── YOUR INFO ── -->
+    <div class="section">
+      <div class="section-label">🪪 Your Info</div>
+      <div class="question">
+        <div class="q-label"><span class="q-num">—</span> In-Game Name <span class="opt-em">(optional — for follow-up only)</span></div>
+        <input type="text" class="text-input" id="ign" placeholder="Character name">
+      </div>
+    </div>
+
+    <!-- ── SUBMIT ── -->
+    <div class="submit-wrap">
+      <div class="err-msg" id="submit-err" style="display:none; text-align:center; margin-bottom:12px;">Please answer the required questions (marked with *).</div>
+      <button type="submit" class="btn-submit" id="submit-btn">Submit Survey →</button>
+      <div class="submit-note">Responses go directly to Infinite Solutions leadership · No commitment required</div>
+    </div>
+
+  </form>
+
+  <!-- ══════════ SUCCESS SCREEN ══════════ -->
+  <div id="success-screen">
+    <div class="check-icon">✓</div>
+    <h2>Response Received</h2>
+    <p style="margin-bottom:16px;">Thanks for taking the time. Your answers go directly to Infinite Solutions leadership and will help shape how we build the Partner Program.</p>
+    <p style="font-size:0.82rem; color:var(--muted);">Questions? DM <strong style="color:var(--dim)">Hamektok Hakaari</strong> in-game or on Discord.</p>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  // ── Check endpoint config ─────────────────────────────────────────────────
+  if (!ENDPOINT || ENDPOINT.includes('YOUR_GOOGLE')) {
+    document.getElementById('setup-banner').style.display = 'block';
+  }
+
+  // ── Q8 max-3 enforcement ──────────────────────────────────────────────────
+  const q8boxes = document.querySelectorAll('.q8-cb');
+  const q8note  = document.getElementById('q8-count-note');
+
+  q8boxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const checked = document.querySelectorAll('.q8-cb:checked');
+      const n = checked.length;
+      q8note.textContent = n === 0 ? 'Select up to 3'
+                         : n === 3 ? '3/3 selected (maximum)'
+                         : `${n}/3 selected`;
+      q8note.style.color = n === 3 ? 'var(--accent)' : 'var(--muted)';
+      q8boxes.forEach(c => { c.disabled = (n >= 3 && !c.checked); });
+    });
+  });
+
+  // ── Form submission ───────────────────────────────────────────────────────
+  document.getElementById('survey-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Validation
+    let valid = true;
+    const q1val = document.querySelector('input[name=q1]:checked');
+    const q7val = document.querySelector('input[name=q7]:checked');
+    document.getElementById('q1-err').classList.remove('show');
+    document.getElementById('q7-err').classList.remove('show');
+    document.getElementById('submit-err').style.display = 'none';
+
+    if (!q1val) { document.getElementById('q1-err').classList.add('show'); valid = false; }
+    if (!q7val) { document.getElementById('q7-err').classList.add('show'); valid = false; }
+
+    if (!valid) {
+      document.getElementById('submit-err').style.display = 'block';
+      document.querySelector('.err-msg.show')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Collect answers
+    const data = {
+      q1:  q1val.value,
+      q2:  document.querySelector('input[name=q2]:checked')?.value || '—',
+      q3:  [...document.querySelectorAll('input[name=q3]:checked')].map(c => c.value).join(', ') || '—',
+      q4:  document.getElementById('q4').value.trim() || '—',
+      q5:  document.querySelector('input[name=q5]:checked')?.value || '—',
+      q6:  document.querySelector('input[name=q6]:checked')?.value || '—',
+      q7:  q7val.value,
+      q8:  [...document.querySelectorAll('.q8-cb:checked')].map(c => c.value).join(' | ') || '—',
+      q9:  document.getElementById('q9').value.trim() || '—',
+      ign: document.getElementById('ign').value.trim() || 'Anonymous',
+    };
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      // Google Apps Script web apps require no-cors from external origins.
+      // The script receives and processes the data; we can't read the response
+      // body but the row is written to the sheet regardless.
+      await fetch(ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: JSON.stringify(data),
+      });
+
+      document.getElementById('survey-form').style.display = 'none';
+      const ss = document.getElementById('success-screen');
+      ss.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Submit Survey →';
+      alert('Submission failed — check your network connection and try again.\n\n' + err.message);
+    }
+  });
+</script>
+
+<!--
+════════════════════════ GOOGLE APPS SCRIPT ════════════════════════
+Copy everything between the dashes and paste it into the Apps Script
+editor (Google Sheet → Extensions → Apps Script → replace all code):
+──────────────────────────────────────────────────────────────────
+
+function doPost(e) {
+  var ss    = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Responses') || ss.getActiveSheet();
+
+  // Write header row on first submission
+  if (sheet.getLastRow() === 0) {
+    var headers = [
+      'Timestamp', 'Active PI?', '# PI Chars', 'Tiers Produced',
+      'Items Produced', 'Monthly Output', 'Where They Sell',
+      'Interest Level', 'What Matters Most', 'Comments', 'In-Game Name'
+    ];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+
+  var d = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    new Date(),
+    d.q1  || '—',
+    d.q2  || '—',
+    d.q3  || '—',
+    d.q4  || '—',
+    d.q5  || '—',
+    d.q6  || '—',
+    d.q7  || '—',
+    d.q8  || '—',
+    d.q9  || '—',
+    d.ign || 'Anonymous'
+  ]);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ok' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+──────────────────────────────────────────────────────────────────
+After pasting: Save → Deploy → New deployment → Web app
+  Execute as: Me  |  Who has access: Anyone  |  Deploy → copy URL
+════════════════════════════════════════════════════════════════════
+-->
+
+</body>
+</html>

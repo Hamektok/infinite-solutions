@@ -7,6 +7,7 @@ from tkinter import ttk, messagebox
 import sqlite3
 import subprocess
 import os
+import sys
 import json
 from datetime import datetime, timezone
 
@@ -190,7 +191,17 @@ class AdminDashboard:
         self.notebook.add(self.consign_frame, text='  Consignments  ')
         self._build_consignment_tab()
 
-        # Tab 9: Quick Actions
+        # Tab 9: Slot Pricing
+        self.slot_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.slot_frame, text='  Slot Pricing  ')
+        self._build_slot_pricing_tab()
+
+        # Tab 10: Slot Manager
+        self.slotmgr_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.slotmgr_frame, text='  Slot Manager  ')
+        self._build_slot_manager_tab()
+
+        # Tab 11: Quick Actions
         self.actions_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
@@ -2289,11 +2300,11 @@ class AdminDashboard:
 
     def _price_for_basis(self, basis, best_buy, best_sell):
         if basis == 'JBV':
-            return best_buy
+            return best_buy or best_sell   # fall back to sell when no buy orders exist
         elif basis == 'JSV':
             return best_sell
         else:  # Jita Split
-            return (best_buy + best_sell) / 2
+            return ((best_buy or best_sell) + best_sell) / 2
 
     def load_export_data(self):
         """Query DB and populate the export treeview."""
@@ -2327,7 +2338,6 @@ class AdminDashboard:
                 SELECT MAX(timestamp) FROM market_price_snapshots
                 WHERE type_id = tmi.type_id
             )
-              AND mps.best_buy  > 0
               AND mps.best_sell > 0
             ORDER BY tmi.category, it.type_name
         """)
@@ -2617,7 +2627,14 @@ class AdminDashboard:
                                                'PI Materials', 'Moon Materials',
                                                'Salvaged Materials'])
         import_cat_menu.pack(side='left', padx=(0, 12))
-        import_cat_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_import_tree())
+        import_cat_menu.bind('<<ComboboxSelected>>', lambda _: self._import_cat_changed())
+        ttk.Label(filter_frame, text="Subcategory:").pack(side='left', padx=(0, 4))
+        self.import_sub_var = tk.StringVar(value='All Subcategories')
+        self.import_sub_menu = ttk.Combobox(filter_frame, textvariable=self.import_sub_var,
+                                            width=18, state='readonly',
+                                            values=['All Subcategories'])
+        self.import_sub_menu.pack(side='left', padx=(0, 12))
+        self.import_sub_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_import_tree())
         ttk.Label(filter_frame, text="Show:").pack(side='left', padx=(0, 4))
         self.import_show_var = tk.StringVar(value='Profitable')
         show_menu = ttk.Combobox(filter_frame, textvariable=self.import_show_var,
@@ -2683,8 +2700,8 @@ class AdminDashboard:
         if key == 'JSV':
             return best_sell
         elif key == 'JBV':
-            return best_buy
-        return (best_buy + best_sell) / 2
+            return best_buy or best_sell   # fall back to sell when no buy orders exist
+        return ((best_buy or best_sell) + best_sell) / 2
 
     def load_import_data(self):
         """Query DB and populate the import analysis treeview."""
@@ -2705,14 +2722,15 @@ class AdminDashboard:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT it.type_name, tmi.category, it.volume, mps.best_buy, mps.best_sell
+            SELECT it.type_name, tmi.category, it.volume, mps.best_buy, mps.best_sell,
+                   tmi.display_order, it.market_group_id
             FROM tracked_market_items tmi
             JOIN inv_types it               ON tmi.type_id = it.type_id
             JOIN market_price_snapshots mps ON tmi.type_id = mps.type_id
             WHERE mps.timestamp = (
                 SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id = tmi.type_id
             )
-              AND mps.best_buy > 0 AND mps.best_sell > 0
+              AND mps.best_sell > 0
             ORDER BY tmi.category, it.type_name
         """)
         rows = cursor.fetchall()
@@ -2725,11 +2743,32 @@ class AdminDashboard:
             'moon_materials': 'Moon Materials', 'pi_materials': 'PI Materials',
             'salvaged_materials': 'Salvaged Materials',
         }
+        _pi_sub  = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+        def _sub(cat, disp, mg):
+            if cat == 'ice_products':
+                if disp <= 8:  return 'Fuel Blocks'
+                if disp <= 11: return 'Refined Ice'
+                return 'Isotopes'
+            if cat == 'moon_materials':
+                if disp < 100:  return 'Raw'
+                if disp < 200:  return 'Processed'
+                return 'Advanced'
+            if cat == 'pi_materials':
+                return _pi_sub.get(mg, '')
+            if cat == 'salvaged_materials':
+                if disp <= 9:  return 'Common'
+                if disp <= 21: return 'Uncommon'
+                if disp <= 32: return 'Rare'
+                if disp <= 42: return 'Very Rare'
+                return 'Rogue Drone'
+            return ''
+
         self._import_all_rows = []
         counts = {'great': 0, 'good': 0, 'marginal': 0, 'avoid': 0}
         margin_sum, margin_n = 0.0, 0
 
-        for name, category, volume, best_buy, best_sell in rows:
+        for name, category, volume, best_buy, best_sell, disp_ord, mgroup in rows:
+            subcategory = _sub(category, disp_ord or 0, mgroup or 0)
             raw_buy        = self._import_price_for_basis(buy_basis, best_buy, best_sell)
             buy_cost       = raw_buy * buy_pct + raw_buy * effective_broker
             ship_cost      = volume * ship_rate
@@ -2758,6 +2797,7 @@ class AdminDashboard:
 
             self._import_all_rows.append({
                 'category':       cat_map.get(category, category.replace('_', ' ').title()),
+                'subcategory':    subcategory,
                 'item':           name,
                 'volume':         volume,
                 'buy_cost':       buy_cost,
@@ -2793,13 +2833,29 @@ class AdminDashboard:
         self.update_status(
             f"Import analysis updated \u2014 {snap_ts[:16] if len(snap_ts) > 16 else snap_ts}")
 
+    def _import_cat_changed(self):
+        cat = self.import_cat_var.get()
+        sub_opts = {
+            'All':                ['All Subcategories'],
+            'Minerals':           ['All Subcategories'],
+            'Ice Products':       ['All Subcategories', 'Fuel Blocks', 'Refined Ice', 'Isotopes'],
+            'PI Materials':       ['All Subcategories', 'P1', 'P2', 'P3', 'P4'],
+            'Moon Materials':     ['All Subcategories', 'Raw', 'Processed', 'Advanced'],
+            'Salvaged Materials': ['All Subcategories', 'Common', 'Uncommon', 'Rare', 'Very Rare', 'Rogue Drone'],
+        }.get(cat, ['All Subcategories'])
+        self.import_sub_menu['values'] = sub_opts
+        self.import_sub_var.set('All Subcategories')
+        self._filter_import_tree()
+
     def _filter_import_tree(self):
         search     = self.import_search_var.get().lower()
         cat_filter = self.import_cat_var.get()
+        sub_filter = self.import_sub_var.get()
         show       = self.import_show_var.get()
         filtered   = [r for r in self._import_all_rows
                       if (not search or search in r['item'].lower())
                       and (cat_filter == 'All' or r['category'] == cat_filter)
+                      and (sub_filter == 'All Subcategories' or r['subcategory'] == sub_filter)
                       and (show == 'All'
                            or (show == 'Profitable' and r['tag'] in ('great', 'good'))
                            or (show == 'Marginal'   and r['tag'] == 'marginal')
@@ -4017,11 +4073,52 @@ class AdminDashboard:
                 auto_logged        INTEGER DEFAULT 0
             )
         """)
+        # Container → consignor assignment
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS consignor_containers (
+                id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+                consignor_id       INTEGER NOT NULL REFERENCES consignors(id),
+                container_item_id  INTEGER NOT NULL UNIQUE,
+                container_name     TEXT,
+                notes              TEXT
+            )
+        """)
+        # Shared-slot sales pending manual attribution
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS consignment_pending_sales (
+                id                INTEGER PRIMARY KEY AUTOINCREMENT,
+                contract_id       INTEGER NOT NULL,
+                type_id           INTEGER NOT NULL,
+                item_name         TEXT,
+                total_qty         INTEGER NOT NULL,
+                total_isk         REAL    NOT NULL,
+                sale_date         TEXT,
+                created_at        TEXT    NOT NULL,
+                notes             TEXT
+            )
+        """)
+        # Per-container inventory history (parallel to lx_zoj_inventory)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS lx_zoj_container_snapshot (
+                id                INTEGER PRIMARY KEY AUTOINCREMENT,
+                snapshot_timestamp TEXT   NOT NULL,
+                container_item_id  INTEGER NOT NULL,
+                type_id            INTEGER NOT NULL,
+                type_name          TEXT    NOT NULL,
+                quantity           INTEGER NOT NULL
+            )
+        """)
         # Safe migrations for existing installs
         for sql in [
-            "ALTER TABLE consignors ADD COLUMN item_type_id INTEGER",
+            "ALTER TABLE consignors ADD COLUMN item_type_id   INTEGER",
+            "ALTER TABLE consignors ADD COLUMN slot_type      TEXT    DEFAULT 'shared'",
+            "ALTER TABLE consignors ADD COLUMN slot_priority  INTEGER DEFAULT 1",
+            "ALTER TABLE consignors ADD COLUMN max_units      INTEGER",
+            "ALTER TABLE consignors ADD COLUMN demand_tier    TEXT    DEFAULT 'medium'",
+            "ALTER TABLE consignors ADD COLUMN current_qty    INTEGER DEFAULT 0",
             "ALTER TABLE consignment_sales ADD COLUMN source_contract_id INTEGER",
             "ALTER TABLE consignment_sales ADD COLUMN auto_logged INTEGER DEFAULT 0",
+            "ALTER TABLE lx_zoj_inventory   ADD COLUMN container_item_id INTEGER",
         ]:
             try:
                 conn.execute(sql)
@@ -4063,23 +4160,33 @@ class AdminDashboard:
         ttk.Button(ctb, text='Toggle Active',
                    command=self._consign_toggle_active).pack(side='left', padx=(0, 4))
 
-        c_cols = ('name', 'item', 'list_price', 'their_pct', 'my_pct', 'start_date', 'status', 'owed')
+        c_cols = ('slot_type', 'name', 'item', 'current_qty', 'max_units',
+                  'list_price', 'their_pct', 'my_pct', 'demand', 'start_date', 'status', 'owed')
         self.consign_tree = ttk.Treeview(top_inner, columns=c_cols, show='headings',
                                          selectmode='browse', height=6)
         for cid, hd, w, a in [
-            ('name',       'Consignor',       150, 'w'),
-            ('item',       'Item',            180, 'w'),
-            ('list_price', 'List Price/Unit', 120, 'e'),
-            ('their_pct',  'Their %',          75, 'e'),
-            ('my_pct',     'My %',             65, 'e'),
-            ('start_date', 'Since',           100, 'c'),
-            ('status',     'Status',           75, 'c'),
-            ('owed',       'ISK Owed',        130, 'e'),
+            ('slot_type',  'Type',             90, 'c'),
+            ('name',       'Consignor',        140, 'w'),
+            ('item',       'Item',             170, 'w'),
+            ('current_qty','In Slot',           70, 'e'),
+            ('max_units',  'Max Units',         75, 'e'),
+            ('list_price', 'Price/Unit',       110, 'e'),
+            ('their_pct',  'Their %',           65, 'e'),
+            ('my_pct',     'My %',              55, 'e'),
+            ('demand',     'Demand',            70, 'c'),
+            ('start_date', 'Since',            100, 'c'),
+            ('status',     'Status',            70, 'c'),
+            ('owed',       'ISK Owed',         120, 'e'),
         ]:
             self.consign_tree.heading(cid, text=hd)
             self.consign_tree.column(cid, width=w, minwidth=40, anchor=a)
-        self.consign_tree.tag_configure('active',   foreground='#00ff88')
-        self.consign_tree.tag_configure('inactive', foreground='#888888')
+        self.consign_tree.tag_configure('active',    foreground='#00ff88')
+        self.consign_tree.tag_configure('inactive',  foreground='#888888')
+        self.consign_tree.tag_configure('exclusive', foreground='#ffcc44')
+        self.consign_tree.tag_configure('combined',  foreground='#00d9ff', font=('Segoe UI', 9, 'bold'))
+        self.consign_tree.tag_configure('d_high',    foreground='#ff6666')
+        self.consign_tree.tag_configure('d_medium',  foreground='#ffcc44')
+        self.consign_tree.tag_configure('d_low',     foreground='#66d9ff')
         self.consign_tree.bind('<<TreeviewSelect>>', lambda _: self._consign_load_sales())
 
         c_vsb = ttk.Scrollbar(top_inner, orient='vertical', command=self.consign_tree.yview)
@@ -4141,43 +4248,176 @@ class AdminDashboard:
         s_hsb.pack(side='bottom', fill='x')
         self.sales_tree.pack(fill='both', expand=True)
 
+        # ── MIDDLE: Container Assignments ─────────────────────────────────
+        cont_card = ttk.Frame(pane, style='Card.TFrame')
+        pane.add(cont_card, minsize=120)
+
+        cont_inner = ttk.Frame(cont_card, style='Card.TFrame')
+        cont_inner.pack(fill='both', expand=True, padx=10, pady=8)
+
+        ctb2 = ttk.Frame(cont_inner, style='Card.TFrame')
+        ctb2.pack(fill='x', pady=(0, 6))
+        tk.Label(ctb2, text='Container Assignments', background='#0a2030',
+                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
+        ttk.Button(ctb2, text='+ Assign Container',
+                   command=self._consign_assign_container_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(ctb2, text='Remove',
+                   command=self._consign_remove_container).pack(side='left', padx=(0, 4))
+        ttk.Button(ctb2, text='\u21ba Refresh Names',
+                   command=self._consign_refresh_container_names).pack(side='left', padx=(0, 16))
+        tk.Label(ctb2, text='Assign a named hangar container to a consignor — qty auto-updates on sync.',
+                 background='#0a2030', foreground='#668899',
+                 font=('Segoe UI', 8)).pack(side='left')
+
+        cc_cols = ('consignor', 'item', 'container_id', 'container_name', 'notes')
+        self.container_tree = ttk.Treeview(cont_inner, columns=cc_cols, show='headings',
+                                           selectmode='browse', height=4)
+        for cid, hd, w, a in [
+            ('consignor',      'Consignor',        140, 'w'),
+            ('item',           'Item',             170, 'w'),
+            ('container_id',   'Container ID',     130, 'e'),
+            ('container_name', 'ESI Name',         200, 'w'),
+            ('notes',          'Notes',            260, 'w'),
+        ]:
+            self.container_tree.heading(cid, text=hd)
+            self.container_tree.column(cid, width=w, minwidth=40, anchor=a)
+
+        cc_vsb = ttk.Scrollbar(cont_inner, orient='vertical', command=self.container_tree.yview)
+        self.container_tree.configure(yscrollcommand=cc_vsb.set)
+        cc_vsb.pack(side='right', fill='y')
+        self.container_tree.pack(fill='both', expand=True)
+
+        # ── BOTTOM: Pending Sales (Shared Slot Attribution) ───────────────
+        pend_card = ttk.Frame(pane, style='Card.TFrame')
+        pane.add(pend_card, minsize=120)
+
+        pend_inner = ttk.Frame(pend_card, style='Card.TFrame')
+        pend_inner.pack(fill='both', expand=True, padx=10, pady=8)
+
+        ptb = ttk.Frame(pend_inner, style='Card.TFrame')
+        ptb.pack(fill='x', pady=(0, 6))
+        tk.Label(ptb, text='Pending Attribution', background='#0a2030',
+                 foreground='#ff9944', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
+        ttk.Button(ptb, text='Split / Attribute',
+                   command=self._consign_split_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(ptb, text='Delete Selected',
+                   command=self._consign_delete_pending).pack(side='left', padx=(0, 16))
+        tk.Label(ptb, text='Shared-slot sales awaiting manual attribution to individual consignors.',
+                 background='#0a2030', foreground='#668899',
+                 font=('Segoe UI', 8)).pack(side='left')
+
+        ps_cols = ('sale_date', 'item_name', 'total_qty', 'total_isk', 'notes')
+        self.pending_tree = ttk.Treeview(pend_inner, columns=ps_cols, show='headings',
+                                         selectmode='browse', height=4)
+        for cid, hd, w, a in [
+            ('sale_date',  'Sale Date',   110, 'c'),
+            ('item_name',  'Item',        200, 'w'),
+            ('total_qty',  'Total Qty',    90, 'e'),
+            ('total_isk',  'Total ISK',   140, 'e'),
+            ('notes',      'Notes',       340, 'w'),
+        ]:
+            self.pending_tree.heading(cid, text=hd)
+            self.pending_tree.column(cid, width=w, minwidth=40, anchor=a)
+        self.pending_tree.tag_configure('pending_row', foreground='#ff9944')
+
+        ps_vsb = ttk.Scrollbar(pend_inner, orient='vertical', command=self.pending_tree.yview)
+        self.pending_tree.configure(yscrollcommand=ps_vsb.set)
+        ps_vsb.pack(side='right', fill='y')
+        self.pending_tree.pack(fill='both', expand=True)
+
         self._consign_load_consignors()
+        self._consign_load_containers()
+        self._consign_load_pending()
 
     def _consign_load_consignors(self):
-        """Load consignors into the treeview."""
+        """Load consignors into the treeview, with combined-stock rows for shared items."""
         conn = sqlite3.connect(DB_PATH)
         rows = conn.execute("""
             SELECT c.id, c.character_name, c.item_name, c.list_price,
                    c.consignor_pct, c.start_date, c.active,
-                   COALESCE(SUM(CASE WHEN s.paid=0 THEN s.consignor_isk ELSE 0 END), 0)
+                   COALESCE(SUM(CASE WHEN s.paid=0 THEN s.consignor_isk ELSE 0 END), 0),
+                   c.slot_type, c.slot_priority, c.max_units, c.demand_tier,
+                   COALESCE(c.current_qty, 0)
             FROM consignors c
             LEFT JOIN consignment_sales s ON s.consignor_id = c.id
             GROUP BY c.id
-            ORDER BY c.active DESC, c.character_name
+            ORDER BY c.active DESC, c.item_name, c.slot_priority, c.character_name
         """).fetchall()
         conn.close()
 
+        # Build a map of item_name -> list of shared+active rows to generate combined rows
+        from collections import defaultdict
+        shared_groups = defaultdict(list)
+        for row in rows:
+            cid, name, item, price, their_pct, start, active, owed, \
+                slot_type, priority, max_units, demand, cur_qty = row
+            if (slot_type or 'shared') == 'shared' and active:
+                shared_groups[item].append(row)
+
+        _demand_label = {'high': '▲ High', 'medium': '◆ Med', 'low': '▼ Low'}
+        _demand_tag   = {'high': 'd_high', 'medium': 'd_medium', 'low': 'd_low'}
+        _slot_label   = {'exclusive': '★ Exclusive', 'shared': '◈ Shared'}
+
         sel = self.consign_tree.selection()
         self.consign_tree.delete(*self.consign_tree.get_children())
-        for cid, name, item, price, their_pct, start, active, owed in rows:
-            my_pct    = round(100.0 - their_pct, 1)
-            price_str = f"{price:,.2f}" if price is not None else '—'
-            owed_str  = f"{owed:,.2f}" if owed else '—'
-            tag       = 'active' if active else 'inactive'
-            self.consign_tree.insert('', 'end', iid=str(cid), tags=(tag,), values=(
-                name, item, price_str,
+
+        # Track which shared items already have a combined row inserted
+        combined_inserted = set()
+
+        for row in rows:
+            cid, name, item, price, their_pct, start, active, owed, \
+                slot_type, priority, max_units, demand, cur_qty = row
+            slot_type  = slot_type  or 'shared'
+            demand     = demand     or 'medium'
+            my_pct     = round(100.0 - their_pct, 1)
+            price_str  = f"{price:,.2f}" if price is not None else '—'
+            owed_str   = f"{owed:,.2f}" if owed else '—'
+            max_str    = f"{max_units:,}" if max_units else '—'
+            cur_str    = f"{cur_qty:,}" if cur_qty else '—'
+            d_label    = _demand_label.get(demand, demand)
+            d_tag      = _demand_tag.get(demand, 'd_medium')
+            type_label = _slot_label.get(slot_type, slot_type)
+
+            # Insert combined-stock summary row for shared items with 2+ active suppliers
+            if slot_type == 'shared' and item not in combined_inserted:
+                group = shared_groups.get(item, [])
+                if len(group) >= 2:
+                    combined_qty   = sum(r[12] for r in group)
+                    combined_owed  = sum(r[7]  for r in group)
+                    combined_inserted.add(item)
+                    self.consign_tree.insert('', 'end',
+                        iid=f'combined_{item}', tags=('combined',), values=(
+                        '◈ Shared',
+                        f'({len(group)} suppliers)',
+                        item,
+                        f"{combined_qty:,}" if combined_qty else '—',
+                        '—', price_str, '—', '—',
+                        d_label,
+                        '—',
+                        '▶ Combined',
+                        f"{combined_owed:,.2f}" if combined_owed else '—',
+                    ))
+
+            status_tag = 'active' if active else 'inactive'
+            type_tag   = 'exclusive' if slot_type == 'exclusive' else status_tag
+            tags       = (type_tag, d_tag)
+            self.consign_tree.insert('', 'end', iid=str(cid), tags=tags, values=(
+                type_label, name, item,
+                cur_str, max_str, price_str,
                 f"{their_pct:.1f}%", f"{my_pct:.1f}%",
-                start, 'Active' if active else 'Inactive',
+                d_label, start,
+                'Active' if active else 'Inactive',
                 owed_str,
             ))
+
         if sel and self.consign_tree.exists(sel[0]):
             self.consign_tree.selection_set(sel[0])
 
     def _consign_load_sales(self):
         """Load the sales log for the selected consignor."""
         sel = self.consign_tree.selection()
-        if not sel:
-            return
+        if not sel or not sel[0].isdigit():
+            return  # ignore combined summary rows
         cid  = int(sel[0])
         name = self.consign_tree.set(sel[0], 'name')
         self._consign_log_title.configure(text=f'Sales Log \u2014 {name}')
@@ -4223,18 +4463,20 @@ class AdminDashboard:
             conn = sqlite3.connect(DB_PATH)
             existing = conn.execute(
                 "SELECT character_name, item_name, item_type_id, list_price, "
-                "consignor_pct, start_date, notes FROM consignors WHERE id=?",
+                "consignor_pct, start_date, notes, slot_type, slot_priority, "
+                "max_units, demand_tier, current_qty FROM consignors WHERE id=?",
                 (consignor_id,)).fetchone()
             conn.close()
 
         dlg = tk.Toplevel(self.root)
         dlg.title('Edit Consignor' if existing else 'Add Consignor')
-        dlg.geometry('440x440')
+        dlg.geometry('460x640')
         dlg.configure(background='#0a1520')
         dlg.resizable(False, False)
         dlg.grab_set()
 
         lbl_cfg = dict(background='#0a1520', foreground='#88d0e8', font=('Segoe UI', 10))
+        sub_cfg = dict(background='#0a1520', foreground='#3a7090', font=('Segoe UI', 8, 'italic'))
 
         def labeled_entry(label, default='', width=32):
             tk.Label(dlg, text=label, **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
@@ -4242,8 +4484,8 @@ class AdminDashboard:
             ttk.Entry(dlg, textvariable=var, width=width).pack(anchor='w', padx=16)
             return var
 
-        name_var  = labeled_entry('Character Name',            existing[0] if existing else '')
-        item_var  = labeled_entry('Item Being Consigned',      existing[1] if existing else '')
+        name_var = labeled_entry('Character Name',       existing[0] if existing else '')
+        item_var = labeled_entry('Item Being Consigned', existing[1] if existing else '')
 
         # Type ID row with live name preview
         tk.Label(dlg, text='Item Type ID  (for contract sync)', **lbl_cfg).pack(
@@ -4267,7 +4509,7 @@ class AdminDashboard:
             conn2.close()
             tid_name_lbl.configure(text=row[0] if row else '(not found)')
         tid_var.trace_add('write', _lookup_type_name)
-        _lookup_type_name()  # populate on load if editing
+        _lookup_type_name()
 
         price_var = labeled_entry('Agreed List Price / Unit',
                                   f"{existing[3]:.2f}" if existing and existing[3] is not None else '')
@@ -4276,8 +4518,60 @@ class AdminDashboard:
         date_var  = labeled_entry('Start Date (YYYY-MM-DD)',
                                   existing[5] if existing else datetime.now().strftime('%Y-%m-%d'))
 
+        # ── Slot type ─────────────────────────────────────────────────────
+        tk.Frame(dlg, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
+        tk.Label(dlg, text='Slot Configuration', background='#0a1520',
+                 foreground='#00d9ff', font=('Segoe UI', 9, 'bold')).pack(anchor='w', padx=16, pady=(6, 2))
+
+        slot_var = tk.StringVar(value=existing[7] if existing and existing[7] else 'shared')
+        slot_row = tk.Frame(dlg, background='#0a1520')
+        slot_row.pack(anchor='w', padx=16)
+        tk.Radiobutton(slot_row, text='◈ Shared  (multiple suppliers)',
+                       variable=slot_var, value='shared',
+                       background='#0a1520', foreground='#66d9ff',
+                       selectcolor='#0a1520', activebackground='#0a1520',
+                       font=('Segoe UI', 10)).pack(side='left', padx=(0, 16))
+        tk.Radiobutton(slot_row, text='★ Exclusive  (single supplier)',
+                       variable=slot_var, value='exclusive',
+                       background='#0a1520', foreground='#ffcc44',
+                       selectcolor='#0a1520', activebackground='#0a1520',
+                       font=('Segoe UI', 10)).pack(side='left')
+
+        # Priority + Max units row
+        pm_row = tk.Frame(dlg, background='#0a1520')
+        pm_row.pack(anchor='w', padx=16, pady=(6, 0))
+        tk.Label(pm_row, text='Priority (1=primary):', **lbl_cfg).pack(side='left', padx=(0, 6))
+        pri_var = tk.StringVar(value=str(existing[8]) if existing and existing[8] else '1')
+        ttk.Entry(pm_row, textvariable=pri_var, width=4).pack(side='left', padx=(0, 16))
+        tk.Label(pm_row, text='Max Units in Slot:', **lbl_cfg).pack(side='left', padx=(0, 6))
+        max_var = tk.StringVar(value=str(existing[9]) if existing and existing[9] else '')
+        ttk.Entry(pm_row, textvariable=max_var, width=10).pack(side='left')
+        tk.Label(dlg, text='For shared slots: lower priority number = listed first. '
+                 'Leave Max Units blank for unlimited.',
+                 **sub_cfg).pack(anchor='w', padx=16)
+
+        # Current qty + demand tier row
+        tk.Label(dlg, text='Current Qty in Slot', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+        qty_var = tk.StringVar(value=str(existing[11]) if existing and existing[11] else '0')
+        ttk.Entry(dlg, textvariable=qty_var, width=12).pack(anchor='w', padx=16)
+        tk.Label(dlg, text='Update when you restock or confirm contract qty.',
+                 **sub_cfg).pack(anchor='w', padx=16)
+
+        tk.Label(dlg, text='Demand Tier', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+        dem_var = tk.StringVar(value=existing[10] if existing and existing[10] else 'medium')
+        dem_row = tk.Frame(dlg, background='#0a1520')
+        dem_row.pack(anchor='w', padx=16)
+        for val, lbl, fg in [('low', '▼ Low', '#66d9ff'), ('medium', '◆ Medium', '#ffcc44'),
+                              ('high', '▲ High', '#ff6666')]:
+            tk.Radiobutton(dem_row, text=lbl, variable=dem_var, value=val,
+                           background='#0a1520', foreground=fg,
+                           selectcolor='#0a1520', activebackground='#0a1520',
+                           font=('Segoe UI', 10)).pack(side='left', padx=(0, 12))
+
+        # ── Notes ─────────────────────────────────────────────────────────
+        tk.Frame(dlg, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
         tk.Label(dlg, text='Notes', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
-        notes_txt = tk.Text(dlg, width=44, height=3, background='#0d2535',
+        notes_txt = tk.Text(dlg, width=46, height=3, background='#0d2535',
                             foreground='#ccddee', insertbackground='white',
                             font=('Segoe UI', 9), relief='flat')
         notes_txt.pack(anchor='w', padx=16)
@@ -4286,14 +4580,19 @@ class AdminDashboard:
 
         def save():
             try:
-                name     = name_var.get().strip()
-                item     = item_var.get().strip()
-                tid_raw  = tid_var.get().strip()
-                type_id  = int(tid_raw) if tid_raw.isdigit() else None
-                price    = float(price_var.get()) if price_var.get().strip() else None
-                pct      = float(pct_var.get())
-                date     = date_var.get().strip()
-                notes    = notes_txt.get('1.0', 'end').strip()
+                name      = name_var.get().strip()
+                item      = item_var.get().strip()
+                tid_raw   = tid_var.get().strip()
+                type_id   = int(tid_raw) if tid_raw.isdigit() else None
+                price     = float(price_var.get()) if price_var.get().strip() else None
+                pct       = float(pct_var.get())
+                date      = date_var.get().strip()
+                notes     = notes_txt.get('1.0', 'end').strip()
+                slot_type = slot_var.get()
+                priority  = int(pri_var.get()) if pri_var.get().strip().isdigit() else 1
+                max_units = int(max_var.get()) if max_var.get().strip().isdigit() else None
+                cur_qty   = int(qty_var.get()) if qty_var.get().strip().isdigit() else 0
+                demand    = dem_var.get()
                 if not name or not item:
                     messagebox.showerror('Error', 'Character Name and Item are required.', parent=dlg)
                     return
@@ -4301,13 +4600,19 @@ class AdminDashboard:
                 if consignor_id:
                     conn.execute(
                         "UPDATE consignors SET character_name=?, item_name=?, item_type_id=?, "
-                        "list_price=?, consignor_pct=?, start_date=?, notes=? WHERE id=?",
-                        (name, item, type_id, price, pct, date, notes, consignor_id))
+                        "list_price=?, consignor_pct=?, start_date=?, notes=?, "
+                        "slot_type=?, slot_priority=?, max_units=?, demand_tier=?, current_qty=? "
+                        "WHERE id=?",
+                        (name, item, type_id, price, pct, date, notes,
+                         slot_type, priority, max_units, demand, cur_qty, consignor_id))
                 else:
                     conn.execute(
                         "INSERT INTO consignors (character_name, item_name, item_type_id, "
-                        "list_price, consignor_pct, start_date, notes) VALUES (?,?,?,?,?,?,?)",
-                        (name, item, type_id, price, pct, date, notes))
+                        "list_price, consignor_pct, start_date, notes, "
+                        "slot_type, slot_priority, max_units, demand_tier, current_qty) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (name, item, type_id, price, pct, date, notes,
+                         slot_type, priority, max_units, demand, cur_qty))
                 conn.commit()
                 conn.close()
                 dlg.destroy()
@@ -4323,14 +4628,14 @@ class AdminDashboard:
     def _consign_edit_dialog(self):
         """Open the edit dialog for the selected consignor."""
         sel = self.consign_tree.selection()
-        if not sel:
-            return
+        if not sel or not sel[0].isdigit():
+            return  # ignore combined summary rows
         self._consign_add_dialog(consignor_id=int(sel[0]))
 
     def _consign_toggle_active(self):
         """Toggle the active/inactive status of the selected consignor."""
         sel = self.consign_tree.selection()
-        if not sel:
+        if not sel or not sel[0].isdigit():
             return
         conn = sqlite3.connect(DB_PATH)
         conn.execute(
@@ -4343,8 +4648,8 @@ class AdminDashboard:
     def _consign_log_sale_dialog(self):
         """Dialog to log a new sale for the selected consignor."""
         sel = self.consign_tree.selection()
-        if not sel:
-            messagebox.showinfo('Select Consignor', 'Select a consignor first.')
+        if not sel or not sel[0].isdigit():
+            messagebox.showinfo('Select Consignor', 'Select an individual consignor row first.')
             return
         cid       = int(sel[0])
         vals      = self.consign_tree.item(sel[0])['values']
@@ -4460,13 +4765,11 @@ class AdminDashboard:
 
     def _consign_sync_contracts(self):
         """
-        Scan contract_profits table for finished contracts containing consigned items
-        and auto-log any new sales entries using value-weighted price attribution.
+        Scan contract_profits table for finished contracts containing consigned items.
 
-        Attribution method: each consigned item gets a share of the contract price
-        proportional to its estimated cost (unit_cost * qty) vs the total contract
-        estimated cost. This uses the cost data already stored in items_json by
-        fetch_contract_profits.py — no extra ESI calls required.
+        - Exclusive slots (one consignor per type_id): auto-log with value-weighted attribution.
+        - Shared slots (multiple active consignors for the same type_id): insert a row in
+          consignment_pending_sales for manual split via the Attribution panel.
         """
         conn = sqlite3.connect(DB_PATH)
 
@@ -4483,13 +4786,25 @@ class AdminDashboard:
                                 parent=self.root)
             return
 
-        type_to_consignor = {c[2]: c for c in consignors}
+        # Build type_id → list of consignors (may be multiple for shared slots)
+        from collections import defaultdict
+        type_to_consignors = defaultdict(list)
+        for c in consignors:
+            type_to_consignors[c[2]].append(c)
 
-        # Contracts already synced
+        # type_ids already present in pending table — don't re-queue them per contract
+        already_pending = set(
+            r[0] for r in conn.execute(
+                "SELECT DISTINCT contract_id FROM consignment_pending_sales"
+            ).fetchall()
+        )
+
+        # Contracts already fully synced
         synced_ids = set(
             r[0] for r in conn.execute(
                 "SELECT DISTINCT source_contract_id FROM consignment_sales "
-                "WHERE source_contract_id IS NOT NULL").fetchall()
+                "WHERE source_contract_id IS NOT NULL"
+            ).fetchall()
         )
 
         # All finished contracts with item data
@@ -4498,71 +4813,1449 @@ class AdminDashboard:
             "FROM contract_profits WHERE contract_price > 0 AND items_json IS NOT NULL"
         ).fetchall()
 
-        new_entries = 0
-        skipped     = 0
+        import json as _json
+        from datetime import datetime as _dt
+
+        new_entries  = 0
+        new_pending  = 0
+        skipped      = 0
 
         for contract_id, date_completed, contract_price, items_json_str in contracts:
             if contract_id in synced_ids:
                 continue
             try:
-                items = json.loads(items_json_str)
-            except (json.JSONDecodeError, TypeError):
+                items = _json.loads(items_json_str)
+            except (_json.JSONDecodeError, TypeError):
                 continue
 
-            # Find any consigned items in this contract
-            consign_hits = [
-                i for i in items if i.get('type_id') in type_to_consignor
-            ]
+            consign_hits = [i for i in items if i.get('type_id') in type_to_consignors]
             if not consign_hits:
                 continue
 
-            # Value-weighted attribution: use unit_cost * qty as the weighting proxy
-            total_weighted = sum(
-                i.get('qty', 0) * i.get('unit_cost', 0) for i in items
-            )
+            # Value-weighted attribution proxy
+            total_weighted = sum(i.get('qty', 0) * i.get('unit_cost', 0) for i in items)
 
             for ci in consign_hits:
-                type_id  = ci['type_id']
-                consignor = type_to_consignor[type_id]
-                c_id, c_name, _, c_pct = consignor
-                qty      = ci.get('qty', 0)
+                type_id = ci['type_id']
+                qty     = ci.get('qty', 0)
                 if qty <= 0:
                     continue
 
-                item_weighted = qty * ci.get('unit_cost', 0)
-                if total_weighted > 0:
-                    attributed = contract_price * (item_weighted / total_weighted)
+                consignor_list = type_to_consignors[type_id]
+                sale_date      = (date_completed or '')[:10]
+
+                if len(consignor_list) > 1:
+                    # Shared slot — route to pending attribution (skip if already queued)
+                    if contract_id not in already_pending:
+                        item_weighted = qty * ci.get('unit_cost', 0)
+                        if total_weighted > 0:
+                            attributed = contract_price * (item_weighted / total_weighted)
+                        else:
+                            attributed = contract_price / max(len(items), 1)
+
+                        item_name = next(
+                            (c['item_name'] for c in consignor_list if c), '')
+                        conn.execute(
+                            "INSERT INTO consignment_pending_sales "
+                            "(contract_id, type_id, item_name, total_qty, total_isk, "
+                            " sale_date, created_at, notes) "
+                            "VALUES (?,?,?,?,?,?,?,?)",
+                            (contract_id, type_id,
+                             consignor_list[0][1] if not item_name else item_name,
+                             qty, round(attributed, 2), sale_date,
+                             _dt.utcnow().isoformat(),
+                             f"Shared slot | contract {contract_id}"))
+                        already_pending.add(contract_id)
+                        new_pending += 1
                 else:
-                    # Fallback: equal split across all items if no cost data
-                    attributed = contract_price / max(len(items), 1)
-                    skipped += 1
+                    # Exclusive slot — auto-log directly
+                    c_id, c_name, _, c_pct = consignor_list[0]
+                    item_weighted = qty * ci.get('unit_cost', 0)
+                    if total_weighted > 0:
+                        attributed = contract_price * (item_weighted / total_weighted)
+                    else:
+                        attributed = contract_price / max(len(items), 1)
+                        skipped += 1
 
-                per_unit  = round(attributed / qty, 2)
-                total_isk = round(attributed, 2)
-                their_isk = round(total_isk * c_pct / 100.0, 2)
-                my_isk    = round(total_isk - their_isk, 2)
-                sale_date = (date_completed or '')[:10]
+                    per_unit  = round(attributed / qty, 2)
+                    total_isk = round(attributed, 2)
+                    their_isk = round(total_isk * c_pct / 100.0, 2)
+                    my_isk    = round(total_isk - their_isk, 2)
 
-                conn.execute(
-                    "INSERT INTO consignment_sales "
-                    "(consignor_id, sale_date, quantity, price_per_unit, total_isk, "
-                    "consignor_isk, broker_isk, paid, notes, source_contract_id, auto_logged) "
-                    "VALUES (?,?,?,?,?,?,?,0,?,?,1)",
-                    (c_id, sale_date, qty, per_unit, total_isk,
-                     their_isk, my_isk,
-                     f"Auto | contract {contract_id}", contract_id))
-                new_entries += 1
+                    conn.execute(
+                        "INSERT INTO consignment_sales "
+                        "(consignor_id, sale_date, quantity, price_per_unit, total_isk, "
+                        "consignor_isk, broker_isk, paid, notes, source_contract_id, auto_logged) "
+                        "VALUES (?,?,?,?,?,?,?,0,?,?,1)",
+                        (c_id, sale_date, qty, per_unit, total_isk,
+                         their_isk, my_isk,
+                         f"Auto | contract {contract_id}", contract_id))
+                    new_entries += 1
 
         conn.commit()
         conn.close()
 
-        msg = f'Synced {new_entries} new sale entr{"y" if new_entries == 1 else "ies"}.'
+        parts = []
+        if new_entries:
+            parts.append(f'{new_entries} sale entr{"y" if new_entries == 1 else "ies"} auto-logged.')
+        if new_pending:
+            parts.append(f'{new_pending} shared-slot sale(s) added to Pending Attribution.')
         if skipped:
-            msg += f'\n{skipped} item(s) used equal-split fallback (no cost data).'
-        if new_entries == 0:
-            msg = 'No new contracts found to sync.'
-        messagebox.showinfo('Sync Contracts', msg, parent=self.root)
+            parts.append(f'{skipped} used equal-split fallback (no cost data).')
+        if not parts:
+            parts = ['No new contracts found to sync.']
+        messagebox.showinfo('Sync Contracts', '\n'.join(parts), parent=self.root)
         self._consign_load_sales()
+        self._consign_load_pending()
+
+    # ── Container assignment methods ──────────────────────────────────────
+
+    def _consign_load_containers(self):
+        """Populate the Container Assignments treeview."""
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute("""
+            SELECT cc.id, c.character_name, c.item_name,
+                   cc.container_item_id, cc.container_name, cc.notes
+            FROM consignor_containers cc
+            JOIN consignors c ON c.id = cc.consignor_id
+            ORDER BY c.item_name, c.character_name
+        """).fetchall()
+        conn.close()
+
+        self.container_tree.delete(*self.container_tree.get_children())
+        for row_id, consignor, item, cid, cname, notes in rows:
+            self.container_tree.insert('', 'end', iid=str(row_id), values=(
+                consignor,
+                item,
+                cid,
+                cname or '(no name yet)',
+                notes or '',
+            ))
+
+    def _consign_assign_container_dialog(self):
+        """Dialog to assign a hangar container item_id to a consignor."""
+        conn = sqlite3.connect(DB_PATH)
+        consignors = conn.execute(
+            "SELECT id, character_name, item_name FROM consignors WHERE active=1 ORDER BY item_name, character_name"
+        ).fetchall()
+        conn.close()
+
+        if not consignors:
+            messagebox.showinfo('Assign Container',
+                                'No active consignors found. Add a consignor first.',
+                                parent=self.root)
+            return
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title('Assign Container to Consignor')
+        dlg.geometry('440x300')
+        dlg.configure(background='#0a1520')
+        dlg.grab_set()
+
+        _lkw = dict(background='#0a1520', foreground='#aaccdd', font=('Segoe UI', 9))
+        _ekw = dict(background='#0d1f30', foreground='#e0e8f0', insertbackground='white',
+                    relief='flat', font=('Segoe UI', 9))
+
+        tk.Label(dlg, text='Assign Hangar Container', background='#0a1520',
+                 foreground='#66d9ff', font=('Segoe UI', 11, 'bold')).pack(pady=(12, 8))
+
+        frm = tk.Frame(dlg, background='#0a1520')
+        frm.pack(fill='x', padx=20)
+
+        tk.Label(frm, text='Consignor:', **_lkw).grid(row=0, column=0, sticky='w', pady=4)
+        consignor_var = tk.StringVar()
+        c_labels = [f"{c[1]} — {c[2]}" for c in consignors]
+        consignor_cb = ttk.Combobox(frm, textvariable=consignor_var, values=c_labels,
+                                     width=36, state='readonly')
+        consignor_cb.grid(row=0, column=1, sticky='ew', padx=(8, 0), pady=4)
+        if c_labels:
+            consignor_cb.current(0)
+
+        tk.Label(frm, text='Container Item ID:', **_lkw).grid(row=1, column=0, sticky='w', pady=4)
+        cid_var = tk.StringVar()
+        tk.Entry(frm, textvariable=cid_var, width=24, **_ekw).grid(
+            row=1, column=1, sticky='w', padx=(8, 0), pady=4)
+
+        tk.Label(frm, text='Notes (optional):', **_lkw).grid(row=2, column=0, sticky='w', pady=4)
+        notes_var = tk.StringVar()
+        tk.Entry(frm, textvariable=notes_var, width=36, **_ekw).grid(
+            row=2, column=1, sticky='ew', padx=(8, 0), pady=4)
+
+        tk.Label(frm,
+                 text='Find the Item ID by right-clicking the container\n'
+                      'in-game → Show Info, or via ESI asset list.',
+                 background='#0a1520', foreground='#556677',
+                 font=('Segoe UI', 8)).grid(row=3, column=0, columnspan=2, sticky='w', pady=(4, 0))
+
+        frm.columnconfigure(1, weight=1)
+
+        def _save():
+            idx = consignor_cb.current()
+            if idx < 0:
+                return
+            cid_txt = cid_var.get().strip()
+            if not cid_txt.isdigit():
+                messagebox.showerror('Invalid', 'Container Item ID must be a number.', parent=dlg)
+                return
+            consignor_id = consignors[idx][0]
+            conn2 = sqlite3.connect(DB_PATH)
+            try:
+                conn2.execute(
+                    "INSERT INTO consignor_containers (consignor_id, container_item_id, notes) "
+                    "VALUES (?,?,?)",
+                    (consignor_id, int(cid_txt), notes_var.get().strip() or None))
+                conn2.commit()
+            except Exception as e:
+                messagebox.showerror('Error', f'Could not save: {e}', parent=dlg)
+                conn2.close()
+                return
+            conn2.close()
+            dlg.destroy()
+            self._consign_load_containers()
+
+        bf = tk.Frame(dlg, background='#0a1520')
+        bf.pack(pady=12)
+        ttk.Button(bf, text='Save', style='Action.TButton', command=_save).pack(side='left', padx=4)
+        ttk.Button(bf, text='Cancel', command=dlg.destroy).pack(side='left', padx=4)
+
+    def _consign_remove_container(self):
+        """Remove the selected container assignment."""
+        sel = self.container_tree.selection()
+        if not sel:
+            return
+        if not messagebox.askyesno('Confirm', 'Remove this container assignment?\n'
+                                   '(Does not affect the actual in-game container.)',
+                                   parent=self.root):
+            return
+        row_id = int(sel[0])
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("DELETE FROM consignor_containers WHERE id=?", (row_id,))
+        conn.commit()
+        conn.close()
+        self._consign_load_containers()
+
+    def _consign_refresh_container_names(self):
+        """Trigger update_lx_zoj_inventory.py in a background thread to refresh ESI names."""
+        import threading, subprocess as _sp
+
+        def _run():
+            try:
+                result = _sp.run(
+                    [sys.executable,
+                     os.path.join(PROJECT_DIR, 'update_lx_zoj_inventory.py')],
+                    cwd=PROJECT_DIR, capture_output=True, text=True, timeout=180
+                )
+                ok = result.returncode == 0
+            except Exception:
+                ok = False
+            self.root.after(0, lambda: (
+                self._consign_load_containers(),
+                self._consign_load_consignors(),
+                messagebox.showinfo(
+                    'Refresh Names',
+                    'Container names refreshed from ESI.' if ok
+                    else 'ESI refresh failed — check console output.',
+                    parent=self.root)
+            ))
+
+        threading.Thread(target=_run, daemon=True).start()
+        messagebox.showinfo('Refresh Names',
+                            'Inventory sync started in background.\n'
+                            'The table will update when complete.',
+                            parent=self.root)
+
+    # ── Pending attribution methods ───────────────────────────────────────
+
+    def _consign_load_pending(self):
+        """Populate the Pending Attribution treeview."""
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute(
+            "SELECT id, sale_date, item_name, total_qty, total_isk, notes "
+            "FROM consignment_pending_sales ORDER BY sale_date DESC, id DESC"
+        ).fetchall()
+        conn.close()
+
+        self.pending_tree.delete(*self.pending_tree.get_children())
+        for row_id, sale_date, item_name, qty, isk, notes in rows:
+            self.pending_tree.insert('', 'end', iid=str(row_id),
+                                     tags=('pending_row',),
+                                     values=(
+                                         sale_date or '',
+                                         item_name or '',
+                                         f'{qty:,}',
+                                         f'{isk:,.2f}',
+                                         notes or '',
+                                     ))
+
+    def _consign_delete_pending(self):
+        """Delete the selected pending sale."""
+        sel = self.pending_tree.selection()
+        if not sel:
+            return
+        if not messagebox.askyesno('Confirm Delete',
+                                   'Delete this pending sale record?\n'
+                                   'No sale entries will be logged — use only if the sale '
+                                   'should not be attributed to any consignor.',
+                                   parent=self.root):
+            return
+        row_id = int(sel[0])
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("DELETE FROM consignment_pending_sales WHERE id=?", (row_id,))
+        conn.commit()
+        conn.close()
+        self._consign_load_pending()
+
+    def _consign_split_dialog(self):
+        """
+        Manual attribution dialog for a pending shared-slot sale.
+        Shows all active consignors for that item type, lets you enter how many
+        units to attribute to each, and optionally uses priority-based FIFO auto-fill.
+        """
+        sel = self.pending_tree.selection()
+        if not sel:
+            messagebox.showinfo('Split', 'Select a pending sale first.', parent=self.root)
+            return
+        row_id = int(sel[0])
+
+        conn = sqlite3.connect(DB_PATH)
+        pending = conn.execute(
+            "SELECT id, contract_id, type_id, item_name, total_qty, total_isk, sale_date "
+            "FROM consignment_pending_sales WHERE id=?", (row_id,)
+        ).fetchone()
+        if not pending:
+            conn.close()
+            return
+
+        p_id, contract_id, type_id, item_name, total_qty, total_isk, sale_date = pending
+
+        # All active consignors for this item type, sorted by priority
+        consignors = conn.execute("""
+            SELECT id, character_name, consignor_pct, slot_priority,
+                   COALESCE(current_qty, 0)
+            FROM consignors
+            WHERE item_type_id=? AND active=1
+            ORDER BY slot_priority, character_name
+        """, (type_id,)).fetchall()
+        conn.close()
+
+        if not consignors:
+            messagebox.showinfo('Split',
+                                f'No active consignors found for type_id {type_id}.',
+                                parent=self.root)
+            return
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title(f'Attribute Sale — {item_name}')
+        dlg.geometry('520x420')
+        dlg.configure(background='#0a1520')
+        dlg.grab_set()
+
+        _lkw = dict(background='#0a1520', foreground='#aaccdd', font=('Segoe UI', 9))
+        _ekw = dict(background='#0d1f30', foreground='#e0e8f0', insertbackground='white',
+                    relief='flat', font=('Segoe UI', 9))
+
+        tk.Label(dlg, text=f'Attribute: {item_name}', background='#0a1520',
+                 foreground='#ff9944', font=('Segoe UI', 11, 'bold')).pack(pady=(10, 2))
+        tk.Label(dlg,
+                 text=f'Total qty: {total_qty:,}  |  Total ISK: {total_isk:,.2f}  |  Date: {sale_date}',
+                 **_lkw).pack(pady=(0, 8))
+
+        # Remaining qty tracker
+        remaining_var = tk.StringVar(value=f'Remaining: {total_qty:,}')
+        remaining_lbl = tk.Label(dlg, textvariable=remaining_var,
+                                 background='#0a1520', foreground='#ffcc44',
+                                 font=('Segoe UI', 9, 'bold'))
+        remaining_lbl.pack()
+
+        frm = tk.Frame(dlg, background='#0a1520')
+        frm.pack(fill='x', padx=20, pady=8)
+
+        qty_vars = []
+        for i, (c_id, c_name, c_pct, priority, cur_qty) in enumerate(consignors):
+            tk.Label(frm, text=f'P{priority} {c_name} (cur:{cur_qty:,}):',
+                     **_lkw).grid(row=i, column=0, sticky='w', pady=3)
+            v = tk.StringVar(value='0')
+            qty_vars.append((c_id, c_pct, v))
+            ent = tk.Entry(frm, textvariable=v, width=12, **_ekw)
+            ent.grid(row=i, column=1, sticky='w', padx=(8, 0), pady=3)
+
+            def _upd(*_, _v=v):
+                try:
+                    used = sum(int(float(x.get()) or 0) for _, _, x in qty_vars)
+                    remaining_var.set(f'Remaining: {total_qty - used:,}')
+                except Exception:
+                    pass
+
+            v.trace_add('write', _upd)
+
+        def _fifo_fill():
+            """Auto-fill using priority order up to current_qty."""
+            left = total_qty
+            for (_, _, v), (_, _, _, _, cur_qty) in zip(qty_vars, consignors):
+                alloc = min(left, cur_qty)
+                v.set(str(alloc))
+                left -= alloc
+                if left <= 0:
+                    break
+            # Put any remainder on the last slot
+            if left > 0:
+                last_v = qty_vars[-1][2]
+                try:
+                    last_v.set(str(int(float(last_v.get()) or 0) + left))
+                except Exception:
+                    last_v.set(str(left))
+
+        ttk.Button(dlg, text='Auto-fill (FIFO by priority)',
+                   command=_fifo_fill).pack(pady=(4, 8))
+
+        def _save():
+            allocations = []
+            total_alloc = 0
+            for c_id, c_pct, v in qty_vars:
+                try:
+                    qty = int(float(v.get()) or 0)
+                except Exception:
+                    qty = 0
+                if qty > 0:
+                    allocations.append((c_id, c_pct, qty))
+                    total_alloc += qty
+
+            if total_alloc == 0:
+                messagebox.showerror('Error', 'Enter at least one non-zero quantity.', parent=dlg)
+                return
+            if total_alloc != total_qty:
+                if not messagebox.askyesno(
+                        'Mismatch',
+                        f'Allocated {total_alloc:,} but sale total is {total_qty:,}.\n'
+                        'Save anyway?', parent=dlg):
+                    return
+
+            per_unit = total_isk / total_qty if total_qty else 0
+
+            conn2 = sqlite3.connect(DB_PATH)
+            for c_id, c_pct, qty in allocations:
+                attributed = round(per_unit * qty, 2)
+                their_isk  = round(attributed * c_pct / 100.0, 2)
+                my_isk     = round(attributed - their_isk, 2)
+                conn2.execute(
+                    "INSERT INTO consignment_sales "
+                    "(consignor_id, sale_date, quantity, price_per_unit, total_isk, "
+                    "consignor_isk, broker_isk, paid, notes, source_contract_id, auto_logged) "
+                    "VALUES (?,?,?,?,?,?,?,0,?,?,0)",
+                    (c_id, sale_date, qty, round(per_unit, 2), attributed,
+                     their_isk, my_isk,
+                     f'Manual split | contract {contract_id}', contract_id))
+                # Reduce current_qty by attributed units
+                conn2.execute(
+                    "UPDATE consignors SET current_qty = MAX(0, current_qty - ?) WHERE id=?",
+                    (qty, c_id))
+            conn2.execute("DELETE FROM consignment_pending_sales WHERE id=?", (p_id,))
+            conn2.commit()
+            conn2.close()
+            dlg.destroy()
+            self._consign_load_pending()
+            self._consign_load_sales()
+            self._consign_load_consignors()
+
+        bf = tk.Frame(dlg, background='#0a1520')
+        bf.pack(pady=8)
+        ttk.Button(bf, text='Save Attribution', style='Action.TButton',
+                   command=_save).pack(side='left', padx=4)
+        ttk.Button(bf, text='Cancel', command=dlg.destroy).pack(side='left', padx=4)
+
+    # ===== SLOT PRICING CALCULATOR =====
+
+    def _build_slot_pricing_tab(self):
+        """Build the PI Slot Pricing Calculator tab."""
+        self._slot_volumes = {}     # type_id -> jita_30d_vol (int)
+        self._slot_basis = {}       # str(type_id) -> {'mode': 'jbv'|'split', 'pct': float}
+        self._slot_items = []       # list of (type_id, name, tier, avg_buy, avg_sell)
+        self._slot_loading = False
+        self._slot_params_saved = {}
+        self._slot_load_config()
+
+        outer = tk.Frame(self.slot_frame, background='#0a1520')
+        outer.pack(fill='both', expand=True, padx=15, pady=10)
+
+        tk.Label(outer, text='PI Slot Pricing Calculator', background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 13, 'bold')).pack(anchor='w', pady=(0, 8))
+
+        # ── Parameters bar ───────────────────────────────────────────────────
+        param_card = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        param_card.pack(fill='x', pady=(0, 8))
+        pf = tk.Frame(param_card, background='#0a2030')
+        pf.pack(fill='x', padx=12, pady=8)
+
+        _lkw = dict(bg='#0a2030', fg='#88d0e8', font=('Segoe UI', 10))
+        _ekw = dict(bg='#0d2030', fg='#00ff88', insertbackground='#00ff88', font=('Segoe UI', 10))
+        _ukw = dict(bg='#0a2030', fg='#66d9ff', font=('Segoe UI', 10))
+
+        tk.Label(pf, text='Shop Scale:', **_lkw).grid(row=0, column=0, padx=(0, 4), sticky='w')
+        self._slot_scale_var = tk.StringVar(value=self._slot_params_saved.get('scale', '0.100'))
+        self._slot_scale_entry = tk.Entry(pf, textvariable=self._slot_scale_var, width=7, **_ekw)
+        self._slot_scale_entry.grid(row=0, column=1, padx=(0, 2))
+        tk.Label(pf, text='% of Jita vol', **_ukw).grid(row=0, column=2, padx=(0, 16), sticky='w')
+
+        tk.Label(pf, text='Commission:', **_lkw).grid(row=0, column=3, padx=(0, 4), sticky='w')
+        self._slot_comm_var = tk.StringVar(value=self._slot_params_saved.get('commission', '5.00'))
+        tk.Entry(pf, textvariable=self._slot_comm_var, width=7, **_ekw).grid(row=0, column=4, padx=(0, 2))
+        tk.Label(pf, text='%', **_ukw).grid(row=0, column=5, padx=(0, 16), sticky='w')
+
+        tk.Label(pf, text='Exclusivity:', **_lkw).grid(row=0, column=6, padx=(0, 4), sticky='w')
+        self._slot_prem_var = tk.StringVar(value=self._slot_params_saved.get('premium', '1.25'))
+        tk.Entry(pf, textvariable=self._slot_prem_var, width=7, **_ekw).grid(row=0, column=7, padx=(0, 2))
+        tk.Label(pf, text='× premium', **_ukw).grid(row=0, column=8, padx=(0, 20), sticky='w')
+
+        self._slot_fetch_btn = ttk.Button(pf, text='\u21ba Fetch Jita Volumes',
+                                          command=self._slot_fetch_volumes)
+        self._slot_fetch_btn.grid(row=0, column=9, padx=(0, 6))
+        ttk.Button(pf, text='Recalculate', command=self._slot_recalculate).grid(row=0, column=10, padx=(0, 6))
+        ttk.Button(pf, text='Save Config', style='Save.TButton',
+                   command=self._slot_save_config).grid(row=0, column=11, padx=(0, 6))
+
+        self._slot_status_lbl = tk.Label(pf, text='', bg='#0a2030', fg='#ffcc44',
+                                         font=('Segoe UI', 9))
+        self._slot_status_lbl.grid(row=0, column=12, padx=(8, 0), sticky='w')
+
+        # ── Main treeview ────────────────────────────────────────────────────
+        tree_frame = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        tree_frame.pack(fill='both', expand=True, pady=(0, 6))
+
+        cols = ('tier', 'item', 'basis', 'price', 'jita_vol', 'shop_vol', 'shop_rev', 'slot_price')
+        self._slot_tree = ttk.Treeview(tree_frame, columns=cols, show='headings',
+                                       selectmode='extended')
+        for cid, hd, w, anchor in [
+            ('tier',       'Tier',           50,  'c'),
+            ('item',       'Item',          210,  'w'),
+            ('basis',      'Price Basis',   130,  'c'),
+            ('price',      'Price Used',    115,  'e'),
+            ('jita_vol',   'Jita 30d Vol',  130,  'e'),
+            ('shop_vol',   'Shop Vol/mo',   115,  'e'),
+            ('shop_rev',   'Shop Rev/mo',   130,  'e'),
+            ('slot_price', 'Slot Price/mo', 120,  'e'),
+        ]:
+            self._slot_tree.heading(cid, text=hd)
+            self._slot_tree.column(cid, width=w, minwidth=40, anchor=anchor)
+
+        self._slot_tree.tag_configure('P1',  foreground='#88d0e8')
+        self._slot_tree.tag_configure('P2',  foreground='#66cc88')
+        self._slot_tree.tag_configure('P3',  foreground='#ffcc44')
+        self._slot_tree.tag_configure('P4',  foreground='#ff8866')
+        self._slot_tree.tag_configure('sep', foreground='#334455', background='#0a1828')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical', command=self._slot_tree.yview)
+        self._slot_tree.configure(yscrollcommand=vsb.set)
+        vsb.pack(side='right', fill='y')
+        self._slot_tree.pack(fill='both', expand=True)
+        self._slot_tree.bind('<<TreeviewSelect>>', self._slot_on_select)
+
+        # ── Bottom: basis config (left) + math breakdown (right) ─────────────
+        bottom = tk.Frame(outer, background='#0a1520')
+        bottom.pack(fill='x', pady=(0, 6))
+
+        # Left: per-item basis configuration
+        config_card = tk.Frame(bottom, background='#0a2030', relief='solid', bd=1)
+        config_card.pack(side='left', fill='y', padx=(0, 8))
+
+        tk.Label(config_card, text='Price Basis — Selected Item', bg='#0a2030',
+                 fg='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=10, pady=(8, 2))
+        self._slot_selected_lbl = tk.Label(config_card, text='— select an item above —',
+                                           bg='#0a2030', fg='#88d0e8',
+                                           font=('Segoe UI', 9, 'italic'))
+        self._slot_selected_lbl.pack(anchor='w', padx=10, pady=(0, 8))
+
+        self._slot_basis_var = tk.StringVar(value='jbv')
+        tk.Radiobutton(config_card, text='JBV  (Jita Buy Value)',
+                       variable=self._slot_basis_var, value='jbv',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_basis_changed).pack(anchor='w', padx=10)
+
+        jbv_pct_row = tk.Frame(config_card, background='#0a2030')
+        jbv_pct_row.pack(anchor='w', padx=10, pady=(4, 0))
+        tk.Radiobutton(jbv_pct_row, text='% of JBV:',
+                       variable=self._slot_basis_var, value='jbv_pct',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_basis_changed).pack(side='left')
+        self._slot_jbv_pct_var = tk.StringVar(value='95')
+        self._slot_jbv_pct_entry = tk.Entry(jbv_pct_row, textvariable=self._slot_jbv_pct_var,
+                                            width=6, bg='#0d2030', fg='#00ff88',
+                                            insertbackground='#00ff88',
+                                            font=('Segoe UI', 10), state='disabled')
+        self._slot_jbv_pct_entry.pack(side='left', padx=(6, 2))
+        tk.Label(jbv_pct_row, text='%', bg='#0a2030', fg='#66d9ff',
+                 font=('Segoe UI', 10)).pack(side='left')
+
+        split_row = tk.Frame(config_card, background='#0a2030')
+        split_row.pack(anchor='w', padx=10, pady=(4, 0))
+        tk.Radiobutton(split_row, text='% of Jita Split:',
+                       variable=self._slot_basis_var, value='split',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_basis_changed).pack(side='left')
+        self._slot_split_pct_var = tk.StringVar(value='95')
+        self._slot_split_entry = tk.Entry(split_row, textvariable=self._slot_split_pct_var,
+                                          width=6, bg='#0d2030', fg='#00ff88',
+                                          insertbackground='#00ff88',
+                                          font=('Segoe UI', 10), state='disabled')
+        self._slot_split_entry.pack(side='left', padx=(6, 2))
+        tk.Label(split_row, text='%', bg='#0a2030', fg='#66d9ff',
+                 font=('Segoe UI', 10)).pack(side='left')
+
+        ttk.Button(config_card, text='Apply to Selected',
+                   command=self._slot_apply_basis).pack(anchor='w', padx=10, pady=(10, 4))
+
+        # Per-item volume mode selection
+        tk.Frame(config_card, bg='#1a3040', height=1).pack(fill='x', padx=10, pady=(4, 6))
+        tk.Label(config_card, text='Volume Mode (this item):', bg='#0a2030',
+                 fg='#66d9ff', font=('Segoe UI', 9, 'bold')).pack(anchor='w', padx=10)
+        self._slot_item_vol_mode_var = tk.StringVar(value='jita')
+        tk.Radiobutton(config_card, text='Jita 30d Vol \u00d7 Scale',
+                       variable=self._slot_item_vol_mode_var, value='jita',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_item_vol_mode_changed).pack(anchor='w', padx=10)
+        tk.Radiobutton(config_card, text='Expected Units/mo',
+                       variable=self._slot_item_vol_mode_var, value='expected',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_item_vol_mode_changed).pack(anchor='w', padx=10)
+        self._slot_units_var   = tk.StringVar(value='0')
+        self._slot_units_entry = tk.Entry(config_card, textvariable=self._slot_units_var,
+                                          width=14, bg='#0d2030', fg='#00ff88',
+                                          insertbackground='#00ff88',
+                                          font=('Segoe UI', 10), state='disabled')
+        self._slot_units_entry.pack(anchor='w', padx=24, pady=(3, 0))
+        tk.Label(config_card, text='(units lessee produces/month)',
+                 bg='#0a2030', fg='#445566', font=('Segoe UI', 9)).pack(anchor='w', padx=24, pady=(0, 10))
+
+        # Right: math breakdown
+        math_card = tk.Frame(bottom, background='#0a2030', relief='solid', bd=1)
+        math_card.pack(side='left', fill='both', expand=True)
+
+        tk.Label(math_card, text='Formula Breakdown', bg='#0a2030',
+                 fg='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=10, pady=(8, 4))
+        self._slot_math_text = tk.Text(math_card, height=9, bg='#060f18', fg='#88d0e8',
+                                       font=('Consolas', 9), state='disabled', relief='flat',
+                                       borderwidth=0, padx=10, pady=6)
+        self._slot_math_text.pack(fill='both', expand=True, padx=8, pady=(0, 8))
+        self._slot_math_text.tag_configure('header',  foreground='#00d9ff')
+        self._slot_math_text.tag_configure('result',  foreground='#00ff88', font=('Consolas', 9, 'bold'))
+        self._slot_math_text.tag_configure('dim',     foreground='#445566')
+        self._slot_math_text.tag_configure('normal',  foreground='#88d0e8')
+
+        # ── Summary footer ────────────────────────────────────────────────────
+        summary_card = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        summary_card.pack(fill='x')
+        sf = tk.Frame(summary_card, background='#0a2030')
+        sf.pack(fill='x', padx=12, pady=6)
+
+        tk.Label(sf, text='Monthly Totals (all slots filled):',
+                 bg='#0a2030', fg='#66d9ff', font=('Segoe UI', 10, 'bold')).grid(
+                 row=0, column=0, padx=(0, 20), sticky='w')
+
+        self._slot_summary_labels = {}
+        tier_colors = {'P1': '#88d0e8', 'P2': '#66cc88', 'P3': '#ffcc44',
+                       'P4': '#ff8866', 'TOTAL': '#00ff88'}
+        for col_i, tier in enumerate(['P1', 'P2', 'P3', 'P4', 'TOTAL'], start=1):
+            color = tier_colors[tier]
+            tk.Label(sf, text=f'{tier}:', bg='#0a2030', fg=color,
+                     font=('Segoe UI', 9, 'bold')).grid(row=0, column=col_i * 2 - 1,
+                                                         padx=(0, 4), sticky='e')
+            lbl = tk.Label(sf, text='—', bg='#0a2030', fg=color, font=('Segoe UI', 9))
+            lbl.grid(row=0, column=col_i * 2, padx=(0, 24), sticky='w')
+            self._slot_summary_labels[tier] = lbl
+
+        # Load items and populate
+        self._slot_load_items()
+
+    def _slot_load_config(self):
+        """Load saved basis config and global params from site_config."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            row_b = conn.execute(
+                "SELECT value FROM site_config WHERE key='slot_pricing_basis'").fetchone()
+            row_p = conn.execute(
+                "SELECT value FROM site_config WHERE key='slot_pricing_params'").fetchone()
+            conn.close()
+            self._slot_basis = json.loads(row_b[0]) if row_b else {}
+            self._slot_params_saved = json.loads(row_p[0]) if row_p else {}
+        except Exception:
+            self._slot_basis = {}
+            self._slot_params_saved = {}
+
+    def _slot_save_config(self):
+        """Save per-item basis config and global params to site_config."""
+        try:
+            params = {
+                'scale':      self._slot_scale_var.get(),
+                'commission': self._slot_comm_var.get(),
+                'premium':    self._slot_prem_var.get(),
+            }
+            conn = sqlite3.connect(DB_PATH, timeout=5)
+            conn.execute("INSERT OR REPLACE INTO site_config (key, value) VALUES (?,?)",
+                         ('slot_pricing_basis',  json.dumps(self._slot_basis)))
+            conn.execute("INSERT OR REPLACE INTO site_config (key, value) VALUES (?,?)",
+                         ('slot_pricing_params', json.dumps(params)))
+            conn.commit()
+            conn.close()
+            self._slot_status_lbl.configure(text='Config saved \u2713', fg='#00ff88')
+            self.root.after(3000, lambda: self._slot_status_lbl.configure(text=''))
+        except Exception as e:
+            self._slot_status_lbl.configure(text=f'Save error: {e}', fg='#ff6666')
+
+    def _slot_load_items(self):
+        """Load PI items and their current prices from the DB."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            rows = conn.execute("""
+                SELECT tmi.type_id, tmi.type_name, it.market_group_id,
+                       ROUND(AVG(mps.best_buy),  0) AS avg_buy,
+                       ROUND(AVG(mps.best_sell), 0) AS avg_sell
+                FROM tracked_market_items tmi
+                JOIN inv_types it ON tmi.type_id = it.type_id
+                LEFT JOIN market_price_snapshots mps
+                    ON tmi.type_id = mps.type_id
+                    AND mps.timestamp >= datetime('now', '-7 days')
+                WHERE tmi.category = 'pi_materials'
+                AND it.market_group_id IN (1334, 1335, 1336, 1337)
+                GROUP BY tmi.type_id, tmi.type_name, it.market_group_id
+                ORDER BY it.market_group_id, tmi.type_name
+            """).fetchall()
+            conn.close()
+            tier_map = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+            self._slot_items = [
+                (r[0], r[1], tier_map[r[2]], r[3] or 0.0, r[4] or 0.0)
+                for r in rows
+            ]
+        except Exception:
+            self._slot_items = []
+        self._slot_recalculate()
+
+    def _slot_get_params(self):
+        """Return (scale_fraction, commission_fraction, premium_multiplier)."""
+        try:    scale = float(self._slot_scale_var.get()) / 100.0
+        except Exception: scale = 0.001
+        try:    comm  = float(self._slot_comm_var.get()) / 100.0
+        except Exception: comm  = 0.05
+        try:    prem  = float(self._slot_prem_var.get())
+        except Exception: prem  = 1.25
+        return scale, comm, prem
+
+    def _slot_get_price(self, type_id, avg_buy, avg_sell):
+        """Return (price, basis_label) for an item based on its stored config."""
+        cfg  = self._slot_basis.get(str(type_id), {'mode': 'jbv', 'pct': 95.0})
+        mode = cfg.get('mode', 'jbv')
+        if mode == 'jbv':
+            return avg_buy, 'JBV'
+        pct = cfg.get('pct', 95.0)
+        if mode == 'jbv_pct':
+            return avg_buy * pct / 100.0, f'{pct:.0f}% JBV'
+        split = (avg_buy + avg_sell) / 2.0 if avg_buy and avg_sell else (avg_buy or avg_sell)
+        return split * pct / 100.0, f'{pct:.0f}% Split'
+
+    @staticmethod
+    def _slot_fmt_vol(v):
+        if v <= 0:   return '—'
+        if v >= 1e9: return f'{v/1e9:.1f}B'
+        if v >= 1e6: return f'{v/1e6:.1f}M'
+        return f'{v/1e3:.0f}K'
+
+    @staticmethod
+    def _slot_fmt_isk(v):
+        if v <= 0:   return '—'
+        if v >= 1e9: return f'{v/1e9:.2f}B'
+        if v >= 1e6: return f'{v/1e6:.1f}M'
+        return f'{v/1e3:.0f}K'
+
+    def _slot_recalculate(self):
+        """Rebuild the treeview with current parameters and per-item basis."""
+        scale, comm, prem = self._slot_get_params()
+        self._slot_tree.delete(*self._slot_tree.get_children())
+        tier_totals = {'P1': 0.0, 'P2': 0.0, 'P3': 0.0, 'P4': 0.0}
+        cur_tier = None
+
+        for type_id, name, tier, avg_buy, avg_sell in self._slot_items:
+            if tier != cur_tier:
+                cur_tier = tier
+                self._slot_tree.insert('', 'end', iid=f'sep_{tier}', tags=('sep',),
+                                       values=(f'  \u2500\u2500 {tier} \u2500\u2500',
+                                               '', '', '', '', '', '', ''))
+
+            jita_vol = self._slot_volumes.get(type_id, 0)
+            price, basis_lbl = self._slot_get_price(type_id, avg_buy, avg_sell)
+            cfg      = self._slot_basis.get(str(type_id), {})
+            item_vol_mode = cfg.get('vol_mode', 'jita')
+            if item_vol_mode == 'expected':
+                shop_vol  = float(cfg.get('units', 0))
+                vol_label = f'{basis_lbl} · exp'
+            else:
+                shop_vol  = jita_vol * scale
+                vol_label = basis_lbl
+            mo_rev   = shop_vol * price
+            slot_p   = mo_rev * comm * prem
+            tier_totals[tier] += slot_p
+
+            self._slot_tree.insert('', 'end', iid=str(type_id), tags=(tier,), values=(
+                tier, name, vol_label,
+                f'{price:,.0f}' if price > 0 else '—',
+                self._slot_fmt_vol(jita_vol),
+                f'{shop_vol:,.0f}' if shop_vol > 0 else '—',
+                self._slot_fmt_isk(mo_rev),
+                self._slot_fmt_isk(slot_p),
+            ))
+
+        # Update summary labels
+        grand = sum(tier_totals.values())
+        for tier, lbl in self._slot_summary_labels.items():
+            if tier == 'TOTAL':
+                val = f'{grand/1e6:.1f}M ISK' if grand >= 1e6 else f'{grand/1e3:.0f}K ISK' if grand > 0 else '—'
+            else:
+                v = tier_totals.get(tier, 0.0)
+                val = f'{v/1e6:.1f}M' if v >= 1e6 else f'{v/1e3:.0f}K' if v > 0 else '—'
+            lbl.configure(text=val)
+
+    def _slot_on_select(self, _event=None):
+        """Update basis controls and math breakdown for the selected item(s)."""
+        sel = self._slot_tree.selection()
+        # Filter out separator rows
+        item_sel = [s for s in sel if not s.startswith('sep_')]
+        if not item_sel:
+            return
+
+        # Multiple items selected — show count and load first item's config into controls
+        if len(item_sel) > 1:
+            self._slot_selected_lbl.configure(text=f'{len(item_sel)} items selected')
+            # Load basis config from the first real item so controls are ready to bulk-apply
+            try:
+                first_id = int(item_sel[0])
+                cfg = self._slot_basis.get(str(first_id), {'mode': 'jbv', 'pct': 95.0})
+                mode = cfg.get('mode', 'jbv')
+                pct  = str(cfg.get('pct', 95.0))
+                self._slot_basis_var.set(mode)
+                if mode == 'jbv_pct':
+                    self._slot_jbv_pct_var.set(pct)
+                else:
+                    self._slot_split_pct_var.set(pct)
+                self._slot_basis_changed()
+            except ValueError:
+                pass
+            # Show a summary in the math panel
+            self._slot_math_text.configure(state='normal')
+            self._slot_math_text.delete('1.0', 'end')
+            self._slot_math_text.insert('end',
+                f'{len(item_sel)} items selected\n\n'
+                'Set the price basis below and click\n'
+                '"Apply to Selected" to update all\n'
+                'highlighted items at once.', 'header')
+            self._slot_math_text.configure(state='disabled')
+            return
+
+        try:
+            type_id = int(item_sel[0])
+        except ValueError:
+            return
+
+        item = next((i for i in self._slot_items if i[0] == type_id), None)
+        if not item:
+            return
+        _, name, tier, avg_buy, avg_sell = item
+
+        # Update basis controls to reflect this item's stored config
+        cfg  = self._slot_basis.get(str(type_id), {'mode': 'jbv', 'pct': 95.0})
+        mode = cfg.get('mode', 'jbv')
+        pct  = str(cfg.get('pct', 95.0))
+        self._slot_basis_var.set(mode)
+        if mode == 'jbv_pct':
+            self._slot_jbv_pct_var.set(pct)
+        else:
+            self._slot_split_pct_var.set(pct)
+        item_vol_mode = cfg.get('vol_mode', 'jita')
+        self._slot_item_vol_mode_var.set(item_vol_mode)
+        self._slot_units_var.set(str(cfg.get('units', 0)))
+        self._slot_basis_changed()
+        self._slot_item_vol_mode_changed()
+        self._slot_selected_lbl.configure(text=f'{name}  ({tier})')
+
+        # Compute values for breakdown
+        scale, comm, prem = self._slot_get_params()
+        jita_vol  = self._slot_volumes.get(type_id, 0)
+        price, basis_lbl = self._slot_get_price(type_id, avg_buy, avg_sell)
+        exp_units = float(cfg.get('units', 0))
+        shop_vol  = exp_units if item_vol_mode == 'expected' else jita_vol * scale
+        mo_rev    = shop_vol * price
+        slot_p    = mo_rev * comm * prem
+        split_mid = (avg_buy + avg_sell) / 2.0 if avg_buy and avg_sell else 0.0
+
+        try:    scale_pct = float(self._slot_scale_var.get())
+        except Exception: scale_pct = 0.1
+        try:    comm_pct  = float(self._slot_comm_var.get())
+        except Exception: comm_pct  = 5.0
+        try:    prem_val  = float(self._slot_prem_var.get())
+        except Exception: prem_val  = 1.25
+
+        sep = '\u2500' * 58
+        lines = [
+            (f'{name}  \u2014  Slot Price Breakdown\n', 'header'),
+            (sep + '\n', 'dim'),
+            (f'  JBV (avg 7d):          {avg_buy:>15,.0f} ISK\n', 'normal'),
+            (f'  JSV (avg 7d):          {avg_sell:>15,.0f} ISK\n', 'normal'),
+            (f'  Jita Split mid-point:  {split_mid:>15,.0f} ISK\n', 'normal'),
+            (f'  Price Used ({basis_lbl:<12s}): {price:>15,.0f} ISK\n', 'normal'),
+            (sep + '\n', 'dim'),
+        ]
+        if item_vol_mode == 'expected':
+            lines += [
+                (f'  Expected Units/mo:     {exp_units:>15,.0f} units\n', 'normal'),
+                (f'  \u00d7 Price Used:           {price:>15,.0f} ISK\n', 'normal'),
+            ]
+        else:
+            lines += [
+                (f'  Jita 30d Volume:       {jita_vol:>15,.0f} units\n', 'normal'),
+                (f'  \u00d7 Shop Scale ({scale_pct:.3f}%):    {shop_vol:>15,.0f} units/mo\n', 'normal'),
+                (f'  \u00d7 Price Used:           {price:>15,.0f} ISK\n', 'normal'),
+            ]
+        lines += [
+            (sep + '\n', 'dim'),
+            (f'  Monthly Shop Revenue:  {mo_rev:>15,.0f} ISK\n', 'normal'),
+            (f'  \u00d7 Commission ({comm_pct:.1f}%):     {mo_rev * comm:>15,.0f} ISK\n', 'normal'),
+            (f'  \u00d7 Exclusivity ({prem_val:.2f}\u00d7):   {slot_p:>15,.0f} ISK\n', 'normal'),
+            (sep + '\n', 'dim'),
+        ]
+        if slot_p >= 1e6:
+            slot_str = f'{slot_p/1e6:.2f}M ISK/mo'
+        elif slot_p > 0:
+            slot_str = f'{slot_p/1e3:.0f}K ISK/mo'
+        else:
+            slot_str = '— (fetch Jita volumes first)'
+        lines.append((f'  Suggested Slot Price:  {slot_str:>22}\n', 'result'))
+
+        self._slot_math_text.configure(state='normal')
+        self._slot_math_text.delete('1.0', 'end')
+        for text, tag in lines:
+            self._slot_math_text.insert('end', text, tag)
+        self._slot_math_text.configure(state='disabled')
+
+    def _slot_item_vol_mode_changed(self):
+        """Enable/disable the Expected Units entry based on the per-item vol mode radio."""
+        mode = self._slot_item_vol_mode_var.get()
+        self._slot_units_entry.configure(state='normal' if mode == 'expected' else 'disabled')
+
+    def _slot_basis_changed(self):
+        """Enable/disable the pct entries based on radio selection."""
+        mode = self._slot_basis_var.get()
+        self._slot_jbv_pct_entry.configure(state='normal' if mode == 'jbv_pct' else 'disabled')
+        self._slot_split_entry.configure(state='normal' if mode == 'split' else 'disabled')
+
+    def _slot_apply_basis(self):
+        """Apply basis setting to all selected items and recalculate."""
+        sel = self._slot_tree.selection()
+        item_sel = [s for s in sel if not s.startswith('sep_')]
+        if not item_sel:
+            return
+        mode = self._slot_basis_var.get()
+        try:
+            if mode == 'jbv_pct':
+                pct = float(self._slot_jbv_pct_var.get())
+            else:
+                pct = float(self._slot_split_pct_var.get())
+        except Exception:
+            pct = 95.0
+
+        try:    units = int(float(self._slot_units_var.get()))
+        except Exception: units = 0
+        item_vol_mode = self._slot_item_vol_mode_var.get()
+
+        for iid in item_sel:
+            try:
+                self._slot_basis[iid] = {
+                    'mode': mode, 'pct': pct,
+                    'units': units, 'vol_mode': item_vol_mode,
+                }
+            except Exception:
+                pass
+
+        self._slot_recalculate()
+        # Restore selection after tree rebuild
+        valid = [iid for iid in item_sel if self._slot_tree.exists(iid)]
+        if valid:
+            self._slot_tree.selection_set(valid)
+            self._slot_on_select()
+
+    def _slot_fetch_volumes(self):
+        """Fetch Jita 30-day volumes from ESI in a background thread."""
+        if self._slot_loading or not self._slot_items:
+            return
+        self._slot_loading = True
+        self._slot_fetch_btn.configure(state='disabled')
+        self._slot_status_lbl.configure(text='Fetching from ESI\u2026', fg='#ffcc44')
+
+        import threading
+        import requests
+        import time as _time
+        from datetime import timedelta
+
+        items_snap = list(self._slot_items)
+        FORGE  = 10000002
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).date()
+
+        def _fetch():
+            volumes = {}
+            for i, (type_id, name, tier, _, _) in enumerate(items_snap):
+                try:
+                    url = (f'https://esi.evetech.net/latest/markets/{FORGE}'
+                           f'/history/?type_id={type_id}')
+                    r = requests.get(url, timeout=10)
+                    if r.status_code == 200:
+                        volumes[type_id] = sum(
+                            d['volume'] for d in r.json()
+                            if d['date'] >= str(cutoff)
+                        )
+                    else:
+                        volumes[type_id] = 0
+                except Exception:
+                    volumes[type_id] = 0
+                _time.sleep(0.1)
+                self.root.after(0, lambda i=i: self._slot_status_lbl.configure(
+                    text=f'Fetching\u2026 {i + 1}/{len(items_snap)}', fg='#ffcc44'))
+
+            def _done():
+                self._slot_volumes.update(volumes)
+                self._slot_loading = False
+                self._slot_fetch_btn.configure(state='normal')
+                self._slot_status_lbl.configure(
+                    text=f'Fetched {len(volumes)} items \u2713', fg='#00ff88')
+                self._slot_recalculate()
+            self.root.after(0, _done)
+
+        threading.Thread(target=_fetch, daemon=True).start()
+
+    # ===== SLOT MANAGER =====
+
+    _SLOTMGR_CONFIG_PATH = os.path.join(PROJECT_DIR, 'slots_config.json')
+
+    _SLOTMGR_CAT_ORDER = [
+        'minerals', 'ice_products', 'moon_materials',
+        'pi_materials', 'salvaged_materials',
+    ]
+    _SLOTMGR_CAT_LABELS = {
+        'minerals':           'Minerals',
+        'ice_products':       'Ice Products',
+        'moon_materials':     'Moon Materials',
+        'pi_materials':       'Planetary Materials',
+        'salvaged_materials': 'Salvaged Materials',
+    }
+
+    def _build_slot_manager_tab(self):
+        """Build the Slot Manager tab."""
+        # State: type_id -> {'in_program': bool, 'status': 'open'|'closed', 'lessee': str}
+        self._sm_state   = {}   # populated by _sm_load
+        self._sm_all_ids = []   # ordered list of type_ids from DB
+
+        outer = tk.Frame(self.slotmgr_frame, background='#0a1520')
+        outer.pack(fill='both', expand=True, padx=15, pady=10)
+
+        tk.Label(outer, text='Slot Manager', background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 13, 'bold')).pack(
+                 anchor='w', pady=(0, 8))
+
+        # ── Toolbar ──────────────────────────────────────────────────────────
+        toolbar = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        toolbar.pack(fill='x', pady=(0, 8))
+        tf = tk.Frame(toolbar, background='#0a2030')
+        tf.pack(fill='x', padx=10, pady=6)
+
+        # Filter controls
+        tk.Label(tf, text='Category:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).pack(side='left', padx=(0, 4))
+        self._sm_cat_var = tk.StringVar(value='All')
+        cat_options = ['All'] + [self._SLOTMGR_CAT_LABELS[c]
+                                  for c in self._SLOTMGR_CAT_ORDER]
+        cat_menu = ttk.Combobox(tf, textvariable=self._sm_cat_var,
+                                values=cat_options, state='readonly', width=20)
+        cat_menu.pack(side='left', padx=(0, 16))
+        cat_menu.bind('<<ComboboxSelected>>', lambda _: self._sm_refresh_tree())
+
+        tk.Label(tf, text='Show:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).pack(side='left', padx=(0, 4))
+        self._sm_show_var = tk.StringVar(value='All')
+        show_menu = ttk.Combobox(tf, textvariable=self._sm_show_var,
+                                 values=['All', 'In Program', 'Not in Program'],
+                                 state='readonly', width=16)
+        show_menu.pack(side='left', padx=(0, 20))
+        show_menu.bind('<<ComboboxSelected>>', lambda _: self._sm_refresh_tree())
+
+        # Action buttons
+        ttk.Button(tf, text='Include Selected',
+                   command=lambda: self._sm_set_program(True)).pack(side='left', padx=(0, 4))
+        ttk.Button(tf, text='Exclude Selected',
+                   command=lambda: self._sm_set_program(False)).pack(side='left', padx=(0, 16))
+
+        ttk.Button(tf, text='Save Config', style='Save.TButton',
+                   command=self._sm_save).pack(side='left', padx=(0, 6))
+        ttk.Button(tf, text='Generate Image', style='Deploy.TButton',
+                   command=self._sm_generate).pack(side='left', padx=(0, 6))
+
+        self._sm_status_lbl = tk.Label(tf, text='', bg='#0a2030', fg='#ffcc44',
+                                       font=('Segoe UI', 9))
+        self._sm_status_lbl.pack(side='left', padx=(10, 0))
+
+        # Counter labels (right side)
+        self._sm_count_lbl = tk.Label(tf, text='', bg='#0a2030', fg='#66d9ff',
+                                      font=('Segoe UI', 9))
+        self._sm_count_lbl.pack(side='right')
+
+        # ── Treeview ─────────────────────────────────────────────────────────
+        tree_frame = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        tree_frame.pack(fill='both', expand=True, pady=(0, 6))
+
+        cols = ('in_prog', 'category', 'sub', 'name', 'status', 'lessee', 'price')
+        self._sm_tree = ttk.Treeview(tree_frame, columns=cols, show='headings',
+                                     selectmode='extended')
+        for cid, hd, w, anchor in [
+            ('in_prog',  '\u2713 Slot?',    60,  'c'),
+            ('category', 'Category',       145,  'c'),
+            ('sub',      'Tier / Grade',   110,  'c'),
+            ('name',     'Item Name',      250,  'w'),
+            ('status',   'Status',          80,  'c'),
+            ('lessee',   'Lessee',         190,  'w'),
+            ('price',    'Price / mo',     110,  'e'),
+        ]:
+            self._sm_tree.heading(cid, text=hd)
+            self._sm_tree.column(cid, width=w, minwidth=30, anchor=anchor)
+
+        self._sm_tree.tag_configure('in_open',   foreground='#00ff88')
+        self._sm_tree.tag_configure('in_closed', foreground='#ffcc44')
+        self._sm_tree.tag_configure('out',       foreground='#445566')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical', command=self._sm_tree.yview)
+        self._sm_tree.configure(yscrollcommand=vsb.set)
+        vsb.pack(side='right', fill='y')
+        self._sm_tree.pack(fill='both', expand=True)
+        self._sm_tree.bind('<<TreeviewSelect>>', self._sm_on_select)
+
+        # ── Edit panel (bottom) ───────────────────────────────────────────────
+        edit_card = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        edit_card.pack(fill='x')
+        ef = tk.Frame(edit_card, background='#0a2030')
+        ef.pack(fill='x', padx=12, pady=8)
+
+        self._sm_sel_lbl = tk.Label(ef, text='— select item(s) above —',
+                                    bg='#0a2030', fg='#88d0e8',
+                                    font=('Segoe UI', 9, 'italic'))
+        self._sm_sel_lbl.grid(row=0, column=0, columnspan=9, sticky='w', pady=(0, 6))
+
+        tk.Label(ef, text='Status:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).grid(row=1, column=0, padx=(0, 6), sticky='w')
+        self._sm_status_var = tk.StringVar(value='open')
+        tk.Radiobutton(ef, text='Open', variable=self._sm_status_var,
+                       value='open', bg='#0a2030', fg='#00ff88',
+                       selectcolor='#0a3040', activebackground='#0a2030',
+                       activeforeground='#00ff88',
+                       command=self._sm_status_changed).grid(
+                       row=1, column=1, padx=(0, 8), sticky='w')
+        tk.Radiobutton(ef, text='Closed', variable=self._sm_status_var,
+                       value='closed', bg='#0a2030', fg='#ffcc44',
+                       selectcolor='#0a3040', activebackground='#0a2030',
+                       activeforeground='#ffcc44',
+                       command=self._sm_status_changed).grid(
+                       row=1, column=2, padx=(0, 20), sticky='w')
+
+        tk.Label(ef, text='Lessee name:', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).grid(row=1, column=3, padx=(0, 6), sticky='w')
+        self._sm_lessee_var = tk.StringVar()
+        self._sm_lessee_entry = tk.Entry(ef, textvariable=self._sm_lessee_var,
+                                         width=22, bg='#0d2030', fg='#ffcc44',
+                                         insertbackground='#ffcc44',
+                                         font=('Segoe UI', 10), state='disabled')
+        self._sm_lessee_entry.grid(row=1, column=4, padx=(0, 16), sticky='w')
+
+        tk.Label(ef, text='Price / mo (ISK):', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).grid(row=1, column=5, padx=(0, 6), sticky='w')
+        self._sm_price_var = tk.StringVar()
+        tk.Entry(ef, textvariable=self._sm_price_var, width=14,
+                 bg='#0d2030', fg='#66d9ff', insertbackground='#66d9ff',
+                 font=('Segoe UI', 10)).grid(row=1, column=6, padx=(0, 8), sticky='w')
+        ttk.Button(ef, text='Pull from Calculator',
+                   command=self._sm_pull_calc_prices).grid(row=1, column=7, padx=(0, 10))
+
+        ttk.Button(ef, text='Apply to Selected',
+                   command=self._sm_apply_edit).grid(row=1, column=8, padx=(0, 0))
+
+        # Load data
+        self._sm_load_all()
+
+    # ── Slot Manager helpers ──────────────────────────────────────────────────
+
+    def _sm_load_all(self):
+        """Load all market items from DB, then overlay slots_config.json."""
+        # Fetch every non-ore item + metadata from DB
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute('''
+            SELECT tmi.type_id, tmi.category, it.type_name,
+                   tmi.display_order, it.market_group_id
+            FROM tracked_market_items tmi
+            JOIN inv_types it ON tmi.type_id = it.type_id
+            WHERE tmi.category NOT IN ("standard_ore","ice_ore","moon_ore")
+            ORDER BY tmi.category, tmi.display_order
+        ''').fetchall()
+        conn.close()
+
+        PI_TIER  = {1334:'P1', 1335:'P2', 1336:'P3', 1337:'P4'}
+
+        def _sal_grade(d):
+            if d is None: return ''
+            if d <= 9:    return 'Common'
+            if d <= 21:   return 'Uncommon'
+            if d <= 32:   return 'Rare'
+            if d <= 42:   return 'Very Rare'
+            return 'Rogue Drone'
+
+        self._sm_meta = {}   # type_id -> (category, name, sub_label)
+        self._sm_all_ids = []
+        for type_id, cat, name, disp, grp in rows:
+            if cat == 'pi_materials':
+                sub = PI_TIER.get(grp, 'P2')
+            elif cat == 'salvaged_materials':
+                sub = _sal_grade(disp)
+            else:
+                sub = ''
+            self._sm_meta[type_id] = (cat, name, sub)
+            self._sm_all_ids.append(type_id)
+            # Default state: not in program
+            self._sm_state.setdefault(type_id, {
+                'in_program': False,
+                'status':     'open',
+                'lessee':     '',
+                'price':      '',
+            })
+
+        # Overlay saved config
+        if os.path.exists(self._SLOTMGR_CONFIG_PATH):
+            try:
+                with open(self._SLOTMGR_CONFIG_PATH, 'r', encoding='utf-8') as f:
+                    cfg = json.load(f)
+                # Mark items that are in the config as in_program
+                in_config = {e['type_id'] for e in cfg}
+                for tid in self._sm_all_ids:
+                    self._sm_state[tid]['in_program'] = tid in in_config
+                for entry in cfg:
+                    tid = entry.get('type_id')
+                    if tid in self._sm_state:
+                        self._sm_state[tid]['status'] = entry.get('status', 'open')
+                        self._sm_state[tid]['lessee'] = entry.get('lessee') or ''
+                        self._sm_state[tid]['price']  = entry.get('price')  or ''
+            except Exception:
+                pass
+
+        self._sm_refresh_tree()
+
+    def _sm_refresh_tree(self):
+        """Rebuild the treeview to match current filter settings."""
+        cat_filter  = self._sm_cat_var.get()
+        show_filter = self._sm_show_var.get()
+
+        # Reverse label -> key
+        label_to_key = {v: k for k, v in self._SLOTMGR_CAT_LABELS.items()}
+
+        self._sm_tree.delete(*self._sm_tree.get_children())
+
+        in_prog_count = out_count = 0
+        for type_id in self._sm_all_ids:
+            cat, name, sub = self._sm_meta[type_id]
+            state = self._sm_state[type_id]
+
+            # Category filter
+            if cat_filter != 'All':
+                if label_to_key.get(cat_filter) != cat:
+                    continue
+
+            # Show filter
+            if show_filter == 'In Program' and not state['in_program']:
+                continue
+            if show_filter == 'Not in Program' and state['in_program']:
+                continue
+
+            in_prog  = state['in_program']
+            status   = state['status']
+            lessee   = state['lessee']
+            in_prog_count += 1 if in_prog else 0
+            out_count     += 0 if in_prog else 1
+
+            tag = ('in_open'   if in_prog and status == 'open'   else
+                   'in_closed' if in_prog and status == 'closed' else
+                   'out')
+
+            price     = state['price']
+            price_disp = self._sm_fmt_price(price) if in_prog and price else ('—' if not in_prog else '')
+
+            self._sm_tree.insert('', 'end', iid=str(type_id), tags=(tag,), values=(
+                '\u2713' if in_prog else '',
+                self._SLOTMGR_CAT_LABELS.get(cat, cat),
+                sub,
+                name,
+                status.capitalize() if in_prog else '—',
+                lessee if in_prog and lessee else ('—' if not in_prog else ''),
+                price_disp,
+            ))
+
+        total = len(self._sm_all_ids)
+        self._sm_count_lbl.configure(
+            text=f'{in_prog_count} in program  ·  {out_count} excluded  ·  {total} total items')
+
+    def _sm_on_select(self, _event=None):
+        """Update the edit panel when selection changes."""
+        sel = self._sm_tree.selection()
+        if not sel:
+            return
+        if len(sel) == 1:
+            tid   = int(sel[0])
+            state = self._sm_state[tid]
+            self._sm_sel_lbl.configure(text=self._sm_meta[tid][1])
+            self._sm_status_var.set(state['status'])
+            self._sm_lessee_var.set(state['lessee'])
+            self._sm_price_var.set(state['price'])
+        else:
+            self._sm_sel_lbl.configure(text=f'{len(sel)} items selected')
+        self._sm_status_changed()
+
+    def _sm_status_changed(self):
+        """Enable lessee entry only when status is closed."""
+        if self._sm_status_var.get() == 'closed':
+            self._sm_lessee_entry.configure(state='normal')
+        else:
+            self._sm_lessee_entry.configure(state='disabled')
+
+    def _sm_set_program(self, include: bool):
+        """Include or exclude all selected items from the slot program."""
+        sel = self._sm_tree.selection()
+        if not sel:
+            return
+        for iid in sel:
+            self._sm_state[int(iid)]['in_program'] = include
+        self._sm_refresh_tree()
+        # Restore selection
+        valid = [i for i in sel if self._sm_tree.exists(i)]
+        if valid:
+            self._sm_tree.selection_set(valid)
+
+    def _sm_apply_edit(self):
+        """Apply status/lessee to all selected in-program items."""
+        sel = self._sm_tree.selection()
+        if not sel:
+            return
+        status = self._sm_status_var.get()
+        lessee = self._sm_lessee_var.get().strip() if status == 'closed' else ''
+        price  = self._sm_price_var.get().strip()
+        for iid in sel:
+            tid = int(iid)
+            self._sm_state[tid]['status'] = status
+            self._sm_state[tid]['lessee'] = lessee
+            self._sm_state[tid]['price']  = price
+            # Auto-include if not already
+            self._sm_state[tid]['in_program'] = True
+        self._sm_refresh_tree()
+        valid = [i for i in sel if self._sm_tree.exists(i)]
+        if valid:
+            self._sm_tree.selection_set(valid)
+
+    @staticmethod
+    def _sm_fmt_price(raw):
+        """Format a raw price value (number or string) for display."""
+        try:
+            v = float(str(raw).replace(',', '').replace('M', 'e6')
+                              .replace('K', 'e3').replace('B', 'e9'))
+            if v >= 1e9: return f'{v/1e9:.2f}B/mo'
+            if v >= 1e6: return f'{v/1e6:.1f}M/mo'
+            if v >= 1e3: return f'{v/1e3:.0f}K/mo'
+            return f'{int(v):,}/mo'
+        except Exception:
+            return str(raw)
+
+    def _sm_pull_calc_prices(self):
+        """Populate prices from the Slot Pricing calculator for matching items."""
+        if not hasattr(self, '_slot_items') or not self._slot_volumes:
+            self._sm_status_lbl.configure(
+                text='Run the Slot Pricing tab and fetch Jita volumes first.',
+                fg='#ff6666')
+            self.root.after(4000, lambda: self._sm_status_lbl.configure(text=''))
+            return
+
+        scale, comm, prem = self._slot_get_params()
+        updated = 0
+        for type_id, name, tier, avg_buy, avg_sell in self._slot_items:
+            if type_id not in self._sm_state:
+                continue
+            cfg           = self._slot_basis.get(str(type_id), {})
+            item_vol_mode = cfg.get('vol_mode', 'jita')
+            price, _      = self._slot_get_price(type_id, avg_buy, avg_sell)
+            if item_vol_mode == 'expected':
+                exp_units = float(cfg.get('units', 0))
+                if not exp_units:
+                    continue
+                slot_p = exp_units * price * comm * prem
+            else:
+                jita_vol = self._slot_volumes.get(type_id, 0)
+                if not jita_vol:
+                    continue
+                slot_p = jita_vol * scale * price * comm * prem
+            self._sm_state[type_id]['price'] = f'{slot_p:,.0f}'
+            updated += 1
+
+        self._sm_refresh_tree()
+        self._sm_status_lbl.configure(
+            text=f'Pulled prices for {updated} PI items \u2713', fg='#00ff88')
+        self.root.after(3000, lambda: self._sm_status_lbl.configure(text=''))
+
+    def _sm_save(self):
+        """Write in-program items to slots_config.json."""
+        entries = []
+        for type_id in self._sm_all_ids:
+            state = self._sm_state[type_id]
+            if not state['in_program']:
+                continue
+            cat, name, _ = self._sm_meta[type_id]
+            entries.append({
+                'type_id':  type_id,
+                'category': cat,
+                'name':     name,
+                'status':   state['status'],
+                'lessee':   state['lessee'] or None,
+                'price':    state['price']  or None,
+            })
+        try:
+            with open(self._SLOTMGR_CONFIG_PATH, 'w', encoding='utf-8') as f:
+                json.dump(entries, f, indent=2, ensure_ascii=False)
+            n = len(entries)
+            self._sm_status_lbl.configure(
+                text=f'Saved {n} slot{"s" if n != 1 else ""} \u2713', fg='#00ff88')
+            self.root.after(3000, lambda: self._sm_status_lbl.configure(text=''))
+        except Exception as e:
+            self._sm_status_lbl.configure(text=f'Error: {e}', fg='#ff6666')
+
+    def _sm_generate(self):
+        """Save config then run generate_slots_image.py in background."""
+        self._sm_save()
+        self._sm_status_lbl.configure(text='Generating\u2026', fg='#ffcc44')
+
+        import threading
+        def _run():
+            try:
+                result = subprocess.run(
+                    [sys.executable,
+                     os.path.join(PROJECT_DIR, 'generate_slots_image.py')],
+                    capture_output=True, text=True
+                )
+                msg = result.stdout.strip().split('\n')[0] if result.stdout else 'Done'
+                if result.returncode != 0:
+                    msg = result.stderr.strip()[:60]
+                self.root.after(0, lambda: self._sm_status_lbl.configure(
+                    text=msg, fg='#00ff88' if result.returncode == 0 else '#ff6666'))
+            except Exception as e:
+                self.root.after(0, lambda: self._sm_status_lbl.configure(
+                    text=str(e)[:60], fg='#ff6666'))
+        threading.Thread(target=_run, daemon=True).start()
 
     def update_status(self, text):
         """Update the status indicator."""

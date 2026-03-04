@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partner Recruitment Post — Infinite Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #080e18;
+    --bg2:      #0a1520;
+    --bg3:      #0d1f30;
+    --card:     #0f2035;
+    --border:   #1a3a55;
+    --accent:   #66d9ff;
+    --gold:     #ffcc44;
+    --green:    #00ff88;
+    --orange:   #ff9944;
+    --muted:    #4a7090;
+    --text:     #c8dde8;
+    --dim:      #6a8fa8;
+    --discord:  #5865F2;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── LAYOUT ── */
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 0;
+    min-height: 100vh;
+  }
+
+  /* ── LEFT: PREVIEW ── */
+  .preview-col {
+    padding: 32px 40px 60px;
+    border-right: 1px solid var(--border);
+  }
+
+  .col-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .col-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Discord-like forum post preview */
+  .discord-post {
+    background: #313338;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  .discord-header {
+    background: #2b2d31;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #1e1f22;
+  }
+
+  .discord-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5865F2 0%, #7289da 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .discord-meta { line-height: 1.3; }
+
+  .discord-author {
+    font-weight: 600;
+    color: #c9b8f5;
+    font-size: 0.9rem;
+  }
+
+  .discord-tag {
+    font-size: 0.7rem;
+    color: #72767d;
+    margin-top: 1px;
+  }
+
+  .discord-body {
+    padding: 20px 24px 28px;
+    font-family: 'gg sans', 'Noto Sans', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #dbdee1;
+  }
+
+  /* Markdown rendering inside discord body */
+  .discord-body h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 4px;
+    line-height: 1.2;
+  }
+
+  .discord-body h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 22px 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #3f4248;
+  }
+
+  .discord-body h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 16px 0 6px;
+  }
+
+  .discord-body p { margin-bottom: 10px; }
+
+  .discord-body ul, .discord-body ol {
+    padding-left: 20px;
+    margin-bottom: 10px;
+  }
+
+  .discord-body li { margin-bottom: 4px; }
+
+  .discord-body strong { color: #fff; font-weight: 600; }
+
+  .discord-body em { color: #dbdee1; font-style: italic; }
+
+  .discord-body code {
+    background: #1e1f22;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Consolas', monospace;
+    font-size: 0.85rem;
+    color: #e06c75;
+  }
+
+  .discord-body blockquote {
+    border-left: 3px solid #4e5058;
+    padding: 2px 12px;
+    margin: 10px 0;
+    color: #b5bac1;
+  }
+
+  .discord-body hr {
+    border: none;
+    border-top: 1px solid #3f4248;
+    margin: 18px 0;
+  }
+
+  /* Simulated pill tags */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0 14px;
+  }
+
+  .tag {
+    background: #1e1f22;
+    border: 1px solid #3f4248;
+    color: #b5bac1;
+    font-size: 0.75rem;
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+
+  .tag.accent { border-color: #5865F2; color: #8fa3f8; }
+  .tag.green  { border-color: #3ba55d; color: #57ab6e; }
+  .tag.gold   { border-color: #faa61a; color: #faa61a; }
+
+  /* ── RIGHT: COPY PANEL ── */
+  .copy-col {
+    background: var(--bg2);
+    padding: 32px 28px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .copy-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--discord);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+
+  .copy-btn:hover  { background: #4752c4; }
+  .copy-btn:active { transform: scale(0.98); }
+
+  .copy-btn.copied {
+    background: #3ba55d;
+  }
+
+  .copy-hint {
+    font-size: 0.82rem;
+    color: var(--dim);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .raw-textarea {
+    flex: 1;
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    padding: 14px;
+    resize: vertical;
+    outline: none;
+    min-height: 600px;
+  }
+
+  .raw-textarea:focus { border-color: var(--discord); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #3ba55d;
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 10px 24px;
+    border-radius: 4px;
+    transition: transform 0.25s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ════ LEFT: DISCORD PREVIEW ════ -->
+  <div class="preview-col">
+    <div class="col-label">Discord Forum Post Preview</div>
+
+    <div class="discord-post">
+      <div class="discord-header">
+        <div class="discord-avatar">IS</div>
+        <div class="discord-meta">
+          <div class="discord-author">Hamektok Hakaari</div>
+          <div class="discord-tag">Today at 12:00 PM · #partner-program</div>
+        </div>
+      </div>
+
+      <div class="discord-body">
+
+        <h1>🏭 Infinite Solutions — PI Partner Program</h1>
+        <p><em>Keep the alliance supplied. Earn ISK doing what you're already doing.</em></p>
+
+        <div class="tag-row">
+          <span class="tag accent">Recruiting</span>
+          <span class="tag green">PI Producers</span>
+          <span class="tag gold">TEST Alliance</span>
+          <span class="tag">Null-Sec</span>
+        </div>
+
+        <hr>
+
+        <h2>The problem we're solving</h2>
+        <p>
+          Every time a corp or alliance member needs PI for manufacturing, fuel, or fitting — and
+          it isn't stocked locally — that's ISK and time walking out the door to Jita. Hauling
+          costs add up. Availability gaps slow down operations. Local supply matters.
+        </p>
+        <p>
+          Infinite Solutions exists to fix that. We stock the materials our people actually need,
+          sourced from producers inside the alliance. If you're running planets, you're already
+          part of the solution — we just want to make it official and make it pay.
+        </p>
+
+        <h2>What this is</h2>
+        <p>
+          A consignment program for PI producers in corp and alliance. You produce, contract
+          your output to us, and receive a <strong>competitive commission split</strong> on every
+          unit sold. We handle the market side — pricing, listings, accounting — you just keep
+          the planets running.
+        </p>
+
+        <h2>Why it matters</h2>
+        <ul>
+          <li><strong>Local supply strengthens ops</strong> — stocked PI means faster manufacturing turnaround, fueled structures, and fewer "we're waiting on materials" moments for everyone.</li>
+          <li><strong>Your output goes further here</strong> — selling locally means the ISK stays in the alliance ecosystem rather than enriching Jita traders.</li>
+          <li><strong>Transparent and professional</strong> — live inventory dashboard, full ISK accounting per sale, regular payouts. You always know what sold and what you're owed.</li>
+          <li><strong>No market skills needed</strong> — we do the selling. You just need to produce and contract.</li>
+          <li><strong>Flexible and low-commitment</strong> — stock when you have it. No penalties for downtime. Real life happens.</li>
+        </ul>
+
+        <h2>How it works</h2>
+        <ol>
+          <li>We have a quick conversation about what you produce and rough volumes.</li>
+          <li>We agree on commission rate and a stock cap per item.</li>
+          <li>You get a dedicated named container in our hangar at LX-ZOJ.</li>
+          <li>Deliver via contract or direct drop — your choice.</li>
+          <li>Items sell on the local market. You receive your cut each payout cycle.</li>
+        </ol>
+
+        <h2>Who we want</h2>
+        <p>
+          Corp and alliance members with <strong>active planetary setups</strong> who produce consistently.
+          Ideally:
+        </p>
+        <ul>
+          <li>P1 producers with high-volume, regular output</li>
+          <li>P2/P3 manufacturers with a consistent monthly yield</li>
+          <li>P4 producers running rare or high-value items</li>
+        </ul>
+        <p>
+          Solo pilots, small industry groups, and alt-based operations all work. If your planets
+          are spinning, we want to hear from you.
+        </p>
+
+        <h2>Open slots</h2>
+        <blockquote>
+          We have capacity across most PI tiers right now. What's most needed shifts with
+          alliance activity — reach out and we'll tell you exactly what has demand and what
+          the rates look like for your specific output.
+        </blockquote>
+
+        <h2>Rates</h2>
+        <p>
+          Negotiated individually based on item tier, volume, and consistency of supply.
+          We don't post a single number because a P4 producer and a bulk P1 supplier are
+          different conversations — both valuable, different math.
+        </p>
+        <p>
+          <strong>We want this to be worth your time.</strong> If the numbers don't work for you,
+          we'll say so upfront.
+        </p>
+
+        <h2>Get in touch</h2>
+        <p>
+          DM me here or convo <strong>Hamektok Hakaari</strong> in-game. Just tell me:
+        </p>
+        <ul>
+          <li>What PI you're producing and roughly how much per month</li>
+          <li>Your current setup (dedicated alt, main, small group, etc.)</li>
+          <li>Any questions</li>
+        </ul>
+        <p>
+          No application form, no hoops. Just a conversation.
+        </p>
+
+        <hr>
+
+        <p style="color:#72767d;font-size:0.85rem;">
+          <em>Infinite Solutions is a TEST Alliance corp operating out of LX-ZOJ. Consignment
+          arrangements run through in-game contracts and our internal tracking system.
+          Payouts in ISK on a regular cycle.</em>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ RIGHT: COPY PANEL ════ -->
+  <div class="copy-col">
+    <div class="col-label">Discord Markdown</div>
+
+    <button class="copy-btn" id="copyBtn" onclick="copyText()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      Copy for Discord
+    </button>
+
+    <p class="copy-hint">
+      Paste directly into a Discord Forum post.<br>
+      Works in any channel that supports markdown formatting.
+    </p>
+
+    <textarea class="raw-textarea" id="rawText" readonly># 🏭 Infinite Solutions — PI Partner Program
+*Keep the alliance supplied. Earn ISK doing what you're already doing.*
+
+`Recruiting` · `PI Producers` · `TEST Alliance` · `Null-Sec`
+
+---
+
+## The problem we're solving
+Every time a corp or alliance member needs PI for manufacturing, fuel, or fitting — and it isn't stocked locally — that's ISK and time walking out the door to Jita. Hauling costs add up. Availability gaps slow down operations. Local supply matters.
+
+Infinite Solutions exists to fix that. We stock the materials our people actually need, sourced from producers inside the alliance. If you're running planets, you're already part of the solution — we just want to make it official and make it pay.
+
+---
+
+## What this is
+A consignment program for PI producers in corp and alliance. You produce, contract your output to us, and receive a **competitive commission split** on every unit sold. We handle the market side — pricing, listings, accounting — you just keep the planets running.
+
+---
+
+## Why it matters
+- **Local supply strengthens ops** — stocked PI means faster manufacturing turnaround, fueled structures, and fewer "we're waiting on materials" moments for everyone.
+- **Your output goes further here** — selling locally means the ISK stays in the alliance ecosystem rather than enriching Jita traders.
+- **Transparent and professional** — live inventory dashboard, full ISK accounting per sale, regular payouts. You always know what sold and what you're owed.
+- **No market skills needed** — we do the selling. You just need to produce and contract.
+- **Flexible and low-commitment** — stock when you have it. No penalties for downtime. Real life happens.
+
+---
+
+## How it works
+1. We have a quick conversation about what you produce and rough volumes.
+2. We agree on commission rate and a stock cap per item.
+3. You get a dedicated named container in our hangar at LX-ZOJ.
+4. Deliver via contract or direct drop — your choice.
+5. Items sell on the local market. You receive your cut each payout cycle.
+
+---
+
+## Who we want
+Corp and alliance members with **active planetary setups** who produce consistently. Ideally:
+
+- P1 producers with high-volume, regular output
+- P2/P3 manufacturers with a consistent monthly yield
+- P4 producers running rare or high-value items
+
+Solo pilots, small industry groups, and alt-based operations all work. If your planets are spinning, we want to hear from you.
+
+---
+
+## Open slots
+> We have capacity across most PI tiers right now. What's most needed shifts with alliance activity — reach out and we'll tell you exactly what has demand and what the rates look like for your specific output.
+
+---
+
+## Rates
+Negotiated individually based on item tier, volume, and consistency of supply. We don't post a single number because a P4 producer and a bulk P1 supplier are different conversations — both valuable, different math.
+
+**We want this to be worth your time.** If the numbers don't work for you, we'll say so upfront.
+
+---
+
+## Get in touch
+DM me here or convo **Hamektok Hakaari** in-game. Just tell me:
+
+- What PI you're producing and roughly how much per month
+- Your current setup (dedicated alt, main, small group, etc.)
+- Any questions
+
+No application form, no hoops. Just a conversation.
+
+---
+*Infinite Solutions is a TEST Alliance corp operating out of LX-ZOJ. Consignment arrangements run through in-game contracts and our internal tracking system. Payouts in ISK on a regular cycle.*</textarea>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+  function copyText() {
+    const ta = document.getElementById('rawText');
+    navigator.clipboard.writeText(ta.value).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.classList.add('copied');
+      btn.textContent = '✓ Copied!';
+
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy for Discord`;
+        toast.classList.remove('show');
+      }, 2500);
+    });
+  }
+</script>
+
+</body>
+</html>

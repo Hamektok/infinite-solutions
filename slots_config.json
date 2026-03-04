@@ -1,0 +1,522 @@
+[
+  {
+    "type_id": 2329,
+    "category": "pi_materials",
+    "name": "Biocells",
+    "status": "open",
+    "lessee": null,
+    "price": "6,844,053"
+  },
+  {
+    "type_id": 2345,
+    "category": "pi_materials",
+    "name": "Camera Drones",
+    "status": "open",
+    "lessee": null,
+    "price": "1,543,904"
+  },
+  {
+    "type_id": 2348,
+    "category": "pi_materials",
+    "name": "Gel-Matrix Biopaste",
+    "status": "open",
+    "lessee": null,
+    "price": "27,610,684"
+  },
+  {
+    "type_id": 2349,
+    "category": "pi_materials",
+    "name": "Supercomputers",
+    "status": "open",
+    "lessee": null,
+    "price": "2,728,118"
+  },
+  {
+    "type_id": 2351,
+    "category": "pi_materials",
+    "name": "Smartfab Units",
+    "status": "open",
+    "lessee": null,
+    "price": "1,566,015"
+  },
+  {
+    "type_id": 2352,
+    "category": "pi_materials",
+    "name": "Nuclear Reactors",
+    "status": "open",
+    "lessee": null,
+    "price": "2,567,608"
+  },
+  {
+    "type_id": 2354,
+    "category": "pi_materials",
+    "name": "Neocoms",
+    "status": "open",
+    "lessee": null,
+    "price": "1,633,874"
+  },
+  {
+    "type_id": 2360,
+    "category": "pi_materials",
+    "name": "Industrial Explosives",
+    "status": "open",
+    "lessee": null,
+    "price": "1,937,292"
+  },
+  {
+    "type_id": 2361,
+    "category": "pi_materials",
+    "name": "Hermetic Membranes",
+    "status": "open",
+    "lessee": null,
+    "price": "4,321,886"
+  },
+  {
+    "type_id": 2367,
+    "category": "pi_materials",
+    "name": "Cryoprotectant Solution",
+    "status": "open",
+    "lessee": null,
+    "price": "26,727,415"
+  },
+  {
+    "type_id": 2401,
+    "category": "pi_materials",
+    "name": "Chiral Structures",
+    "status": "open",
+    "lessee": null,
+    "price": "5,618,790"
+  },
+  {
+    "type_id": 2463,
+    "category": "pi_materials",
+    "name": "Nanites",
+    "status": "open",
+    "lessee": null,
+    "price": "9,406,457"
+  },
+  {
+    "type_id": 2867,
+    "category": "pi_materials",
+    "name": "Broadcast Node",
+    "status": "open",
+    "lessee": null,
+    "price": "30,050,541"
+  },
+  {
+    "type_id": 2868,
+    "category": "pi_materials",
+    "name": "Integrity Response Drones",
+    "status": "open",
+    "lessee": null,
+    "price": "32,100,955"
+  },
+  {
+    "type_id": 2869,
+    "category": "pi_materials",
+    "name": "Nano-Factory",
+    "status": "open",
+    "lessee": null,
+    "price": "13,470,613"
+  },
+  {
+    "type_id": 2870,
+    "category": "pi_materials",
+    "name": "Organic Mortar Applicators",
+    "status": "open",
+    "lessee": null,
+    "price": "16,014,362"
+  },
+  {
+    "type_id": 2871,
+    "category": "pi_materials",
+    "name": "Recursive Computing Module",
+    "status": "open",
+    "lessee": null,
+    "price": "9,362,556"
+  },
+  {
+    "type_id": 2872,
+    "category": "pi_materials",
+    "name": "Self-Harmonizing Power Core",
+    "status": "open",
+    "lessee": null,
+    "price": "33,828,316"
+  },
+  {
+    "type_id": 2875,
+    "category": "pi_materials",
+    "name": "Sterile Conduits",
+    "status": "open",
+    "lessee": null,
+    "price": "12,086,921"
+  },
+  {
+    "type_id": 2876,
+    "category": "pi_materials",
+    "name": "Wetware Mainframe",
+    "status": "open",
+    "lessee": null,
+    "price": "35,225,239"
+  },
+  {
+    "type_id": 3645,
+    "category": "pi_materials",
+    "name": "Water",
+    "status": "open",
+    "lessee": null,
+    "price": "7,355,851"
+  },
+  {
+    "type_id": 3775,
+    "category": "pi_materials",
+    "name": "Viral Agent",
+    "status": "open",
+    "lessee": null,
+    "price": "8,510,103"
+  },
+  {
+    "type_id": 3779,
+    "category": "pi_materials",
+    "name": "Biomass",
+    "status": "open",
+    "lessee": null,
+    "price": "6,697,452"
+  },
+  {
+    "type_id": 3828,
+    "category": "pi_materials",
+    "name": "Construction Blocks",
+    "status": "open",
+    "lessee": null,
+    "price": "7,691,920"
+  },
+  {
+    "type_id": 9838,
+    "category": "pi_materials",
+    "name": "Superconductors",
+    "status": "open",
+    "lessee": null,
+    "price": "8,898,761"
+  },
+  {
+    "type_id": 9842,
+    "category": "pi_materials",
+    "name": "Miniature Electronics",
+    "status": "open",
+    "lessee": null,
+    "price": "8,151,794"
+  },
+  {
+    "type_id": 9846,
+    "category": "pi_materials",
+    "name": "Planetary Vehicles",
+    "status": "open",
+    "lessee": null,
+    "price": "1,974,241"
+  },
+  {
+    "type_id": 2358,
+    "category": "pi_materials",
+    "name": "Biotech Research Reports",
+    "status": "open",
+    "lessee": null,
+    "price": "1,571,490"
+  },
+  {
+    "type_id": 2344,
+    "category": "pi_materials",
+    "name": "Condensates",
+    "status": "open",
+    "lessee": null,
+    "price": "1,141,490"
+  },
+  {
+    "type_id": 17392,
+    "category": "pi_materials",
+    "name": "Data Chips",
+    "status": "open",
+    "lessee": null,
+    "price": "3,676,225"
+  },
+  {
+    "type_id": 2366,
+    "category": "pi_materials",
+    "name": "Hazmat Detection Systems",
+    "status": "open",
+    "lessee": null,
+    "price": "1,342,075"
+  },
+  {
+    "type_id": 17898,
+    "category": "pi_materials",
+    "name": "High-Tech Transmitters",
+    "status": "open",
+    "lessee": null,
+    "price": "3,259,918"
+  },
+  {
+    "type_id": 2346,
+    "category": "pi_materials",
+    "name": "Synthetic Synapses",
+    "status": "open",
+    "lessee": null,
+    "price": "22,291,885"
+  },
+  {
+    "type_id": 12836,
+    "category": "pi_materials",
+    "name": "Transcranial Microcontrollers",
+    "status": "open",
+    "lessee": null,
+    "price": "19,495,213"
+  },
+  {
+    "type_id": 17136,
+    "category": "pi_materials",
+    "name": "Ukomi Superconductors",
+    "status": "open",
+    "lessee": null,
+    "price": "11,994,876"
+  },
+  {
+    "type_id": 28974,
+    "category": "pi_materials",
+    "name": "Vaccines",
+    "status": "open",
+    "lessee": null,
+    "price": "1,024,571"
+  },
+  {
+    "type_id": 15317,
+    "category": "pi_materials",
+    "name": "Genetically Enhanced Livestock",
+    "status": "open",
+    "lessee": null,
+    "price": "2,395,241"
+  },
+  {
+    "type_id": 2327,
+    "category": "pi_materials",
+    "name": "Microfiber Shielding",
+    "status": "open",
+    "lessee": null,
+    "price": "4,068,334"
+  },
+  {
+    "type_id": 2321,
+    "category": "pi_materials",
+    "name": "Polyaramids",
+    "status": "open",
+    "lessee": null,
+    "price": "4,268,201"
+  },
+  {
+    "type_id": 3695,
+    "category": "pi_materials",
+    "name": "Polytextiles",
+    "status": "open",
+    "lessee": null,
+    "price": "1,461,839"
+  },
+  {
+    "type_id": 3697,
+    "category": "pi_materials",
+    "name": "Silicate Glass",
+    "status": "open",
+    "lessee": null,
+    "price": "3,630,339"
+  },
+  {
+    "type_id": 3691,
+    "category": "pi_materials",
+    "name": "Synthetic Oil",
+    "status": "open",
+    "lessee": null,
+    "price": "7,257,890"
+  },
+  {
+    "type_id": 2319,
+    "category": "pi_materials",
+    "name": "Test Cultures",
+    "status": "open",
+    "lessee": null,
+    "price": "10,814,131"
+  },
+  {
+    "type_id": 2393,
+    "category": "pi_materials",
+    "name": "Bacteria",
+    "status": "open",
+    "lessee": null,
+    "price": "5,018,322"
+  },
+  {
+    "type_id": 2396,
+    "category": "pi_materials",
+    "name": "Biofuels",
+    "status": "open",
+    "lessee": null,
+    "price": "2,318,490"
+  },
+  {
+    "type_id": 2390,
+    "category": "pi_materials",
+    "name": "Electrolytes",
+    "status": "open",
+    "lessee": null,
+    "price": "4,656,977"
+  },
+  {
+    "type_id": 2397,
+    "category": "pi_materials",
+    "name": "Industrial Fibers",
+    "status": "open",
+    "lessee": null,
+    "price": "4,929,669"
+  },
+  {
+    "type_id": 2392,
+    "category": "pi_materials",
+    "name": "Oxidizing Compound",
+    "status": "open",
+    "lessee": null,
+    "price": "5,966,882"
+  },
+  {
+    "type_id": 2389,
+    "category": "pi_materials",
+    "name": "Plasmoids",
+    "status": "open",
+    "lessee": null,
+    "price": "4,042,209"
+  },
+  {
+    "type_id": 2399,
+    "category": "pi_materials",
+    "name": "Precious Metals",
+    "status": "open",
+    "lessee": null,
+    "price": "7,155,830"
+  },
+  {
+    "type_id": 2395,
+    "category": "pi_materials",
+    "name": "Proteins",
+    "status": "open",
+    "lessee": null,
+    "price": "3,857,786"
+  },
+  {
+    "type_id": 2398,
+    "category": "pi_materials",
+    "name": "Reactive Metals",
+    "status": "open",
+    "lessee": null,
+    "price": "5,307,523"
+  },
+  {
+    "type_id": 9828,
+    "category": "pi_materials",
+    "name": "Silicon",
+    "status": "open",
+    "lessee": null,
+    "price": "4,410,656"
+  },
+  {
+    "type_id": 2400,
+    "category": "pi_materials",
+    "name": "Toxic Metals",
+    "status": "open",
+    "lessee": null,
+    "price": "2,844,541"
+  },
+  {
+    "type_id": 44,
+    "category": "pi_materials",
+    "name": "Enriched Uranium",
+    "status": "open",
+    "lessee": null,
+    "price": "10,750,285"
+  },
+  {
+    "type_id": 3683,
+    "category": "pi_materials",
+    "name": "Oxygen",
+    "status": "open",
+    "lessee": null,
+    "price": "6,334,609"
+  },
+  {
+    "type_id": 3689,
+    "category": "pi_materials",
+    "name": "Mechanical Parts",
+    "status": "open",
+    "lessee": null,
+    "price": "18,207,041"
+  },
+  {
+    "type_id": 9832,
+    "category": "pi_materials",
+    "name": "Coolant",
+    "status": "open",
+    "lessee": null,
+    "price": "20,260,205"
+  },
+  {
+    "type_id": 9848,
+    "category": "pi_materials",
+    "name": "Robotics",
+    "status": "open",
+    "lessee": null,
+    "price": "55,729,023"
+  },
+  {
+    "type_id": 9830,
+    "category": "pi_materials",
+    "name": "Rocket Fuel",
+    "status": "open",
+    "lessee": null,
+    "price": "10,435,360"
+  },
+  {
+    "type_id": 9834,
+    "category": "pi_materials",
+    "name": "Guidance Systems",
+    "status": "open",
+    "lessee": null,
+    "price": "13,919,366"
+  },
+  {
+    "type_id": 9836,
+    "category": "pi_materials",
+    "name": "Consumer Electronics",
+    "status": "open",
+    "lessee": null,
+    "price": "7,703,867"
+  },
+  {
+    "type_id": 9840,
+    "category": "pi_materials",
+    "name": "Transmitter",
+    "status": "open",
+    "lessee": null,
+    "price": "8,748,997"
+  },
+  {
+    "type_id": 2312,
+    "category": "pi_materials",
+    "name": "Supertensile Plastics",
+    "status": "open",
+    "lessee": null,
+    "price": "11,326,125"
+  },
+  {
+    "type_id": 2317,
+    "category": "pi_materials",
+    "name": "Oxides",
+    "status": "open",
+    "lessee": null,
+    "price": "4,262,984"
+  }
+]
