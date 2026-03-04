@@ -190,7 +190,12 @@ class AdminDashboard:
         self.notebook.add(self.consign_frame, text='  Consignments  ')
         self._build_consignment_tab()
 
-        # Tab 9: Quick Actions
+        # Tab 9: Slot Pricing
+        self.slot_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.slot_frame, text='  Slot Pricing  ')
+        self._build_slot_pricing_tab()
+
+        # Tab 10: Quick Actions
         self.actions_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
@@ -4563,6 +4568,483 @@ class AdminDashboard:
             msg = 'No new contracts found to sync.'
         messagebox.showinfo('Sync Contracts', msg, parent=self.root)
         self._consign_load_sales()
+
+    # ===== SLOT PRICING CALCULATOR =====
+
+    def _build_slot_pricing_tab(self):
+        """Build the PI Slot Pricing Calculator tab."""
+        self._slot_volumes = {}     # type_id -> jita_30d_vol (int)
+        self._slot_basis = {}       # str(type_id) -> {'mode': 'jbv'|'split', 'pct': float}
+        self._slot_items = []       # list of (type_id, name, tier, avg_buy, avg_sell)
+        self._slot_loading = False
+        self._slot_params_saved = {}
+        self._slot_load_config()
+
+        outer = tk.Frame(self.slot_frame, background='#0a1520')
+        outer.pack(fill='both', expand=True, padx=15, pady=10)
+
+        tk.Label(outer, text='PI Slot Pricing Calculator', background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 13, 'bold')).pack(anchor='w', pady=(0, 8))
+
+        # ── Parameters bar ───────────────────────────────────────────────────
+        param_card = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        param_card.pack(fill='x', pady=(0, 8))
+        pf = tk.Frame(param_card, background='#0a2030')
+        pf.pack(fill='x', padx=12, pady=8)
+
+        _lkw = dict(bg='#0a2030', fg='#88d0e8', font=('Segoe UI', 10))
+        _ekw = dict(bg='#0d2030', fg='#00ff88', insertbackground='#00ff88', font=('Segoe UI', 10))
+        _ukw = dict(bg='#0a2030', fg='#66d9ff', font=('Segoe UI', 10))
+
+        tk.Label(pf, text='Shop Scale:', **_lkw).grid(row=0, column=0, padx=(0, 4), sticky='w')
+        self._slot_scale_var = tk.StringVar(value=self._slot_params_saved.get('scale', '0.100'))
+        tk.Entry(pf, textvariable=self._slot_scale_var, width=7, **_ekw).grid(row=0, column=1, padx=(0, 2))
+        tk.Label(pf, text='% of Jita vol', **_ukw).grid(row=0, column=2, padx=(0, 16), sticky='w')
+
+        tk.Label(pf, text='Commission:', **_lkw).grid(row=0, column=3, padx=(0, 4), sticky='w')
+        self._slot_comm_var = tk.StringVar(value=self._slot_params_saved.get('commission', '5.00'))
+        tk.Entry(pf, textvariable=self._slot_comm_var, width=7, **_ekw).grid(row=0, column=4, padx=(0, 2))
+        tk.Label(pf, text='%', **_ukw).grid(row=0, column=5, padx=(0, 16), sticky='w')
+
+        tk.Label(pf, text='Exclusivity:', **_lkw).grid(row=0, column=6, padx=(0, 4), sticky='w')
+        self._slot_prem_var = tk.StringVar(value=self._slot_params_saved.get('premium', '1.25'))
+        tk.Entry(pf, textvariable=self._slot_prem_var, width=7, **_ekw).grid(row=0, column=7, padx=(0, 2))
+        tk.Label(pf, text='× premium', **_ukw).grid(row=0, column=8, padx=(0, 20), sticky='w')
+
+        self._slot_fetch_btn = ttk.Button(pf, text='\u21ba Fetch Jita Volumes',
+                                          command=self._slot_fetch_volumes)
+        self._slot_fetch_btn.grid(row=0, column=9, padx=(0, 6))
+        ttk.Button(pf, text='Recalculate', command=self._slot_recalculate).grid(row=0, column=10, padx=(0, 6))
+        ttk.Button(pf, text='Save Config', style='Save.TButton',
+                   command=self._slot_save_config).grid(row=0, column=11, padx=(0, 6))
+
+        self._slot_status_lbl = tk.Label(pf, text='', bg='#0a2030', fg='#ffcc44',
+                                         font=('Segoe UI', 9))
+        self._slot_status_lbl.grid(row=0, column=12, padx=(8, 0), sticky='w')
+
+        # ── Main treeview ────────────────────────────────────────────────────
+        tree_frame = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        tree_frame.pack(fill='both', expand=True, pady=(0, 6))
+
+        cols = ('tier', 'item', 'basis', 'price', 'jita_vol', 'shop_vol', 'shop_rev', 'slot_price')
+        self._slot_tree = ttk.Treeview(tree_frame, columns=cols, show='headings',
+                                       selectmode='extended')
+        for cid, hd, w, anchor in [
+            ('tier',       'Tier',           50,  'c'),
+            ('item',       'Item',          210,  'w'),
+            ('basis',      'Price Basis',   130,  'c'),
+            ('price',      'Price Used',    115,  'e'),
+            ('jita_vol',   'Jita 30d Vol',  130,  'e'),
+            ('shop_vol',   'Shop Vol/mo',   115,  'e'),
+            ('shop_rev',   'Shop Rev/mo',   130,  'e'),
+            ('slot_price', 'Slot Price/mo', 120,  'e'),
+        ]:
+            self._slot_tree.heading(cid, text=hd)
+            self._slot_tree.column(cid, width=w, minwidth=40, anchor=anchor)
+
+        self._slot_tree.tag_configure('P1',  foreground='#88d0e8')
+        self._slot_tree.tag_configure('P2',  foreground='#66cc88')
+        self._slot_tree.tag_configure('P3',  foreground='#ffcc44')
+        self._slot_tree.tag_configure('P4',  foreground='#ff8866')
+        self._slot_tree.tag_configure('sep', foreground='#334455', background='#0a1828')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical', command=self._slot_tree.yview)
+        self._slot_tree.configure(yscrollcommand=vsb.set)
+        vsb.pack(side='right', fill='y')
+        self._slot_tree.pack(fill='both', expand=True)
+        self._slot_tree.bind('<<TreeviewSelect>>', self._slot_on_select)
+
+        # ── Bottom: basis config (left) + math breakdown (right) ─────────────
+        bottom = tk.Frame(outer, background='#0a1520')
+        bottom.pack(fill='x', pady=(0, 6))
+
+        # Left: per-item basis configuration
+        config_card = tk.Frame(bottom, background='#0a2030', relief='solid', bd=1)
+        config_card.pack(side='left', fill='y', padx=(0, 8))
+
+        tk.Label(config_card, text='Price Basis — Selected Item', bg='#0a2030',
+                 fg='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=10, pady=(8, 2))
+        self._slot_selected_lbl = tk.Label(config_card, text='— select an item above —',
+                                           bg='#0a2030', fg='#88d0e8',
+                                           font=('Segoe UI', 9, 'italic'))
+        self._slot_selected_lbl.pack(anchor='w', padx=10, pady=(0, 8))
+
+        self._slot_basis_var = tk.StringVar(value='jbv')
+        tk.Radiobutton(config_card, text='JBV  (Jita Buy Value)',
+                       variable=self._slot_basis_var, value='jbv',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_basis_changed).pack(anchor='w', padx=10)
+
+        split_row = tk.Frame(config_card, background='#0a2030')
+        split_row.pack(anchor='w', padx=10, pady=(4, 0))
+        tk.Radiobutton(split_row, text='% of Jita Split:',
+                       variable=self._slot_basis_var, value='split',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_basis_changed).pack(side='left')
+        self._slot_split_pct_var = tk.StringVar(value='95')
+        self._slot_split_entry = tk.Entry(split_row, textvariable=self._slot_split_pct_var,
+                                          width=6, bg='#0d2030', fg='#00ff88',
+                                          insertbackground='#00ff88',
+                                          font=('Segoe UI', 10), state='disabled')
+        self._slot_split_entry.pack(side='left', padx=(6, 2))
+        tk.Label(split_row, text='%', bg='#0a2030', fg='#66d9ff',
+                 font=('Segoe UI', 10)).pack(side='left')
+
+        ttk.Button(config_card, text='Apply to Selected',
+                   command=self._slot_apply_basis).pack(anchor='w', padx=10, pady=(10, 10))
+
+        # Right: math breakdown
+        math_card = tk.Frame(bottom, background='#0a2030', relief='solid', bd=1)
+        math_card.pack(side='left', fill='both', expand=True)
+
+        tk.Label(math_card, text='Formula Breakdown', bg='#0a2030',
+                 fg='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=10, pady=(8, 4))
+        self._slot_math_text = tk.Text(math_card, height=9, bg='#060f18', fg='#88d0e8',
+                                       font=('Consolas', 9), state='disabled', relief='flat',
+                                       borderwidth=0, padx=10, pady=6)
+        self._slot_math_text.pack(fill='both', expand=True, padx=8, pady=(0, 8))
+        self._slot_math_text.tag_configure('header',  foreground='#00d9ff')
+        self._slot_math_text.tag_configure('result',  foreground='#00ff88', font=('Consolas', 9, 'bold'))
+        self._slot_math_text.tag_configure('dim',     foreground='#445566')
+        self._slot_math_text.tag_configure('normal',  foreground='#88d0e8')
+
+        # ── Summary footer ────────────────────────────────────────────────────
+        summary_card = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
+        summary_card.pack(fill='x')
+        sf = tk.Frame(summary_card, background='#0a2030')
+        sf.pack(fill='x', padx=12, pady=6)
+
+        tk.Label(sf, text='Monthly Totals (all slots filled):',
+                 bg='#0a2030', fg='#66d9ff', font=('Segoe UI', 10, 'bold')).grid(
+                 row=0, column=0, padx=(0, 20), sticky='w')
+
+        self._slot_summary_labels = {}
+        tier_colors = {'P1': '#88d0e8', 'P2': '#66cc88', 'P3': '#ffcc44',
+                       'P4': '#ff8866', 'TOTAL': '#00ff88'}
+        for col_i, tier in enumerate(['P1', 'P2', 'P3', 'P4', 'TOTAL'], start=1):
+            color = tier_colors[tier]
+            tk.Label(sf, text=f'{tier}:', bg='#0a2030', fg=color,
+                     font=('Segoe UI', 9, 'bold')).grid(row=0, column=col_i * 2 - 1,
+                                                         padx=(0, 4), sticky='e')
+            lbl = tk.Label(sf, text='—', bg='#0a2030', fg=color, font=('Segoe UI', 9))
+            lbl.grid(row=0, column=col_i * 2, padx=(0, 24), sticky='w')
+            self._slot_summary_labels[tier] = lbl
+
+        # Load items and populate
+        self._slot_load_items()
+
+    def _slot_load_config(self):
+        """Load saved basis config and global params from site_config."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            row_b = conn.execute(
+                "SELECT value FROM site_config WHERE key='slot_pricing_basis'").fetchone()
+            row_p = conn.execute(
+                "SELECT value FROM site_config WHERE key='slot_pricing_params'").fetchone()
+            conn.close()
+            self._slot_basis = json.loads(row_b[0]) if row_b else {}
+            self._slot_params_saved = json.loads(row_p[0]) if row_p else {}
+        except Exception:
+            self._slot_basis = {}
+            self._slot_params_saved = {}
+
+    def _slot_save_config(self):
+        """Save per-item basis config and global params to site_config."""
+        try:
+            params = {
+                'scale':      self._slot_scale_var.get(),
+                'commission': self._slot_comm_var.get(),
+                'premium':    self._slot_prem_var.get(),
+            }
+            conn = sqlite3.connect(DB_PATH, timeout=5)
+            conn.execute("INSERT OR REPLACE INTO site_config (key, value) VALUES (?,?)",
+                         ('slot_pricing_basis',  json.dumps(self._slot_basis)))
+            conn.execute("INSERT OR REPLACE INTO site_config (key, value) VALUES (?,?)",
+                         ('slot_pricing_params', json.dumps(params)))
+            conn.commit()
+            conn.close()
+            self._slot_status_lbl.configure(text='Config saved \u2713', fg='#00ff88')
+            self.root.after(3000, lambda: self._slot_status_lbl.configure(text=''))
+        except Exception as e:
+            self._slot_status_lbl.configure(text=f'Save error: {e}', fg='#ff6666')
+
+    def _slot_load_items(self):
+        """Load PI items and their current prices from the DB."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            rows = conn.execute("""
+                SELECT tmi.type_id, tmi.type_name, it.market_group_id,
+                       ROUND(AVG(mps.best_buy),  0) AS avg_buy,
+                       ROUND(AVG(mps.best_sell), 0) AS avg_sell
+                FROM tracked_market_items tmi
+                JOIN inv_types it ON tmi.type_id = it.type_id
+                LEFT JOIN market_price_snapshots mps
+                    ON tmi.type_id = mps.type_id
+                    AND mps.timestamp >= datetime('now', '-7 days')
+                WHERE tmi.category = 'pi_materials'
+                AND it.market_group_id IN (1334, 1335, 1336, 1337)
+                GROUP BY tmi.type_id, tmi.type_name, it.market_group_id
+                ORDER BY it.market_group_id, tmi.type_name
+            """).fetchall()
+            conn.close()
+            tier_map = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+            self._slot_items = [
+                (r[0], r[1], tier_map[r[2]], r[3] or 0.0, r[4] or 0.0)
+                for r in rows
+            ]
+        except Exception:
+            self._slot_items = []
+        self._slot_recalculate()
+
+    def _slot_get_params(self):
+        """Return (scale_fraction, commission_fraction, premium_multiplier)."""
+        try:    scale = float(self._slot_scale_var.get()) / 100.0
+        except Exception: scale = 0.001
+        try:    comm  = float(self._slot_comm_var.get()) / 100.0
+        except Exception: comm  = 0.05
+        try:    prem  = float(self._slot_prem_var.get())
+        except Exception: prem  = 1.25
+        return scale, comm, prem
+
+    def _slot_get_price(self, type_id, avg_buy, avg_sell):
+        """Return (price, basis_label) for an item based on its stored config."""
+        cfg  = self._slot_basis.get(str(type_id), {'mode': 'jbv', 'pct': 95.0})
+        mode = cfg.get('mode', 'jbv')
+        if mode == 'jbv':
+            return avg_buy, 'JBV'
+        pct   = cfg.get('pct', 95.0)
+        split = (avg_buy + avg_sell) / 2.0 if avg_buy and avg_sell else (avg_buy or avg_sell)
+        return split * pct / 100.0, f'{pct:.0f}% Split'
+
+    @staticmethod
+    def _slot_fmt_vol(v):
+        if v <= 0:   return '—'
+        if v >= 1e9: return f'{v/1e9:.1f}B'
+        if v >= 1e6: return f'{v/1e6:.1f}M'
+        return f'{v/1e3:.0f}K'
+
+    @staticmethod
+    def _slot_fmt_isk(v):
+        if v <= 0:   return '—'
+        if v >= 1e9: return f'{v/1e9:.2f}B'
+        if v >= 1e6: return f'{v/1e6:.1f}M'
+        return f'{v/1e3:.0f}K'
+
+    def _slot_recalculate(self):
+        """Rebuild the treeview with current parameters and per-item basis."""
+        scale, comm, prem = self._slot_get_params()
+        self._slot_tree.delete(*self._slot_tree.get_children())
+        tier_totals = {'P1': 0.0, 'P2': 0.0, 'P3': 0.0, 'P4': 0.0}
+        cur_tier = None
+
+        for type_id, name, tier, avg_buy, avg_sell in self._slot_items:
+            if tier != cur_tier:
+                cur_tier = tier
+                self._slot_tree.insert('', 'end', iid=f'sep_{tier}', tags=('sep',),
+                                       values=(f'  \u2500\u2500 {tier} \u2500\u2500',
+                                               '', '', '', '', '', '', ''))
+
+            jita_vol = self._slot_volumes.get(type_id, 0)
+            price, basis_lbl = self._slot_get_price(type_id, avg_buy, avg_sell)
+            shop_vol = jita_vol * scale
+            mo_rev   = shop_vol * price
+            slot_p   = mo_rev * comm * prem
+            tier_totals[tier] += slot_p
+
+            self._slot_tree.insert('', 'end', iid=str(type_id), tags=(tier,), values=(
+                tier, name, basis_lbl,
+                f'{price:,.0f}' if price > 0 else '—',
+                self._slot_fmt_vol(jita_vol),
+                f'{shop_vol:,.0f}' if shop_vol > 0 else '—',
+                self._slot_fmt_isk(mo_rev),
+                self._slot_fmt_isk(slot_p),
+            ))
+
+        # Update summary labels
+        grand = sum(tier_totals.values())
+        for tier, lbl in self._slot_summary_labels.items():
+            if tier == 'TOTAL':
+                val = f'{grand/1e6:.1f}M ISK' if grand >= 1e6 else f'{grand/1e3:.0f}K ISK' if grand > 0 else '—'
+            else:
+                v = tier_totals.get(tier, 0.0)
+                val = f'{v/1e6:.1f}M' if v >= 1e6 else f'{v/1e3:.0f}K' if v > 0 else '—'
+            lbl.configure(text=val)
+
+    def _slot_on_select(self, _event=None):
+        """Update basis controls and math breakdown for the selected item(s)."""
+        sel = self._slot_tree.selection()
+        # Filter out separator rows
+        item_sel = [s for s in sel if not s.startswith('sep_')]
+        if not item_sel:
+            return
+
+        # Multiple items selected — show count and load first item's config into controls
+        if len(item_sel) > 1:
+            self._slot_selected_lbl.configure(text=f'{len(item_sel)} items selected')
+            # Load basis config from the first real item so controls are ready to bulk-apply
+            try:
+                first_id = int(item_sel[0])
+                cfg = self._slot_basis.get(str(first_id), {'mode': 'jbv', 'pct': 95.0})
+                self._slot_basis_var.set(cfg.get('mode', 'jbv'))
+                self._slot_split_pct_var.set(str(cfg.get('pct', 95.0)))
+                self._slot_basis_changed()
+            except ValueError:
+                pass
+            # Show a summary in the math panel
+            self._slot_math_text.configure(state='normal')
+            self._slot_math_text.delete('1.0', 'end')
+            self._slot_math_text.insert('end',
+                f'{len(item_sel)} items selected\n\n'
+                'Set the price basis below and click\n'
+                '"Apply to Selected" to update all\n'
+                'highlighted items at once.', 'header')
+            self._slot_math_text.configure(state='disabled')
+            return
+
+        try:
+            type_id = int(item_sel[0])
+        except ValueError:
+            return
+
+        item = next((i for i in self._slot_items if i[0] == type_id), None)
+        if not item:
+            return
+        _, name, tier, avg_buy, avg_sell = item
+
+        # Update basis controls to reflect this item's stored config
+        cfg = self._slot_basis.get(str(type_id), {'mode': 'jbv', 'pct': 95.0})
+        self._slot_basis_var.set(cfg.get('mode', 'jbv'))
+        self._slot_split_pct_var.set(str(cfg.get('pct', 95.0)))
+        self._slot_basis_changed()
+        self._slot_selected_lbl.configure(text=f'{name}  ({tier})')
+
+        # Compute values for breakdown
+        scale, comm, prem = self._slot_get_params()
+        jita_vol  = self._slot_volumes.get(type_id, 0)
+        price, basis_lbl = self._slot_get_price(type_id, avg_buy, avg_sell)
+        shop_vol  = jita_vol * scale
+        mo_rev    = shop_vol * price
+        slot_p    = mo_rev * comm * prem
+        split_mid = (avg_buy + avg_sell) / 2.0 if avg_buy and avg_sell else 0.0
+
+        try:    scale_pct = float(self._slot_scale_var.get())
+        except Exception: scale_pct = 0.1
+        try:    comm_pct  = float(self._slot_comm_var.get())
+        except Exception: comm_pct  = 5.0
+        try:    prem_val  = float(self._slot_prem_var.get())
+        except Exception: prem_val  = 1.25
+
+        sep = '\u2500' * 58
+        lines = [
+            (f'{name}  \u2014  Slot Price Breakdown\n', 'header'),
+            (sep + '\n', 'dim'),
+            (f'  JBV (avg 7d):          {avg_buy:>15,.0f} ISK\n', 'normal'),
+            (f'  JSV (avg 7d):          {avg_sell:>15,.0f} ISK\n', 'normal'),
+            (f'  Jita Split mid-point:  {split_mid:>15,.0f} ISK\n', 'normal'),
+            (f'  Price Used ({basis_lbl:<12s}): {price:>15,.0f} ISK\n', 'normal'),
+            (sep + '\n', 'dim'),
+            (f'  Jita 30d Volume:       {jita_vol:>15,.0f} units\n', 'normal'),
+            (f'  \u00d7 Shop Scale ({scale_pct:.3f}%):    {shop_vol:>15,.0f} units/mo\n', 'normal'),
+            (f'  \u00d7 Price Used:           {price:>15,.0f} ISK\n', 'normal'),
+            (sep + '\n', 'dim'),
+            (f'  Monthly Shop Revenue:  {mo_rev:>15,.0f} ISK\n', 'normal'),
+            (f'  \u00d7 Commission ({comm_pct:.1f}%):     {mo_rev * comm:>15,.0f} ISK\n', 'normal'),
+            (f'  \u00d7 Exclusivity ({prem_val:.2f}\u00d7):   {slot_p:>15,.0f} ISK\n', 'normal'),
+            (sep + '\n', 'dim'),
+        ]
+        if slot_p >= 1e6:
+            slot_str = f'{slot_p/1e6:.2f}M ISK/mo'
+        elif slot_p > 0:
+            slot_str = f'{slot_p/1e3:.0f}K ISK/mo'
+        else:
+            slot_str = '— (fetch Jita volumes first)'
+        lines.append((f'  Suggested Slot Price:  {slot_str:>22}\n', 'result'))
+
+        self._slot_math_text.configure(state='normal')
+        self._slot_math_text.delete('1.0', 'end')
+        for text, tag in lines:
+            self._slot_math_text.insert('end', text, tag)
+        self._slot_math_text.configure(state='disabled')
+
+    def _slot_basis_changed(self):
+        """Enable/disable the split-% entry based on radio selection."""
+        if self._slot_basis_var.get() == 'split':
+            self._slot_split_entry.configure(state='normal')
+        else:
+            self._slot_split_entry.configure(state='disabled')
+
+    def _slot_apply_basis(self):
+        """Apply basis setting to all selected items and recalculate."""
+        sel = self._slot_tree.selection()
+        item_sel = [s for s in sel if not s.startswith('sep_')]
+        if not item_sel:
+            return
+        mode = self._slot_basis_var.get()
+        try:    pct = float(self._slot_split_pct_var.get())
+        except Exception: pct = 95.0
+
+        for iid in item_sel:
+            try:
+                self._slot_basis[iid] = {'mode': mode, 'pct': pct}
+            except Exception:
+                pass
+
+        self._slot_recalculate()
+        # Restore selection after tree rebuild
+        valid = [iid for iid in item_sel if self._slot_tree.exists(iid)]
+        if valid:
+            self._slot_tree.selection_set(valid)
+            self._slot_on_select()
+
+    def _slot_fetch_volumes(self):
+        """Fetch Jita 30-day volumes from ESI in a background thread."""
+        if self._slot_loading or not self._slot_items:
+            return
+        self._slot_loading = True
+        self._slot_fetch_btn.configure(state='disabled')
+        self._slot_status_lbl.configure(text='Fetching from ESI\u2026', fg='#ffcc44')
+
+        import threading
+        import requests
+        import time as _time
+        from datetime import timedelta
+
+        items_snap = list(self._slot_items)
+        FORGE  = 10000002
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).date()
+
+        def _fetch():
+            volumes = {}
+            for i, (type_id, name, tier, _, _) in enumerate(items_snap):
+                try:
+                    url = (f'https://esi.evetech.net/latest/markets/{FORGE}'
+                           f'/history/?type_id={type_id}')
+                    r = requests.get(url, timeout=10)
+                    if r.status_code == 200:
+                        volumes[type_id] = sum(
+                            d['volume'] for d in r.json()
+                            if d['date'] >= str(cutoff)
+                        )
+                    else:
+                        volumes[type_id] = 0
+                except Exception:
+                    volumes[type_id] = 0
+                _time.sleep(0.1)
+                self.root.after(0, lambda i=i: self._slot_status_lbl.configure(
+                    text=f'Fetching\u2026 {i + 1}/{len(items_snap)}', fg='#ffcc44'))
+
+            def _done():
+                self._slot_volumes.update(volumes)
+                self._slot_loading = False
+                self._slot_fetch_btn.configure(state='normal')
+                self._slot_status_lbl.configure(
+                    text=f'Fetched {len(volumes)} items \u2713', fg='#00ff88')
+                self._slot_recalculate()
+            self.root.after(0, _done)
+
+        threading.Thread(target=_fetch, daemon=True).start()
 
     def update_status(self, text):
         """Update the status indicator."""
