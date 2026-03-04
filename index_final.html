@@ -4906,11 +4906,17 @@ Tip: Copy directly from EVE inventory window"></textarea>
             'Nocxium', 'Zydrine', 'Megacyte', 'Morphite'
         ];
 
-        const ICE_PRODUCTS = [
-            'Nitrogen Fuel Block', 'Hydrogen Fuel Block', 'Helium Fuel Block', 'Oxygen Fuel Block',
-            'Heavy Water', 'Liquid Ozone', 'Strontium Clathrates',
-            'Oxygen Isotopes', 'Hydrogen Isotopes', 'Helium Isotopes', 'Nitrogen Isotopes'
-        ];
+        const ICE_PRODUCTS = {
+            'Fuel Blocks': [
+                'Nitrogen Fuel Block', 'Hydrogen Fuel Block', 'Helium Fuel Block', 'Oxygen Fuel Block'
+            ],
+            'Refined Ice': [
+                'Heavy Water', 'Liquid Ozone', 'Strontium Clathrates'
+            ],
+            'Isotopes': [
+                'Oxygen Isotopes', 'Hydrogen Isotopes', 'Helium Isotopes', 'Nitrogen Isotopes'
+            ],
+        };
 
         const MOON_MATERIALS = {
             'R4 - Ubiquitous': ['Atmospheric Gases', 'Evaporite Deposits', 'Hydrocarbons', 'Silicates'],
@@ -5219,10 +5225,22 @@ Tip: Copy directly from EVE inventory window"></textarea>
             const grid = document.getElementById('ice-grid');
             grid.innerHTML = '';
 
-            ICE_PRODUCTS.forEach(product => {
-                const quantity = inventory[product] || 0;
-                const item = createItemCard(product, quantity, getRates(product));
-                grid.appendChild(item);
+            Object.entries(ICE_PRODUCTS).forEach(([group, products]) => {
+                const header = document.createElement('div');
+                header.className = 'salvage-tier-header';
+                header.textContent = group;
+                grid.appendChild(header);
+
+                const groupGrid = document.createElement('div');
+                groupGrid.className = 'item-grid';
+
+                products.forEach(product => {
+                    const quantity = inventory[product] || 0;
+                    const item = createItemCard(product, quantity, getRates(product));
+                    groupGrid.appendChild(item);
+                });
+
+                grid.appendChild(groupGrid);
             });
         }
 
