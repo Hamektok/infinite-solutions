@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-04 03:37 UTC
+// Generated: 2026-03-04 03:57 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -7016,7 +7016,7 @@ const BUYBACK_DATA = {
       "visible": true,
       "subs": {
         "fuel_blocks": {
-          "visible": true,
+          "visible": false,
           "displayName": "Fuel Blocks"
         },
         "refined_ice": {
@@ -7037,37 +7037,37 @@ const BUYBACK_DATA = {
           "displayName": "Raw"
         },
         "processed": {
-          "visible": true,
+          "visible": false,
           "displayName": "Processed"
         },
         "advanced": {
-          "visible": true,
+          "visible": false,
           "displayName": "Advanced"
         }
       }
     },
     "pi_materials": {
-      "visible": true,
+      "visible": false,
       "subs": {
         "p1": {
-          "visible": true,
+          "visible": false,
           "displayName": "P1"
         },
         "p2": {
-          "visible": true,
+          "visible": false,
           "displayName": "P2"
         },
         "p3": {
-          "visible": true,
+          "visible": false,
           "displayName": "P3"
         },
         "p4": {
-          "visible": true,
+          "visible": false,
           "displayName": "P4"
         }
       }
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-04 03:37 UTC"
+  "generated": "2026-03-04 03:57 UTC"
 };
