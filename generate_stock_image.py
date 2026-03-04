@@ -111,12 +111,15 @@ def main():
         "SELECT key, value FROM site_config WHERE key LIKE 'market_tab_%' OR key LIKE 'market_sub_%'"
     ).fetchall()
     vis = {k: (str(v) == '1') for k, v in vis_rows}
-    show_minerals   = vis.get('market_tab_minerals',               True)
-    show_ice        = vis.get('market_tab_ice_products',           True)
-    show_moon       = vis.get('market_tab_moon_materials',         True)
-    show_moon_raw   = vis.get('market_sub_moon_materials_raw',      True)
-    show_moon_proc  = vis.get('market_sub_moon_materials_processed', True)
-    show_moon_adv   = vis.get('market_sub_moon_materials_advanced',  True)
+    show_minerals      = vis.get('market_tab_minerals',                    True)
+    show_ice           = vis.get('market_tab_ice_products',                True)
+    show_moon          = vis.get('market_tab_moon_materials',              True)
+    show_ice_fuel      = vis.get('market_sub_ice_products_fuel_blocks',    True)
+    show_ice_refined   = vis.get('market_sub_ice_products_refined_ice',    True)
+    show_ice_isotopes  = vis.get('market_sub_ice_products_isotopes',       True)
+    show_moon_raw      = vis.get('market_sub_moon_materials_raw',          True)
+    show_moon_proc     = vis.get('market_sub_moon_materials_processed',    True)
+    show_moon_adv      = vis.get('market_sub_moon_materials_advanced',     True)
 
     # Fetch items only for visible categories
     visible_cats = [c_name for c_name, flag in [
@@ -145,14 +148,20 @@ def main():
     snap_ts = c.fetchone()[0] or ''
     conn.close()
 
+    def ice_sub_visible(display_order):
+        if display_order <= 8:   return show_ice_fuel
+        if display_order <= 11:  return show_ice_refined
+        return show_ice_isotopes
+
     def moon_sub_visible(display_order):
-        """Return True if this moon item's subcategory is currently visible."""
-        if display_order < 100:   return show_moon_raw
-        if display_order < 200:   return show_moon_proc
+        if display_order < 100:  return show_moon_raw
+        if display_order < 200:  return show_moon_proc
         return show_moon_adv
 
     by_cat = {}
     for cat, name, qty, buyback, disp_ord in rows:
+        if cat == 'ice_products'   and not ice_sub_visible(disp_ord):
+            continue
         if cat == 'moon_materials' and not moon_sub_visible(disp_ord):
             continue
         by_cat.setdefault(cat, []).append((name, qty, buyback))
