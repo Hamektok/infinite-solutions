@@ -442,6 +442,40 @@
             padding-top: 0;
         }
 
+        .pi-tier-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px 0 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .pi-tier-tab {
+            padding: 6px 18px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 100, 150, 0.1);
+            color: #7ac8e0;
+            border: 1px solid #1a3d55;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pi-tier-tab:hover {
+            background: rgba(0, 200, 255, 0.12);
+            border-color: #008aaa;
+            color: #c0eeff;
+        }
+
+        .pi-tier-tab.active {
+            background: rgba(0, 200, 255, 0.18);
+            border-color: #00aacc;
+            color: #00d9ff;
+        }
+
         .ice-group-divider {
             grid-column: 1 / -1;
             color: rgba(160, 190, 210, 0.6);
@@ -2150,6 +2184,13 @@
 
                     <!-- PLANETARY MATERIALS SUB-CONTENT -->
                     <div id="pi-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab active" onclick="filterPI(this, 'all')">All</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p1')">P1 - Processed</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p2')">P2 - Refined</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p3')">P3 - Specialized</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p4')">P4 - Advanced</button>
+                        </div>
                         <div class="item-grid" id="pi-grid"></div>
                     </div>
 
@@ -5310,15 +5351,20 @@ Tip: Copy directly from EVE inventory window"></textarea>
             });
         }
 
-        function renderPlanetaryMaterials(inventory) {
+        function renderPlanetaryMaterials(inventory, tierFilter = 'all') {
             const grid = document.getElementById('pi-grid');
             grid.innerHTML = '';
 
             Object.entries(PLANETARY_MATERIALS).forEach(([group, materials]) => {
-                const divider = document.createElement('div');
-                divider.className = 'ice-group-divider';
-                divider.textContent = group;
-                grid.appendChild(divider);
+                const groupKey = group.split(' ')[0].toLowerCase(); // 'p1', 'p2', etc.
+                if (tierFilter !== 'all' && groupKey !== tierFilter) return;
+
+                if (tierFilter === 'all') {
+                    const divider = document.createElement('div');
+                    divider.className = 'ice-group-divider';
+                    divider.textContent = group;
+                    grid.appendChild(divider);
+                }
 
                 materials.forEach(material => {
                     const quantity = inventory[material] || 0;
@@ -5326,6 +5372,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     grid.appendChild(item);
                 });
             });
+        }
+
+        function filterPI(btn, tier) {
+            document.querySelectorAll('.pi-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderPlanetaryMaterials(EMBEDDED_DATA.inventory, tier);
         }
 
         function renderSalvage(inventory) {
