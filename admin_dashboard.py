@@ -4604,8 +4604,25 @@ class AdminDashboard:
 
         tk.Label(pf, text='Shop Scale:', **_lkw).grid(row=0, column=0, padx=(0, 4), sticky='w')
         self._slot_scale_var = tk.StringVar(value=self._slot_params_saved.get('scale', '0.100'))
-        tk.Entry(pf, textvariable=self._slot_scale_var, width=7, **_ekw).grid(row=0, column=1, padx=(0, 2))
+        self._slot_scale_entry = tk.Entry(pf, textvariable=self._slot_scale_var, width=7, **_ekw)
+        self._slot_scale_entry.grid(row=0, column=1, padx=(0, 2))
         tk.Label(pf, text='% of Jita vol', **_ukw).grid(row=0, column=2, padx=(0, 16), sticky='w')
+
+        # Volume mode toggle (row 1)
+        self._slot_vol_mode_var = tk.StringVar(value=self._slot_params_saved.get('vol_mode', 'jita'))
+        tk.Label(pf, text='Volume Basis:', **_lkw).grid(row=1, column=0, padx=(0, 4), pady=(6, 0), sticky='w')
+        tk.Radiobutton(pf, text='Jita 30d Volume',
+                       variable=self._slot_vol_mode_var, value='jita',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_vol_mode_changed).grid(row=1, column=1, columnspan=2,
+                                                                  sticky='w', pady=(6, 0))
+        tk.Radiobutton(pf, text='Expected Units/mo',
+                       variable=self._slot_vol_mode_var, value='expected',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_vol_mode_changed).grid(row=1, column=3, columnspan=3,
+                                                                  sticky='w', pady=(6, 0))
 
         tk.Label(pf, text='Commission:', **_lkw).grid(row=0, column=3, padx=(0, 4), sticky='w')
         self._slot_comm_var = tk.StringVar(value=self._slot_params_saved.get('commission', '5.00'))
@@ -4682,6 +4699,22 @@ class AdminDashboard:
                        activebackground='#0a2030', activeforeground='#00ff88',
                        command=self._slot_basis_changed).pack(anchor='w', padx=10)
 
+        jbv_pct_row = tk.Frame(config_card, background='#0a2030')
+        jbv_pct_row.pack(anchor='w', padx=10, pady=(4, 0))
+        tk.Radiobutton(jbv_pct_row, text='% of JBV:',
+                       variable=self._slot_basis_var, value='jbv_pct',
+                       bg='#0a2030', fg='#88d0e8', selectcolor='#0a3040',
+                       activebackground='#0a2030', activeforeground='#00ff88',
+                       command=self._slot_basis_changed).pack(side='left')
+        self._slot_jbv_pct_var = tk.StringVar(value='95')
+        self._slot_jbv_pct_entry = tk.Entry(jbv_pct_row, textvariable=self._slot_jbv_pct_var,
+                                            width=6, bg='#0d2030', fg='#00ff88',
+                                            insertbackground='#00ff88',
+                                            font=('Segoe UI', 10), state='disabled')
+        self._slot_jbv_pct_entry.pack(side='left', padx=(6, 2))
+        tk.Label(jbv_pct_row, text='%', bg='#0a2030', fg='#66d9ff',
+                 font=('Segoe UI', 10)).pack(side='left')
+
         split_row = tk.Frame(config_card, background='#0a2030')
         split_row.pack(anchor='w', padx=10, pady=(4, 0))
         tk.Radiobutton(split_row, text='% of Jita Split:',
@@ -4699,7 +4732,18 @@ class AdminDashboard:
                  font=('Segoe UI', 10)).pack(side='left')
 
         ttk.Button(config_card, text='Apply to Selected',
-                   command=self._slot_apply_basis).pack(anchor='w', padx=10, pady=(10, 10))
+                   command=self._slot_apply_basis).pack(anchor='w', padx=10, pady=(10, 6))
+
+        tk.Label(config_card, text='Expected Units/mo:', bg='#0a2030',
+                 fg='#88d0e8', font=('Segoe UI', 10)).pack(anchor='w', padx=10, pady=(6, 0))
+        self._slot_units_var   = tk.StringVar(value='0')
+        self._slot_units_entry = tk.Entry(config_card, textvariable=self._slot_units_var,
+                                          width=14, bg='#0d2030', fg='#00ff88',
+                                          insertbackground='#00ff88',
+                                          font=('Segoe UI', 10), state='disabled')
+        self._slot_units_entry.pack(anchor='w', padx=10, pady=(2, 0))
+        tk.Label(config_card, text='(units lessee produces/month)',
+                 bg='#0a2030', fg='#445566', font=('Segoe UI', 9)).pack(anchor='w', padx=10, pady=(0, 10))
 
         # Right: math breakdown
         math_card = tk.Frame(bottom, background='#0a2030', relief='solid', bd=1)
@@ -4738,7 +4782,8 @@ class AdminDashboard:
             lbl.grid(row=0, column=col_i * 2, padx=(0, 24), sticky='w')
             self._slot_summary_labels[tier] = lbl
 
-        # Load items and populate
+        # Load items and populate; apply initial vol_mode UI state
+        self._slot_vol_mode_changed()
         self._slot_load_items()
 
     def _slot_load_config(self):
@@ -4763,6 +4808,7 @@ class AdminDashboard:
                 'scale':      self._slot_scale_var.get(),
                 'commission': self._slot_comm_var.get(),
                 'premium':    self._slot_prem_var.get(),
+                'vol_mode':   self._slot_vol_mode_var.get(),
             }
             conn = sqlite3.connect(DB_PATH, timeout=5)
             conn.execute("INSERT OR REPLACE INTO site_config (key, value) VALUES (?,?)",
@@ -4820,7 +4866,9 @@ class AdminDashboard:
         mode = cfg.get('mode', 'jbv')
         if mode == 'jbv':
             return avg_buy, 'JBV'
-        pct   = cfg.get('pct', 95.0)
+        pct = cfg.get('pct', 95.0)
+        if mode == 'jbv_pct':
+            return avg_buy * pct / 100.0, f'{pct:.0f}% JBV'
         split = (avg_buy + avg_sell) / 2.0 if avg_buy and avg_sell else (avg_buy or avg_sell)
         return split * pct / 100.0, f'{pct:.0f}% Split'
 
@@ -4854,7 +4902,11 @@ class AdminDashboard:
 
             jita_vol = self._slot_volumes.get(type_id, 0)
             price, basis_lbl = self._slot_get_price(type_id, avg_buy, avg_sell)
-            shop_vol = jita_vol * scale
+            vol_mode = self._slot_vol_mode_var.get()
+            if vol_mode == 'expected':
+                shop_vol = float(self._slot_basis.get(str(type_id), {}).get('units', 0))
+            else:
+                shop_vol = jita_vol * scale
             mo_rev   = shop_vol * price
             slot_p   = mo_rev * comm * prem
             tier_totals[tier] += slot_p
@@ -4893,8 +4945,13 @@ class AdminDashboard:
             try:
                 first_id = int(item_sel[0])
                 cfg = self._slot_basis.get(str(first_id), {'mode': 'jbv', 'pct': 95.0})
-                self._slot_basis_var.set(cfg.get('mode', 'jbv'))
-                self._slot_split_pct_var.set(str(cfg.get('pct', 95.0)))
+                mode = cfg.get('mode', 'jbv')
+                pct  = str(cfg.get('pct', 95.0))
+                self._slot_basis_var.set(mode)
+                if mode == 'jbv_pct':
+                    self._slot_jbv_pct_var.set(pct)
+                else:
+                    self._slot_split_pct_var.set(pct)
                 self._slot_basis_changed()
             except ValueError:
                 pass
@@ -4920,17 +4977,25 @@ class AdminDashboard:
         _, name, tier, avg_buy, avg_sell = item
 
         # Update basis controls to reflect this item's stored config
-        cfg = self._slot_basis.get(str(type_id), {'mode': 'jbv', 'pct': 95.0})
-        self._slot_basis_var.set(cfg.get('mode', 'jbv'))
-        self._slot_split_pct_var.set(str(cfg.get('pct', 95.0)))
+        cfg  = self._slot_basis.get(str(type_id), {'mode': 'jbv', 'pct': 95.0})
+        mode = cfg.get('mode', 'jbv')
+        pct  = str(cfg.get('pct', 95.0))
+        self._slot_basis_var.set(mode)
+        if mode == 'jbv_pct':
+            self._slot_jbv_pct_var.set(pct)
+        else:
+            self._slot_split_pct_var.set(pct)
+        self._slot_units_var.set(str(cfg.get('units', 0)))
         self._slot_basis_changed()
         self._slot_selected_lbl.configure(text=f'{name}  ({tier})')
 
         # Compute values for breakdown
         scale, comm, prem = self._slot_get_params()
+        vol_mode  = self._slot_vol_mode_var.get()
         jita_vol  = self._slot_volumes.get(type_id, 0)
         price, basis_lbl = self._slot_get_price(type_id, avg_buy, avg_sell)
-        shop_vol  = jita_vol * scale
+        exp_units = float(cfg.get('units', 0))
+        shop_vol  = exp_units if vol_mode == 'expected' else jita_vol * scale
         mo_rev    = shop_vol * price
         slot_p    = mo_rev * comm * prem
         split_mid = (avg_buy + avg_sell) / 2.0 if avg_buy and avg_sell else 0.0
@@ -4951,9 +5016,19 @@ class AdminDashboard:
             (f'  Jita Split mid-point:  {split_mid:>15,.0f} ISK\n', 'normal'),
             (f'  Price Used ({basis_lbl:<12s}): {price:>15,.0f} ISK\n', 'normal'),
             (sep + '\n', 'dim'),
-            (f'  Jita 30d Volume:       {jita_vol:>15,.0f} units\n', 'normal'),
-            (f'  \u00d7 Shop Scale ({scale_pct:.3f}%):    {shop_vol:>15,.0f} units/mo\n', 'normal'),
-            (f'  \u00d7 Price Used:           {price:>15,.0f} ISK\n', 'normal'),
+        ]
+        if vol_mode == 'expected':
+            lines += [
+                (f'  Expected Units/mo:     {exp_units:>15,.0f} units\n', 'normal'),
+                (f'  \u00d7 Price Used:           {price:>15,.0f} ISK\n', 'normal'),
+            ]
+        else:
+            lines += [
+                (f'  Jita 30d Volume:       {jita_vol:>15,.0f} units\n', 'normal'),
+                (f'  \u00d7 Shop Scale ({scale_pct:.3f}%):    {shop_vol:>15,.0f} units/mo\n', 'normal'),
+                (f'  \u00d7 Price Used:           {price:>15,.0f} ISK\n', 'normal'),
+            ]
+        lines += [
             (sep + '\n', 'dim'),
             (f'  Monthly Shop Revenue:  {mo_rev:>15,.0f} ISK\n', 'normal'),
             (f'  \u00d7 Commission ({comm_pct:.1f}%):     {mo_rev * comm:>15,.0f} ISK\n', 'normal'),
@@ -4974,12 +5049,20 @@ class AdminDashboard:
             self._slot_math_text.insert('end', text, tag)
         self._slot_math_text.configure(state='disabled')
 
+    def _slot_vol_mode_changed(self):
+        """Switch between Jita-volume and expected-units mode."""
+        mode = self._slot_vol_mode_var.get()
+        self._slot_scale_entry.configure(state='normal'   if mode == 'jita'     else 'disabled')
+        self._slot_units_entry.configure(state='normal'   if mode == 'expected' else 'disabled')
+        hdr = 'Shop Vol/mo' if mode == 'jita' else 'Units/mo'
+        self._slot_tree.heading('shop_vol', text=hdr)
+        self._slot_recalculate()
+
     def _slot_basis_changed(self):
-        """Enable/disable the split-% entry based on radio selection."""
-        if self._slot_basis_var.get() == 'split':
-            self._slot_split_entry.configure(state='normal')
-        else:
-            self._slot_split_entry.configure(state='disabled')
+        """Enable/disable the pct entries based on radio selection."""
+        mode = self._slot_basis_var.get()
+        self._slot_jbv_pct_entry.configure(state='normal' if mode == 'jbv_pct' else 'disabled')
+        self._slot_split_entry.configure(state='normal' if mode == 'split' else 'disabled')
 
     def _slot_apply_basis(self):
         """Apply basis setting to all selected items and recalculate."""
@@ -4988,12 +5071,20 @@ class AdminDashboard:
         if not item_sel:
             return
         mode = self._slot_basis_var.get()
-        try:    pct = float(self._slot_split_pct_var.get())
-        except Exception: pct = 95.0
+        try:
+            if mode == 'jbv_pct':
+                pct = float(self._slot_jbv_pct_var.get())
+            else:
+                pct = float(self._slot_split_pct_var.get())
+        except Exception:
+            pct = 95.0
+
+        try:    units = int(float(self._slot_units_var.get()))
+        except Exception: units = 0
 
         for iid in item_sel:
             try:
-                self._slot_basis[iid] = {'mode': mode, 'pct': pct}
+                self._slot_basis[iid] = {'mode': mode, 'pct': pct, 'units': units}
             except Exception:
                 pass
 

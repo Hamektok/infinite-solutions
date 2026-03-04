@@ -1,1332 +1,522 @@
 [
   {
-    "type_id": 4051,
-    "category": "ice_products",
-    "name": "Nitrogen Fuel Block",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 4246,
-    "category": "ice_products",
-    "name": "Hydrogen Fuel Block",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 4247,
-    "category": "ice_products",
-    "name": "Helium Fuel Block",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 4312,
-    "category": "ice_products",
-    "name": "Oxygen Fuel Block",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16272,
-    "category": "ice_products",
-    "name": "Heavy Water",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16273,
-    "category": "ice_products",
-    "name": "Liquid Ozone",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16275,
-    "category": "ice_products",
-    "name": "Strontium Clathrates",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 17887,
-    "category": "ice_products",
-    "name": "Oxygen Isotopes",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 17889,
-    "category": "ice_products",
-    "name": "Hydrogen Isotopes",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16274,
-    "category": "ice_products",
-    "name": "Helium Isotopes",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 17888,
-    "category": "ice_products",
-    "name": "Nitrogen Isotopes",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 34,
-    "category": "minerals",
-    "name": "Tritanium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 35,
-    "category": "minerals",
-    "name": "Pyerite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 37,
-    "category": "minerals",
-    "name": "Isogen",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 36,
-    "category": "minerals",
-    "name": "Mexallon",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 38,
-    "category": "minerals",
-    "name": "Nocxium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 39,
-    "category": "minerals",
-    "name": "Zydrine",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 40,
-    "category": "minerals",
-    "name": "Megacyte",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 11399,
-    "category": "minerals",
-    "name": "Morphite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16634,
-    "category": "moon_materials",
-    "name": "Atmospheric Gases",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16635,
-    "category": "moon_materials",
-    "name": "Evaporite Deposits",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16633,
-    "category": "moon_materials",
-    "name": "Hydrocarbons",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16636,
-    "category": "moon_materials",
-    "name": "Silicates",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16640,
-    "category": "moon_materials",
-    "name": "Cobalt",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16639,
-    "category": "moon_materials",
-    "name": "Scandium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16637,
-    "category": "moon_materials",
-    "name": "Tungsten",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16638,
-    "category": "moon_materials",
-    "name": "Titanium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16641,
-    "category": "moon_materials",
-    "name": "Chromium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16643,
-    "category": "moon_materials",
-    "name": "Cadmium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16644,
-    "category": "moon_materials",
-    "name": "Platinum",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16642,
-    "category": "moon_materials",
-    "name": "Vanadium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16649,
-    "category": "moon_materials",
-    "name": "Technetium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16646,
-    "category": "moon_materials",
-    "name": "Mercury",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16647,
-    "category": "moon_materials",
-    "name": "Caesium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16648,
-    "category": "moon_materials",
-    "name": "Hafnium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16652,
-    "category": "moon_materials",
-    "name": "Promethium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16651,
-    "category": "moon_materials",
-    "name": "Neodymium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16650,
-    "category": "moon_materials",
-    "name": "Dysprosium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16653,
-    "category": "moon_materials",
-    "name": "Thulium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16654,
-    "category": "moon_materials",
-    "name": "Titanium Chromide",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16655,
-    "category": "moon_materials",
-    "name": "Crystallite Alloy",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16656,
-    "category": "moon_materials",
-    "name": "Fernite Alloy",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16657,
-    "category": "moon_materials",
-    "name": "Rolled Tungsten Alloy",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16658,
-    "category": "moon_materials",
-    "name": "Silicon Diborite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16659,
-    "category": "moon_materials",
-    "name": "Carbon Polymers",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16660,
-    "category": "moon_materials",
-    "name": "Ceramic Powder",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16661,
-    "category": "moon_materials",
-    "name": "Sulfuric Acid",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16662,
-    "category": "moon_materials",
-    "name": "Platinum Technite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16663,
-    "category": "moon_materials",
-    "name": "Caesarium Cadmide",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16664,
-    "category": "moon_materials",
-    "name": "Solerium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16665,
-    "category": "moon_materials",
-    "name": "Hexite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16666,
-    "category": "moon_materials",
-    "name": "Hyperflurite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16667,
-    "category": "moon_materials",
-    "name": "Neo Mercurite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16668,
-    "category": "moon_materials",
-    "name": "Dysporite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16669,
-    "category": "moon_materials",
-    "name": "Ferrofluid",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 17769,
-    "category": "moon_materials",
-    "name": "Fluxed Condensates",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 17959,
-    "category": "moon_materials",
-    "name": "Vanadium Hafnite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 17960,
-    "category": "moon_materials",
-    "name": "Prometium",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 33336,
-    "category": "moon_materials",
-    "name": "Thulium Hafnite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 33337,
-    "category": "moon_materials",
-    "name": "Promethium Mercurite",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 57453,
-    "category": "moon_materials",
-    "name": "Carbon Fiber",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 57454,
-    "category": "moon_materials",
-    "name": "Oxy-Organic Solvents",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 57455,
-    "category": "moon_materials",
-    "name": "Thermosetting Polymer",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16670,
-    "category": "moon_materials",
-    "name": "Crystalline Carbonide",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 17317,
-    "category": "moon_materials",
-    "name": "Fermionic Condensates",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16673,
-    "category": "moon_materials",
-    "name": "Fernite Carbide",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16683,
-    "category": "moon_materials",
-    "name": "Ferrogel",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16679,
-    "category": "moon_materials",
-    "name": "Fullerides",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16682,
-    "category": "moon_materials",
-    "name": "Hypersynaptic Fibers",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16681,
-    "category": "moon_materials",
-    "name": "Nanotransistors",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16680,
-    "category": "moon_materials",
-    "name": "Phenolic Composites",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16678,
-    "category": "moon_materials",
-    "name": "Sylramic Fibers",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16671,
-    "category": "moon_materials",
-    "name": "Titanium Carbide",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 16672,
-    "category": "moon_materials",
-    "name": "Tungsten Carbide",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 33362,
-    "category": "moon_materials",
-    "name": "Nonlinear Metamaterials",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 33359,
-    "category": "moon_materials",
-    "name": "Photonic Metamaterials",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 33361,
-    "category": "moon_materials",
-    "name": "Plasmonic Metamaterials",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 33360,
-    "category": "moon_materials",
-    "name": "Terahertz Metamaterials",
-    "status": "open",
-    "lessee": null
-  },
-  {
     "type_id": 2329,
     "category": "pi_materials",
     "name": "Biocells",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "6,844,053"
   },
   {
     "type_id": 2345,
     "category": "pi_materials",
     "name": "Camera Drones",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,543,904"
   },
   {
     "type_id": 2348,
     "category": "pi_materials",
     "name": "Gel-Matrix Biopaste",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "27,610,684"
   },
   {
     "type_id": 2349,
     "category": "pi_materials",
     "name": "Supercomputers",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "2,728,118"
   },
   {
     "type_id": 2351,
     "category": "pi_materials",
     "name": "Smartfab Units",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,566,015"
   },
   {
     "type_id": 2352,
     "category": "pi_materials",
     "name": "Nuclear Reactors",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "2,567,608"
   },
   {
     "type_id": 2354,
     "category": "pi_materials",
     "name": "Neocoms",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,633,874"
   },
   {
     "type_id": 2360,
     "category": "pi_materials",
     "name": "Industrial Explosives",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,937,292"
   },
   {
     "type_id": 2361,
     "category": "pi_materials",
     "name": "Hermetic Membranes",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,321,886"
   },
   {
     "type_id": 2367,
     "category": "pi_materials",
     "name": "Cryoprotectant Solution",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "26,727,415"
   },
   {
     "type_id": 2401,
     "category": "pi_materials",
     "name": "Chiral Structures",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "5,618,790"
   },
   {
     "type_id": 2463,
     "category": "pi_materials",
     "name": "Nanites",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "9,406,457"
   },
   {
     "type_id": 2867,
     "category": "pi_materials",
     "name": "Broadcast Node",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "30,050,541"
   },
   {
     "type_id": 2868,
     "category": "pi_materials",
     "name": "Integrity Response Drones",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "32,100,955"
   },
   {
     "type_id": 2869,
     "category": "pi_materials",
     "name": "Nano-Factory",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "13,470,613"
   },
   {
     "type_id": 2870,
     "category": "pi_materials",
     "name": "Organic Mortar Applicators",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "16,014,362"
   },
   {
     "type_id": 2871,
     "category": "pi_materials",
     "name": "Recursive Computing Module",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "9,362,556"
   },
   {
     "type_id": 2872,
     "category": "pi_materials",
     "name": "Self-Harmonizing Power Core",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "33,828,316"
   },
   {
     "type_id": 2875,
     "category": "pi_materials",
     "name": "Sterile Conduits",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "12,086,921"
   },
   {
     "type_id": 2876,
     "category": "pi_materials",
     "name": "Wetware Mainframe",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "35,225,239"
   },
   {
     "type_id": 3645,
     "category": "pi_materials",
     "name": "Water",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "7,355,851"
   },
   {
     "type_id": 3775,
     "category": "pi_materials",
     "name": "Viral Agent",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "8,510,103"
   },
   {
     "type_id": 3779,
     "category": "pi_materials",
     "name": "Biomass",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "6,697,452"
   },
   {
     "type_id": 3828,
     "category": "pi_materials",
     "name": "Construction Blocks",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "7,691,920"
   },
   {
     "type_id": 9838,
     "category": "pi_materials",
     "name": "Superconductors",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "8,898,761"
   },
   {
     "type_id": 9842,
     "category": "pi_materials",
     "name": "Miniature Electronics",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "8,151,794"
   },
   {
     "type_id": 9846,
     "category": "pi_materials",
     "name": "Planetary Vehicles",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,974,241"
   },
   {
     "type_id": 2358,
     "category": "pi_materials",
     "name": "Biotech Research Reports",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,571,490"
   },
   {
     "type_id": 2344,
     "category": "pi_materials",
     "name": "Condensates",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,141,490"
   },
   {
     "type_id": 17392,
     "category": "pi_materials",
     "name": "Data Chips",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "3,676,225"
   },
   {
     "type_id": 2366,
     "category": "pi_materials",
     "name": "Hazmat Detection Systems",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,342,075"
   },
   {
     "type_id": 17898,
     "category": "pi_materials",
     "name": "High-Tech Transmitters",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "3,259,918"
   },
   {
     "type_id": 2346,
     "category": "pi_materials",
     "name": "Synthetic Synapses",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "22,291,885"
   },
   {
     "type_id": 12836,
     "category": "pi_materials",
     "name": "Transcranial Microcontrollers",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "19,495,213"
   },
   {
     "type_id": 17136,
     "category": "pi_materials",
     "name": "Ukomi Superconductors",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "11,994,876"
   },
   {
     "type_id": 28974,
     "category": "pi_materials",
     "name": "Vaccines",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,024,571"
   },
   {
     "type_id": 15317,
     "category": "pi_materials",
     "name": "Genetically Enhanced Livestock",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "2,395,241"
   },
   {
     "type_id": 2327,
     "category": "pi_materials",
     "name": "Microfiber Shielding",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,068,334"
   },
   {
     "type_id": 2321,
     "category": "pi_materials",
     "name": "Polyaramids",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,268,201"
   },
   {
     "type_id": 3695,
     "category": "pi_materials",
     "name": "Polytextiles",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "1,461,839"
   },
   {
     "type_id": 3697,
     "category": "pi_materials",
     "name": "Silicate Glass",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "3,630,339"
   },
   {
     "type_id": 3691,
     "category": "pi_materials",
     "name": "Synthetic Oil",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "7,257,890"
   },
   {
     "type_id": 2319,
     "category": "pi_materials",
     "name": "Test Cultures",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "10,814,131"
   },
   {
     "type_id": 2393,
     "category": "pi_materials",
     "name": "Bacteria",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "5,018,322"
   },
   {
     "type_id": 2396,
     "category": "pi_materials",
     "name": "Biofuels",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "2,318,490"
   },
   {
     "type_id": 2390,
     "category": "pi_materials",
     "name": "Electrolytes",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,656,977"
   },
   {
     "type_id": 2397,
     "category": "pi_materials",
     "name": "Industrial Fibers",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,929,669"
   },
   {
     "type_id": 2392,
     "category": "pi_materials",
     "name": "Oxidizing Compound",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "5,966,882"
   },
   {
     "type_id": 2389,
     "category": "pi_materials",
     "name": "Plasmoids",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,042,209"
   },
   {
     "type_id": 2399,
     "category": "pi_materials",
     "name": "Precious Metals",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "7,155,830"
   },
   {
     "type_id": 2395,
     "category": "pi_materials",
     "name": "Proteins",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "3,857,786"
   },
   {
     "type_id": 2398,
     "category": "pi_materials",
     "name": "Reactive Metals",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "5,307,523"
   },
   {
     "type_id": 9828,
     "category": "pi_materials",
     "name": "Silicon",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,410,656"
   },
   {
     "type_id": 2400,
     "category": "pi_materials",
     "name": "Toxic Metals",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "2,844,541"
   },
   {
     "type_id": 44,
     "category": "pi_materials",
     "name": "Enriched Uranium",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "10,750,285"
   },
   {
     "type_id": 3683,
     "category": "pi_materials",
     "name": "Oxygen",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "6,334,609"
   },
   {
     "type_id": 3689,
     "category": "pi_materials",
     "name": "Mechanical Parts",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "18,207,041"
   },
   {
     "type_id": 9832,
     "category": "pi_materials",
     "name": "Coolant",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "20,260,205"
   },
   {
     "type_id": 9848,
     "category": "pi_materials",
     "name": "Robotics",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "55,729,023"
   },
   {
     "type_id": 9830,
     "category": "pi_materials",
     "name": "Rocket Fuel",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "10,435,360"
   },
   {
     "type_id": 9834,
     "category": "pi_materials",
     "name": "Guidance Systems",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "13,919,366"
   },
   {
     "type_id": 9836,
     "category": "pi_materials",
     "name": "Consumer Electronics",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "7,703,867"
   },
   {
     "type_id": 9840,
     "category": "pi_materials",
     "name": "Transmitter",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "8,748,997"
   },
   {
     "type_id": 2312,
     "category": "pi_materials",
     "name": "Supertensile Plastics",
     "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "11,326,125"
   },
   {
     "type_id": 2317,
     "category": "pi_materials",
     "name": "Oxides",
     "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 3812,
-    "category": "pi_materials",
-    "name": "Data Sheets",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25588,
-    "category": "salvaged_materials",
-    "name": "Scorched Telemetry Processor",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25589,
-    "category": "salvaged_materials",
-    "name": "Malfunctioning Shield Emitter",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25593,
-    "category": "salvaged_materials",
-    "name": "Smashed Trigger Unit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25595,
-    "category": "salvaged_materials",
-    "name": "Alloyed Tritanium Bar",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25596,
-    "category": "salvaged_materials",
-    "name": "Broken Drone Transceiver",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25597,
-    "category": "salvaged_materials",
-    "name": "Damaged Artificial Neural Network",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25598,
-    "category": "salvaged_materials",
-    "name": "Tripped Power Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25599,
-    "category": "salvaged_materials",
-    "name": "Charred Micro Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25590,
-    "category": "salvaged_materials",
-    "name": "Contaminated Nanite Compound",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25591,
-    "category": "salvaged_materials",
-    "name": "Contaminated Lorentz Fluid",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25592,
-    "category": "salvaged_materials",
-    "name": "Defective Current Pump",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25594,
-    "category": "salvaged_materials",
-    "name": "Tangled Power Conduit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25600,
-    "category": "salvaged_materials",
-    "name": "Burned Logic Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25601,
-    "category": "salvaged_materials",
-    "name": "Fried Interface Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25602,
-    "category": "salvaged_materials",
-    "name": "Thruster Console",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25603,
-    "category": "salvaged_materials",
-    "name": "Melted Capacitor Console",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25604,
-    "category": "salvaged_materials",
-    "name": "Conductive Polymer",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25605,
-    "category": "salvaged_materials",
-    "name": "Armor Plates",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25606,
-    "category": "salvaged_materials",
-    "name": "Ward Console",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25607,
-    "category": "salvaged_materials",
-    "name": "Telemetry Processor",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25611,
-    "category": "salvaged_materials",
-    "name": "Current Pump",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25613,
-    "category": "salvaged_materials",
-    "name": "Power Conduit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25614,
-    "category": "salvaged_materials",
-    "name": "Single-crystal Superalloy I-beam",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25615,
-    "category": "salvaged_materials",
-    "name": "Drone Transceiver",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25616,
-    "category": "salvaged_materials",
-    "name": "Artificial Neural Network",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25618,
-    "category": "salvaged_materials",
-    "name": "Micro Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25620,
-    "category": "salvaged_materials",
-    "name": "Interface Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25621,
-    "category": "salvaged_materials",
-    "name": "Impetus Console",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25623,
-    "category": "salvaged_materials",
-    "name": "Conductive Thermoplastic",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25608,
-    "category": "salvaged_materials",
-    "name": "Intact Shield Emitter",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25609,
-    "category": "salvaged_materials",
-    "name": "Nanite Compound",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25610,
-    "category": "salvaged_materials",
-    "name": "Lorentz Fluid",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25612,
-    "category": "salvaged_materials",
-    "name": "Trigger Unit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25617,
-    "category": "salvaged_materials",
-    "name": "Power Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25619,
-    "category": "salvaged_materials",
-    "name": "Logic Circuit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25622,
-    "category": "salvaged_materials",
-    "name": "Capacitor Console",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25624,
-    "category": "salvaged_materials",
-    "name": "Intact Armor Plates",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 25625,
-    "category": "salvaged_materials",
-    "name": "Enhanced Ward Console",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 28361,
-    "category": "salvaged_materials",
-    "name": "Drone Synaptic Relay Wiring",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 28362,
-    "category": "salvaged_materials",
-    "name": "Drone Capillary Fluid",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 28363,
-    "category": "salvaged_materials",
-    "name": "Drone Cerebral Fragment",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 28364,
-    "category": "salvaged_materials",
-    "name": "Drone Tactical Limb",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 28365,
-    "category": "salvaged_materials",
-    "name": "Drone Epidermal Shielding Chunk",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 28366,
-    "category": "salvaged_materials",
-    "name": "Drone Coronary Unit",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 21815,
-    "category": "salvaged_materials",
-    "name": "Elite Drone AI",
-    "status": "open",
-    "lessee": null
-  },
-  {
-    "type_id": 81945,
-    "category": "salvaged_materials",
-    "name": "Drone Graviton Emitter",
-    "status": "open",
-    "lessee": null
+    "lessee": null,
+    "price": "4,262,984"
   }
 ]
