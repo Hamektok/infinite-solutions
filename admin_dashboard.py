@@ -27,6 +27,46 @@ CATEGORY_DISPLAY = {
 # Reverse lookup: display name -> DB category key
 CATEGORY_DB_KEY = {v: k for k, v in CATEGORY_DISPLAY.items()}
 
+# Market tab visibility
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials']
+MARKET_TAB_LABELS = {
+    'minerals':       'Minerals',
+    'ice_products':   'Ice Products',
+    'moon_materials': 'Moon Materials',
+    'pi_materials':   'Planetary Materials',
+}
+
+# Market subcategory definitions: (tab_key, sub_key, display_label)
+MARKET_SUBTAB_DEFS = [
+    ('ice_products',   'fuel_blocks',  'Fuel Blocks'),
+    ('ice_products',   'refined_ice',  'Refined Ice'),
+    ('ice_products',   'isotopes',     'Isotopes'),
+    ('moon_materials', 'raw',          'Raw'),
+    ('moon_materials', 'processed',    'Processed'),
+    ('moon_materials', 'advanced',     'Advanced'),
+    ('pi_materials',   'p1',           'P1'),
+    ('pi_materials',   'p2',           'P2'),
+    ('pi_materials',   'p3',           'P3'),
+    ('pi_materials',   'p4',           'P4'),
+]
+
+
+def _get_ice_subcat(display_order):
+    if display_order is None: return ''
+    if display_order <= 4:  return 'Fuel Blocks'
+    if display_order <= 11: return 'Refined Ice'
+    return 'Isotopes'
+
+
+def _get_moon_subcat(display_order):
+    if display_order is None: return ''
+    if display_order <= 35:  return 'Raw'
+    if display_order <= 124: return 'Processed'
+    return 'Advanced'
+
+
+PI_GROUP_MAP = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+
 
 class AdminDashboard:
     def __init__(self, root):
@@ -174,24 +214,76 @@ class AdminDashboard:
         ttk.Button(btn_frame, text="Reset", style='Action.TButton',
                    command=self.load_data).pack(side='left', padx=5)
 
+        # ── Market Visibility Panel ──────────────────────────────────────────
+        self.market_tab_vars = {}
+        self.market_subtab_vars = {}
+        self.market_tab_btns = {}
+        self.market_subtab_btns = {}
+
+        vis_frame = ttk.Frame(self.rates_frame, style='Card.TFrame')
+        vis_frame.pack(fill='x', padx=15, pady=(0, 8))
+        vis_inner = ttk.Frame(vis_frame)
+        vis_inner.pack(fill='x', padx=15, pady=10)
+
+        ttk.Label(vis_inner, text="Market Tabs:",
+                  font=('Segoe UI', 10, 'bold'),
+                  foreground='#00d9ff').grid(row=0, column=0, sticky='w', padx=(0, 10))
+
+        for col_i, tab_key in enumerate(MARKET_TAB_KEYS):
+            var = tk.BooleanVar(value=True)
+            self.market_tab_vars[tab_key] = var
+            btn = tk.Checkbutton(
+                vis_inner, text=MARKET_TAB_LABELS[tab_key], variable=var,
+                font=('Segoe UI', 9, 'bold'),
+                bg='#0d1117', fg='#00ff88', selectcolor='#0a2030',
+                activebackground='#0d1117', activeforeground='#00ffff',
+                indicatoron=False, width=14, relief='flat', bd=1,
+                command=lambda k=tab_key: self._on_market_tab_toggle(k))
+            btn.grid(row=0, column=col_i + 1, padx=3)
+            self.market_tab_btns[tab_key] = btn
+
+        ttk.Label(vis_inner, text="Subcategories:",
+                  font=('Segoe UI', 10, 'bold'),
+                  foreground='#00d9ff').grid(row=1, column=0, sticky='w', padx=(0, 10), pady=(6, 0))
+
+        for sub_i, (tab_key, sub_key, label) in enumerate(MARKET_SUBTAB_DEFS):
+            var = tk.BooleanVar(value=True)
+            self.market_subtab_vars[(tab_key, sub_key)] = var
+            btn = tk.Checkbutton(
+                vis_inner, text=label, variable=var,
+                font=('Segoe UI', 9, 'bold'),
+                bg='#0d1117', fg='#00ff88', selectcolor='#0a2030',
+                activebackground='#0d1117', activeforeground='#00ffff',
+                indicatoron=False, width=10, relief='flat', bd=1,
+                command=lambda tk_=tab_key, sk=sub_key: self._on_market_subtab_toggle(tk_, sk))
+            btn.grid(row=1, column=sub_i + 1, padx=2, pady=(6, 0))
+            self.market_subtab_btns[(tab_key, sub_key)] = btn
+
+        ttk.Button(vis_inner, text="Save Visibility", style='Save.TButton',
+                   command=self.save_market_visibility).grid(
+            row=0, column=len(MARKET_TAB_KEYS) + 2, rowspan=2,
+            padx=(20, 0), sticky='ns')
+
         # Rates treeview
         tree_frame = ttk.Frame(self.rates_frame)
         tree_frame.pack(fill='both', expand=True, padx=15, pady=(0, 10))
 
-        columns = ('category', 'item', 'current_rate', 'new_rate', 'corp_discount')
+        columns = ('category', 'subcategory', 'item', 'current_rate', 'new_rate', 'corp_discount')
         self.rates_tree = ttk.Treeview(tree_frame, columns=columns, show='headings',
                                         selectmode='extended')
 
-        self.rates_tree.heading('category', text='Category')
-        self.rates_tree.heading('item', text='Item Name')
+        self.rates_tree.heading('category',     text='Category')
+        self.rates_tree.heading('subcategory',  text='Subcategory')
+        self.rates_tree.heading('item',         text='Item Name')
         self.rates_tree.heading('current_rate', text='Alliance %')
-        self.rates_tree.heading('new_rate', text='New Alliance %')
-        self.rates_tree.heading('corp_discount', text='Corp Discount  →  Corp Rate')
+        self.rates_tree.heading('new_rate',     text='New Alliance %')
+        self.rates_tree.heading('corp_discount',text='Corp Discount  →  Corp Rate')
 
-        self.rates_tree.column('category', width=130, anchor='center')
-        self.rates_tree.column('item', width=230)
-        self.rates_tree.column('current_rate', width=100, anchor='center')
-        self.rates_tree.column('new_rate', width=120, anchor='center')
+        self.rates_tree.column('category',      width=120, anchor='center')
+        self.rates_tree.column('subcategory',   width=110, anchor='center')
+        self.rates_tree.column('item',          width=200)
+        self.rates_tree.column('current_rate',  width=100, anchor='center')
+        self.rates_tree.column('new_rate',      width=120, anchor='center')
         self.rates_tree.column('corp_discount', width=200, anchor='center')
 
         scrollbar = ttk.Scrollbar(tree_frame, orient='vertical',
@@ -850,6 +942,7 @@ class AdminDashboard:
         self.unsaved_bp_changes = {}
         self.update_status("All saved")
         self.load_rates()
+        self.load_market_visibility()
         self.load_buyback_data()
         self.load_blueprint_settings()
         self.load_inventory()
@@ -863,25 +956,107 @@ class AdminDashboard:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id, type_id, type_name, category, price_percentage, alliance_discount
-            FROM tracked_market_items
-            ORDER BY category, display_order, type_name
+            SELECT tmi.id, tmi.type_id, tmi.type_name, tmi.category,
+                   tmi.price_percentage, tmi.alliance_discount,
+                   tmi.display_order, it.market_group_id
+            FROM tracked_market_items tmi
+            LEFT JOIN inv_types it ON tmi.type_id = it.type_id
+            ORDER BY tmi.category, tmi.display_order, tmi.type_name
         """)
         rows = cursor.fetchall()
         conn.close()
 
         self.rate_items = {}
-        for row_id, type_id, name, category, pct, discount in rows:
-            cat_display = category.replace('_', ' ').title()
+        for row_id, type_id, name, category, pct, discount, display_order, mkt_group_id in rows:
+            cat_display = CATEGORY_DISPLAY.get(category, category.replace('_', ' ').title())
+
+            if category == 'ice_products':
+                subcat = _get_ice_subcat(display_order)
+            elif category == 'moon_materials':
+                subcat = _get_moon_subcat(display_order)
+            elif category == 'pi_materials':
+                subcat = PI_GROUP_MAP.get(mkt_group_id, '')
+            else:
+                subcat = ''
+
             corp_rate = (pct or 0) - (discount or 0)
             iid = self.rates_tree.insert('', 'end', values=(
-                cat_display, name, f"{pct}%", f"{pct}%",
+                cat_display, subcat, name, f"{pct}%", f"{pct}%",
                 f"-{discount}%  →  {corp_rate}%"
             ))
             self.rate_items[iid] = {
                 'id': row_id, 'type_id': type_id, 'name': name,
                 'category': category, 'rate': pct, 'discount': discount
             }
+
+    def load_market_visibility(self):
+        """Load market tab/subtab visibility settings from site_config."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT key, value FROM site_config
+                WHERE key LIKE 'market_tab_%' OR key LIKE 'market_sub_%'
+            """)
+            rows = {k: v for k, v in cursor.fetchall()}
+            conn.close()
+        except Exception:
+            rows = {}
+
+        for tab_key in MARKET_TAB_KEYS:
+            visible = rows.get(f'market_tab_{tab_key}', '1') == '1'
+            self.market_tab_vars[tab_key].set(visible)
+            self._on_market_tab_toggle(tab_key)
+
+        for tab_key, sub_key, _ in MARKET_SUBTAB_DEFS:
+            visible = rows.get(f'market_sub_{tab_key}_{sub_key}', '1') == '1'
+            self.market_subtab_vars[(tab_key, sub_key)].set(visible)
+            self._on_market_subtab_toggle(tab_key, sub_key)
+
+    def _on_market_tab_toggle(self, tab_key):
+        """Update button colour when a market tab visibility toggle changes."""
+        visible = self.market_tab_vars[tab_key].get()
+        self.market_tab_btns[tab_key].configure(
+            fg='#00ff88' if visible else '#ff6666')
+
+    def _on_market_subtab_toggle(self, tab_key, sub_key):
+        """Update button colour when a subcategory visibility toggle changes."""
+        visible = self.market_subtab_vars[(tab_key, sub_key)].get()
+        self.market_subtab_btns[(tab_key, sub_key)].configure(
+            fg='#00ff88' if visible else '#ff6666')
+
+    def save_market_visibility(self):
+        """Persist market tab/subtab visibility to site_config and regenerate data."""
+        try:
+            conn = sqlite3.connect(DB_PATH, timeout=5)
+            cursor = conn.cursor()
+            for tab_key in MARKET_TAB_KEYS:
+                value = '1' if self.market_tab_vars[tab_key].get() else '0'
+                cursor.execute(
+                    "INSERT OR REPLACE INTO site_config (key, value) VALUES (?, ?)",
+                    (f'market_tab_{tab_key}', value))
+            for tab_key, sub_key, _ in MARKET_SUBTAB_DEFS:
+                value = '1' if self.market_subtab_vars[(tab_key, sub_key)].get() else '0'
+                cursor.execute(
+                    "INSERT OR REPLACE INTO site_config (key, value) VALUES (?, ?)",
+                    (f'market_sub_{tab_key}_{sub_key}', value))
+            conn.commit()
+            conn.close()
+            self.update_status("Market visibility saved")
+        except Exception as e:
+            self.update_status(f"Error saving visibility: {e}")
+            return
+
+        # Regenerate buyback_data.js in background thread
+        import threading
+        def _regen():
+            try:
+                subprocess.run(
+                    ['python', os.path.join(PROJECT_DIR, 'generate_buyback_data.py')],
+                    capture_output=True)
+            except Exception:
+                pass
+        threading.Thread(target=_regen, daemon=True).start()
 
     def load_inventory(self):
         """Load current inventory from database."""

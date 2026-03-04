@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-04 03:17 UTC
+// Generated: 2026-03-04 03:37 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -7007,6 +7007,67 @@ const BUYBACK_DATA = {
       "pricingMethod": "Jita Buy"
     }
   },
+  "marketVisibility": {
+    "minerals": {
+      "visible": true,
+      "subs": {}
+    },
+    "ice_products": {
+      "visible": true,
+      "subs": {
+        "fuel_blocks": {
+          "visible": true,
+          "displayName": "Fuel Blocks"
+        },
+        "refined_ice": {
+          "visible": true,
+          "displayName": "Refined Ice"
+        },
+        "isotopes": {
+          "visible": true,
+          "displayName": "Isotopes"
+        }
+      }
+    },
+    "moon_materials": {
+      "visible": true,
+      "subs": {
+        "raw": {
+          "visible": true,
+          "displayName": "Raw"
+        },
+        "processed": {
+          "visible": true,
+          "displayName": "Processed"
+        },
+        "advanced": {
+          "visible": true,
+          "displayName": "Advanced"
+        }
+      }
+    },
+    "pi_materials": {
+      "visible": true,
+      "subs": {
+        "p1": {
+          "visible": true,
+          "displayName": "P1"
+        },
+        "p2": {
+          "visible": true,
+          "displayName": "P2"
+        },
+        "p3": {
+          "visible": true,
+          "displayName": "P3"
+        },
+        "p4": {
+          "visible": true,
+          "displayName": "P4"
+        }
+      }
+    }
+  },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-04 03:17 UTC"
+  "generated": "2026-03-04 03:37 UTC"
 };

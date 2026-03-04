@@ -52,6 +52,23 @@ CONFIG_TO_DB_CATEGORY = {
     'planetary_materials': 'pi_materials',
 }
 
+# Market tab visibility keys
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials']
+
+# Market subcategory definitions: (tab_key, sub_key, display_name)
+MARKET_SUBTAB_DEFS = [
+    ('ice_products',   'fuel_blocks',  'Fuel Blocks'),
+    ('ice_products',   'refined_ice',  'Refined Ice'),
+    ('ice_products',   'isotopes',     'Isotopes'),
+    ('moon_materials', 'raw',          'Raw'),
+    ('moon_materials', 'processed',    'Processed'),
+    ('moon_materials', 'advanced',     'Advanced'),
+    ('pi_materials',   'p1',           'P1'),
+    ('pi_materials',   'p2',           'P2'),
+    ('pi_materials',   'p3',           'P3'),
+    ('pi_materials',   'p4',           'P4'),
+]
+
 
 def load_sde_ore_data(ore_type_ids):
     """
@@ -185,6 +202,13 @@ def get_buyback_data():
         db_cat = CONFIG_TO_DB_CATEGORY.get(slug, slug)
         category_pricing[db_cat] = value
 
+    # Get market tab/subcategory visibility from site_config
+    cursor.execute("""
+        SELECT key, value FROM site_config
+        WHERE key LIKE 'market_tab_%' OR key LIKE 'market_sub_%'
+    """)
+    market_visibility_raw = {row[0]: row[1] for row in cursor.fetchall()}
+
     conn.close()
 
     # Identify all ore type_ids that need mineral-value calculation
@@ -247,9 +271,23 @@ def get_buyback_data():
             'pricingMethod': category_pricing.get(cat_key, 'Jita Buy'),
         }
 
+    # Build market tab/subcategory visibility structure
+    market_visibility = {}
+    for tab_key in MARKET_TAB_KEYS:
+        market_visibility[tab_key] = {
+            'visible': market_visibility_raw.get(f'market_tab_{tab_key}', '1') == '1',
+            'subs': {},
+        }
+    for tab_key, sub_key, display_name in MARKET_SUBTAB_DEFS:
+        market_visibility[tab_key]['subs'][sub_key] = {
+            'visible': market_visibility_raw.get(f'market_sub_{tab_key}_{sub_key}', '1') == '1',
+            'displayName': display_name,
+        }
+
     return {
         'items': buyback_items,
         'categories': categories,
+        'marketVisibility': market_visibility,
         'refiningEfficiency': refining_efficiency,
         'generated': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
     }

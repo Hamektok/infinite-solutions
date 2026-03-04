@@ -2160,10 +2160,10 @@
             <div id="market-tab" class="tab-content active">
                 <!-- SUB TABS -->
                 <div class="sub-tabs">
-                    <button class="sub-tab active" onclick="showSubTab('minerals')">Minerals</button>
-                    <button class="sub-tab" onclick="showSubTab('ice')">Ice Products</button>
-                    <button class="sub-tab" onclick="showSubTab('moon')">Moon Materials</button>
-                    <button class="sub-tab" onclick="showSubTab('pi')">Planetary Materials</button>
+                    <button class="sub-tab active" onclick="showSubTab('minerals')" data-market-tab="minerals">Minerals</button>
+                    <button class="sub-tab" onclick="showSubTab('ice')" data-market-tab="ice_products">Ice Products</button>
+                    <button class="sub-tab" onclick="showSubTab('moon')" data-market-tab="moon_materials">Moon Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('pi')" data-market-tab="pi_materials">Planetary Materials</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" style="display:none;">Salvage</button>
                 </div>
 
@@ -2181,9 +2181,9 @@
                     <!-- MOON MATERIALS SUB-CONTENT -->
                     <div id="moon-content" class="tab-content">
                         <div class="pi-tier-tabs">
-                            <button class="pi-tier-tab moon-tier-tab active" onclick="filterMoon(this, 'raw')">Raw</button>
-                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'processed')">Processed</button>
-                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'advanced')">Advanced</button>
+                            <button class="pi-tier-tab moon-tier-tab active" onclick="filterMoon(this, 'raw')" data-market-sub="moon_materials:raw">Raw</button>
+                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'processed')" data-market-sub="moon_materials:processed">Processed</button>
+                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'advanced')" data-market-sub="moon_materials:advanced">Advanced</button>
                         </div>
                         <div class="item-grid" id="moon-materials"></div>
                     </div>
@@ -2191,10 +2191,10 @@
                     <!-- PLANETARY MATERIALS SUB-CONTENT -->
                     <div id="pi-content" class="tab-content">
                         <div class="pi-tier-tabs">
-                            <button class="pi-tier-tab active" onclick="filterPI(this, 'p1')">P1 - Processed</button>
-                            <button class="pi-tier-tab" onclick="filterPI(this, 'p2')">P2 - Refined</button>
-                            <button class="pi-tier-tab" onclick="filterPI(this, 'p3')">P3 - Specialized</button>
-                            <button class="pi-tier-tab" onclick="filterPI(this, 'p4')">P4 - Advanced</button>
+                            <button class="pi-tier-tab active" onclick="filterPI(this, 'p1')" data-market-sub="pi_materials:p1">P1 - Processed</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p2')" data-market-sub="pi_materials:p2">P2 - Refined</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p3')" data-market-sub="pi_materials:p3">P3 - Specialized</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p4')" data-market-sub="pi_materials:p4">P4 - Advanced</button>
                         </div>
                         <div class="item-grid" id="pi-grid"></div>
                     </div>
@@ -5142,7 +5142,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
         async function loadInventoryData() {
             const inventory = EMBEDDED_DATA.inventory;
             renderMinerals(inventory);
-            renderIceProducts(inventory);
+            const iceSubs = window.BUYBACK_DATA && BUYBACK_DATA.marketVisibility && BUYBACK_DATA.marketVisibility.ice_products
+                ? BUYBACK_DATA.marketVisibility.ice_products.subs : null;
+            renderIceProducts(inventory, iceSubs);
             renderMoonMaterials(inventory);
             renderPlanetaryMaterials(inventory);
             renderSalvage(inventory);
@@ -5337,11 +5339,17 @@ Tip: Copy directly from EVE inventory window"></textarea>
             });
         }
 
-        function renderIceProducts(inventory) {
+        const ICE_SUBCAT_KEYS = { 'Fuel Blocks': 'fuel_blocks', 'Refined Ice': 'refined_ice', 'Isotopes': 'isotopes' };
+
+        function renderIceProducts(inventory, subVis) {
             const grid = document.getElementById('ice-grid');
             grid.innerHTML = '';
 
             Object.entries(ICE_PRODUCTS).forEach(([group, products]) => {
+                if (subVis) {
+                    const key = ICE_SUBCAT_KEYS[group];
+                    if (key && subVis[key] && !subVis[key].visible) return;
+                }
                 const divider = document.createElement('div');
                 divider.className = 'ice-group-divider';
                 divider.textContent = group;
@@ -5407,6 +5415,27 @@ Tip: Copy directly from EVE inventory window"></textarea>
             document.querySelectorAll('.pi-tier-tab').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderPlanetaryMaterials(EMBEDDED_DATA.inventory, tier);
+        }
+
+        function applyMarketVisibility() {
+            if (!window.BUYBACK_DATA || !BUYBACK_DATA.marketVisibility) return;
+            const mv = BUYBACK_DATA.marketVisibility;
+
+            // Show/hide market sub-tab buttons
+            document.querySelectorAll('[data-market-tab]').forEach(btn => {
+                const tabKey = btn.getAttribute('data-market-tab');
+                if (mv[tabKey] !== undefined) {
+                    btn.style.display = mv[tabKey].visible ? '' : 'none';
+                }
+            });
+
+            // Show/hide subcategory filter buttons (moon / PI)
+            document.querySelectorAll('[data-market-sub]').forEach(btn => {
+                const [tabKey, subKey] = btn.getAttribute('data-market-sub').split(':');
+                if (mv[tabKey] && mv[tabKey].subs && mv[tabKey].subs[subKey] !== undefined) {
+                    btn.style.display = mv[tabKey].subs[subKey].visible ? '' : 'none';
+                }
+            });
         }
 
         function renderSalvage(inventory) {
@@ -6565,6 +6594,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         document.addEventListener('DOMContentLoaded', function() {
             loadInventoryData();
+            applyMarketVisibility();
             loadBlueprintData();
             loadBPCData();  // Load BPC data for BPC tab
             loadResearchJobs();
