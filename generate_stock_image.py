@@ -108,12 +108,15 @@ def main():
 
     # Load visibility flags from site_config
     vis_rows = c.execute(
-        "SELECT key, value FROM site_config WHERE key LIKE 'market_tab_%'"
+        "SELECT key, value FROM site_config WHERE key LIKE 'market_tab_%' OR key LIKE 'market_sub_%'"
     ).fetchall()
     vis = {k: (str(v) == '1') for k, v in vis_rows}
-    show_minerals = vis.get('market_tab_minerals',      True)
-    show_ice      = vis.get('market_tab_ice_products',  True)
-    show_moon     = vis.get('market_tab_moon_materials', True)
+    show_minerals   = vis.get('market_tab_minerals',               True)
+    show_ice        = vis.get('market_tab_ice_products',           True)
+    show_moon       = vis.get('market_tab_moon_materials',         True)
+    show_moon_raw   = vis.get('market_sub_moon_materials_raw',      True)
+    show_moon_proc  = vis.get('market_sub_moon_materials_processed', True)
+    show_moon_adv   = vis.get('market_sub_moon_materials_advanced',  True)
 
     # Fetch items only for visible categories
     visible_cats = [c_name for c_name, flag in [
@@ -129,7 +132,7 @@ def main():
 
     placeholders = ','.join('?' * len(visible_cats))
     c.execute(f'''
-        SELECT tm.category, t.type_name, i.quantity, tm.buyback_accepted
+        SELECT tm.category, t.type_name, i.quantity, tm.buyback_accepted, tm.display_order
         FROM lx_zoj_current_inventory i
         JOIN tracked_market_items tm ON i.type_id = tm.type_id
         JOIN inv_types t             ON i.type_id = t.type_id
@@ -142,8 +145,16 @@ def main():
     snap_ts = c.fetchone()[0] or ''
     conn.close()
 
+    def moon_sub_visible(display_order):
+        """Return True if this moon item's subcategory is currently visible."""
+        if display_order < 100:   return show_moon_raw
+        if display_order < 200:   return show_moon_proc
+        return show_moon_adv
+
     by_cat = {}
-    for cat, name, qty, buyback in rows:
+    for cat, name, qty, buyback, disp_ord in rows:
+        if cat == 'moon_materials' and not moon_sub_visible(disp_ord):
+            continue
         by_cat.setdefault(cat, []).append((name, qty, buyback))
 
     minerals  = by_cat.get('minerals',       []) if show_minerals else []
