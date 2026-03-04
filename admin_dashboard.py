@@ -5131,16 +5131,17 @@ class AdminDashboard:
         tree_frame = tk.Frame(outer, background='#0a2030', relief='solid', bd=1)
         tree_frame.pack(fill='both', expand=True, pady=(0, 6))
 
-        cols = ('in_prog', 'category', 'sub', 'name', 'status', 'lessee')
+        cols = ('in_prog', 'category', 'sub', 'name', 'status', 'lessee', 'price')
         self._sm_tree = ttk.Treeview(tree_frame, columns=cols, show='headings',
                                      selectmode='extended')
         for cid, hd, w, anchor in [
             ('in_prog',  '\u2713 Slot?',    60,  'c'),
-            ('category', 'Category',       150,  'c'),
+            ('category', 'Category',       145,  'c'),
             ('sub',      'Tier / Grade',   110,  'c'),
-            ('name',     'Item Name',      260,  'w'),
+            ('name',     'Item Name',      250,  'w'),
             ('status',   'Status',          80,  'c'),
-            ('lessee',   'Lessee',         200,  'w'),
+            ('lessee',   'Lessee',         190,  'w'),
+            ('price',    'Price / mo',     110,  'e'),
         ]:
             self._sm_tree.heading(cid, text=hd)
             self._sm_tree.column(cid, width=w, minwidth=30, anchor=anchor)
@@ -5164,7 +5165,7 @@ class AdminDashboard:
         self._sm_sel_lbl = tk.Label(ef, text='— select item(s) above —',
                                     bg='#0a2030', fg='#88d0e8',
                                     font=('Segoe UI', 9, 'italic'))
-        self._sm_sel_lbl.grid(row=0, column=0, columnspan=7, sticky='w', pady=(0, 6))
+        self._sm_sel_lbl.grid(row=0, column=0, columnspan=9, sticky='w', pady=(0, 6))
 
         tk.Label(ef, text='Status:', bg='#0a2030', fg='#88d0e8',
                  font=('Segoe UI', 10)).grid(row=1, column=0, padx=(0, 6), sticky='w')
@@ -5186,13 +5187,22 @@ class AdminDashboard:
                  font=('Segoe UI', 10)).grid(row=1, column=3, padx=(0, 6), sticky='w')
         self._sm_lessee_var = tk.StringVar()
         self._sm_lessee_entry = tk.Entry(ef, textvariable=self._sm_lessee_var,
-                                         width=28, bg='#0d2030', fg='#ffcc44',
+                                         width=22, bg='#0d2030', fg='#ffcc44',
                                          insertbackground='#ffcc44',
                                          font=('Segoe UI', 10), state='disabled')
-        self._sm_lessee_entry.grid(row=1, column=4, padx=(0, 10), sticky='w')
+        self._sm_lessee_entry.grid(row=1, column=4, padx=(0, 16), sticky='w')
+
+        tk.Label(ef, text='Price / mo (ISK):', bg='#0a2030', fg='#88d0e8',
+                 font=('Segoe UI', 10)).grid(row=1, column=5, padx=(0, 6), sticky='w')
+        self._sm_price_var = tk.StringVar()
+        tk.Entry(ef, textvariable=self._sm_price_var, width=14,
+                 bg='#0d2030', fg='#66d9ff', insertbackground='#66d9ff',
+                 font=('Segoe UI', 10)).grid(row=1, column=6, padx=(0, 8), sticky='w')
+        ttk.Button(ef, text='Pull from Calculator',
+                   command=self._sm_pull_calc_prices).grid(row=1, column=7, padx=(0, 10))
 
         ttk.Button(ef, text='Apply to Selected',
-                   command=self._sm_apply_edit).grid(row=1, column=5, padx=(0, 0))
+                   command=self._sm_apply_edit).grid(row=1, column=8, padx=(0, 0))
 
         # Load data
         self._sm_load_all()
@@ -5239,6 +5249,7 @@ class AdminDashboard:
                 'in_program': False,
                 'status':     'open',
                 'lessee':     '',
+                'price':      '',
             })
 
         # Overlay saved config
@@ -5255,6 +5266,7 @@ class AdminDashboard:
                     if tid in self._sm_state:
                         self._sm_state[tid]['status'] = entry.get('status', 'open')
                         self._sm_state[tid]['lessee'] = entry.get('lessee') or ''
+                        self._sm_state[tid]['price']  = entry.get('price')  or ''
             except Exception:
                 pass
 
@@ -5296,6 +5308,9 @@ class AdminDashboard:
                    'in_closed' if in_prog and status == 'closed' else
                    'out')
 
+            price     = state['price']
+            price_disp = self._sm_fmt_price(price) if in_prog and price else ('—' if not in_prog else '')
+
             self._sm_tree.insert('', 'end', iid=str(type_id), tags=(tag,), values=(
                 '\u2713' if in_prog else '',
                 self._SLOTMGR_CAT_LABELS.get(cat, cat),
@@ -5303,6 +5318,7 @@ class AdminDashboard:
                 name,
                 status.capitalize() if in_prog else '—',
                 lessee if in_prog and lessee else ('—' if not in_prog else ''),
+                price_disp,
             ))
 
         total = len(self._sm_all_ids)
@@ -5320,6 +5336,7 @@ class AdminDashboard:
             self._sm_sel_lbl.configure(text=self._sm_meta[tid][1])
             self._sm_status_var.set(state['status'])
             self._sm_lessee_var.set(state['lessee'])
+            self._sm_price_var.set(state['price'])
         else:
             self._sm_sel_lbl.configure(text=f'{len(sel)} items selected')
         self._sm_status_changed()
@@ -5351,16 +5368,58 @@ class AdminDashboard:
             return
         status = self._sm_status_var.get()
         lessee = self._sm_lessee_var.get().strip() if status == 'closed' else ''
+        price  = self._sm_price_var.get().strip()
         for iid in sel:
             tid = int(iid)
             self._sm_state[tid]['status'] = status
             self._sm_state[tid]['lessee'] = lessee
+            self._sm_state[tid]['price']  = price
             # Auto-include if not already
             self._sm_state[tid]['in_program'] = True
         self._sm_refresh_tree()
         valid = [i for i in sel if self._sm_tree.exists(i)]
         if valid:
             self._sm_tree.selection_set(valid)
+
+    @staticmethod
+    def _sm_fmt_price(raw):
+        """Format a raw price value (number or string) for display."""
+        try:
+            v = float(str(raw).replace(',', '').replace('M', 'e6')
+                              .replace('K', 'e3').replace('B', 'e9'))
+            if v >= 1e9: return f'{v/1e9:.2f}B/mo'
+            if v >= 1e6: return f'{v/1e6:.1f}M/mo'
+            if v >= 1e3: return f'{v/1e3:.0f}K/mo'
+            return f'{int(v):,}/mo'
+        except Exception:
+            return str(raw)
+
+    def _sm_pull_calc_prices(self):
+        """Populate prices from the Slot Pricing calculator for matching items."""
+        if not hasattr(self, '_slot_items') or not self._slot_volumes:
+            self._sm_status_lbl.configure(
+                text='Run the Slot Pricing tab and fetch Jita volumes first.',
+                fg='#ff6666')
+            self.root.after(4000, lambda: self._sm_status_lbl.configure(text=''))
+            return
+
+        scale, comm, prem = self._slot_get_params()
+        updated = 0
+        for type_id, name, tier, avg_buy, avg_sell in self._slot_items:
+            if type_id not in self._sm_state:
+                continue
+            jita_vol = self._slot_volumes.get(type_id, 0)
+            if not jita_vol:
+                continue
+            price, _ = self._slot_get_price(type_id, avg_buy, avg_sell)
+            slot_p   = jita_vol * scale * price * comm * prem
+            self._sm_state[type_id]['price'] = f'{slot_p:,.0f}'
+            updated += 1
+
+        self._sm_refresh_tree()
+        self._sm_status_lbl.configure(
+            text=f'Pulled prices for {updated} PI items \u2713', fg='#00ff88')
+        self.root.after(3000, lambda: self._sm_status_lbl.configure(text=''))
 
     def _sm_save(self):
         """Write in-program items to slots_config.json."""
@@ -5376,6 +5435,7 @@ class AdminDashboard:
                 'name':     name,
                 'status':   state['status'],
                 'lessee':   state['lessee'] or None,
+                'price':    state['price']  or None,
             })
         try:
             with open(self._SLOTMGR_CONFIG_PATH, 'w', encoding='utf-8') as f:

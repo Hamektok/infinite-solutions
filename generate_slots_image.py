@@ -85,7 +85,24 @@ def tw(draw, text, font):
 
 
 # ── Drawing helpers ───────────────────────────────────────────────────────────
-def draw_slot_row(draw, x, y, col_w, name, status, lessee, row_i):
+PRICE_COL = ( 80, 180, 220)   # cyan-ish for price
+
+
+def _fmt_price(raw):
+    """Format a stored price value for display on the image."""
+    if not raw:
+        return ''
+    try:
+        v = float(str(raw).replace(',', ''))
+        if v >= 1e9: return f'{v/1e9:.2f}B/mo'
+        if v >= 1e6: return f'{v/1e6:.1f}M/mo'
+        if v >= 1e3: return f'{v/1e3:.0f}K/mo'
+        return f'{int(v):,}/mo'
+    except Exception:
+        return str(raw)
+
+
+def draw_slot_row(draw, x, y, col_w, name, status, lessee, price, row_i):
     row_bg = BG_ROW_B if row_i % 2 else BG_ROW_A
     draw.rectangle([(x, y), (x + col_w, y + ROW_H - 1)], fill=row_bg)
 
@@ -103,16 +120,27 @@ def draw_slot_row(draw, x, y, col_w, name, status, lessee, row_i):
         tag     = 'OPEN'
         tag_col = GREEN
 
-    sw          = tw(draw, tag, F_STATUS)
-    name_budget = col_w - BAR_W - 6 - sw - 10
-    disp        = name
+    # Right side: price (rightmost), then status/lessee tag to its left
+    price_str = _fmt_price(price)
+    pw        = tw(draw, price_str, F_STATUS) if price_str else 0
+    sw        = tw(draw, tag, F_STATUS)
+    gap       = 10 if price_str else 0
+
+    # price at far right, tag to the left of it
+    price_x   = x + col_w - pw - 4
+    tag_x     = price_x - sw - gap
+
+    name_budget = tag_x - (x + BAR_W + 6) - 6
+    disp = name
     if tw(draw, disp, F_ITEM) > name_budget:
         while disp and tw(draw, disp + '\u2026', F_ITEM) > name_budget:
             disp = disp[:-1]
         disp += '\u2026'
 
-    draw.text((x + BAR_W + 6,       y + 6), disp, font=F_ITEM,   fill=WHITE)
-    draw.text((x + col_w - sw - 4,  y + 6), tag,  font=F_STATUS, fill=tag_col)
+    draw.text((x + BAR_W + 6, y + 6), disp,      font=F_ITEM,   fill=WHITE)
+    draw.text((tag_x,          y + 6), tag,       font=F_STATUS, fill=tag_col)
+    if price_str:
+        draw.text((price_x,    y + 6), price_str, font=F_STATUS, fill=PRICE_COL)
 
 
 def draw_sec_header(draw, x, y, w, label, count, hidden):
@@ -136,10 +164,10 @@ def draw_sub_header(draw, x, y, col_w, label):
 
 
 def draw_column(draw, x, y_start, col_w, items, row_offset=0):
-    """items = list of (name, status, lessee)"""
+    """items = list of (name, status, lessee, price)"""
     y = y_start
-    for i, (name, status, lessee) in enumerate(items):
-        draw_slot_row(draw, x, y, col_w, name, status, lessee, row_offset + i)
+    for i, (name, status, lessee, price) in enumerate(items):
+        draw_slot_row(draw, x, y, col_w, name, status, lessee, price, row_offset + i)
         y += ROW_H
     return y
 
@@ -268,7 +296,7 @@ def main():
         ts_str = datetime.now().strftime('%d %b %Y  %H:%M')
 
     # Organise config entries into category buckets with sub-group keys
-    by_cat = {c: {} for c in CAT_ORDER}   # cat -> {sub_key: [(name, status, lessee)]}
+    by_cat = {c: {} for c in CAT_ORDER}   # cat -> {sub_key: [(name, status, lessee, price)]}
 
     PI_TIERS   = ['P1', 'P2', 'P3', 'P4']
     SAL_GRADES = ['Common', 'Uncommon', 'Rare', 'Very Rare', 'Rogue Drone']
@@ -281,6 +309,7 @@ def main():
         name    = entry.get('name', f'Item {tid}')
         status  = entry.get('status', 'open')
         lessee  = entry.get('lessee') or None
+        price   = entry.get('price')  or None
 
         disp, grp = meta.get(tid, (None, None))
 
@@ -291,7 +320,7 @@ def main():
         else:
             sub = '__all__'
 
-        by_cat[cat].setdefault(sub, []).append((name, status, lessee))
+        by_cat[cat].setdefault(sub, []).append((name, status, lessee, price))
 
     # ── Compute dimensions ─────────────────────────────────────────────────
     CONTENT_W = W - PAD * 2
