@@ -2144,7 +2144,7 @@
 
                     <!-- MOON MATERIALS SUB-CONTENT -->
                     <div id="moon-content" class="tab-content">
-                        <div id="moon-materials"></div>
+                        <div class="item-grid" id="moon-materials"></div>
                     </div>
 
                     <!-- SALVAGE SUB-CONTENT (hidden initially) -->
@@ -5260,16 +5260,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
             container.innerHTML = '';
 
             Object.entries(MOON_MATERIALS).forEach(([group, materials]) => {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'item-grid moon-material-group';
+                const divider = document.createElement('div');
+                divider.className = 'ice-group-divider';
+                divider.textContent = group;
+                container.appendChild(divider);
 
                 materials.forEach(material => {
                     const quantity = inventory[material] || 0;
                     const item = createItemCard(material, quantity, getRates(material));
-                    groupDiv.appendChild(item);
+                    container.appendChild(item);
                 });
-
-                container.appendChild(groupDiv);
             });
         }
 
