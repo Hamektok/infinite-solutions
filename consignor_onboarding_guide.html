@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consignor Onboarding Guide — Infinite Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  /* ── RESET ─────────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── BASE ──────────────────────────────────────────────────────────── */
+  :root {
+    --bg:          #080e18;
+    --bg2:         #0a1520;
+    --bg3:         #0d1f30;
+    --card:        #0f2035;
+    --border:      #1a3a55;
+    --accent:      #66d9ff;
+    --gold:        #ffcc44;
+    --green:       #00ff88;
+    --orange:      #ff9944;
+    --muted:       #4a7090;
+    --text:        #c8dde8;
+    --text-dim:    #6a8fa8;
+    --warn:        #ff6666;
+  }
+
+  html { font-size: 14px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* ── PAGE WRAPPER ───────────────────────────────────────────────────── */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────────────────── */
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 0 20px;
+    margin-bottom: 36px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .corp-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .doc-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  .doc-title span {
+    display: block;
+    color: var(--gold);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  /* ── TOC ─────────────────────────────────────────────────────────────── */
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 36px;
+  }
+
+  .toc-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .toc ol {
+    padding-left: 20px;
+    column-count: 2;
+    column-gap: 32px;
+  }
+
+  .toc li {
+    margin-bottom: 5px;
+    break-inside: avoid;
+  }
+
+  .toc a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.15s;
+  }
+
+  .toc a:hover { color: var(--accent); }
+
+  /* ── SECTIONS ───────────────────────────────────────────────────────── */
+  section {
+    margin-bottom: 40px;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-badge {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .step-badge.ongoing  { background: var(--gold);   }
+  .step-badge.offboard { background: var(--warn);   }
+  .step-badge.ref      { background: var(--muted);  }
+
+  h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #e0f0ff;
+    letter-spacing: 0.04em;
+  }
+
+  h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gold);
+    margin: 20px 0 8px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  /* ── CALLOUT BOXES ──────────────────────────────────────────────────── */
+  .callout {
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.95rem;
+    border-left-width: 3px;
+    border-left-style: solid;
+  }
+
+  .callout-note   { background: #0a2030; border-color: var(--accent); }
+  .callout-warn   { background: #1a1208; border-color: var(--gold);   }
+  .callout-tip    { background: #091a10; border-color: var(--green);  }
+  .callout-danger { background: #1a0a0a; border-color: var(--warn);   }
+
+  .callout-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .callout-note   .callout-label { color: var(--accent); }
+  .callout-warn   .callout-label { color: var(--gold);   }
+  .callout-tip    .callout-label { color: var(--green);  }
+  .callout-danger .callout-label { color: var(--warn);   }
+
+  /* ── ORDERED / UNORDERED LISTS ──────────────────────────────────────── */
+  ol, ul {
+    padding-left: 22px;
+    margin-bottom: 12px;
+  }
+
+  li {
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  li strong {
+    color: #ddeeff;
+  }
+
+  /* ── TABLES ─────────────────────────────────────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 14px 0;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.93rem;
+  }
+
+  thead th {
+    background: #112233;
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr:nth-child(odd)  { background: var(--bg3); }
+  tbody tr:nth-child(even) { background: var(--card); }
+
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #102030;
+    vertical-align: top;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td:first-child { color: var(--gold); font-weight: 600; }
+
+  /* ── CODE / MONO ────────────────────────────────────────────────────── */
+  code {
+    font-family: 'Share Tech Mono', monospace;
+    background: #112233;
+    color: var(--accent);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.88rem;
+  }
+
+  /* ── UI LABELS ──────────────────────────────────────────────────────── */
+  .ui {
+    display: inline-block;
+    background: #112233;
+    border: 1px solid var(--border);
+    color: #c0d8f0;
+    font-size: 0.82rem;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-family: 'Segoe UI', sans-serif;
+    white-space: nowrap;
+  }
+
+  /* ── DIVIDER ────────────────────────────────────────────────────────── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── FOOTER ─────────────────────────────────────────────────────────── */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 18px 0;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .site-footer span { font-family: 'Share Tech Mono', monospace; }
+
+  /* ── PRINT ──────────────────────────────────────────────────────────── */
+  @media print {
+    @page { margin: 18mm 16mm; size: A4; }
+
+    body {
+      background: #fff;
+      color: #111;
+      font-size: 11pt;
+    }
+
+    .page { max-width: 100%; padding: 0; }
+
+    .site-header { border-color: #bbb; }
+    .corp-name   { color: #1155aa; }
+    .doc-title   { color: #555; }
+    .doc-title span { color: #aa7700; }
+
+    .toc { background: #f5f8fa; border-color: #bbb; border-left-color: #1155aa; }
+    .toc-title { color: #1155aa; }
+    .toc a { color: #333; }
+
+    .step-badge { background: #1155aa !important; color: #fff !important; }
+    .step-badge.ongoing  { background: #aa7700 !important; }
+    .step-badge.offboard { background: #aa2222 !important; }
+    .step-badge.ref      { background: #556677 !important; }
+
+    h2 { color: #0d2244; }
+    h3 { color: #aa7700; }
+    p, li { color: #222; }
+
+    .step-header { border-color: #ccc; }
+    section { page-break-inside: avoid; }
+
+    .callout        { border-left-width: 3px; }
+    .callout-note   { background: #eef6ff; border-color: #1155aa; }
+    .callout-warn   { background: #fff8e6; border-color: #aa7700; }
+    .callout-tip    { background: #efffef; border-color: #228833; }
+    .callout-danger { background: #fff0f0; border-color: #aa2222; }
+
+    .callout-note   .callout-label { color: #1155aa; }
+    .callout-warn   .callout-label { color: #aa7700; }
+    .callout-tip    .callout-label { color: #228833; }
+    .callout-danger .callout-label { color: #aa2222; }
+
+    .callout p, .callout li { color: #222; }
+
+    .table-wrap { border-color: #bbb; }
+    thead th    { background: #e0eaf5; color: #1155aa; border-color: #bbb; }
+    tbody tr:nth-child(odd)  { background: #f7f9fb; }
+    tbody tr:nth-child(even) { background: #fff; }
+    tbody td    { border-color: #ddd; color: #222; }
+    td:first-child { color: #8a6000; }
+
+    code { background: #eef; color: #114; border: 1px solid #ccd; }
+    .ui  { background: #f0f4fa; border-color: #bbb; color: #222; }
+
+    .divider { border-color: #ccc; }
+
+    .site-footer { border-color: #bbb; color: #888; }
+
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div>
+      <div class="corp-name">Infinite Solutions</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;font-family:'Share Tech Mono',monospace;">
+        LX-ZOJ · Consignment Program
+      </div>
+    </div>
+    <div class="doc-title">
+      Internal Operations Guide<br>
+      <span>Consignor Onboarding</span>
+    </div>
+  </header>
+
+  <!-- PRINT BUTTON -->
+  <div class="no-print" style="text-align:right;margin-bottom:24px;">
+    <button onclick="window.print()"
+      style="background:#0d2535;color:#66d9ff;border:1px solid #1a3a55;
+             padding:8px 20px;border-radius:3px;cursor:pointer;
+             font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.1em;">
+      ⎙ PRINT / SAVE PDF
+    </button>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#s1">Initial Agreement</a></li>
+      <li><a href="#s2">Add Consignor in Dashboard</a></li>
+      <li><a href="#s3">Set Up Container In-Game</a></li>
+      <li><a href="#s4">Assign Container in Dashboard</a></li>
+      <li><a href="#s5">Run First Inventory Sync</a></li>
+      <li><a href="#s6">Notify the Consignor</a></li>
+      <li><a href="#s7">Ongoing — Sales &amp; Payouts</a></li>
+      <li><a href="#s8">Offboarding</a></li>
+      <li><a href="#s9">Reference Tables</a></li>
+      <li><a href="#s10">Troubleshooting</a></li>
+    </ol>
+  </div>
+
+
+  <!-- ══ STEP 1 ══════════════════════════════════════════════════════════ -->
+  <section id="s1">
+    <div class="step-header">
+      <div class="step-badge">Step 1</div>
+      <h2>Initial Agreement</h2>
+    </div>
+
+    <p>Before opening the dashboard, agree on all terms with the consignor. This avoids needing to edit the record later.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Decision needed</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Item</td>
+            <td>One specific item per consignor record</td>
+            <td>e.g. "Wetware Mainframe". Multiple items = multiple records.</td>
+          </tr>
+          <tr>
+            <td>Slot Type</td>
+            <td>Exclusive or Shared</td>
+            <td><strong>Exclusive</strong> — only they supply this item. <strong>Shared</strong> — another consignor also covers it.</td>
+          </tr>
+          <tr>
+            <td>Commission %</td>
+            <td>Their cut of each sale</td>
+            <td>e.g. <code>70</code> = they keep 70%, you keep 30%.</td>
+          </tr>
+          <tr>
+            <td>Max Units</td>
+            <td>Stock cap you'll accept at once</td>
+            <td>Prevents overstocking. Set based on monthly sell velocity.</td>
+          </tr>
+          <tr>
+            <td>Demand Tier</td>
+            <td>High / Medium / Low</td>
+            <td>Your assessment of how fast this item sells in J-space.</td>
+          </tr>
+          <tr>
+            <td>List Price</td>
+            <td>Price per unit</td>
+            <td>Can be left blank and filled in later once you've checked Jita.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">Important</div>
+      <p>For shared slots, also agree on <strong>Priority</strong>: who gets sales attributed first when both have stock.
+      Priority 1 = primary supplier; Priority 2 = secondary/filler.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ STEP 2 ══════════════════════════════════════════════════════════ -->
+  <section id="s2">
+    <div class="step-header">
+      <div class="step-badge">Step 2</div>
+      <h2>Add the Consignor in the Dashboard</h2>
+    </div>
+
+    <p>Open <strong>Admin Dashboard → Consignment</strong> tab.</p>
+
+    <ol>
+      <li>Click <span class="ui">+ Add Consignor</span></li>
+      <li>Fill in the dialog fields:
+        <ul style="margin-top:8px;">
+          <li><strong>Character Name</strong> — exact in-game name</li>
+          <li><strong>Item Name</strong> — the item they supply</li>
+          <li><strong>Item Type ID</strong> — the number from EVE's market (see reference below). <em>Required for contract sync.</em></li>
+          <li><strong>List Price / Unit</strong> — agreed ISK per unit</li>
+          <li><strong>Their Commission %</strong> — e.g. <code>70</code></li>
+          <li><strong>Slot Type</strong> — Exclusive or Shared</li>
+          <li><strong>Priority</strong> — <code>1</code> for primary, <code>2</code> for secondary</li>
+          <li><strong>Max Units</strong> — stock cap</li>
+          <li><strong>Demand Tier</strong> — High / Medium / Low</li>
+          <li><strong>Start Date</strong> — today's date (auto-filled)</li>
+        </ul>
+      </li>
+      <li>Click <span class="ui">Save</span></li>
+    </ol>
+
+    <p>The consignor appears in the Consignors treeview. Status shows <strong style="color:var(--green)">Active</strong>.</p>
+
+    <div class="callout callout-note">
+      <div class="callout-label">Finding the Item Type ID</div>
+      <p>
+        <strong>In-game:</strong> right-click the item → Show Info. The type ID is displayed in the info window title bar.<br>
+        <strong>EVE Marketer:</strong> go to <code>evemarketer.com</code>, search the item — the type ID is in the URL (<code>typeID=XXXXX</code>).<br>
+        <strong>Janice / evepraisal:</strong> paste the item name; the type ID appears in the JSON output.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ══ STEP 3 ══════════════════════════════════════════════════════════ -->
+  <section id="s3">
+    <div class="step-header">
+      <div class="step-badge">Step 3</div>
+      <h2>Set Up Their Container In-Game</h2>
+    </div>
+
+    <p>Each consignor gets a dedicated hangar container. This is what makes inventory tracking automatic — the system reads container contents every sync and updates the consignor's <em>In Slot</em> quantity.</p>
+
+    <ol>
+      <li>In EVE, open your <strong>personal hangar</strong> at LX-ZOJ</li>
+      <li>Place a container there — any type works (<em>Giant Secure Container</em> recommended for capacity)</li>
+      <li><strong>Name it clearly</strong> — right-click → Rename<br>
+        Suggested format: <code>[CharName] — [Item]</code><br>
+        Example: <code>Hamektok — Wetware Mainframe</code><br>
+        ESI reads this name and stores it in the dashboard automatically.
+      </li>
+      <li>Give the consignor access to deliver to you, or take delivery yourself via contract</li>
+    </ol>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Finding the Container Item ID</th><th>Method</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>In-game</td>
+            <td>Right-click container → Show Info. Note the <em>Item ID</em> shown in the info window.</td>
+          </tr>
+          <tr>
+            <td>After first sync</td>
+            <td>The container will appear in the <em>Container Assignments</em> treeview once assigned and synced. The Item ID column shows the number.</td>
+          </tr>
+          <tr>
+            <td>ESI asset viewer</td>
+            <td>Tools like Evernus or Adam4EVE can browse your assets and show item_ids.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-label">Critical Rule</div>
+      <p>Keep the consignor's container at the <strong>top level</strong> of your personal hangar — do not nest it inside another container. The tracking system uses the top-level container ID as the assignment key. Nesting changes how IDs are resolved.</p>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">Container Stability</div>
+      <p>The container's Item ID is permanent as long as the container exists. If the container is destroyed or replaced with a new one, you'll need to update the assignment in the dashboard with the new ID.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ STEP 4 ══════════════════════════════════════════════════════════ -->
+  <section id="s4">
+    <div class="step-header">
+      <div class="step-badge">Step 4</div>
+      <h2>Assign the Container in the Dashboard</h2>
+    </div>
+
+    <p>In the Consignment tab, scroll down to the <strong>Container Assignments</strong> pane.</p>
+
+    <ol>
+      <li>Click <span class="ui">+ Assign Container</span></li>
+      <li>Select the consignor from the dropdown</li>
+      <li>Enter the <strong>Container Item ID</strong> from Step 3</li>
+      <li>Add a note if helpful (e.g. <code>Row 2, Giant Secure Container</code>)</li>
+      <li>Click <span class="ui">Save</span></li>
+    </ol>
+
+    <p>The assignment appears in the table. The <em>ESI Name</em> column shows <code>(no name yet)</code> until the first sync.</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">One Container per Consignor</div>
+      <p>Each container assignment is one-to-one: one container → one consignor record. If a consignor supplies two different items, create two consignor records (one per item) and assign a separate container to each.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ STEP 5 ══════════════════════════════════════════════════════════ -->
+  <section id="s5">
+    <div class="step-header">
+      <div class="step-badge">Step 5</div>
+      <h2>Run the First Inventory Sync</h2>
+    </div>
+
+    <p>In the Container Assignments pane, click <span class="ui">↺ Refresh Names</span>. This triggers a full ESI inventory sync in the background.</p>
+
+    <p>The sync does the following in one pass:</p>
+
+    <ol>
+      <li>Fetches all personal assets from ESI for the LX-ZOJ hangar</li>
+      <li>Walks container contents using ESI's asset graph</li>
+      <li>Reads custom container names from ESI (<code>/assets/names/</code>)</li>
+      <li>Updates <em>container_name</em> in the Container Assignments table</li>
+      <li>Stores a per-container inventory snapshot in the database</li>
+      <li>Updates each consignor's <strong>In Slot</strong> quantity based on what's in their assigned container</li>
+      <li>Regenerates the live site inventory display and pushes to GitHub Pages</li>
+    </ol>
+
+    <p>When complete, a dialog confirms success. The ESI Name column will now show the container's in-game name, and the Consignors treeview will show the consignor's current stock quantity.</p>
+
+    <div class="callout callout-note">
+      <div class="callout-label">Automatic Schedule</div>
+      <p>After the initial setup, inventory syncs run automatically every 2 hours via the Windows Task Scheduler. Manual syncs are only needed for immediate updates or initial onboarding.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ STEP 6 ══════════════════════════════════════════════════════════ -->
+  <section id="s6">
+    <div class="step-header">
+      <div class="step-badge">Step 6</div>
+      <h2>Notify the Consignor</h2>
+    </div>
+
+    <p>Once setup is complete, send the consignor the following information. A suggested message template:</p>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:18px 20px;margin:14px 0;font-size:0.93rem;line-height:1.75;">
+      <p>Hey [name], your consignment slot is set up! Here are your details:</p>
+      <ul style="margin:10px 0 10px 20px;">
+        <li><strong>Item:</strong> [item name]</li>
+        <li><strong>Your container:</strong> [container name] (in my personal hangar at LX-ZOJ)</li>
+        <li><strong>Max stock at one time:</strong> [max units] units</li>
+        <li><strong>List price:</strong> [price] ISK/unit</li>
+        <li><strong>Your commission:</strong> [their %]% per unit sold</li>
+        <li><strong>Delivery:</strong> contract to me in-game, or drop directly if you have hangar access</li>
+      </ul>
+      <p>I'll pay out after each sales cycle. Contact me anytime if you have questions. o7</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">Tip</div>
+      <p>Point them to the live site — the Inventory tab shows real-time stock levels so they can see when their container is running low and schedule a restock.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ STEP 7 ══════════════════════════════════════════════════════════ -->
+  <section id="s7">
+    <div class="step-header">
+      <div class="step-badge ongoing">Ongoing</div>
+      <h2>Sales, Attribution &amp; Payouts</h2>
+    </div>
+
+    <h3>When the consignor restocks</h3>
+    <p>Nothing to do. The next scheduled sync will detect the new units in their container and update <em>In Slot</em> automatically. You can also click <span class="ui">↺ Refresh Names</span> for an immediate update.</p>
+
+    <h3>Syncing contract sales — Exclusive slot</h3>
+    <ol>
+      <li>Ensure <code>fetch_contract_profits.py</code> has run (or wait for its schedule)</li>
+      <li>In the Sales Log toolbar, click <span class="ui">↺ Sync Contracts</span></li>
+      <li>Sales are auto-logged with value-weighted price attribution</li>
+      <li>The <em>ISK Owed</em> column in the Consignors treeview updates immediately</li>
+    </ol>
+
+    <h3>Syncing contract sales — Shared slot</h3>
+    <ol>
+      <li>Sync Contracts as above</li>
+      <li>Shared-slot sales appear in the <strong>Pending Attribution</strong> pane (orange) instead of auto-logging, because the system cannot determine which consignor's units were sold</li>
+      <li>Select the pending row → click <span class="ui">Split / Attribute</span></li>
+      <li>The dialog shows all active consignors for that item with their current stock</li>
+      <li>Click <span class="ui">Auto-fill (FIFO by priority)</span> to pre-fill quantities based on priority order and current stock, or enter quantities manually</li>
+      <li>Click <span class="ui">Save Attribution</span> — individual sale entries are logged per consignor and their <em>In Slot</em> quantities are decremented</li>
+    </ol>
+
+    <h3>Paying out</h3>
+    <ol>
+      <li>Select the consignor in the Consignors treeview — their Sales Log loads below</li>
+      <li>Review unpaid entries (shown in gold)</li>
+      <li>Transfer ISK in-game</li>
+      <li>Back in the dashboard: select all unpaid rows → <span class="ui">Mark Selected Paid</span></li>
+    </ol>
+
+    <div class="callout callout-warn">
+      <div class="callout-label">Payout Cadence</div>
+      <p>There is no enforced schedule — set your own (weekly is common). Be consistent and communicate it to consignors upfront to avoid disputes.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ STEP 8 ══════════════════════════════════════════════════════════ -->
+  <section id="s8">
+    <div class="step-header">
+      <div class="step-badge offboard">Offboard</div>
+      <h2>Offboarding a Consignor</h2>
+    </div>
+
+    <p>When a consignor stops supplying or the arrangement ends:</p>
+
+    <ol>
+      <li>Return any remaining stock from their container via contract or direct trade</li>
+      <li>Settle any outstanding ISK owed — mark all entries Paid</li>
+      <li>In the Consignors treeview → select their row → <span class="ui">Toggle Active</span><br>
+        This marks them Inactive and greys out the row. Historical sale records are preserved.</li>
+      <li>In Container Assignments → select their row → <span class="ui">Remove</span><br>
+        This removes the tracking assignment only — the physical container in-game is unaffected.</li>
+      <li>In EVE: empty the container, rename or remove it as preferred</li>
+    </ol>
+
+    <div class="callout callout-note">
+      <div class="callout-label">Record Preservation</div>
+      <p>Deactivating a consignor does not delete their sale history. Records remain in the database for accounting purposes. If they return later, simply re-activate via <span class="ui">Toggle Active</span> and reassign a container.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ REFERENCE ══════════════════════════════════════════════════════ -->
+  <section id="s9">
+    <div class="step-header">
+      <div class="step-badge ref">Reference</div>
+      <h2>Reference Tables</h2>
+    </div>
+
+    <h3>Slot Type Comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Exclusive</th><th>Shared</th></tr></thead>
+        <tbody>
+          <tr><td>Multiple suppliers</td><td>No</td><td>Yes (up to you)</td></tr>
+          <tr><td>Contract sync</td><td>Auto-logs directly</td><td>Routes to Pending Attribution</td></tr>
+          <tr><td>Priority field used</td><td>No</td><td>Yes (FIFO auto-fill)</td></tr>
+          <tr><td>Combined stock display</td><td>N/A</td><td>Shown as aggregated row in treeview</td></tr>
+          <tr><td>Attribution effort</td><td>None</td><td>Manual split per sale batch</td></tr>
+          <tr><td>Best for</td><td>Unique / high-volume items</td><td>Common items with multiple producers</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Demand Tier Guide</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tier</th><th>Meaning</th><th>Suggested Max Units</th></tr></thead>
+        <tbody>
+          <tr><td>High ▲</td><td>Sells within days. Critical supply item.</td><td>Cap high — never want to be empty</td></tr>
+          <tr><td>Medium ◆</td><td>Sells within 2–4 weeks. Steady demand.</td><td>2–4 weeks of expected production</td></tr>
+          <tr><td>Low ▼</td><td>Sells slowly. Niche or seasonal demand.</td><td>Cap low — avoid overstocking</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Priority Values (Shared Slots)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Priority</th><th>Role</th><th>Auto-fill Behaviour</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Primary supplier</td><td>Units deducted first, up to their current_qty</td></tr>
+          <tr><td>2</td><td>Secondary / filler</td><td>Receives remainder after Priority 1 is exhausted</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Key Dashboard Actions — Quick Reference</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Button</th><th>Location</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>+ Add Consignor</td><td>Consignors toolbar</td><td>Opens new consignor dialog</td></tr>
+          <tr><td>Edit</td><td>Consignors toolbar</td><td>Edit selected consignor's details</td></tr>
+          <tr><td>Toggle Active</td><td>Consignors toolbar</td><td>Activate / deactivate selected consignor</td></tr>
+          <tr><td>+ Assign Container</td><td>Container Assignments</td><td>Link a container item_id to a consignor</td></tr>
+          <tr><td>↺ Refresh Names</td><td>Container Assignments</td><td>Run ESI sync + update container names</td></tr>
+          <tr><td>↺ Sync Contracts</td><td>Sales Log toolbar</td><td>Scan contracts, auto-log or pend sales</td></tr>
+          <tr><td>Split / Attribute</td><td>Pending Attribution</td><td>Manually assign a pending shared sale</td></tr>
+          <tr><td>Mark Selected Paid</td><td>Sales Log toolbar</td><td>Mark highlighted sales as paid out</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- ══ TROUBLESHOOTING ════════════════════════════════════════════════ -->
+  <section id="s10">
+    <div class="step-header">
+      <div class="step-badge ref">Reference</div>
+      <h2>Troubleshooting</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Problem</th><th>Likely cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>In Slot stays 0 after sync</td>
+            <td>Container ID mismatch or container not assigned yet</td>
+            <td>Verify the Container Item ID in the assignment matches the actual in-game container. Reassign if needed.</td>
+          </tr>
+          <tr>
+            <td>ESI Name still shows "(no name yet)"</td>
+            <td>Container not named in-game, or sync hasn't run since naming</td>
+            <td>Name the container in-game, then click <span class="ui">↺ Refresh Names</span>.</td>
+          </tr>
+          <tr>
+            <td>Contract sync finds nothing</td>
+            <td>Item Type ID missing or wrong on consignor record</td>
+            <td>Edit the consignor → check/correct the Item Type ID. Also ensure <code>fetch_contract_profits.py</code> has run recently.</td>
+          </tr>
+          <tr>
+            <td>Sale goes to Pending instead of auto-logging</td>
+            <td>Two active consignors share the same Item Type ID</td>
+            <td>This is correct for shared slots. Use <span class="ui">Split / Attribute</span> to resolve.</td>
+          </tr>
+          <tr>
+            <td>Consignor missing from Split dialog</td>
+            <td>Their record is Inactive or has no Item Type ID set</td>
+            <td>Edit the consignor → set Item Type ID. Toggle Active if they were deactivated.</td>
+          </tr>
+          <tr>
+            <td>Refresh Names shows "ESI refresh failed"</td>
+            <td>Auth token expired or ESI is down</td>
+            <td>Re-authenticate via <code>token_manager.py</code>, then retry. Check ESI status at <code>status.eveonline.com</code>.</td>
+          </tr>
+          <tr>
+            <td>current_qty shows wrong number</td>
+            <td>Items in container not in tracked_market_items</td>
+            <td>The container may hold other untracked items; only tracked type_ids count. Check if the item's type_id is in the tracked list.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <hr class="divider">
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <span>Infinite Solutions · LX-ZOJ Citadel</span>
+    <span>Contact: Hamektok Hakaari</span>
+  </footer>
+
+</div>
+</body>
+</html>

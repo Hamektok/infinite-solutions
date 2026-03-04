@@ -58,7 +58,7 @@ BAR_W     = 4
 # ── Layout ────────────────────────────────────────────────────────────────────
 W       = 1400
 PAD     = 24
-ROW_H   = 24
+ROW_H   = 44
 COL_GAP = 16
 SEC_H   = 28
 SUB_H   = 22
@@ -77,6 +77,7 @@ F_ITEM   = load_font('segoeui.ttf',  12)
 F_STATUS = load_font('segoeuib.ttf', 11)
 F_SMALL  = load_font('segoeui.ttf',  11)
 F_TS     = load_font('segoeui.ttf',  12)
+F_DETAIL = load_font('segoeui.ttf',  10)
 
 
 def tw(draw, text, font):
@@ -85,7 +86,8 @@ def tw(draw, text, font):
 
 
 # ── Drawing helpers ───────────────────────────────────────────────────────────
-PRICE_COL = ( 80, 180, 220)   # cyan-ish for price
+PRICE_COL  = ( 80, 180, 220)   # cyan-ish for price
+DETAIL_COL = ( 65, 110, 140)   # dimmer for detail sub-line
 
 
 def _fmt_price(raw):
@@ -102,7 +104,19 @@ def _fmt_price(raw):
         return str(raw)
 
 
-def draw_slot_row(draw, x, y, col_w, name, status, lessee, price, row_i):
+def _fmt_isk(v):
+    """Format ISK value without /mo suffix."""
+    try:
+        v = float(v)
+        if v >= 1e9: return f'{v/1e9:.2f}B'
+        if v >= 1e6: return f'{v/1e6:.1f}M'
+        if v >= 1e3: return f'{v/1e3:.0f}K'
+        return f'{int(v):,}'
+    except Exception:
+        return '?'
+
+
+def draw_slot_row(draw, x, y, col_w, name, status, lessee, price, detail, row_i):
     row_bg = BG_ROW_B if row_i % 2 else BG_ROW_A
     draw.rectangle([(x, y), (x + col_w, y + ROW_H - 1)], fill=row_bg)
 
@@ -120,27 +134,37 @@ def draw_slot_row(draw, x, y, col_w, name, status, lessee, price, row_i):
         tag     = 'OPEN'
         tag_col = GREEN
 
-    # Right side: price (rightmost), then status/lessee tag to its left
-    price_str = _fmt_price(price)
+    # Line 1: name (left), tag + "~price est. fee" (right)
+    price_str = ('~' + _fmt_price(price)) if price else ''
     pw        = tw(draw, price_str, F_STATUS) if price_str else 0
     sw        = tw(draw, tag, F_STATUS)
-    gap       = 10 if price_str else 0
+    gap       = 8 if price_str else 0
 
-    # price at far right, tag to the left of it
-    price_x   = x + col_w - pw - 4
-    tag_x     = price_x - sw - gap
-
+    price_x     = x + col_w - pw - 4
+    tag_x       = price_x - sw - gap
     name_budget = tag_x - (x + BAR_W + 6) - 6
+
     disp = name
     if tw(draw, disp, F_ITEM) > name_budget:
         while disp and tw(draw, disp + '\u2026', F_ITEM) > name_budget:
             disp = disp[:-1]
         disp += '\u2026'
 
-    draw.text((x + BAR_W + 6, y + 6), disp,      font=F_ITEM,   fill=WHITE)
-    draw.text((tag_x,          y + 6), tag,       font=F_STATUS, fill=tag_col)
+    line1_y = y + 5
+    draw.text((x + BAR_W + 6, line1_y), disp,      font=F_ITEM,   fill=WHITE)
+    draw.text((tag_x,          line1_y), tag,       font=F_STATUS, fill=tag_col)
     if price_str:
-        draw.text((price_x,    y + 6), price_str, font=F_STATUS, fill=PRICE_COL)
+        draw.text((price_x,    line1_y), price_str, font=F_STATUS, fill=PRICE_COL)
+
+    # Line 2: calculation detail (smaller, dimmer)
+    if detail:
+        detail_budget = col_w - (BAR_W + 6) - 4
+        det = detail
+        if tw(draw, det, F_DETAIL) > detail_budget:
+            while det and tw(draw, det + '\u2026', F_DETAIL) > detail_budget:
+                det = det[:-1]
+            det += '\u2026'
+        draw.text((x + BAR_W + 6, y + 24), det, font=F_DETAIL, fill=DETAIL_COL)
 
 
 def draw_sec_header(draw, x, y, w, label, count, hidden):
@@ -164,10 +188,10 @@ def draw_sub_header(draw, x, y, col_w, label):
 
 
 def draw_column(draw, x, y_start, col_w, items, row_offset=0):
-    """items = list of (name, status, lessee, price)"""
+    """items = list of (name, status, lessee, price, detail)"""
     y = y_start
-    for i, (name, status, lessee, price) in enumerate(items):
-        draw_slot_row(draw, x, y, col_w, name, status, lessee, price, row_offset + i)
+    for i, (name, status, lessee, price, detail) in enumerate(items):
+        draw_slot_row(draw, x, y, col_w, name, status, lessee, price, detail, row_offset + i)
         y += ROW_H
     return y
 
@@ -285,7 +309,28 @@ def main():
     snap_ts = (conn.execute(
         'SELECT MAX(snapshot_timestamp) FROM lx_zoj_inventory'
     ).fetchone()[0] or '')
+
+    # Load slot pricing config for estimate detail lines
+    raw_params = conn.execute(
+        "SELECT value FROM site_config WHERE key='slot_pricing_params'"
+    ).fetchone()
+    slot_params = json.loads(raw_params[0]) if raw_params else {}
+
+    raw_basis = conn.execute(
+        "SELECT value FROM site_config WHERE key='slot_pricing_basis'"
+    ).fetchone()
+    slot_basis = json.loads(raw_basis[0]) if raw_basis else {}
+
     conn.close()
+
+    # Derive pricing constants from params
+    comm_pct        = float(slot_params.get('commission', 2.5))   # e.g. 2.5 (%)
+    prem_mult       = float(slot_params.get('premium', 1.0))
+    scale_raw       = float(slot_params.get('scale', 0.1))        # e.g. 0.1 (= 10%)
+    scale_pct       = scale_raw * 100                              # 10.0
+    global_vol_mode = slot_params.get('vol_mode', 'jita')
+    comm            = comm_pct / 100.0                             # 0.025
+    prem            = prem_mult
 
     def tab_hidden(cat):
         return vis_cfg.get(f'market_tab_{cat}', '0') != '1'
@@ -320,7 +365,26 @@ def main():
         else:
             sub = '__all__'
 
-        by_cat[cat].setdefault(sub, []).append((name, status, lessee, price))
+        # Build estimate detail line for open slots with a price
+        detail = ''
+        if price and status == 'open':
+            try:
+                fee      = float(str(price).replace(',', ''))
+                gross    = fee / (comm * prem) if (comm * prem) > 0 else 0
+                net      = gross - fee
+                cfg      = slot_basis.get(str(tid), {})
+                vol_mode = cfg.get('vol_mode', global_vol_mode)
+                exp_u    = int(cfg.get('units', 0))
+                if vol_mode == 'expected' and exp_u > 0:
+                    basis_info = f'{exp_u:,} units/mo'
+                else:
+                    basis_info = f'Jita 30d \u00d7 {scale_pct:.0f}% scale'
+                detail = (f'{comm_pct:.1f}% comm \u00b7 {basis_info}'
+                          f' \u00b7 ~lessee net: {_fmt_isk(net)}/mo')
+            except Exception:
+                pass
+
+        by_cat[cat].setdefault(sub, []).append((name, status, lessee, price, detail))
 
     # ── Compute dimensions ─────────────────────────────────────────────────
     CONTENT_W = W - PAD * 2
@@ -385,12 +449,13 @@ def main():
     # Header
     draw.rectangle([(0, 0), (W, HDR_H)], fill=BG_HDR)
     draw.line([(0, HDR_H), (W, HDR_H)], fill=ACCENT, width=2)
-    draw.text((PAD, 14), 'LX-ZOJ  \u00b7  MARKET SLOT AVAILABILITY', font=F_TITLE, fill=WHITE)
-    draw.text((PAD, 56), f'Updated  {ts_str}', font=F_TS, fill=SUBTEXT)
+    draw.text((PAD, 12), 'LX-ZOJ  \u00b7  MARKET SLOT PRICING  \u00b7  ESTIMATES', font=F_TITLE, fill=WHITE)
+    draw.text((PAD, 48), 'Fees estimated from current market prices  \u00b7  Actual rates negotiated individually', font=F_SMALL, fill=SUBTEXT)
+    draw.text((PAD, 64), f'Updated  {ts_str}', font=F_TS, fill=SUBTEXT)
 
     # Legend
     lx = W - PAD
-    ly = 56
+    ly = 48
     for label, col in [('Open', GREEN), ('Closed / Leased', AMBER)]:
         lw = tw(draw, label, F_SMALL)
         lx -= lw
@@ -487,7 +552,7 @@ def main():
                f'{closed_slots} leased')
     sw = tw(draw, summary, F_SMALL)
     draw.text(((W - sw) // 2, footer_y + 10), summary, font=F_SMALL, fill=SUBTEXT)
-    note = '@ or DM Hamektok Hakaari on Discord to lease a slot'
+    note = 'All figures are estimates  \u00b7  Actual slot fees negotiated individually  \u00b7  DM Hamektok Hakaari to inquire'
     nw   = tw(draw, note, F_SMALL)
     draw.text(((W - nw) // 2, footer_y + 28), note, font=F_SMALL, fill=SUBTEXT)
 
