@@ -286,6 +286,10 @@ MOON_MATERIAL_IDS = [
     16681,  # Nanotransistors
     16682,  # Hypersynaptic Fibers
     16683,  # Ferrogel
+    33359,  # Photonic Metamaterials
+    33360,  # Terahertz Metamaterials
+    33361,  # Plasmonic Metamaterials
+    33362,  # Nonlinear Metamaterials
 ]
 
 # ── Anomaly ores (found in ore anomalies) ─────────────────────────────────
