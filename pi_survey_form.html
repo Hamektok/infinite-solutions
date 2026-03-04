@@ -218,6 +218,29 @@
 
   .opt-em { color: var(--dim); font-size: 0.78rem; margin-left: 2px; }
 
+  /* ── PI ITEM TIER GRID (Q4) ── */
+  .tier-head {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 16px 0 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tier-head:first-child { margin-top: 0; }
+  .check-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+  .check-grid .opt-label {
+    font-size: 0.82rem;
+    padding: 6px 10px;
+  }
+  @media (max-width: 520px) { .check-grid { grid-template-columns: repeat(2, 1fr); } }
+
   /* ── TEXT INPUTS ── */
   .text-input, textarea {
     width: 100%;
@@ -364,7 +387,7 @@ STEP 4 — Paste the URL below, replacing the placeholder:
 
   <!-- ── SETUP BANNER (shown if webhook not configured) ── -->
   <div id="setup-banner">
-    <strong>⚠ Endpoint not configured.</strong> See the setup instructions at the top of this HTML file. You need to deploy a Google Apps Script and paste the web app URL into the <code>ENDPOINT</code> constant.<br>
+    <strong>Endpoint not configured.</strong> See the setup instructions at the top of this HTML file. You need to deploy a Google Apps Script and paste the web app URL into the <code>ENDPOINT</code> constant.<br>
     Short version: Google Sheet → Extensions → Apps Script → paste script → Deploy as Web App (Anyone) → copy URL → paste below <code>ENDPOINT =</code>
   </div>
 
@@ -385,7 +408,7 @@ STEP 4 — Paste the URL below, replacing the placeholder:
 
     <!-- ── SECTION 1: Current Setup ── -->
     <div class="section">
-      <div class="section-label">🪐 Section 1 — Your Current Setup</div>
+      <div class="section-label">Section 1 — Your Current Setup</div>
 
       <!-- Q1 -->
       <div class="question">
@@ -396,13 +419,13 @@ STEP 4 — Paste the URL below, replacing the placeholder:
         </div>
         <div class="radio-group">
           <input type="radio" name="q1" id="q1a" value="Actively (most months)">
-          <label class="opt-label" for="q1a"><span class="opt-indicator"></span>🟢 Actively — I produce most months</label>
+          <label class="opt-label" for="q1a"><span class="opt-indicator"></span>Actively — I produce most months</label>
 
           <input type="radio" name="q1" id="q1b" value="On and off — have skills but haven't lately">
-          <label class="opt-label" for="q1b"><span class="opt-indicator"></span>🟡 On and off — have the skills but haven't lately</label>
+          <label class="opt-label" for="q1b"><span class="opt-indicator"></span>On and off — have the skills but haven't lately</label>
 
           <input type="radio" name="q1" id="q1c" value="Never / no PI skills">
-          <label class="opt-label" for="q1c"><span class="opt-indicator"></span>⚪ Never / no PI skills</label>
+          <label class="opt-label" for="q1c"><span class="opt-indicator"></span>Never / no PI skills</label>
         </div>
         <div class="err-msg" id="q1-err">Please select an answer.</div>
       </div>
@@ -446,13 +469,158 @@ STEP 4 — Paste the URL below, replacing the placeholder:
 
     <!-- ── SECTION 2: What You Produce ── -->
     <div class="section">
-      <div class="section-label">📦 Section 2 — What You Produce</div>
+      <div class="section-label">Section 2 — What You Produce</div>
 
       <!-- Q4 -->
       <div class="question">
-        <div class="q-label"><span class="q-num">Q4</span> Which specific items do you make?</div>
-        <div class="q-hint">List by name — e.g. "Robotics, Coolant, Guidance Systems"</div>
-        <input type="text" class="text-input" id="q4" placeholder="e.g. Robotics, Coolant, Guidance Systems">
+        <div class="q-label"><span class="q-num">Q4</span> Which specific items do you make? <span class="opt-em">(all that apply)</span></div>
+        <div class="q-hint">Check all items you currently produce or could produce.</div>
+
+        <div class="tier-head">P1 — Raw Extraction</div>
+        <div class="check-grid">
+          <input type="checkbox" name="q4" id="q4_bacteria" value="Bacteria">
+          <label class="opt-label" for="q4_bacteria"><span class="opt-indicator"></span>Bacteria</label>
+          <input type="checkbox" name="q4" id="q4_biofuels" value="Biofuels">
+          <label class="opt-label" for="q4_biofuels"><span class="opt-indicator"></span>Biofuels</label>
+          <input type="checkbox" name="q4" id="q4_biomass" value="Biomass">
+          <label class="opt-label" for="q4_biomass"><span class="opt-indicator"></span>Biomass</label>
+          <input type="checkbox" name="q4" id="q4_chiral" value="Chiral Structures">
+          <label class="opt-label" for="q4_chiral"><span class="opt-indicator"></span>Chiral Structures</label>
+          <input type="checkbox" name="q4" id="q4_electrolytes" value="Electrolytes">
+          <label class="opt-label" for="q4_electrolytes"><span class="opt-indicator"></span>Electrolytes</label>
+          <input type="checkbox" name="q4" id="q4_indfibers" value="Industrial Fibers">
+          <label class="opt-label" for="q4_indfibers"><span class="opt-indicator"></span>Industrial Fibers</label>
+          <input type="checkbox" name="q4" id="q4_oxidizing" value="Oxidizing Compound">
+          <label class="opt-label" for="q4_oxidizing"><span class="opt-indicator"></span>Oxidizing Compound</label>
+          <input type="checkbox" name="q4" id="q4_oxygen" value="Oxygen">
+          <label class="opt-label" for="q4_oxygen"><span class="opt-indicator"></span>Oxygen</label>
+          <input type="checkbox" name="q4" id="q4_plasmoids" value="Plasmoids">
+          <label class="opt-label" for="q4_plasmoids"><span class="opt-indicator"></span>Plasmoids</label>
+          <input type="checkbox" name="q4" id="q4_precious" value="Precious Metals">
+          <label class="opt-label" for="q4_precious"><span class="opt-indicator"></span>Precious Metals</label>
+          <input type="checkbox" name="q4" id="q4_proteins" value="Proteins">
+          <label class="opt-label" for="q4_proteins"><span class="opt-indicator"></span>Proteins</label>
+          <input type="checkbox" name="q4" id="q4_reactive" value="Reactive Metals">
+          <label class="opt-label" for="q4_reactive"><span class="opt-indicator"></span>Reactive Metals</label>
+          <input type="checkbox" name="q4" id="q4_silicon" value="Silicon">
+          <label class="opt-label" for="q4_silicon"><span class="opt-indicator"></span>Silicon</label>
+          <input type="checkbox" name="q4" id="q4_toxic" value="Toxic Metals">
+          <label class="opt-label" for="q4_toxic"><span class="opt-indicator"></span>Toxic Metals</label>
+          <input type="checkbox" name="q4" id="q4_water" value="Water">
+          <label class="opt-label" for="q4_water"><span class="opt-indicator"></span>Water</label>
+        </div>
+
+        <div class="tier-head">P2 — Refined Commodities</div>
+        <div class="check-grid">
+          <input type="checkbox" name="q4" id="q4_biocells" value="Biocells">
+          <label class="opt-label" for="q4_biocells"><span class="opt-indicator"></span>Biocells</label>
+          <input type="checkbox" name="q4" id="q4_constblocks" value="Construction Blocks">
+          <label class="opt-label" for="q4_constblocks"><span class="opt-indicator"></span>Construction Blocks</label>
+          <input type="checkbox" name="q4" id="q4_conselec" value="Consumer Electronics">
+          <label class="opt-label" for="q4_conselec"><span class="opt-indicator"></span>Consumer Electronics</label>
+          <input type="checkbox" name="q4" id="q4_coolant" value="Coolant">
+          <label class="opt-label" for="q4_coolant"><span class="opt-indicator"></span>Coolant</label>
+          <input type="checkbox" name="q4" id="q4_enriched" value="Enriched Uranium">
+          <label class="opt-label" for="q4_enriched"><span class="opt-indicator"></span>Enriched Uranium</label>
+          <input type="checkbox" name="q4" id="q4_gelivestock" value="Genetically Enhanced Livestock">
+          <label class="opt-label" for="q4_gelivestock"><span class="opt-indicator"></span>Genetically Enhanced Livestock</label>
+          <input type="checkbox" name="q4" id="q4_mechparts" value="Mechanical Parts">
+          <label class="opt-label" for="q4_mechparts"><span class="opt-indicator"></span>Mechanical Parts</label>
+          <input type="checkbox" name="q4" id="q4_microfiber" value="Microfiber Shielding">
+          <label class="opt-label" for="q4_microfiber"><span class="opt-indicator"></span>Microfiber Shielding</label>
+          <input type="checkbox" name="q4" id="q4_minielectron" value="Miniature Electronics">
+          <label class="opt-label" for="q4_minielectron"><span class="opt-indicator"></span>Miniature Electronics</label>
+          <input type="checkbox" name="q4" id="q4_nanites" value="Nanites">
+          <label class="opt-label" for="q4_nanites"><span class="opt-indicator"></span>Nanites</label>
+          <input type="checkbox" name="q4" id="q4_oxides" value="Oxides">
+          <label class="opt-label" for="q4_oxides"><span class="opt-indicator"></span>Oxides</label>
+          <input type="checkbox" name="q4" id="q4_polyaramids" value="Polyaramids">
+          <label class="opt-label" for="q4_polyaramids"><span class="opt-indicator"></span>Polyaramids</label>
+          <input type="checkbox" name="q4" id="q4_polytextiles" value="Polytextiles">
+          <label class="opt-label" for="q4_polytextiles"><span class="opt-indicator"></span>Polytextiles</label>
+          <input type="checkbox" name="q4" id="q4_rocketfuel" value="Rocket Fuel">
+          <label class="opt-label" for="q4_rocketfuel"><span class="opt-indicator"></span>Rocket Fuel</label>
+          <input type="checkbox" name="q4" id="q4_silglass" value="Silicate Glass">
+          <label class="opt-label" for="q4_silglass"><span class="opt-indicator"></span>Silicate Glass</label>
+          <input type="checkbox" name="q4" id="q4_supercond" value="Superconductors">
+          <label class="opt-label" for="q4_supercond"><span class="opt-indicator"></span>Superconductors</label>
+          <input type="checkbox" name="q4" id="q4_supertensile" value="Supertensile Plastics">
+          <label class="opt-label" for="q4_supertensile"><span class="opt-indicator"></span>Supertensile Plastics</label>
+          <input type="checkbox" name="q4" id="q4_synthoil" value="Synthetic Oil">
+          <label class="opt-label" for="q4_synthoil"><span class="opt-indicator"></span>Synthetic Oil</label>
+          <input type="checkbox" name="q4" id="q4_testcult" value="Test Cultures">
+          <label class="opt-label" for="q4_testcult"><span class="opt-indicator"></span>Test Cultures</label>
+          <input type="checkbox" name="q4" id="q4_transmitter" value="Transmitter">
+          <label class="opt-label" for="q4_transmitter"><span class="opt-indicator"></span>Transmitter</label>
+          <input type="checkbox" name="q4" id="q4_viralagent" value="Viral Agent">
+          <label class="opt-label" for="q4_viralagent"><span class="opt-indicator"></span>Viral Agent</label>
+        </div>
+
+        <div class="tier-head">P3 — Specialized Commodities</div>
+        <div class="check-grid">
+          <input type="checkbox" name="q4" id="q4_biotech" value="Biotech Research Reports">
+          <label class="opt-label" for="q4_biotech"><span class="opt-indicator"></span>Biotech Research Reports</label>
+          <input type="checkbox" name="q4" id="q4_camdrones" value="Camera Drones">
+          <label class="opt-label" for="q4_camdrones"><span class="opt-indicator"></span>Camera Drones</label>
+          <input type="checkbox" name="q4" id="q4_condensates" value="Condensates">
+          <label class="opt-label" for="q4_condensates"><span class="opt-indicator"></span>Condensates</label>
+          <input type="checkbox" name="q4" id="q4_cryoprot" value="Cryoprotectant Solution">
+          <label class="opt-label" for="q4_cryoprot"><span class="opt-indicator"></span>Cryoprotectant Solution</label>
+          <input type="checkbox" name="q4" id="q4_datachips" value="Data Chips">
+          <label class="opt-label" for="q4_datachips"><span class="opt-indicator"></span>Data Chips</label>
+          <input type="checkbox" name="q4" id="q4_gelbiopaste" value="Gel-Matrix Biopaste">
+          <label class="opt-label" for="q4_gelbiopaste"><span class="opt-indicator"></span>Gel-Matrix Biopaste</label>
+          <input type="checkbox" name="q4" id="q4_guidance" value="Guidance Systems">
+          <label class="opt-label" for="q4_guidance"><span class="opt-indicator"></span>Guidance Systems</label>
+          <input type="checkbox" name="q4" id="q4_hazmat" value="Hazmat Detection Systems">
+          <label class="opt-label" for="q4_hazmat"><span class="opt-indicator"></span>Hazmat Detection Systems</label>
+          <input type="checkbox" name="q4" id="q4_hermetic" value="Hermetic Membranes">
+          <label class="opt-label" for="q4_hermetic"><span class="opt-indicator"></span>Hermetic Membranes</label>
+          <input type="checkbox" name="q4" id="q4_hitechtx" value="High-Tech Transmitters">
+          <label class="opt-label" for="q4_hitechtx"><span class="opt-indicator"></span>High-Tech Transmitters</label>
+          <input type="checkbox" name="q4" id="q4_indexplosives" value="Industrial Explosives">
+          <label class="opt-label" for="q4_indexplosives"><span class="opt-indicator"></span>Industrial Explosives</label>
+          <input type="checkbox" name="q4" id="q4_neocoms" value="Neocoms">
+          <label class="opt-label" for="q4_neocoms"><span class="opt-indicator"></span>Neocoms</label>
+          <input type="checkbox" name="q4" id="q4_nukreactors" value="Nuclear Reactors">
+          <label class="opt-label" for="q4_nukreactors"><span class="opt-indicator"></span>Nuclear Reactors</label>
+          <input type="checkbox" name="q4" id="q4_planetveh" value="Planetary Vehicles">
+          <label class="opt-label" for="q4_planetveh"><span class="opt-indicator"></span>Planetary Vehicles</label>
+          <input type="checkbox" name="q4" id="q4_robotics" value="Robotics">
+          <label class="opt-label" for="q4_robotics"><span class="opt-indicator"></span>Robotics</label>
+          <input type="checkbox" name="q4" id="q4_smartfab" value="Smartfab Units">
+          <label class="opt-label" for="q4_smartfab"><span class="opt-indicator"></span>Smartfab Units</label>
+          <input type="checkbox" name="q4" id="q4_supercomp" value="Supercomputers">
+          <label class="opt-label" for="q4_supercomp"><span class="opt-indicator"></span>Supercomputers</label>
+          <input type="checkbox" name="q4" id="q4_synthsynapses" value="Synthetic Synapses">
+          <label class="opt-label" for="q4_synthsynapses"><span class="opt-indicator"></span>Synthetic Synapses</label>
+          <input type="checkbox" name="q4" id="q4_transcranial" value="Transcranial Microcontrollers">
+          <label class="opt-label" for="q4_transcranial"><span class="opt-indicator"></span>Transcranial Microcontrollers</label>
+          <input type="checkbox" name="q4" id="q4_ukomi" value="Ukomi Superconductors">
+          <label class="opt-label" for="q4_ukomi"><span class="opt-indicator"></span>Ukomi Superconductors</label>
+          <input type="checkbox" name="q4" id="q4_vaccines" value="Vaccines">
+          <label class="opt-label" for="q4_vaccines"><span class="opt-indicator"></span>Vaccines</label>
+        </div>
+
+        <div class="tier-head">P4 — Advanced Commodities</div>
+        <div class="check-grid">
+          <input type="checkbox" name="q4" id="q4_broadcastnode" value="Broadcast Node">
+          <label class="opt-label" for="q4_broadcastnode"><span class="opt-indicator"></span>Broadcast Node</label>
+          <input type="checkbox" name="q4" id="q4_ird" value="Integrity Response Drones">
+          <label class="opt-label" for="q4_ird"><span class="opt-indicator"></span>Integrity Response Drones</label>
+          <input type="checkbox" name="q4" id="q4_nanofactory" value="Nano-Factory">
+          <label class="opt-label" for="q4_nanofactory"><span class="opt-indicator"></span>Nano-Factory</label>
+          <input type="checkbox" name="q4" id="q4_oma" value="Organic Mortar Applicators">
+          <label class="opt-label" for="q4_oma"><span class="opt-indicator"></span>Organic Mortar Applicators</label>
+          <input type="checkbox" name="q4" id="q4_rcm" value="Recursive Computing Module">
+          <label class="opt-label" for="q4_rcm"><span class="opt-indicator"></span>Recursive Computing Module</label>
+          <input type="checkbox" name="q4" id="q4_shpc" value="Self-Harmonizing Power Core">
+          <label class="opt-label" for="q4_shpc"><span class="opt-indicator"></span>Self-Harmonizing Power Core</label>
+          <input type="checkbox" name="q4" id="q4_stericond" value="Sterile Conduits">
+          <label class="opt-label" for="q4_stericond"><span class="opt-indicator"></span>Sterile Conduits</label>
+          <input type="checkbox" name="q4" id="q4_wetware" value="Wetware Mainframe">
+          <label class="opt-label" for="q4_wetware"><span class="opt-indicator"></span>Wetware Mainframe</label>
+        </div>
       </div>
 
       <!-- Q5 -->
@@ -481,23 +649,23 @@ STEP 4 — Paste the URL below, replacing the placeholder:
         <div class="q-label"><span class="q-num">Q6</span> Where are you currently selling your PI output?</div>
         <div class="radio-group">
           <input type="radio" name="q6" id="q6a" value="Jita / major trade hub">
-          <label class="opt-label" for="q6a"><span class="opt-indicator"></span>🏙️ Jita / major trade hub</label>
+          <label class="opt-label" for="q6a"><span class="opt-indicator"></span>Jita / major trade hub</label>
 
           <input type="radio" name="q6" id="q6b" value="Alliance or corp buyback">
-          <label class="opt-label" for="q6b"><span class="opt-indicator"></span>🏰 Alliance or corp buyback</label>
+          <label class="opt-label" for="q6b"><span class="opt-indicator"></span>Alliance or corp buyback</label>
 
           <input type="radio" name="q6" id="q6c" value="Mix of both">
-          <label class="opt-label" for="q6c"><span class="opt-indicator"></span>🔀 Mix of both</label>
+          <label class="opt-label" for="q6c"><span class="opt-indicator"></span>Mix of both</label>
 
           <input type="radio" name="q6" id="q6d" value="I stockpile / sell inconsistently">
-          <label class="opt-label" for="q6d"><span class="opt-indicator"></span>❓ I stockpile / sell inconsistently</label>
+          <label class="opt-label" for="q6d"><span class="opt-indicator"></span>I stockpile / sell inconsistently</label>
         </div>
       </div>
     </div>
 
     <!-- ── SECTION 3: Interest Level ── -->
     <div class="section">
-      <div class="section-label">🤝 Section 3 — Interest in the Program</div>
+      <div class="section-label">Section 3 — Interest in the Program</div>
 
       <!-- Q7 -->
       <div class="question">
@@ -508,16 +676,16 @@ STEP 4 — Paste the URL below, replacing the placeholder:
         </div>
         <div class="radio-group">
           <input type="radio" name="q7" id="q7a" value="Very interested — I want to set up a slot">
-          <label class="opt-label" for="q7a"><span class="opt-indicator"></span>✅ Very interested — I want to set up a slot</label>
+          <label class="opt-label" for="q7a"><span class="opt-indicator"></span>Very interested — I want to set up a slot</label>
 
           <input type="radio" name="q7" id="q7b" value="Interested but have questions">
-          <label class="opt-label" for="q7b"><span class="opt-indicator"></span>🤔 Interested but have questions first</label>
+          <label class="opt-label" for="q7b"><span class="opt-indicator"></span>Interested but have questions first</label>
 
           <input type="radio" name="q7" id="q7c" value="Neutral / not sure yet">
-          <label class="opt-label" for="q7c"><span class="opt-indicator"></span>😐 Neutral / not sure yet</label>
+          <label class="opt-label" for="q7c"><span class="opt-indicator"></span>Neutral / not sure yet</label>
 
           <input type="radio" name="q7" id="q7d" value="Not interested right now">
-          <label class="opt-label" for="q7d"><span class="opt-indicator"></span>❌ Not interested right now</label>
+          <label class="opt-label" for="q7d"><span class="opt-indicator"></span>Not interested right now</label>
         </div>
         <div class="err-msg" id="q7-err">Please select an answer.</div>
       </div>
@@ -527,19 +695,19 @@ STEP 4 — Paste the URL below, replacing the placeholder:
         <div class="q-label"><span class="q-num">Q8</span> What would matter most to you in a consignment deal? <span class="opt-em">(pick up to 3)</span></div>
         <div class="check-group" id="q8-group">
           <input type="checkbox" class="q8-cb" name="q8" id="q8a" value="Best possible ISK/unit return">
-          <label class="opt-label" for="q8a"><span class="opt-indicator"></span>💰 Best possible ISK/unit return</label>
+          <label class="opt-label" for="q8a"><span class="opt-indicator"></span>Best possible ISK/unit return</label>
 
           <input type="checkbox" class="q8-cb" name="q8" id="q8b" value="No hauling — sell out of the citadel directly">
-          <label class="opt-label" for="q8b"><span class="opt-indicator"></span>📍 No hauling — sell out of the citadel directly</label>
+          <label class="opt-label" for="q8b"><span class="opt-indicator"></span>No hauling — sell out of the citadel directly</label>
 
           <input type="checkbox" class="q8-cb" name="q8" id="q8c" value="Exclusive slot — predictable monthly income with no item competition">
-          <label class="opt-label" for="q8c"><span class="opt-indicator"></span>🔒 Exclusive slot — predictable income, no item competition</label>
+          <label class="opt-label" for="q8c"><span class="opt-indicator"></span>Exclusive slot — predictable income, no item competition</label>
 
           <input type="checkbox" class="q8-cb" name="q8" id="q8d" value="Simple setup and low overhead">
-          <label class="opt-label" for="q8d"><span class="opt-indicator"></span>📋 Simple setup and low overhead</label>
+          <label class="opt-label" for="q8d"><span class="opt-indicator"></span>Simple setup and low overhead</label>
 
           <input type="checkbox" class="q8-cb" name="q8" id="q8e" value="Flexible terms — easy to exit if I stop playing">
-          <label class="opt-label" for="q8e"><span class="opt-indicator"></span>🚪 Flexible terms — easy to exit if life gets busy</label>
+          <label class="opt-label" for="q8e"><span class="opt-indicator"></span>Flexible terms — easy to exit if life gets busy</label>
         </div>
         <div id="q8-count-note" style="color:var(--muted);font-size:0.75rem;margin-top:6px;">Select up to 3</div>
       </div>
@@ -553,7 +721,7 @@ STEP 4 — Paste the URL below, replacing the placeholder:
 
     <!-- ── YOUR INFO ── -->
     <div class="section">
-      <div class="section-label">🪪 Your Info</div>
+      <div class="section-label">Your Info</div>
       <div class="question">
         <div class="q-label"><span class="q-num">—</span> In-Game Name <span class="opt-em">(optional — for follow-up only)</span></div>
         <input type="text" class="text-input" id="ign" placeholder="Character name">
@@ -627,7 +795,7 @@ STEP 4 — Paste the URL below, replacing the placeholder:
       q1:  q1val.value,
       q2:  document.querySelector('input[name=q2]:checked')?.value || '—',
       q3:  [...document.querySelectorAll('input[name=q3]:checked')].map(c => c.value).join(', ') || '—',
-      q4:  document.getElementById('q4').value.trim() || '—',
+      q4:  [...document.querySelectorAll('input[name=q4]:checked')].map(c => c.value).join(', ') || '—',
       q5:  document.querySelector('input[name=q5]:checked')?.value || '—',
       q6:  document.querySelector('input[name=q6]:checked')?.value || '—',
       q7:  q7val.value,
