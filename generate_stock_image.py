@@ -106,15 +106,36 @@ def main():
     conn = sqlite3.connect(DB_PATH)
     c    = conn.cursor()
 
-    # Fetch ALL items (including out of stock) with buyback flag
-    c.execute('''
+    # Load visibility flags from site_config
+    vis_rows = c.execute(
+        "SELECT key, value FROM site_config WHERE key LIKE 'market_tab_%'"
+    ).fetchall()
+    vis = {k: (str(v) == '1') for k, v in vis_rows}
+    show_minerals = vis.get('market_tab_minerals',      True)
+    show_ice      = vis.get('market_tab_ice_products',  True)
+    show_moon     = vis.get('market_tab_moon_materials', True)
+
+    # Fetch items only for visible categories
+    visible_cats = [c_name for c_name, flag in [
+        ('minerals',       show_minerals),
+        ('ice_products',   show_ice),
+        ('moon_materials', show_moon),
+    ] if flag]
+
+    if not visible_cats:
+        print('No visible categories — nothing to render.')
+        conn.close()
+        return
+
+    placeholders = ','.join('?' * len(visible_cats))
+    c.execute(f'''
         SELECT tm.category, t.type_name, i.quantity, tm.buyback_accepted
         FROM lx_zoj_current_inventory i
         JOIN tracked_market_items tm ON i.type_id = tm.type_id
         JOIN inv_types t             ON i.type_id = t.type_id
-        WHERE tm.category IN ('minerals', 'ice_products', 'moon_materials')
+        WHERE tm.category IN ({placeholders})
         ORDER BY tm.category, tm.display_order
-    ''')
+    ''', visible_cats)
     rows = c.fetchall()
 
     c.execute('SELECT MAX(snapshot_timestamp) FROM lx_zoj_inventory')
@@ -125,9 +146,9 @@ def main():
     for cat, name, qty, buyback in rows:
         by_cat.setdefault(cat, []).append((name, qty, buyback))
 
-    minerals  = by_cat.get('minerals',       [])
-    ice       = by_cat.get('ice_products',   [])
-    moon_mats = by_cat.get('moon_materials', [])
+    minerals  = by_cat.get('minerals',       []) if show_minerals else []
+    ice       = by_cat.get('ice_products',   []) if show_ice      else []
+    moon_mats = by_cat.get('moon_materials', []) if show_moon     else []
 
     try:
         dt     = datetime.fromisoformat(snap_ts)
@@ -138,17 +159,30 @@ def main():
     # ── Calculate heights ─────────────────────────────────────────────────
     HDR_H   = 72
     SEC_HDR = 24
-    FOOTER  = 46   # taller to fit legend
+    FOOTER  = 46
     GAP     = 16
 
     col_w     = (W - PAD * 2 - COL_GAP) // 2
+    full_w    = W - PAD * 2
     half_moon = (len(moon_mats) + 1) // 2
 
-    top_rows = max(len(minerals), len(ice))
-    top_h    = SEC_HDR + top_rows * ROW_H + GAP
-    moon_h   = SEC_HDR + half_moon * ROW_H + GAP
+    # Top pair: minerals and/or ice
+    show_top = show_minerals or show_ice
+    if show_minerals and show_ice:
+        top_rows = max(len(minerals), len(ice))
+    elif show_minerals:
+        top_rows = len(minerals)
+    elif show_ice:
+        top_rows = len(ice)
+    else:
+        top_rows = 0
 
-    total_h  = HDR_H + PAD + top_h + GAP + moon_h + FOOTER
+    total_h = HDR_H + PAD
+    if show_top:
+        total_h += SEC_HDR + top_rows * ROW_H + GAP
+    if show_moon:
+        total_h += SEC_HDR + half_moon * ROW_H + GAP
+    total_h += FOOTER
 
     # ── Render ───────────────────────────────────────────────────────────
     img  = Image.new('RGB', (W, total_h), BG)
@@ -164,37 +198,42 @@ def main():
     x_l = PAD
     x_r = PAD + col_w + COL_GAP
 
-    # Minerals (left) + Ice Products (right)
-    y_after_l = draw_section(draw, 'MINERALS',     minerals, x_l, y, col_w)
-    y_after_r = draw_section(draw, 'ICE PRODUCTS', ice,      x_r, y, col_w)
-    y = max(y_after_l, y_after_r) + GAP
+    # Top section: minerals and/or ice
+    if show_minerals and show_ice:
+        # Side by side
+        y_after_l = draw_section(draw, 'MINERALS',     minerals, x_l, y, col_w)
+        y_after_r = draw_section(draw, 'ICE PRODUCTS', ice,      x_r, y, col_w)
+        y = max(y_after_l, y_after_r) + GAP
+    elif show_minerals:
+        y = draw_section(draw, 'MINERALS', minerals, x_l, y, full_w) + GAP
+    elif show_ice:
+        y = draw_section(draw, 'ICE PRODUCTS', ice, x_l, y, full_w) + GAP
 
-    # Moon materials — full-width header, two-column rows with shared stripes
-    full_w = W - PAD * 2
-    draw.text((x_l, y), 'MOON MATERIALS', font=F_HDR, fill=ACCENT)
-    line_y = y + 18
-    draw.line([(x_l, line_y), (x_l + full_w, line_y)], fill=DIM, width=1)
-    yr = line_y + 5
+    # Moon materials — full-width, two columns
+    if show_moon:
+        draw.text((x_l, y), 'MOON MATERIALS', font=F_HDR, fill=ACCENT)
+        line_y = y + 18
+        draw.line([(x_l, line_y), (x_l + full_w, line_y)], fill=DIM, width=1)
+        yr = line_y + 5
 
-    left_moon  = moon_mats[:half_moon]
-    right_moon = moon_mats[half_moon:]
+        left_moon  = moon_mats[:half_moon]
+        right_moon = moon_mats[half_moon:]
 
-    for i in range(half_moon):
-        row_bg = BG_ROW_B if i % 2 == 1 else BG_ROW_A
-        draw.rectangle([(x_l, yr), (x_l + full_w, yr + ROW_H - 1)], fill=row_bg)
-        if i < len(left_moon):
-            name, qty, buyback = left_moon[i]
-            draw_item_row(draw, x_l, yr, col_w, name, qty, buyback, row_bg)
-        if i < len(right_moon):
-            name, qty, buyback = right_moon[i]
-            draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg)
-        yr += ROW_H
+        for i in range(half_moon):
+            row_bg = BG_ROW_B if i % 2 == 1 else BG_ROW_A
+            draw.rectangle([(x_l, yr), (x_l + full_w, yr + ROW_H - 1)], fill=row_bg)
+            if i < len(left_moon):
+                name, qty, buyback = left_moon[i]
+                draw_item_row(draw, x_l, yr, col_w, name, qty, buyback, row_bg)
+            if i < len(right_moon):
+                name, qty, buyback = right_moon[i]
+                draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg)
+            yr += ROW_H
 
     # Footer with legend
     footer_y = total_h - FOOTER
     draw.line([(0, footer_y), (W, footer_y)], fill=DIM, width=1)
 
-    # Legend: buyback indicator explanation
     lx = PAD
     ly = footer_y + 10
     draw.rectangle([(lx, ly + 1), (lx + BB_BAR, ly + 13)], fill=GOLD)
@@ -213,6 +252,8 @@ def main():
     img.save(OUT_PATH, optimize=True)
     print(f'Saved:  {OUT_PATH}')
     print(f'Size      {W} x {total_h} px')
+    shown = ', '.join(c.title().replace('_', ' ') for c in visible_cats)
+    print(f'Shown:    {shown}')
 
 
 if __name__ == '__main__':
