@@ -110,25 +110,43 @@ def main():
     conn = sqlite3.connect(DB_PATH)
     c    = conn.cursor()
 
+    # Load visibility flags from site_config
+    vis_rows = c.execute(
+        "SELECT key, value FROM site_config WHERE key LIKE 'market_sub_ice_%'"
+    ).fetchall()
+    vis = {k: (str(v) == '1') for k, v in vis_rows}
+    show_fuel     = vis.get('market_sub_ice_products_fuel_blocks', True)
+    show_refined  = vis.get('market_sub_ice_products_refined_ice', True)
+    show_isotopes = vis.get('market_sub_ice_products_isotopes',    True)
+
+    def ice_sub_visible(display_order):
+        if display_order <= 8:   return show_fuel
+        if display_order <= 11:  return show_refined
+        return show_isotopes
+
     c.execute('''
-        SELECT t.type_name, i.quantity, tm.buyback_accepted
+        SELECT t.type_name, i.quantity, tm.buyback_accepted, tm.display_order
         FROM lx_zoj_current_inventory i
         JOIN tracked_market_items tm ON i.type_id = tm.type_id
         JOIN inv_types t             ON i.type_id = t.type_id
         WHERE tm.category = 'ice_products'
         ORDER BY tm.display_order
     ''')
-    all_ice = c.fetchall()
+    all_ice = [r for r in c.fetchall() if ice_sub_visible(r[3])]
 
     c.execute('SELECT MAX(snapshot_timestamp) FROM lx_zoj_inventory')
     snap_ts = c.fetchone()[0] or ''
     conn.close()
 
-    # Split into isotopes vs auxiliaries
+    if not all_ice:
+        print('No visible ice product sub-categories — nothing to render.')
+        return
+
+    # Split into isotopes vs auxiliaries (fuel blocks + refined ice)
     isotope_names = {'Oxygen Isotopes', 'Hydrogen Isotopes',
                      'Helium Isotopes', 'Nitrogen Isotopes'}
-    isotopes   = [r for r in all_ice if r[0] in isotope_names]
-    aux        = [r for r in all_ice if r[0] not in isotope_names]
+    isotopes = [(n, q, b) for n, q, b, _ in all_ice if n     in isotope_names]
+    aux      = [(n, q, b) for n, q, b, _ in all_ice if n not in isotope_names]
 
     try:
         dt     = datetime.fromisoformat(snap_ts)
@@ -137,16 +155,24 @@ def main():
         ts_str = snap_ts
 
     # ── Layout heights ────────────────────────────────────────────────────
-    HDR_H  = 76
-    SEC_H  = 26   # section label + divider
-    FOOTER = 46
-    GAP    = 18
+    HDR_H   = 76
+    SEC_H   = 26
+    FOOTER  = 46
+    GAP     = 18
     COL_GAP = 20
 
-    col_w   = (W - PAD * 2 - COL_GAP) // 2
-    iso_h   = SEC_H + len(isotopes) * ROW_H
-    aux_h   = SEC_H + len(aux)      * ROW_H
-    body_h  = max(iso_h, aux_h)
+    col_w  = (W - PAD * 2 - COL_GAP) // 2
+    full_w = W - PAD * 2
+
+    show_iso = bool(isotopes)
+    show_aux = bool(aux)
+
+    if show_iso and show_aux:
+        body_h = max(SEC_H + len(isotopes) * ROW_H, SEC_H + len(aux) * ROW_H)
+    elif show_iso:
+        body_h = SEC_H + len(isotopes) * ROW_H
+    else:
+        body_h = SEC_H + len(aux) * ROW_H
 
     total_h = HDR_H + PAD + body_h + GAP + FOOTER
 
@@ -164,8 +190,13 @@ def main():
     x_l = PAD
     x_r = PAD + col_w + COL_GAP
 
-    draw_group(draw, 'ISOTOPES',              isotopes, x_l, y, col_w)
-    draw_group(draw, 'FUEL BLOCK COMPONENTS', aux,      x_r, y, col_w)
+    if show_iso and show_aux:
+        draw_group(draw, 'ISOTOPES',              isotopes, x_l, y, col_w)
+        draw_group(draw, 'FUEL BLOCK COMPONENTS', aux,      x_r, y, col_w)
+    elif show_iso:
+        draw_group(draw, 'ISOTOPES',              isotopes, x_l, y, full_w)
+    else:
+        draw_group(draw, 'FUEL BLOCK COMPONENTS', aux,      x_l, y, full_w)
 
     # Footer
     footer_y = total_h - FOOTER
