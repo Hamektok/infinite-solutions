@@ -442,6 +442,57 @@
             padding-top: 0;
         }
 
+        .pi-tier-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 0 20px 0;
+            margin-top: -25px;
+            flex-wrap: wrap;
+        }
+
+        .pi-tier-tab {
+            padding: 6px 18px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 100, 150, 0.1);
+            color: #7ac8e0;
+            border: 1px solid #1a3d55;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pi-tier-tab:hover {
+            background: rgba(0, 200, 255, 0.12);
+            border-color: #008aaa;
+            color: #c0eeff;
+        }
+
+        .pi-tier-tab.active {
+            background: rgba(0, 200, 255, 0.18);
+            border-color: #00aacc;
+            color: #00d9ff;
+        }
+
+        .ice-group-divider {
+            grid-column: 1 / -1;
+            color: rgba(160, 190, 210, 0.6);
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+            margin-top: 16px;
+        }
+
+        .ice-group-divider:first-child {
+            margin-top: 0;
+        }
+
         .item {
             background: rgba(0, 50, 80, 0.3);
             border: 1px solid rgba(0, 217, 255, 0.3);
@@ -2109,9 +2160,10 @@
             <div id="market-tab" class="tab-content active">
                 <!-- SUB TABS -->
                 <div class="sub-tabs">
-                    <button class="sub-tab active" onclick="showSubTab('minerals')">Minerals</button>
-                    <button class="sub-tab" onclick="showSubTab('ice')">Ice Products</button>
-                    <button class="sub-tab" onclick="showSubTab('moon')">Moon Materials</button>
+                    <button class="sub-tab active" onclick="showSubTab('minerals')" data-market-tab="minerals">Minerals</button>
+                    <button class="sub-tab" onclick="showSubTab('ice')" data-market-tab="ice_products">Ice Products</button>
+                    <button class="sub-tab" onclick="showSubTab('moon')" data-market-tab="moon_materials">Moon Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('pi')" data-market-tab="pi_materials">Planetary Materials</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" style="display:none;">Salvage</button>
                 </div>
 
@@ -2128,7 +2180,23 @@
 
                     <!-- MOON MATERIALS SUB-CONTENT -->
                     <div id="moon-content" class="tab-content">
-                        <div id="moon-materials"></div>
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab moon-tier-tab active" onclick="filterMoon(this, 'raw')" data-market-sub="moon_materials:raw">Raw</button>
+                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'processed')" data-market-sub="moon_materials:processed">Processed</button>
+                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'advanced')" data-market-sub="moon_materials:advanced">Advanced</button>
+                        </div>
+                        <div class="item-grid" id="moon-materials"></div>
+                    </div>
+
+                    <!-- PLANETARY MATERIALS SUB-CONTENT -->
+                    <div id="pi-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab active" onclick="filterPI(this, 'p1')" data-market-sub="pi_materials:p1">P1 - Processed</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p2')" data-market-sub="pi_materials:p2">P2 - Refined</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p3')" data-market-sub="pi_materials:p3">P3 - Specialized</button>
+                            <button class="pi-tier-tab" onclick="filterPI(this, 'p4')" data-market-sub="pi_materials:p4">P4 - Advanced</button>
+                        </div>
+                        <div class="item-grid" id="pi-grid"></div>
                     </div>
 
                     <!-- SALVAGE SUB-CONTENT (hidden initially) -->
@@ -2780,7 +2848,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Hedbergite II-Grade": 0,
                         "Hedbergite III-Grade": 0,
                         "Hedbergite IV-Grade": 0,
-                        "Helium Isotopes": 448835,
+                        "Helium Isotopes": 30018,
                         "Hemorphite": 0,
                         "Hemorphite II-Grade": 0,
                         "Hemorphite III-Grade": 0,
@@ -2792,7 +2860,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Hezorime IV-Grade": 0,
                         "High-Tech Transmitters": 0,
                         "Hydrocarbons": 0,
-                        "Hydrogen Isotopes": 295200,
+                        "Hydrogen Isotopes": 0,
                         "Impetus Console": 0,
                         "Industrial Explosives": 0,
                         "Industrial Fibers": 0,
@@ -2824,7 +2892,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Lorentz Fluid": 0,
                         "Malfunctioning Shield Emitter": 11,
                         "Mechanical Parts": 0,
-                        "Megacyte": 18641,
+                        "Megacyte": 16484,
                         "Melted Capacitor Console": 5,
                         "Mercoxit": 0,
                         "Mercoxit II-Grade": 0,
@@ -2861,7 +2929,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Oxides": 0,
                         "Oxidizing Compound": 0,
                         "Oxygen": 0,
-                        "Oxygen Isotopes": 714673,
+                        "Oxygen Isotopes": 295856,
                         "Plagioclase": 0,
                         "Plagioclase II-Grade": 0,
                         "Plagioclase III-Grade": 0,
@@ -2877,7 +2945,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Precious Metals": 0,
                         "Promethium": 7948,
                         "Proteins": 0,
-                        "Pyerite": 61669255,
+                        "Pyerite": 0,
                         "Pyroxeres": 0,
                         "Pyroxeres II-Grade": 0,
                         "Pyroxeres III-Grade": 0,
@@ -2970,10 +3038,10 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Ytterbite": 58,
                         "Zeolites": 0,
                         "Zircon": 62,
-                        "Zydrine": 315959
+                        "Zydrine": 0
             },
             "blueprintsLastUpdated": "Mar 03, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Mar 03, 2026 14:08 EVE"
+            "inventoryLastUpdated": "Mar 04, 2026 02:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -4906,17 +4974,71 @@ Tip: Copy directly from EVE inventory window"></textarea>
             'Nocxium', 'Zydrine', 'Megacyte', 'Morphite'
         ];
 
-        const ICE_PRODUCTS = [
-            'Heavy Water', 'Liquid Ozone', 'Strontium Clathrates',
-            'Oxygen Isotopes', 'Hydrogen Isotopes', 'Helium Isotopes', 'Nitrogen Isotopes'
-        ];
+        const ICE_PRODUCTS = {
+            'Fuel Blocks': [
+                'Nitrogen Fuel Block', 'Hydrogen Fuel Block', 'Helium Fuel Block', 'Oxygen Fuel Block'
+            ],
+            'Refined Ice': [
+                'Heavy Water', 'Liquid Ozone', 'Strontium Clathrates'
+            ],
+            'Isotopes': [
+                'Oxygen Isotopes', 'Hydrogen Isotopes', 'Helium Isotopes', 'Nitrogen Isotopes'
+            ],
+        };
 
         const MOON_MATERIALS = {
-            'R4 - Ubiquitous': ['Atmospheric Gases', 'Evaporite Deposits', 'Hydrocarbons', 'Silicates'],
-            'R8 - Common': ['Cobalt', 'Scandium', 'Tungsten', 'Titanium'],
-            'R16 - Uncommon': ['Chromium', 'Cadmium', 'Platinum', 'Vanadium'],
-            'R32 - Rare': ['Technetium', 'Mercury', 'Caesium', 'Hafnium'],
-            'R64 - Exceptional': ['Promethium', 'Neodymium', 'Dysprosium', 'Thulium']
+            raw: {
+                'R4 - Ubiquitous': ['Atmospheric Gases', 'Evaporite Deposits', 'Hydrocarbons', 'Silicates'],
+                'R8 - Common': ['Cobalt', 'Scandium', 'Tungsten', 'Titanium'],
+                'R16 - Uncommon': ['Chromium', 'Cadmium', 'Platinum', 'Vanadium'],
+                'R32 - Rare': ['Technetium', 'Mercury', 'Caesium', 'Hafnium'],
+                'R64 - Exceptional': ['Promethium', 'Neodymium', 'Dysprosium', 'Thulium'],
+            },
+            processed: [
+                'Titanium Chromide', 'Crystallite Alloy', 'Fernite Alloy', 'Rolled Tungsten Alloy',
+                'Silicon Diborite', 'Carbon Polymers', 'Ceramic Powder', 'Sulfuric Acid',
+                'Platinum Technite', 'Caesarium Cadmide', 'Solerium', 'Hexite', 'Hyperflurite',
+                'Neo Mercurite', 'Dysporite', 'Ferrofluid', 'Fluxed Condensates', 'Vanadium Hafnite',
+                'Prometium', 'Thulium Hafnite', 'Promethium Mercurite', 'Carbon Fiber',
+                'Oxy-Organic Solvents', 'Thermosetting Polymer',
+            ],
+            advanced: [
+                'Crystalline Carbonide', 'Fermionic Condensates', 'Fernite Carbide', 'Ferrogel',
+                'Fullerides', 'Hypersynaptic Fibers', 'Nanotransistors', 'Phenolic Composites',
+                'Sylramic Fibers', 'Titanium Carbide', 'Tungsten Carbide',
+                'Nonlinear Metamaterials', 'Photonic Metamaterials',
+                'Plasmonic Metamaterials', 'Terahertz Metamaterials',
+            ],
+        };
+
+        const PLANETARY_MATERIALS = {
+            'P1 - Processed': [
+                'Bacteria', 'Biofuels', 'Biomass', 'Chiral Structures', 'Electrolytes',
+                'Industrial Fibers', 'Oxidizing Compound', 'Oxygen', 'Plasmoids',
+                'Precious Metals', 'Proteins', 'Reactive Metals', 'Silicon', 'Toxic Metals', 'Water'
+            ],
+            'P2 - Refined': [
+                'Biocells', 'Construction Blocks', 'Consumer Electronics', 'Coolant',
+                'Data Sheets', 'Enriched Uranium', 'Genetically Enhanced Livestock',
+                'Mechanical Parts', 'Microfiber Shielding', 'Miniature Electronics',
+                'Nanites', 'Oxides', 'Polyaramids', 'Polytextiles', 'Rocket Fuel',
+                'Silicate Glass', 'Superconductors', 'Supertensile Plastics',
+                'Synthetic Oil', 'Test Cultures', 'Transmitter', 'Viral Agent'
+            ],
+            'P3 - Specialized': [
+                'Biotech Research Reports', 'Camera Drones', 'Condensates',
+                'Cryoprotectant Solution', 'Data Chips', 'Gel-Matrix Biopaste',
+                'Guidance Systems', 'Hazmat Detection Systems', 'Hermetic Membranes',
+                'High-Tech Transmitters', 'Industrial Explosives', 'Neocoms',
+                'Nuclear Reactors', 'Planetary Vehicles', 'Robotics', 'Smartfab Units',
+                'Supercomputers', 'Synthetic Synapses', 'Transcranial Microcontrollers',
+                'Ukomi Superconductors', 'Vaccines'
+            ],
+            'P4 - Advanced': [
+                'Broadcast Node', 'Integrity Response Drones', 'Nano-Factory',
+                'Organic Mortar Applicators', 'Recursive Computing Module',
+                'Self-Harmonizing Power Core', 'Sterile Conduits', 'Wetware Mainframe'
+            ],
         };
 
         const SALVAGE_MATERIALS = {
@@ -4997,7 +5119,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         function showSubTab(subTabName) {
             // Hide all sub-content
-            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #salvage-content').forEach(content => {
+            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #salvage-content').forEach(content => {
                 content.classList.remove('active');
             });
 
@@ -5020,8 +5142,11 @@ Tip: Copy directly from EVE inventory window"></textarea>
         async function loadInventoryData() {
             const inventory = EMBEDDED_DATA.inventory;
             renderMinerals(inventory);
-            renderIceProducts(inventory);
+            const iceSubs = window.BUYBACK_DATA && BUYBACK_DATA.marketVisibility && BUYBACK_DATA.marketVisibility.ice_products
+                ? BUYBACK_DATA.marketVisibility.ice_products.subs : null;
+            renderIceProducts(inventory, iceSubs);
             renderMoonMaterials(inventory);
+            renderPlanetaryMaterials(inventory);
             renderSalvage(inventory);
         }
 
@@ -5214,32 +5339,102 @@ Tip: Copy directly from EVE inventory window"></textarea>
             });
         }
 
-        function renderIceProducts(inventory) {
+        const ICE_SUBCAT_KEYS = { 'Fuel Blocks': 'fuel_blocks', 'Refined Ice': 'refined_ice', 'Isotopes': 'isotopes' };
+
+        function renderIceProducts(inventory, subVis) {
             const grid = document.getElementById('ice-grid');
             grid.innerHTML = '';
 
-            ICE_PRODUCTS.forEach(product => {
-                const quantity = inventory[product] || 0;
-                const item = createItemCard(product, quantity, getRates(product));
-                grid.appendChild(item);
+            Object.entries(ICE_PRODUCTS).forEach(([group, products]) => {
+                if (subVis) {
+                    const key = ICE_SUBCAT_KEYS[group];
+                    if (key && subVis[key] && !subVis[key].visible) return;
+                }
+                const divider = document.createElement('div');
+                divider.className = 'ice-group-divider';
+                divider.textContent = group;
+                grid.appendChild(divider);
+
+                products.forEach(product => {
+                    const quantity = inventory[product] || 0;
+                    const item = createItemCard(product, quantity, getRates(product));
+                    grid.appendChild(item);
+                });
             });
         }
 
-        function renderMoonMaterials(inventory) {
+        function renderMoonMaterials(inventory, tierFilter = 'raw') {
             const container = document.getElementById('moon-materials');
             container.innerHTML = '';
 
-            Object.entries(MOON_MATERIALS).forEach(([group, materials]) => {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'item-grid moon-material-group';
+            if (tierFilter === 'raw') {
+                Object.entries(MOON_MATERIALS.raw).forEach(([group, materials]) => {
+                    const divider = document.createElement('div');
+                    divider.className = 'ice-group-divider';
+                    divider.textContent = group;
+                    container.appendChild(divider);
+
+                    materials.forEach(material => {
+                        const quantity = inventory[material] || 0;
+                        const item = createItemCard(material, quantity, getRates(material));
+                        container.appendChild(item);
+                    });
+                });
+            } else {
+                MOON_MATERIALS[tierFilter].forEach(material => {
+                    const quantity = inventory[material] || 0;
+                    const item = createItemCard(material, quantity, getRates(material));
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        function filterMoon(btn, tier) {
+            document.querySelectorAll('.moon-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMoonMaterials(EMBEDDED_DATA.inventory, tier);
+        }
+
+        function renderPlanetaryMaterials(inventory, tierFilter = 'p1') {
+            const grid = document.getElementById('pi-grid');
+            grid.innerHTML = '';
+
+            Object.entries(PLANETARY_MATERIALS).forEach(([group, materials]) => {
+                const groupKey = group.split(' ')[0].toLowerCase();
+                if (groupKey !== tierFilter) return;
 
                 materials.forEach(material => {
                     const quantity = inventory[material] || 0;
                     const item = createItemCard(material, quantity, getRates(material));
-                    groupDiv.appendChild(item);
+                    grid.appendChild(item);
                 });
+            });
+        }
 
-                container.appendChild(groupDiv);
+        function filterPI(btn, tier) {
+            document.querySelectorAll('.pi-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderPlanetaryMaterials(EMBEDDED_DATA.inventory, tier);
+        }
+
+        function applyMarketVisibility() {
+            if (!window.BUYBACK_DATA || !BUYBACK_DATA.marketVisibility) return;
+            const mv = BUYBACK_DATA.marketVisibility;
+
+            // Show/hide market sub-tab buttons
+            document.querySelectorAll('[data-market-tab]').forEach(btn => {
+                const tabKey = btn.getAttribute('data-market-tab');
+                if (mv[tabKey] !== undefined) {
+                    btn.style.display = mv[tabKey].visible ? '' : 'none';
+                }
+            });
+
+            // Show/hide subcategory filter buttons (moon / PI)
+            document.querySelectorAll('[data-market-sub]').forEach(btn => {
+                const [tabKey, subKey] = btn.getAttribute('data-market-sub').split(':');
+                if (mv[tabKey] && mv[tabKey].subs && mv[tabKey].subs[subKey] !== undefined) {
+                    btn.style.display = mv[tabKey].subs[subKey].visible ? '' : 'none';
+                }
             });
         }
 
@@ -6399,6 +6594,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         document.addEventListener('DOMContentLoaded', function() {
             loadInventoryData();
+            applyMarketVisibility();
             loadBlueprintData();
             loadBPCData();  // Load BPC data for BPC tab
             loadResearchJobs();

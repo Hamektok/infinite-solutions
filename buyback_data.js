@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-03 05:45 UTC
+// Generated: 2026-03-04 03:57 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -13,7 +13,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 315030.6775
+      "avgJitaBuy": 311681.3915
     },
     {
       "typeId": 16263,
@@ -26,7 +26,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 203177.361
+      "avgJitaBuy": 199674.2397
     },
     {
       "typeId": 16264,
@@ -39,7 +39,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 291827.8025
+      "avgJitaBuy": 291814.1173
     },
     {
       "typeId": 16265,
@@ -52,7 +52,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 269806.8332
+      "avgJitaBuy": 269646.8169
     },
     {
       "typeId": 16266,
@@ -65,7 +65,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 292189.1443
+      "avgJitaBuy": 294509.2723
     },
     {
       "typeId": 16267,
@@ -78,7 +78,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 386547.7712
+      "avgJitaBuy": 389461.272
     },
     {
       "typeId": 16268,
@@ -91,7 +91,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 404184.197
+      "avgJitaBuy": 408259.4837
     },
     {
       "typeId": 16269,
@@ -104,7 +104,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 597412.1514
+      "avgJitaBuy": 603947.3356
     },
     {
       "typeId": 17975,
@@ -117,7 +117,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 343320.2158
+      "avgJitaBuy": 343314.5695
     },
     {
       "typeId": 17976,
@@ -130,7 +130,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 317629.085
+      "avgJitaBuy": 317452.719
     },
     {
       "typeId": 17977,
@@ -143,7 +143,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 239894.7008
+      "avgJitaBuy": 235818.0456
     },
     {
       "typeId": 17978,
@@ -156,7 +156,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 370390.2367
+      "avgJitaBuy": 366493.0561
     },
     {
       "typeId": 28433,
@@ -169,7 +169,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 291827.8025
+      "avgJitaBuy": 291814.1173
     },
     {
       "typeId": 28443,
@@ -182,7 +182,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 343320.2158
+      "avgJitaBuy": 343314.5695
     },
     {
       "typeId": 28434,
@@ -195,7 +195,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 315030.6775
+      "avgJitaBuy": 311681.3915
     },
     {
       "typeId": 28436,
@@ -208,7 +208,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 370390.2367
+      "avgJitaBuy": 366493.0561
     },
     {
       "typeId": 28435,
@@ -221,7 +221,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 386547.7712
+      "avgJitaBuy": 389461.272
     },
     {
       "typeId": 28437,
@@ -234,7 +234,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 404184.197
+      "avgJitaBuy": 408259.4837
     },
     {
       "typeId": 28438,
@@ -247,7 +247,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 203177.361
+      "avgJitaBuy": 199674.2397
     },
     {
       "typeId": 28442,
@@ -260,7 +260,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 239894.7008
+      "avgJitaBuy": 235818.0456
     },
     {
       "typeId": 28439,
@@ -273,7 +273,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 292189.1443
+      "avgJitaBuy": 294509.2723
     },
     {
       "typeId": 28440,
@@ -286,7 +286,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 597412.1514
+      "avgJitaBuy": 603947.3356
     },
     {
       "typeId": 28444,
@@ -299,7 +299,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 269806.8332
+      "avgJitaBuy": 269646.8169
     },
     {
       "typeId": 28441,
@@ -312,7 +312,59 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 317629.085
+      "avgJitaBuy": 317452.719
+    },
+    {
+      "typeId": 4051,
+      "name": "Nitrogen Fuel Block",
+      "category": "ice_products",
+      "displayCategory": "Ice Products",
+      "rate": 101,
+      "sellRate": 101,
+      "corpRate": 98,
+      "allianceDiscount": 3,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 4246,
+      "name": "Hydrogen Fuel Block",
+      "category": "ice_products",
+      "displayCategory": "Ice Products",
+      "rate": 101,
+      "sellRate": 101,
+      "corpRate": 98,
+      "allianceDiscount": 3,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 16789.17
+    },
+    {
+      "typeId": 4247,
+      "name": "Helium Fuel Block",
+      "category": "ice_products",
+      "displayCategory": "Ice Products",
+      "rate": 101,
+      "sellRate": 101,
+      "corpRate": 98,
+      "allianceDiscount": 3,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 16993.33
+    },
+    {
+      "typeId": 4312,
+      "name": "Oxygen Fuel Block",
+      "category": "ice_products",
+      "displayCategory": "Ice Products",
+      "rate": 101,
+      "sellRate": 101,
+      "corpRate": 98,
+      "allianceDiscount": 3,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 18099.72
     },
     {
       "typeId": 16272,
@@ -325,7 +377,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 3,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 103.74
+      "avgJitaBuy": 104.64
     },
     {
       "typeId": 16273,
@@ -338,7 +390,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 3,
       "accepted": false,
       "quota": 1000000,
-      "avgJitaBuy": 89.63
+      "avgJitaBuy": 89.43
     },
     {
       "typeId": 16275,
@@ -351,7 +403,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 3,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3348.53
+      "avgJitaBuy": 3390.11
     },
     {
       "typeId": 17887,
@@ -364,7 +416,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 744.82
+      "avgJitaBuy": 744.55
     },
     {
       "typeId": 17889,
@@ -377,7 +429,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 508.55
+      "avgJitaBuy": 498.98
     },
     {
       "typeId": 16274,
@@ -390,7 +442,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 806.66
+      "avgJitaBuy": 797.5
     },
     {
       "typeId": 17888,
@@ -403,7 +455,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 686.13
+      "avgJitaBuy": 685.47
     },
     {
       "typeId": 34,
@@ -416,7 +468,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 100000000,
-      "avgJitaBuy": 3.91
+      "avgJitaBuy": 3.9
     },
     {
       "typeId": 35,
@@ -429,7 +481,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": false,
       "quota": 100000000,
-      "avgJitaBuy": 17.59
+      "avgJitaBuy": 17.51
     },
     {
       "typeId": 37,
@@ -442,7 +494,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": false,
       "quota": 1000000,
-      "avgJitaBuy": 179.25
+      "avgJitaBuy": 180.33
     },
     {
       "typeId": 36,
@@ -455,7 +507,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": false,
       "quota": 1000000,
-      "avgJitaBuy": 68.93
+      "avgJitaBuy": 69.5
     },
     {
       "typeId": 38,
@@ -468,7 +520,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": false,
       "quota": 1000000,
-      "avgJitaBuy": 676.21
+      "avgJitaBuy": 678.31
     },
     {
       "typeId": 39,
@@ -481,7 +533,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": false,
       "quota": 50000,
-      "avgJitaBuy": 895.35
+      "avgJitaBuy": 902.91
     },
     {
       "typeId": 40,
@@ -494,7 +546,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": false,
       "quota": 50000,
-      "avgJitaBuy": 2480.11
+      "avgJitaBuy": 2461.46
     },
     {
       "typeId": 11399,
@@ -507,7 +559,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": false,
       "quota": 5000,
-      "avgJitaBuy": 18923.64
+      "avgJitaBuy": 18984.56
     },
     {
       "typeId": 16634,
@@ -520,7 +572,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 237.71
+      "avgJitaBuy": 238.91
     },
     {
       "typeId": 16635,
@@ -533,7 +585,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 289.32
+      "avgJitaBuy": 296.27
     },
     {
       "typeId": 16633,
@@ -546,7 +598,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": true,
       "quota": 100000,
-      "avgJitaBuy": 571.63
+      "avgJitaBuy": 575.36
     },
     {
       "typeId": 16636,
@@ -559,7 +611,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 4,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 379.07
+      "avgJitaBuy": 382.89
     },
     {
       "typeId": 16640,
@@ -572,7 +624,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 3,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 566.27
+      "avgJitaBuy": 599.7
     },
     {
       "typeId": 16639,
@@ -585,7 +637,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 3,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 452.69
+      "avgJitaBuy": 454.07
     },
     {
       "typeId": 16637,
@@ -598,7 +650,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 3,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 1420.34
+      "avgJitaBuy": 1436.7
     },
     {
       "typeId": 16638,
@@ -611,7 +663,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 3,
       "accepted": true,
       "quota": 50000,
-      "avgJitaBuy": 762.56
+      "avgJitaBuy": 762.06
     },
     {
       "typeId": 16641,
@@ -624,7 +676,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 5242.57
+      "avgJitaBuy": 5195.25
     },
     {
       "typeId": 16643,
@@ -637,7 +689,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 4187.83
+      "avgJitaBuy": 4205.53
     },
     {
       "typeId": 16644,
@@ -650,7 +702,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 7102.83
+      "avgJitaBuy": 7098.4
     },
     {
       "typeId": 16642,
@@ -663,7 +715,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 25000,
-      "avgJitaBuy": 2011.52
+      "avgJitaBuy": 2032.44
     },
     {
       "typeId": 16649,
@@ -676,7 +728,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 18531.38
+      "avgJitaBuy": 18375.26
     },
     {
       "typeId": 16646,
@@ -689,7 +741,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 3420.05
+      "avgJitaBuy": 3426.79
     },
     {
       "typeId": 16647,
@@ -702,7 +754,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 5108.88
+      "avgJitaBuy": 5072.16
     },
     {
       "typeId": 16648,
@@ -715,7 +767,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 12500,
-      "avgJitaBuy": 9011.02
+      "avgJitaBuy": 8992.95
     },
     {
       "typeId": 16652,
@@ -728,7 +780,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 0,
       "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 63854.31
+      "avgJitaBuy": 64598.6
     },
     {
       "typeId": 16651,
@@ -741,7 +793,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 0,
       "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 63053.1
+      "avgJitaBuy": 61858.07
     },
     {
       "typeId": 16650,
@@ -754,7 +806,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 0,
       "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 57260.69
+      "avgJitaBuy": 57182.28
     },
     {
       "typeId": 16653,
@@ -767,7 +819,514 @@ const BUYBACK_DATA = {
       "allianceDiscount": 0,
       "accepted": false,
       "quota": 6250,
-      "avgJitaBuy": 33894.14
+      "avgJitaBuy": 33945.79
+    },
+    {
+      "typeId": 16654,
+      "name": "Titanium Chromide",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16655,
+      "name": "Crystallite Alloy",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16656,
+      "name": "Fernite Alloy",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16657,
+      "name": "Rolled Tungsten Alloy",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16658,
+      "name": "Silicon Diborite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16659,
+      "name": "Carbon Polymers",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16660,
+      "name": "Ceramic Powder",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16661,
+      "name": "Sulfuric Acid",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16662,
+      "name": "Platinum Technite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16663,
+      "name": "Caesarium Cadmide",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16664,
+      "name": "Solerium",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16665,
+      "name": "Hexite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16666,
+      "name": "Hyperflurite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16667,
+      "name": "Neo Mercurite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16668,
+      "name": "Dysporite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16669,
+      "name": "Ferrofluid",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 17769,
+      "name": "Fluxed Condensates",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 17959,
+      "name": "Vanadium Hafnite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 17960,
+      "name": "Prometium",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 33336,
+      "name": "Thulium Hafnite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 33337,
+      "name": "Promethium Mercurite",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 57453,
+      "name": "Carbon Fiber",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 57454,
+      "name": "Oxy-Organic Solvents",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 57455,
+      "name": "Thermosetting Polymer",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16670,
+      "name": "Crystalline Carbonide",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 17317,
+      "name": "Fermionic Condensates",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16673,
+      "name": "Fernite Carbide",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16683,
+      "name": "Ferrogel",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16679,
+      "name": "Fullerides",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16682,
+      "name": "Hypersynaptic Fibers",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16681,
+      "name": "Nanotransistors",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16680,
+      "name": "Phenolic Composites",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16678,
+      "name": "Sylramic Fibers",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16671,
+      "name": "Titanium Carbide",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 16672,
+      "name": "Tungsten Carbide",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 33362,
+      "name": "Nonlinear Metamaterials",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 33359,
+      "name": "Photonic Metamaterials",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 33361,
+      "name": "Plasmonic Metamaterials",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
+    },
+    {
+      "typeId": 33360,
+      "name": "Terahertz Metamaterials",
+      "category": "moon_materials",
+      "displayCategory": "Reaction Materials",
+      "rate": 98,
+      "sellRate": 101,
+      "corpRate": 97,
+      "allianceDiscount": 4,
+      "accepted": false,
+      "quota": 0,
+      "avgJitaBuy": 0
     },
     {
       "typeId": 45490,
@@ -780,7 +1339,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1665.2642
+      "avgJitaBuy": 1662.2371
     },
     {
       "typeId": 45491,
@@ -793,7 +1352,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1057.9947
+      "avgJitaBuy": 1061.2551
     },
     {
       "typeId": 45492,
@@ -806,7 +1365,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1543.1384
+      "avgJitaBuy": 1543.0519
     },
     {
       "typeId": 45493,
@@ -819,7 +1378,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 792.0296
+      "avgJitaBuy": 794.8962
     },
     {
       "typeId": 46280,
@@ -832,7 +1391,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1915.5924
+      "avgJitaBuy": 1912.114
     },
     {
       "typeId": 46282,
@@ -845,7 +1404,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1217.3494
+      "avgJitaBuy": 1221.1146
     },
     {
       "typeId": 46284,
@@ -858,7 +1417,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1775.9044
+      "avgJitaBuy": 1775.8133
     },
     {
       "typeId": 46286,
@@ -871,7 +1430,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 911.6929
+      "avgJitaBuy": 914.9982
     },
     {
       "typeId": 46281,
@@ -884,7 +1443,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3330.5283
+      "avgJitaBuy": 3324.4743
     },
     {
       "typeId": 46283,
@@ -897,7 +1456,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2115.9894
+      "avgJitaBuy": 2122.5102
     },
     {
       "typeId": 46285,
@@ -910,7 +1469,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3086.2769
+      "avgJitaBuy": 3086.1038
     },
     {
       "typeId": 46287,
@@ -923,7 +1482,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1584.0592
+      "avgJitaBuy": 1589.7925
     },
     {
       "typeId": 45494,
@@ -936,7 +1495,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 205.2842
+      "avgJitaBuy": 217.4032
     },
     {
       "typeId": 45495,
@@ -949,7 +1508,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 164.1092
+      "avgJitaBuy": 164.6095
     },
     {
       "typeId": 45496,
@@ -962,7 +1521,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 276.4433
+      "avgJitaBuy": 276.262
     },
     {
       "typeId": 45497,
@@ -975,7 +1534,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 514.9017
+      "avgJitaBuy": 520.8325
     },
     {
       "typeId": 46288,
@@ -988,7 +1547,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 236.0768
+      "avgJitaBuy": 250.0137
     },
     {
       "typeId": 46290,
@@ -1001,7 +1560,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 188.7256
+      "avgJitaBuy": 189.3009
     },
     {
       "typeId": 46292,
@@ -1014,7 +1573,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 317.9097
+      "avgJitaBuy": 317.7013
     },
     {
       "typeId": 46294,
@@ -1027,7 +1586,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 592.1369
+      "avgJitaBuy": 598.9574
     },
     {
       "typeId": 46289,
@@ -1040,7 +1599,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 410.5684
+      "avgJitaBuy": 434.8065
     },
     {
       "typeId": 46291,
@@ -1053,7 +1612,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 328.2184
+      "avgJitaBuy": 329.2189
     },
     {
       "typeId": 46293,
@@ -1066,7 +1625,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 552.8865
+      "avgJitaBuy": 552.524
     },
     {
       "typeId": 46295,
@@ -1079,7 +1638,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1029.8033
+      "avgJitaBuy": 1041.665
     },
     {
       "typeId": 45498,
@@ -1092,7 +1651,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1539.7158
+      "avgJitaBuy": 1546.2411
     },
     {
       "typeId": 45499,
@@ -1105,7 +1664,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2601.139
+      "avgJitaBuy": 2600.1629
     },
     {
       "typeId": 45500,
@@ -1118,7 +1677,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 763.5713
+      "avgJitaBuy": 771.5015
     },
     {
       "typeId": 45501,
@@ -1131,7 +1690,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1952.3433
+      "avgJitaBuy": 1935.5269
     },
     {
       "typeId": 46296,
@@ -1144,7 +1703,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1771.7503
+      "avgJitaBuy": 1779.2599
     },
     {
       "typeId": 46298,
@@ -1157,7 +1716,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2992.6209
+      "avgJitaBuy": 2991.5299
     },
     {
       "typeId": 46300,
@@ -1170,7 +1729,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 879.8248
+      "avgJitaBuy": 888.9618
     },
     {
       "typeId": 46302,
@@ -1183,7 +1742,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2247.7851
+      "avgJitaBuy": 2228.4632
     },
     {
       "typeId": 46297,
@@ -1196,7 +1755,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3079.4316
+      "avgJitaBuy": 3092.4823
     },
     {
       "typeId": 46299,
@@ -1209,7 +1768,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5202.278
+      "avgJitaBuy": 5200.3258
     },
     {
       "typeId": 46301,
@@ -1222,7 +1781,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1527.1427
+      "avgJitaBuy": 1543.0029
     },
     {
       "typeId": 46303,
@@ -1235,7 +1794,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3904.6866
+      "avgJitaBuy": 3871.0538
     },
     {
       "typeId": 45502,
@@ -1248,7 +1807,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8481.1314
+      "avgJitaBuy": 8413.5785
     },
     {
       "typeId": 45503,
@@ -1261,7 +1820,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4203.9872
+      "avgJitaBuy": 4196.2728
     },
     {
       "typeId": 45504,
@@ -1274,7 +1833,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2433.8265
+      "avgJitaBuy": 2417.819
     },
     {
       "typeId": 45506,
@@ -1287,7 +1846,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1717.8527
+      "avgJitaBuy": 1723.3344
     },
     {
       "typeId": 46304,
@@ -1300,7 +1859,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 9839.3035
+      "avgJitaBuy": 9761.059
     },
     {
       "typeId": 46306,
@@ -1313,7 +1872,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4878.0154
+      "avgJitaBuy": 4869.051
     },
     {
       "typeId": 46308,
@@ -1326,7 +1885,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2822.8076
+      "avgJitaBuy": 2804.2303
     },
     {
       "typeId": 46310,
@@ -1339,7 +1898,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1996.8093
+      "avgJitaBuy": 2003.2022
     },
     {
       "typeId": 46305,
@@ -1352,7 +1911,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 16962.2628
+      "avgJitaBuy": 16827.157
     },
     {
       "typeId": 46307,
@@ -1365,7 +1924,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8407.9744
+      "avgJitaBuy": 8392.5455
     },
     {
       "typeId": 46309,
@@ -1378,7 +1937,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4867.653
+      "avgJitaBuy": 4835.638
     },
     {
       "typeId": 46311,
@@ -1391,7 +1950,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3435.7054
+      "avgJitaBuy": 3446.6689
     },
     {
       "typeId": 45510,
@@ -1404,7 +1963,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 11745.0134
+      "avgJitaBuy": 11737.5526
     },
     {
       "typeId": 45511,
@@ -1417,7 +1976,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13356.9325
+      "avgJitaBuy": 13118.5968
     },
     {
       "typeId": 45512,
@@ -1430,7 +1989,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13561.0532
+      "avgJitaBuy": 13709.9789
     },
     {
       "typeId": 45513,
@@ -1443,7 +2002,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 7344.4919
+      "avgJitaBuy": 7356.9961
     },
     {
       "typeId": 46312,
@@ -1456,7 +2015,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13360.1945
+      "avgJitaBuy": 13351.9226
     },
     {
       "typeId": 46314,
@@ -1469,7 +2028,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15212.794
+      "avgJitaBuy": 14941.7427
     },
     {
       "typeId": 46316,
@@ -1482,7 +2041,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15453.7841
+      "avgJitaBuy": 15623.005
     },
     {
       "typeId": 46318,
@@ -1495,7 +2054,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8372.988
+      "avgJitaBuy": 8387.3077
     },
     {
       "typeId": 46313,
@@ -1508,7 +2067,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 23490.0268
+      "avgJitaBuy": 23475.1051
     },
     {
       "typeId": 46315,
@@ -1521,7 +2080,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 26713.865
+      "avgJitaBuy": 26237.1936
     },
     {
       "typeId": 46317,
@@ -1534,7 +2093,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 27122.1064
+      "avgJitaBuy": 27419.9579
     },
     {
       "typeId": 46319,
@@ -1547,7 +2106,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 14688.9838
+      "avgJitaBuy": 14713.9922
     },
     {
       "typeId": 62454,
@@ -1560,7 +2119,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1543.1384
+      "avgJitaBuy": 1543.0519
     },
     {
       "typeId": 62457,
@@ -1573,7 +2132,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 792.0296
+      "avgJitaBuy": 794.8962
     },
     {
       "typeId": 62455,
@@ -1586,7 +2145,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1775.9044
+      "avgJitaBuy": 1775.8133
     },
     {
       "typeId": 62458,
@@ -1599,7 +2158,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 911.6929
+      "avgJitaBuy": 914.9982
     },
     {
       "typeId": 62461,
@@ -1612,7 +2171,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1217.3494
+      "avgJitaBuy": 1221.1146
     },
     {
       "typeId": 62464,
@@ -1625,7 +2184,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1915.5924
+      "avgJitaBuy": 1912.114
     },
     {
       "typeId": 62456,
@@ -1638,7 +2197,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3086.2769
+      "avgJitaBuy": 3086.1038
     },
     {
       "typeId": 62459,
@@ -1651,7 +2210,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1584.0592
+      "avgJitaBuy": 1589.7925
     },
     {
       "typeId": 62466,
@@ -1664,7 +2223,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2115.9894
+      "avgJitaBuy": 2122.5102
     },
     {
       "typeId": 62467,
@@ -1677,7 +2236,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3330.5283
+      "avgJitaBuy": 3324.4743
     },
     {
       "typeId": 62460,
@@ -1690,7 +2249,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1057.9947
+      "avgJitaBuy": 1061.2551
     },
     {
       "typeId": 62463,
@@ -1703,7 +2262,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1665.2642
+      "avgJitaBuy": 1662.2371
     },
     {
       "typeId": 62474,
@@ -1716,7 +2275,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 205.2842
+      "avgJitaBuy": 217.4032
     },
     {
       "typeId": 62471,
@@ -1729,7 +2288,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 164.1092
+      "avgJitaBuy": 164.6095
     },
     {
       "typeId": 62468,
@@ -1742,7 +2301,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 514.9017
+      "avgJitaBuy": 520.8325
     },
     {
       "typeId": 62477,
@@ -1755,7 +2314,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 276.4433
+      "avgJitaBuy": 276.262
     },
     {
       "typeId": 62475,
@@ -1768,7 +2327,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 236.0768
+      "avgJitaBuy": 250.0137
     },
     {
       "typeId": 62472,
@@ -1781,7 +2340,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 188.7256
+      "avgJitaBuy": 189.3009
     },
     {
       "typeId": 62469,
@@ -1794,7 +2353,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 592.1369
+      "avgJitaBuy": 598.9574
     },
     {
       "typeId": 62478,
@@ -1807,7 +2366,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 317.9097
+      "avgJitaBuy": 317.7013
     },
     {
       "typeId": 62476,
@@ -1820,7 +2379,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 410.5684
+      "avgJitaBuy": 434.8065
     },
     {
       "typeId": 62473,
@@ -1833,7 +2392,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 328.2184
+      "avgJitaBuy": 329.2189
     },
     {
       "typeId": 62470,
@@ -1846,7 +2405,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1029.8033
+      "avgJitaBuy": 1041.665
     },
     {
       "typeId": 62479,
@@ -1859,7 +2418,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 552.8865
+      "avgJitaBuy": 552.524
     },
     {
       "typeId": 62480,
@@ -1872,7 +2431,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1952.3433
+      "avgJitaBuy": 1935.5269
     },
     {
       "typeId": 62483,
@@ -1885,7 +2444,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1539.7158
+      "avgJitaBuy": 1546.2411
     },
     {
       "typeId": 62486,
@@ -1898,7 +2457,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2601.139
+      "avgJitaBuy": 2600.1629
     },
     {
       "typeId": 62489,
@@ -1911,7 +2470,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 763.5713
+      "avgJitaBuy": 771.5015
     },
     {
       "typeId": 62481,
@@ -1924,7 +2483,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2247.7851
+      "avgJitaBuy": 2228.4632
     },
     {
       "typeId": 62484,
@@ -1937,7 +2496,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1771.7503
+      "avgJitaBuy": 1779.2599
     },
     {
       "typeId": 62487,
@@ -1950,7 +2509,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2992.6209
+      "avgJitaBuy": 2991.5299
     },
     {
       "typeId": 62490,
@@ -1963,7 +2522,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 879.8248
+      "avgJitaBuy": 888.9618
     },
     {
       "typeId": 62482,
@@ -1976,7 +2535,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3904.6866
+      "avgJitaBuy": 3871.0538
     },
     {
       "typeId": 62485,
@@ -1989,7 +2548,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3079.4316
+      "avgJitaBuy": 3092.4823
     },
     {
       "typeId": 62488,
@@ -2002,7 +2561,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5202.278
+      "avgJitaBuy": 5200.3258
     },
     {
       "typeId": 62491,
@@ -2015,7 +2574,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1527.1427
+      "avgJitaBuy": 1543.0029
     },
     {
       "typeId": 62492,
@@ -2028,7 +2587,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 8481.1314
+      "avgJitaBuy": 8413.5785
     },
     {
       "typeId": 62501,
@@ -2041,7 +2600,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4203.9872
+      "avgJitaBuy": 4196.2728
     },
     {
       "typeId": 62498,
@@ -2054,7 +2613,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2433.8265
+      "avgJitaBuy": 2417.819
     },
     {
       "typeId": 62495,
@@ -2067,7 +2626,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1717.8527
+      "avgJitaBuy": 1723.3344
     },
     {
       "typeId": 62493,
@@ -2080,7 +2639,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 9839.3035
+      "avgJitaBuy": 9761.059
     },
     {
       "typeId": 62502,
@@ -2093,7 +2652,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4878.0154
+      "avgJitaBuy": 4869.051
     },
     {
       "typeId": 62499,
@@ -2106,7 +2665,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2822.8076
+      "avgJitaBuy": 2804.2303
     },
     {
       "typeId": 62496,
@@ -2119,7 +2678,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1996.8093
+      "avgJitaBuy": 2003.2022
     },
     {
       "typeId": 62494,
@@ -2132,7 +2691,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 16962.2628
+      "avgJitaBuy": 16827.157
     },
     {
       "typeId": 62503,
@@ -2145,7 +2704,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 8407.9744
+      "avgJitaBuy": 8392.5455
     },
     {
       "typeId": 62500,
@@ -2158,7 +2717,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4867.653
+      "avgJitaBuy": 4835.638
     },
     {
       "typeId": 62497,
@@ -2171,7 +2730,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3435.7054
+      "avgJitaBuy": 3446.6689
     },
     {
       "typeId": 62504,
@@ -2184,7 +2743,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 13561.0532
+      "avgJitaBuy": 13709.9789
     },
     {
       "typeId": 62510,
@@ -2197,7 +2756,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 11745.0134
+      "avgJitaBuy": 11737.5526
     },
     {
       "typeId": 62507,
@@ -2210,7 +2769,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 13356.9325
+      "avgJitaBuy": 13118.5968
     },
     {
       "typeId": 62513,
@@ -2223,7 +2782,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 7344.4919
+      "avgJitaBuy": 7356.9961
     },
     {
       "typeId": 62505,
@@ -2236,7 +2795,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 15453.7841
+      "avgJitaBuy": 15623.005
     },
     {
       "typeId": 62511,
@@ -2249,7 +2808,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 13360.1945
+      "avgJitaBuy": 13351.9226
     },
     {
       "typeId": 62508,
@@ -2262,7 +2821,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 15212.794
+      "avgJitaBuy": 14941.7427
     },
     {
       "typeId": 62514,
@@ -2275,7 +2834,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 8372.988
+      "avgJitaBuy": 8387.3077
     },
     {
       "typeId": 62506,
@@ -2288,7 +2847,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 27122.1064
+      "avgJitaBuy": 27419.9579
     },
     {
       "typeId": 62512,
@@ -2301,7 +2860,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 23490.0268
+      "avgJitaBuy": 23475.1051
     },
     {
       "typeId": 62509,
@@ -2314,7 +2873,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 26713.865
+      "avgJitaBuy": 26237.1936
     },
     {
       "typeId": 62515,
@@ -2327,7 +2886,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 14688.9838
+      "avgJitaBuy": 14713.9922
     },
     {
       "typeId": 2329,
@@ -2340,7 +2899,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8669.83
+      "avgJitaBuy": 8634.25
     },
     {
       "typeId": 2345,
@@ -2353,7 +2912,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 92658.0
+      "avgJitaBuy": 92993.89
     },
     {
       "typeId": 2348,
@@ -2366,7 +2925,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 113882.64
+      "avgJitaBuy": 112720.14
     },
     {
       "typeId": 2349,
@@ -2379,7 +2938,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 95288.67
+      "avgJitaBuy": 95436.5
     },
     {
       "typeId": 2351,
@@ -2392,7 +2951,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 70458.46
+      "avgJitaBuy": 70315.79
     },
     {
       "typeId": 2352,
@@ -2405,7 +2964,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 90083.85
+      "avgJitaBuy": 90312.43
     },
     {
       "typeId": 2354,
@@ -2418,7 +2977,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 86072.62
+      "avgJitaBuy": 86109.83
     },
     {
       "typeId": 2360,
@@ -2431,7 +2990,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 60395.02
+      "avgJitaBuy": 60986.03
     },
     {
       "typeId": 2361,
@@ -2444,7 +3003,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 96554.44
+      "avgJitaBuy": 95140.98
     },
     {
       "typeId": 2367,
@@ -2457,7 +3016,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 117945.09
+      "avgJitaBuy": 117908.5
     },
     {
       "typeId": 2401,
@@ -2470,7 +3029,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 688.65
+      "avgJitaBuy": 687.25
     },
     {
       "typeId": 2463,
@@ -2483,7 +3042,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8337.97
+      "avgJitaBuy": 8249.18
     },
     {
       "typeId": 2867,
@@ -2496,7 +3055,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1884920.32
+      "avgJitaBuy": 1879626.46
     },
     {
       "typeId": 2868,
@@ -2509,7 +3068,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2161581.3
+      "avgJitaBuy": 2145198.51
     },
     {
       "typeId": 2869,
@@ -2522,7 +3081,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 976425.14
+      "avgJitaBuy": 971684.58
     },
     {
       "typeId": 2870,
@@ -2535,7 +3094,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 918998.58
+      "avgJitaBuy": 913789.8
     },
     {
       "typeId": 2871,
@@ -2548,7 +3107,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1251139.23
+      "avgJitaBuy": 1259109.08
     },
     {
       "typeId": 2872,
@@ -2561,7 +3120,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1962305.56
+      "avgJitaBuy": 1959118.06
     },
     {
       "typeId": 2875,
@@ -2574,7 +3133,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1062307.59
+      "avgJitaBuy": 1062964.43
     },
     {
       "typeId": 2876,
@@ -2587,7 +3146,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1962823.61
+      "avgJitaBuy": 1959411.11
     },
     {
       "typeId": 3645,
@@ -2600,7 +3159,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 442.58
+      "avgJitaBuy": 438.89
     },
     {
       "typeId": 3775,
@@ -2613,7 +3172,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 11540.46
+      "avgJitaBuy": 11559.74
     },
     {
       "typeId": 3779,
@@ -2626,7 +3185,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 861.54
+      "avgJitaBuy": 857.63
     },
     {
       "typeId": 3828,
@@ -2639,7 +3198,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8824.65
+      "avgJitaBuy": 8856.17
     },
     {
       "typeId": 9838,
@@ -2652,7 +3211,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 10121.47
+      "avgJitaBuy": 10171.51
     },
     {
       "typeId": 9842,
@@ -2665,7 +3224,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 12246.41
+      "avgJitaBuy": 12269.5
     },
     {
       "typeId": 9846,
@@ -2678,7 +3237,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 119566.43
+      "avgJitaBuy": 119341.29
     },
     {
       "typeId": 2358,
@@ -2691,7 +3250,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 99713.61
+      "avgJitaBuy": 100309.86
     },
     {
       "typeId": 2344,
@@ -2704,7 +3263,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 50232.28
+      "avgJitaBuy": 49921.33
     },
     {
       "typeId": 17392,
@@ -2717,7 +3276,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 93378.49
+      "avgJitaBuy": 93826.96
     },
     {
       "typeId": 2366,
@@ -2730,7 +3289,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 110130.97
+      "avgJitaBuy": 109376.53
     },
     {
       "typeId": 17898,
@@ -2743,7 +3302,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 93958.56
+      "avgJitaBuy": 94730.17
     },
     {
       "typeId": 2346,
@@ -2756,7 +3315,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 83608.07
+      "avgJitaBuy": 84048.82
     },
     {
       "typeId": 12836,
@@ -2769,7 +3328,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 71174.94
+      "avgJitaBuy": 71413.51
     },
     {
       "typeId": 17136,
@@ -2782,7 +3341,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 77155.23
+      "avgJitaBuy": 76488.72
     },
     {
       "typeId": 28974,
@@ -2795,7 +3354,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 76560.0
+      "avgJitaBuy": 77043.57
     },
     {
       "typeId": 15317,
@@ -2808,7 +3367,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 12063.03
+      "avgJitaBuy": 12066.69
     },
     {
       "typeId": 2327,
@@ -2821,7 +3380,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15493.58
+      "avgJitaBuy": 15534.82
     },
     {
       "typeId": 2321,
@@ -2834,7 +3393,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 16796.62
+      "avgJitaBuy": 16966.51
     },
     {
       "typeId": 3695,
@@ -2847,7 +3406,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5237.56
+      "avgJitaBuy": 5220.76
     },
     {
       "typeId": 3697,
@@ -2860,7 +3419,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 14672.61
+      "avgJitaBuy": 14785.37
     },
     {
       "typeId": 3691,
@@ -2873,7 +3432,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 9824.68
+      "avgJitaBuy": 9820.55
     },
     {
       "typeId": 2319,
@@ -2886,7 +3445,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 9487.07
+      "avgJitaBuy": 9502.82
     },
     {
       "typeId": 2393,
@@ -2899,7 +3458,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 424.7
+      "avgJitaBuy": 423.11
     },
     {
       "typeId": 2396,
@@ -2912,7 +3471,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 232.6
+      "avgJitaBuy": 234.1
     },
     {
       "typeId": 2390,
@@ -2925,7 +3484,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 596.06
+      "avgJitaBuy": 596.77
     },
     {
       "typeId": 2397,
@@ -2938,7 +3497,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 811.35
+      "avgJitaBuy": 811.82
     },
     {
       "typeId": 2392,
@@ -2951,7 +3510,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 709.57
+      "avgJitaBuy": 721.04
     },
     {
       "typeId": 2389,
@@ -2964,7 +3523,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 514.4
+      "avgJitaBuy": 513.22
     },
     {
       "typeId": 2399,
@@ -2977,7 +3536,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 621.33
+      "avgJitaBuy": 622.12
     },
     {
       "typeId": 2395,
@@ -2990,7 +3549,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 824.97
+      "avgJitaBuy": 826.08
     },
     {
       "typeId": 2398,
@@ -3003,7 +3562,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 414.37
+      "avgJitaBuy": 408.49
     },
     {
       "typeId": 9828,
@@ -3016,7 +3575,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 814.18
+      "avgJitaBuy": 815.18
     },
     {
       "typeId": 2400,
@@ -3029,7 +3588,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 324.65
+      "avgJitaBuy": 325.61
     },
     {
       "typeId": 44,
@@ -3042,7 +3601,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 11285.39
+      "avgJitaBuy": 11265.65
     },
     {
       "typeId": 3683,
@@ -3055,7 +3614,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 407.49
+      "avgJitaBuy": 404.84
     },
     {
       "typeId": 3689,
@@ -3068,7 +3627,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 9974.5
+      "avgJitaBuy": 9935.17
     },
     {
       "typeId": 9832,
@@ -3081,7 +3640,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 9906.09
+      "avgJitaBuy": 9885.12
     },
     {
       "typeId": 9848,
@@ -3094,7 +3653,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 78066.17
+      "avgJitaBuy": 77768.8
     },
     {
       "typeId": 9830,
@@ -3107,7 +3666,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 11326.01
+      "avgJitaBuy": 11309.72
     },
     {
       "typeId": 9834,
@@ -3120,7 +3679,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 78203.26
+      "avgJitaBuy": 78308.75
     },
     {
       "typeId": 9836,
@@ -3133,7 +3692,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8918.75
+      "avgJitaBuy": 8951.79
     },
     {
       "typeId": 9840,
@@ -3146,7 +3705,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 10728.83
+      "avgJitaBuy": 10754.31
     },
     {
       "typeId": 2312,
@@ -3159,7 +3718,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 13854.54
+      "avgJitaBuy": 13898.74
     },
     {
       "typeId": 2317,
@@ -3172,7 +3731,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 8844.89
+      "avgJitaBuy": 8853.4
     },
     {
       "typeId": 3812,
@@ -3185,7 +3744,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 236.77
+      "avgJitaBuy": 226.51
     },
     {
       "typeId": 25588,
@@ -3198,7 +3757,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 1990.44,
+      "avgJitaBuy": 2071.78,
       "tier": "Common"
     },
     {
@@ -3212,7 +3771,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 351.41,
+      "avgJitaBuy": 351.37,
       "tier": "Common"
     },
     {
@@ -3226,7 +3785,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 8061.31,
+      "avgJitaBuy": 8142.14,
       "tier": "Common"
     },
     {
@@ -3240,7 +3799,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 2089.56,
+      "avgJitaBuy": 2029.53,
       "tier": "Common"
     },
     {
@@ -3254,7 +3813,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 3692.22,
+      "avgJitaBuy": 3775.86,
       "tier": "Common"
     },
     {
@@ -3268,7 +3827,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 231.64,
+      "avgJitaBuy": 232.94,
       "tier": "Common"
     },
     {
@@ -3282,7 +3841,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 2663.92,
+      "avgJitaBuy": 2688.67,
       "tier": "Common"
     },
     {
@@ -3296,7 +3855,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 5000,
-      "avgJitaBuy": 226.21,
+      "avgJitaBuy": 226.47,
       "tier": "Common"
     },
     {
@@ -3310,7 +3869,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 76756.94,
+      "avgJitaBuy": 77325.28,
       "tier": "Uncommon"
     },
     {
@@ -3324,7 +3883,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 85355.28,
+      "avgJitaBuy": 85666.67,
       "tier": "Uncommon"
     },
     {
@@ -3338,7 +3897,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 12449.44,
+      "avgJitaBuy": 12508.33,
       "tier": "Uncommon"
     },
     {
@@ -3352,7 +3911,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 100275.0,
+      "avgJitaBuy": 100754.17,
       "tier": "Uncommon"
     },
     {
@@ -3366,7 +3925,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 25365.56,
+      "avgJitaBuy": 25410.28,
       "tier": "Uncommon"
     },
     {
@@ -3380,7 +3939,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 2739.97,
+      "avgJitaBuy": 2806.39,
       "tier": "Uncommon"
     },
     {
@@ -3394,7 +3953,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 11248.06,
+      "avgJitaBuy": 11350.28,
       "tier": "Uncommon"
     },
     {
@@ -3408,7 +3967,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 4911.61,
+      "avgJitaBuy": 4901.06,
       "tier": "Uncommon"
     },
     {
@@ -3422,7 +3981,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 19250.28,
+      "avgJitaBuy": 19824.44,
       "tier": "Uncommon"
     },
     {
@@ -3436,7 +3995,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 23869.44,
+      "avgJitaBuy": 23683.06,
       "tier": "Uncommon"
     },
     {
@@ -3450,7 +4009,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 1000,
-      "avgJitaBuy": 13566.11,
+      "avgJitaBuy": 13518.06,
       "tier": "Uncommon"
     },
     {
@@ -3464,7 +4023,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 64065.56,
+      "avgJitaBuy": 65633.06,
       "tier": "Rare"
     },
     {
@@ -3478,7 +4037,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 54784.72,
+      "avgJitaBuy": 55869.72,
       "tier": "Rare"
     },
     {
@@ -3492,7 +4051,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 458603.33,
+      "avgJitaBuy": 455089.44,
       "tier": "Rare"
     },
     {
@@ -3520,7 +4079,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 59567.78,
+      "avgJitaBuy": 58865.83,
       "tier": "Rare"
     },
     {
@@ -3534,7 +4093,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 857.92,
+      "avgJitaBuy": 829.17,
       "tier": "Rare"
     },
     {
@@ -3548,7 +4107,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 2761.53,
+      "avgJitaBuy": 2626.69,
       "tier": "Rare"
     },
     {
@@ -3562,7 +4121,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 7487.61,
+      "avgJitaBuy": 7532.28,
       "tier": "Rare"
     },
     {
@@ -3576,7 +4135,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 97551.39,
+      "avgJitaBuy": 98241.67,
       "tier": "Rare"
     },
     {
@@ -3590,7 +4149,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 500,
-      "avgJitaBuy": 21732.22,
+      "avgJitaBuy": 21742.78,
       "tier": "Rare"
     },
     {
@@ -3604,7 +4163,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 436655.56,
+      "avgJitaBuy": 434825.0,
       "tier": "Very Rare"
     },
     {
@@ -3618,7 +4177,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 1236222.22,
+      "avgJitaBuy": 1240833.33,
       "tier": "Very Rare"
     },
     {
@@ -3632,7 +4191,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 846886.11,
+      "avgJitaBuy": 846772.22,
       "tier": "Very Rare"
     },
     {
@@ -3646,7 +4205,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 991177.78,
+      "avgJitaBuy": 994150.0,
       "tier": "Very Rare"
     },
     {
@@ -3660,7 +4219,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 230469.44,
+      "avgJitaBuy": 229227.78,
       "tier": "Very Rare"
     },
     {
@@ -3674,7 +4233,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 1829027.78,
+      "avgJitaBuy": 1851277.78,
       "tier": "Very Rare"
     },
     {
@@ -3688,7 +4247,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 223952.78,
+      "avgJitaBuy": 223825.0,
       "tier": "Very Rare"
     },
     {
@@ -3702,7 +4261,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 1983666.67,
+      "avgJitaBuy": 1963777.78,
       "tier": "Very Rare"
     },
     {
@@ -3716,7 +4275,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 50,
-      "avgJitaBuy": 1155972.22,
+      "avgJitaBuy": 1140611.11,
       "tier": "Very Rare"
     },
     {
@@ -3730,7 +4289,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 835.59,
+      "avgJitaBuy": 845.19,
       "tier": "Rogue Drone"
     },
     {
@@ -3744,7 +4303,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 3931.5,
+      "avgJitaBuy": 3948.14,
       "tier": "Rogue Drone"
     },
     {
@@ -3758,7 +4317,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 269925.0,
+      "avgJitaBuy": 272366.67,
       "tier": "Rogue Drone"
     },
     {
@@ -3772,7 +4331,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 4112.94,
+      "avgJitaBuy": 4115.89,
       "tier": "Rogue Drone"
     },
     {
@@ -3786,7 +4345,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 1075.78,
+      "avgJitaBuy": 1089.11,
       "tier": "Rogue Drone"
     },
     {
@@ -3800,7 +4359,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 12713.47,
+      "avgJitaBuy": 12987.08,
       "tier": "Rogue Drone"
     },
     {
@@ -3814,7 +4373,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 1852944.44,
+      "avgJitaBuy": 1861722.22,
       "tier": "Rogue Drone"
     },
     {
@@ -3828,7 +4387,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 1,
       "accepted": true,
       "quota": 250,
-      "avgJitaBuy": 802311.11,
+      "avgJitaBuy": 802683.33,
       "tier": "Rogue Drone"
     },
     {
@@ -3842,7 +4401,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 14.1745
+      "avgJitaBuy": 14.1383
     },
     {
       "typeId": 17470,
@@ -3855,7 +4414,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 14.8833
+      "avgJitaBuy": 14.8452
     },
     {
       "typeId": 17471,
@@ -3868,7 +4427,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15.592
+      "avgJitaBuy": 15.5521
     },
     {
       "typeId": 46689,
@@ -3881,7 +4440,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 16.3007
+      "avgJitaBuy": 16.259
     },
     {
       "typeId": 1228,
@@ -3894,7 +4453,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 22.8514
+      "avgJitaBuy": 22.7581
     },
     {
       "typeId": 17463,
@@ -3907,7 +4466,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 23.7726
+      "avgJitaBuy": 23.6756
     },
     {
       "typeId": 17464,
@@ -3920,7 +4479,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 24.8178
+      "avgJitaBuy": 24.7165
     },
     {
       "typeId": 46687,
@@ -3933,7 +4492,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 26.0578
+      "avgJitaBuy": 25.9514
     },
     {
       "typeId": 1224,
@@ -3946,7 +4505,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 33.089
+      "avgJitaBuy": 33.1787
     },
     {
       "typeId": 17459,
@@ -3959,7 +4518,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 35.1355
+      "avgJitaBuy": 35.232
     },
     {
       "typeId": 17460,
@@ -3972,7 +4531,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 36.3979
+      "avgJitaBuy": 36.4966
     },
     {
       "typeId": 46686,
@@ -3985,7 +4544,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 38.4444
+      "avgJitaBuy": 38.5498
     },
     {
       "typeId": 18,
@@ -3998,7 +4557,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 49.9312
+      "avgJitaBuy": 50.277
     },
     {
       "typeId": 17455,
@@ -4011,7 +4570,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 52.749
+      "avgJitaBuy": 53.1146
     },
     {
       "typeId": 17456,
@@ -4024,7 +4583,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 54.9421
+      "avgJitaBuy": 55.3224
     },
     {
       "typeId": 46685,
@@ -4037,7 +4596,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 57.7244
+      "avgJitaBuy": 58.1246
     },
     {
       "typeId": 1227,
@@ -4050,7 +4609,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 136.1883
+      "avgJitaBuy": 136.8572
     },
     {
       "typeId": 17867,
@@ -4063,7 +4622,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 143.4836
+      "avgJitaBuy": 144.188
     },
     {
       "typeId": 17868,
@@ -4076,7 +4635,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 150.6194
+      "avgJitaBuy": 151.3601
     },
     {
       "typeId": 46684,
@@ -4089,7 +4648,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 156.2902
+      "avgJitaBuy": 157.0565
     },
     {
       "typeId": 20,
@@ -4102,7 +4661,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 232.4279
+      "avgJitaBuy": 233.9124
     },
     {
       "typeId": 17452,
@@ -4115,7 +4674,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 244.0493
+      "avgJitaBuy": 245.608
     },
     {
       "typeId": 17453,
@@ -4128,7 +4687,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 255.6707
+      "avgJitaBuy": 257.3036
     },
     {
       "typeId": 46683,
@@ -4141,7 +4700,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 267.2921
+      "avgJitaBuy": 268.9993
     },
     {
       "typeId": 21,
@@ -4154,7 +4713,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 807.1571
+      "avgJitaBuy": 809.1147
     },
     {
       "typeId": 17440,
@@ -4167,7 +4726,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 847.5947
+      "avgJitaBuy": 849.6498
     },
     {
       "typeId": 17441,
@@ -4180,7 +4739,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 887.8728
+      "avgJitaBuy": 890.0262
     },
     {
       "typeId": 46680,
@@ -4193,7 +4752,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 928.3104
+      "avgJitaBuy": 930.5613
     },
     {
       "typeId": 1231,
@@ -4206,7 +4765,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 941.4545
+      "avgJitaBuy": 945.5165
     },
     {
       "typeId": 17444,
@@ -4219,7 +4778,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 991.5914
+      "avgJitaBuy": 995.8661
     },
     {
       "typeId": 17445,
@@ -4232,7 +4791,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1035.5999
+      "avgJitaBuy": 1040.0682
     },
     {
       "typeId": 46681,
@@ -4245,7 +4804,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1085.7369
+      "avgJitaBuy": 1090.4177
     },
     {
       "typeId": 1226,
@@ -4258,7 +4817,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 400.1315
+      "avgJitaBuy": 401.858
     },
     {
       "typeId": 17448,
@@ -4271,7 +4830,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 423.5146
+      "avgJitaBuy": 425.3396
     },
     {
       "typeId": 17449,
@@ -4284,7 +4843,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 440.1446
+      "avgJitaBuy": 442.0437
     },
     {
       "typeId": 46682,
@@ -4297,7 +4856,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 463.5278
+      "avgJitaBuy": 465.5253
     },
     {
       "typeId": 1229,
@@ -4310,7 +4869,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2555.5394
+      "avgJitaBuy": 2569.6686
     },
     {
       "typeId": 17865,
@@ -4323,7 +4882,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2683.3164
+      "avgJitaBuy": 2698.1521
     },
     {
       "typeId": 17866,
@@ -4336,7 +4895,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2811.0934
+      "avgJitaBuy": 2826.6355
     },
     {
       "typeId": 46679,
@@ -4349,7 +4908,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2938.8703
+      "avgJitaBuy": 2955.1189
     },
     {
       "typeId": 1232,
@@ -4362,7 +4921,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4760.1776
+      "avgJitaBuy": 4785.0392
     },
     {
       "typeId": 17436,
@@ -4375,7 +4934,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4998.1865
+      "avgJitaBuy": 5024.2912
     },
     {
       "typeId": 17437,
@@ -4388,7 +4947,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5236.1954
+      "avgJitaBuy": 5263.5432
     },
     {
       "typeId": 46675,
@@ -4401,7 +4960,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5474.2043
+      "avgJitaBuy": 5502.7951
     },
     {
       "typeId": 1225,
@@ -4414,7 +4973,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6279.7527
+      "avgJitaBuy": 6304.7303
     },
     {
       "typeId": 17432,
@@ -4427,7 +4986,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6593.7403
+      "avgJitaBuy": 6619.9668
     },
     {
       "typeId": 17433,
@@ -4440,7 +4999,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6907.728
+      "avgJitaBuy": 6935.2034
     },
     {
       "typeId": 46677,
@@ -4453,7 +5012,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 7221.7156
+      "avgJitaBuy": 7250.4399
     },
     {
       "typeId": 19,
@@ -4466,7 +5025,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 5854.2992
+      "avgJitaBuy": 5861.5025
     },
     {
       "typeId": 17466,
@@ -4479,7 +5038,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6147.0142
+      "avgJitaBuy": 6154.5776
     },
     {
       "typeId": 17467,
@@ -4492,7 +5051,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6439.7292
+      "avgJitaBuy": 6447.6528
     },
     {
       "typeId": 46688,
@@ -4505,7 +5064,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 6732.4441
+      "avgJitaBuy": 6740.7279
     },
     {
       "typeId": 1223,
@@ -4518,7 +5077,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2558.1224
+      "avgJitaBuy": 2572.9639
     },
     {
       "typeId": 17428,
@@ -4531,7 +5090,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2686.0285
+      "avgJitaBuy": 2701.6121
     },
     {
       "typeId": 17429,
@@ -4544,7 +5103,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2813.9346
+      "avgJitaBuy": 2830.2603
     },
     {
       "typeId": 46676,
@@ -4557,7 +5116,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2941.8407
+      "avgJitaBuy": 2958.9085
     },
     {
       "typeId": 22,
@@ -4570,7 +5129,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3957.0617
+      "avgJitaBuy": 3940.6577
     },
     {
       "typeId": 17425,
@@ -4583,7 +5142,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4154.9148
+      "avgJitaBuy": 4137.6905
     },
     {
       "typeId": 17426,
@@ -4596,7 +5155,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4352.7679
+      "avgJitaBuy": 4334.7234
     },
     {
       "typeId": 46678,
@@ -4609,7 +5168,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4550.6209
+      "avgJitaBuy": 4531.7563
     },
     {
       "typeId": 11396,
@@ -4622,7 +5181,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 24010.6929
+      "avgJitaBuy": 24087.9894
     },
     {
       "typeId": 17869,
@@ -4635,7 +5194,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 25211.2276
+      "avgJitaBuy": 25292.3889
     },
     {
       "typeId": 17870,
@@ -4648,7 +5207,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 26411.7622
+      "avgJitaBuy": 26496.7884
     },
     {
       "typeId": 81900,
@@ -4661,7 +5220,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 386.1065
+      "avgJitaBuy": 388.7755
     },
     {
       "typeId": 81901,
@@ -4674,7 +5233,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 405.7241
+      "avgJitaBuy": 408.5292
     },
     {
       "typeId": 81902,
@@ -4687,7 +5246,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 424.7171
+      "avgJitaBuy": 427.6531
     },
     {
       "typeId": 81903,
@@ -4700,7 +5259,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 444.3348
+      "avgJitaBuy": 447.4068
     },
     {
       "typeId": 82016,
@@ -4713,7 +5272,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 699.297
+      "avgJitaBuy": 701.1051
     },
     {
       "typeId": 82017,
@@ -4726,7 +5285,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 738.9379
+      "avgJitaBuy": 740.8503
     },
     {
       "typeId": 82018,
@@ -4739,7 +5298,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 772.2909
+      "avgJitaBuy": 774.2893
     },
     {
       "typeId": 82019,
@@ -4752,7 +5311,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 805.8034
+      "avgJitaBuy": 807.8871
     },
     {
       "typeId": 82205,
@@ -4765,7 +5324,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 927.4385
+      "avgJitaBuy": 920.605
     },
     {
       "typeId": 82206,
@@ -4778,7 +5337,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 973.8105
+      "avgJitaBuy": 966.6353
     },
     {
       "typeId": 82207,
@@ -4791,7 +5350,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1020.1824
+      "avgJitaBuy": 1012.6655
     },
     {
       "typeId": 82208,
@@ -4804,7 +5363,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 1066.5543
+      "avgJitaBuy": 1058.6958
     },
     {
       "typeId": 82163,
@@ -4817,7 +5376,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 752.6912
+      "avgJitaBuy": 757.7955
     },
     {
       "typeId": 82164,
@@ -4830,7 +5389,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 790.3258
+      "avgJitaBuy": 795.6853
     },
     {
       "typeId": 82165,
@@ -4843,7 +5402,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 827.9603
+      "avgJitaBuy": 833.575
     },
     {
       "typeId": 82166,
@@ -4856,7 +5415,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 865.5949
+      "avgJitaBuy": 871.4648
     },
     {
       "typeId": 81975,
@@ -4869,7 +5428,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 138.8225
+      "avgJitaBuy": 139.5829
     },
     {
       "typeId": 81976,
@@ -4882,7 +5441,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 145.7813
+      "avgJitaBuy": 146.5797
     },
     {
       "typeId": 81977,
@@ -4895,7 +5454,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 152.7048
+      "avgJitaBuy": 153.5412
     },
     {
       "typeId": 81978,
@@ -4908,7 +5467,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 159.6636
+      "avgJitaBuy": 160.538
     },
     {
       "typeId": 74521,
@@ -4921,7 +5480,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 15.4636
+      "avgJitaBuy": 15.3932
     },
     {
       "typeId": 74522,
@@ -4934,7 +5493,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 16.1012
+      "avgJitaBuy": 16.028
     },
     {
       "typeId": 74523,
@@ -4947,7 +5506,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 17.0577
+      "avgJitaBuy": 16.9802
     },
     {
       "typeId": 74524,
@@ -4960,7 +5519,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 17.8548
+      "avgJitaBuy": 17.7736
     },
     {
       "typeId": 74525,
@@ -4973,7 +5532,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 389.8903
+      "avgJitaBuy": 392.2394
     },
     {
       "typeId": 74526,
@@ -4986,7 +5545,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 409.3848
+      "avgJitaBuy": 411.8514
     },
     {
       "typeId": 74527,
@@ -4999,7 +5558,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 428.8793
+      "avgJitaBuy": 431.4633
     },
     {
       "typeId": 74528,
@@ -5012,7 +5571,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 448.3738
+      "avgJitaBuy": 451.0753
     },
     {
       "typeId": 74529,
@@ -5025,7 +5584,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2158.4722
+      "avgJitaBuy": 2176.6975
     },
     {
       "typeId": 74530,
@@ -5038,7 +5597,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2263.9614
+      "avgJitaBuy": 2283.0775
     },
     {
       "typeId": 74531,
@@ -5051,7 +5610,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2377.5652
+      "avgJitaBuy": 2397.6405
     },
     {
       "typeId": 74532,
@@ -5064,7 +5623,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 2483.0545
+      "avgJitaBuy": 2504.0204
     },
     {
       "typeId": 74533,
@@ -5077,7 +5636,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 3821.1303
+      "avgJitaBuy": 3792.396
     },
     {
       "typeId": 74534,
@@ -5090,7 +5649,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4023.4254
+      "avgJitaBuy": 3993.1699
     },
     {
       "typeId": 74535,
@@ -5103,7 +5662,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4203.2433
+      "avgJitaBuy": 4171.6356
     },
     {
       "typeId": 74536,
@@ -5116,7 +5675,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": false,
       "quota": 0,
-      "avgJitaBuy": 4405.5384
+      "avgJitaBuy": 4372.4095
     },
     {
       "typeId": 62516,
@@ -5129,7 +5688,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 14.1745
+      "avgJitaBuy": 14.1383
     },
     {
       "typeId": 62517,
@@ -5142,7 +5701,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 14.8833
+      "avgJitaBuy": 14.8452
     },
     {
       "typeId": 62518,
@@ -5155,7 +5714,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 15.592
+      "avgJitaBuy": 15.5521
     },
     {
       "typeId": 62519,
@@ -5168,7 +5727,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 16.3007
+      "avgJitaBuy": 16.259
     },
     {
       "typeId": 62520,
@@ -5181,7 +5740,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 22.8514
+      "avgJitaBuy": 22.7581
     },
     {
       "typeId": 62521,
@@ -5194,7 +5753,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 23.7726
+      "avgJitaBuy": 23.6756
     },
     {
       "typeId": 62522,
@@ -5207,7 +5766,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 24.8178
+      "avgJitaBuy": 24.7165
     },
     {
       "typeId": 62523,
@@ -5220,7 +5779,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 26.0578
+      "avgJitaBuy": 25.9514
     },
     {
       "typeId": 62524,
@@ -5233,7 +5792,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 33.089
+      "avgJitaBuy": 33.1787
     },
     {
       "typeId": 62525,
@@ -5246,7 +5805,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 35.1355
+      "avgJitaBuy": 35.232
     },
     {
       "typeId": 62526,
@@ -5259,7 +5818,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 36.3979
+      "avgJitaBuy": 36.4966
     },
     {
       "typeId": 62527,
@@ -5272,7 +5831,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 38.4444
+      "avgJitaBuy": 38.5498
     },
     {
       "typeId": 62528,
@@ -5285,7 +5844,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 49.9312
+      "avgJitaBuy": 50.277
     },
     {
       "typeId": 62529,
@@ -5298,7 +5857,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 52.749
+      "avgJitaBuy": 53.1146
     },
     {
       "typeId": 62530,
@@ -5311,7 +5870,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 54.9421
+      "avgJitaBuy": 55.3224
     },
     {
       "typeId": 62531,
@@ -5324,7 +5883,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 57.7244
+      "avgJitaBuy": 58.1246
     },
     {
       "typeId": 62532,
@@ -5337,7 +5896,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 136.1883
+      "avgJitaBuy": 136.8572
     },
     {
       "typeId": 62533,
@@ -5350,7 +5909,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 143.4836
+      "avgJitaBuy": 144.188
     },
     {
       "typeId": 62534,
@@ -5363,7 +5922,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 150.6194
+      "avgJitaBuy": 151.3601
     },
     {
       "typeId": 62535,
@@ -5376,7 +5935,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 156.2902
+      "avgJitaBuy": 157.0565
     },
     {
       "typeId": 62536,
@@ -5389,7 +5948,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 232.4279
+      "avgJitaBuy": 233.9124
     },
     {
       "typeId": 62537,
@@ -5402,7 +5961,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 244.0493
+      "avgJitaBuy": 245.608
     },
     {
       "typeId": 62538,
@@ -5415,7 +5974,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 255.6707
+      "avgJitaBuy": 257.3036
     },
     {
       "typeId": 62539,
@@ -5428,7 +5987,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 267.2921
+      "avgJitaBuy": 268.9993
     },
     {
       "typeId": 62540,
@@ -5441,7 +6000,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 400.1315
+      "avgJitaBuy": 401.858
     },
     {
       "typeId": 62541,
@@ -5454,7 +6013,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 423.5146
+      "avgJitaBuy": 425.3396
     },
     {
       "typeId": 62542,
@@ -5467,7 +6026,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 440.1446
+      "avgJitaBuy": 442.0437
     },
     {
       "typeId": 62543,
@@ -5480,7 +6039,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 463.5278
+      "avgJitaBuy": 465.5253
     },
     {
       "typeId": 62544,
@@ -5493,7 +6052,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 941.4545
+      "avgJitaBuy": 945.5165
     },
     {
       "typeId": 62545,
@@ -5506,7 +6065,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 991.5914
+      "avgJitaBuy": 995.8661
     },
     {
       "typeId": 62546,
@@ -5519,7 +6078,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1035.5999
+      "avgJitaBuy": 1040.0682
     },
     {
       "typeId": 62547,
@@ -5532,7 +6091,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1085.7369
+      "avgJitaBuy": 1090.4177
     },
     {
       "typeId": 62548,
@@ -5545,7 +6104,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 807.1571
+      "avgJitaBuy": 809.1147
     },
     {
       "typeId": 62549,
@@ -5558,7 +6117,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 847.5947
+      "avgJitaBuy": 849.6498
     },
     {
       "typeId": 62550,
@@ -5571,7 +6130,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 887.8728
+      "avgJitaBuy": 890.0262
     },
     {
       "typeId": 62551,
@@ -5584,7 +6143,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 928.3104
+      "avgJitaBuy": 930.5613
     },
     {
       "typeId": 62552,
@@ -5597,7 +6156,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2555.5394
+      "avgJitaBuy": 2569.6686
     },
     {
       "typeId": 62553,
@@ -5610,7 +6169,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2683.3164
+      "avgJitaBuy": 2698.1521
     },
     {
       "typeId": 62554,
@@ -5623,7 +6182,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2811.0934
+      "avgJitaBuy": 2826.6355
     },
     {
       "typeId": 62555,
@@ -5636,7 +6195,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2938.8703
+      "avgJitaBuy": 2955.1189
     },
     {
       "typeId": 62556,
@@ -5649,7 +6208,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4760.1776
+      "avgJitaBuy": 4785.0392
     },
     {
       "typeId": 62557,
@@ -5662,7 +6221,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4998.1865
+      "avgJitaBuy": 5024.2912
     },
     {
       "typeId": 62558,
@@ -5675,7 +6234,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5236.1954
+      "avgJitaBuy": 5263.5432
     },
     {
       "typeId": 62559,
@@ -5688,7 +6247,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5474.2043
+      "avgJitaBuy": 5502.7951
     },
     {
       "typeId": 62560,
@@ -5701,7 +6260,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6279.7527
+      "avgJitaBuy": 6304.7303
     },
     {
       "typeId": 62561,
@@ -5714,7 +6273,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6593.7403
+      "avgJitaBuy": 6619.9668
     },
     {
       "typeId": 62562,
@@ -5727,7 +6286,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6907.728
+      "avgJitaBuy": 6935.2034
     },
     {
       "typeId": 62563,
@@ -5740,7 +6299,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 7221.7156
+      "avgJitaBuy": 7250.4399
     },
     {
       "typeId": 62564,
@@ -5753,7 +6312,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2558.1224
+      "avgJitaBuy": 2572.9639
     },
     {
       "typeId": 62565,
@@ -5766,7 +6325,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2686.0285
+      "avgJitaBuy": 2701.6121
     },
     {
       "typeId": 62566,
@@ -5779,7 +6338,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2813.9346
+      "avgJitaBuy": 2830.2603
     },
     {
       "typeId": 62567,
@@ -5792,7 +6351,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2941.8407
+      "avgJitaBuy": 2958.9085
     },
     {
       "typeId": 62568,
@@ -5805,7 +6364,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3957.0617
+      "avgJitaBuy": 3940.6577
     },
     {
       "typeId": 62569,
@@ -5818,7 +6377,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4154.9148
+      "avgJitaBuy": 4137.6905
     },
     {
       "typeId": 62570,
@@ -5831,7 +6390,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4352.7679
+      "avgJitaBuy": 4334.7234
     },
     {
       "typeId": 62571,
@@ -5844,7 +6403,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4550.6209
+      "avgJitaBuy": 4531.7563
     },
     {
       "typeId": 62572,
@@ -5857,7 +6416,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 5854.2992
+      "avgJitaBuy": 5861.5025
     },
     {
       "typeId": 62573,
@@ -5870,7 +6429,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6147.0142
+      "avgJitaBuy": 6154.5776
     },
     {
       "typeId": 62574,
@@ -5883,7 +6442,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6439.7292
+      "avgJitaBuy": 6447.6528
     },
     {
       "typeId": 62575,
@@ -5896,7 +6455,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 6732.4441
+      "avgJitaBuy": 6740.7279
     },
     {
       "typeId": 62586,
@@ -5909,7 +6468,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 24010.6929
+      "avgJitaBuy": 24087.9894
     },
     {
       "typeId": 62587,
@@ -5922,7 +6481,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 25211.2276
+      "avgJitaBuy": 25292.3889
     },
     {
       "typeId": 62588,
@@ -5935,7 +6494,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 26411.7622
+      "avgJitaBuy": 26496.7884
     },
     {
       "typeId": 82300,
@@ -5948,7 +6507,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 386.1065
+      "avgJitaBuy": 388.7755
     },
     {
       "typeId": 82301,
@@ -5961,7 +6520,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 405.7241
+      "avgJitaBuy": 408.5292
     },
     {
       "typeId": 82302,
@@ -5974,7 +6533,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 424.7171
+      "avgJitaBuy": 427.6531
     },
     {
       "typeId": 82303,
@@ -5987,7 +6546,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 444.3348
+      "avgJitaBuy": 447.4068
     },
     {
       "typeId": 82304,
@@ -6000,7 +6559,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 699.297
+      "avgJitaBuy": 701.1051
     },
     {
       "typeId": 82305,
@@ -6013,7 +6572,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 738.9379
+      "avgJitaBuy": 740.8503
     },
     {
       "typeId": 82306,
@@ -6026,7 +6585,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 772.2909
+      "avgJitaBuy": 774.2893
     },
     {
       "typeId": 82307,
@@ -6039,7 +6598,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 805.8034
+      "avgJitaBuy": 807.8871
     },
     {
       "typeId": 82308,
@@ -6052,7 +6611,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 927.4385
+      "avgJitaBuy": 920.605
     },
     {
       "typeId": 82309,
@@ -6065,7 +6624,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 973.8105
+      "avgJitaBuy": 966.6353
     },
     {
       "typeId": 82310,
@@ -6078,7 +6637,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1020.1824
+      "avgJitaBuy": 1012.6655
     },
     {
       "typeId": 82311,
@@ -6091,7 +6650,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 1066.5543
+      "avgJitaBuy": 1058.6958
     },
     {
       "typeId": 82312,
@@ -6104,7 +6663,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 752.6912
+      "avgJitaBuy": 757.7955
     },
     {
       "typeId": 82313,
@@ -6117,7 +6676,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 790.3258
+      "avgJitaBuy": 795.6853
     },
     {
       "typeId": 82314,
@@ -6130,7 +6689,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 827.9603
+      "avgJitaBuy": 833.575
     },
     {
       "typeId": 82315,
@@ -6143,7 +6702,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 865.5949
+      "avgJitaBuy": 871.4648
     },
     {
       "typeId": 82316,
@@ -6156,7 +6715,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 138.8225
+      "avgJitaBuy": 139.5829
     },
     {
       "typeId": 82317,
@@ -6169,7 +6728,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 145.7813
+      "avgJitaBuy": 146.5797
     },
     {
       "typeId": 82318,
@@ -6182,7 +6741,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 152.7048
+      "avgJitaBuy": 153.5412
     },
     {
       "typeId": 82319,
@@ -6195,7 +6754,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 159.6636
+      "avgJitaBuy": 160.538
     },
     {
       "typeId": 75275,
@@ -6208,7 +6767,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 15.4636
+      "avgJitaBuy": 15.3932
     },
     {
       "typeId": 75276,
@@ -6221,7 +6780,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 16.1012
+      "avgJitaBuy": 16.028
     },
     {
       "typeId": 75277,
@@ -6234,7 +6793,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 17.0577
+      "avgJitaBuy": 16.9802
     },
     {
       "typeId": 75278,
@@ -6247,7 +6806,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 17.8548
+      "avgJitaBuy": 17.7736
     },
     {
       "typeId": 75279,
@@ -6260,7 +6819,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 389.8903
+      "avgJitaBuy": 392.2394
     },
     {
       "typeId": 75280,
@@ -6273,7 +6832,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 409.3848
+      "avgJitaBuy": 411.8514
     },
     {
       "typeId": 75281,
@@ -6286,7 +6845,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 428.8793
+      "avgJitaBuy": 431.4633
     },
     {
       "typeId": 75282,
@@ -6299,7 +6858,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 448.3738
+      "avgJitaBuy": 451.0753
     },
     {
       "typeId": 75283,
@@ -6312,7 +6871,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2158.4722
+      "avgJitaBuy": 2176.6975
     },
     {
       "typeId": 75284,
@@ -6325,7 +6884,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2263.9614
+      "avgJitaBuy": 2283.0775
     },
     {
       "typeId": 75285,
@@ -6338,7 +6897,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2377.5652
+      "avgJitaBuy": 2397.6405
     },
     {
       "typeId": 75286,
@@ -6351,7 +6910,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 2483.0545
+      "avgJitaBuy": 2504.0204
     },
     {
       "typeId": 75287,
@@ -6364,7 +6923,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 3821.1303
+      "avgJitaBuy": 3792.396
     },
     {
       "typeId": 75288,
@@ -6377,7 +6936,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4023.4254
+      "avgJitaBuy": 3993.1699
     },
     {
       "typeId": 75289,
@@ -6390,7 +6949,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4203.2433
+      "avgJitaBuy": 4171.6356
     },
     {
       "typeId": 75290,
@@ -6403,7 +6962,7 @@ const BUYBACK_DATA = {
       "allianceDiscount": 2,
       "accepted": true,
       "quota": 0,
-      "avgJitaBuy": 4405.5384
+      "avgJitaBuy": 4372.4095
     }
   ],
   "categories": {
@@ -6448,6 +7007,67 @@ const BUYBACK_DATA = {
       "pricingMethod": "Jita Buy"
     }
   },
+  "marketVisibility": {
+    "minerals": {
+      "visible": true,
+      "subs": {}
+    },
+    "ice_products": {
+      "visible": true,
+      "subs": {
+        "fuel_blocks": {
+          "visible": false,
+          "displayName": "Fuel Blocks"
+        },
+        "refined_ice": {
+          "visible": true,
+          "displayName": "Refined Ice"
+        },
+        "isotopes": {
+          "visible": true,
+          "displayName": "Isotopes"
+        }
+      }
+    },
+    "moon_materials": {
+      "visible": true,
+      "subs": {
+        "raw": {
+          "visible": true,
+          "displayName": "Raw"
+        },
+        "processed": {
+          "visible": false,
+          "displayName": "Processed"
+        },
+        "advanced": {
+          "visible": false,
+          "displayName": "Advanced"
+        }
+      }
+    },
+    "pi_materials": {
+      "visible": false,
+      "subs": {
+        "p1": {
+          "visible": false,
+          "displayName": "P1"
+        },
+        "p2": {
+          "visible": false,
+          "displayName": "P2"
+        },
+        "p3": {
+          "visible": false,
+          "displayName": "P3"
+        },
+        "p4": {
+          "visible": false,
+          "displayName": "P4"
+        }
+      }
+    }
+  },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-03 05:45 UTC"
+  "generated": "2026-03-04 03:57 UTC"
 };

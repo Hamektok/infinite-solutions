@@ -215,6 +215,11 @@ ICE_PRODUCT_IDS = [
     17887,  # Oxygen Isotopes
     17888,  # Nitrogen Isotopes
     17889,  # Hydrogen Isotopes
+    # Fuel blocks (manufactured from ice products)
+     4051,  # Nitrogen Fuel Block
+     4246,  # Hydrogen Fuel Block
+     4247,  # Helium Fuel Block
+     4312,  # Oxygen Fuel Block
 ]
 
 # Refined products — moon materials (R4 through R64)
@@ -244,6 +249,47 @@ MOON_MATERIAL_IDS = [
     16651,  # Neodymium
     16652,  # Promethium
     16653,  # Thulium
+    # Processed moon reaction products (T1)
+    16654,  # Titanium Chromide
+    16655,  # Crystallite Alloy
+    16656,  # Fernite Alloy
+    16657,  # Rolled Tungsten Alloy
+    16658,  # Silicon Diborite
+    16659,  # Carbon Polymers
+    16660,  # Ceramic Powder
+    16661,  # Sulfuric Acid
+    16662,  # Platinum Technite
+    16663,  # Caesarium Cadmide
+    16664,  # Solerium
+    16665,  # Hexite
+    16666,  # Hyperflurite
+    16667,  # Neo Mercurite
+    16668,  # Dysporite
+    16669,  # Ferrofluid
+    17769,  # Fluxed Condensates
+    17959,  # Vanadium Hafnite
+    17960,  # Prometium
+    33336,  # Thulium Hafnite
+    33337,  # Promethium Mercurite
+    57453,  # Carbon Fiber
+    57454,  # Oxy-Organic Solvents
+    57455,  # Thermosetting Polymer
+    # Advanced moon reaction products (T2)
+    16670,  # Crystalline Carbonide
+    17317,  # Fermionic Condensates
+    16671,  # Titanium Carbide
+    16672,  # Tungsten Carbide
+    16673,  # Fernite Carbide
+    16678,  # Sylramic Fibers
+    16679,  # Fullerides
+    16680,  # Phenolic Composites
+    16681,  # Nanotransistors
+    16682,  # Hypersynaptic Fibers
+    16683,  # Ferrogel
+    33359,  # Photonic Metamaterials
+    33360,  # Terahertz Metamaterials
+    33361,  # Plasmonic Metamaterials
+    33362,  # Nonlinear Metamaterials
 ]
 
 # ── Anomaly ores (found in ore anomalies) ─────────────────────────────────
