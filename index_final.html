@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603040420"></script>
+    <script src="buyback_data.js?v=202603040438"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -5142,7 +5142,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
         async function loadInventoryData() {
             const inventory = EMBEDDED_DATA.inventory;
             renderMinerals(inventory);
-            const iceSubs = window.BUYBACK_DATA && BUYBACK_DATA.marketVisibility && BUYBACK_DATA.marketVisibility.ice_products
+            const iceSubs = typeof BUYBACK_DATA !== 'undefined' && BUYBACK_DATA.marketVisibility && BUYBACK_DATA.marketVisibility.ice_products
                 ? BUYBACK_DATA.marketVisibility.ice_products.subs : null;
             renderIceProducts(inventory, iceSubs);
             renderMoonMaterials(inventory);
@@ -5418,7 +5418,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
         }
 
         function applyMarketVisibility() {
-            if (!window.BUYBACK_DATA || !BUYBACK_DATA.marketVisibility) return;
+            if (typeof BUYBACK_DATA === 'undefined' || !BUYBACK_DATA.marketVisibility) return;
             const mv = BUYBACK_DATA.marketVisibility;
 
             // Show/hide market sub-tab buttons
