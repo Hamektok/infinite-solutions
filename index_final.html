@@ -445,7 +445,8 @@
         .pi-tier-tabs {
             display: flex;
             gap: 8px;
-            padding: 16px 0 20px 0;
+            padding: 0 0 20px 0;
+            margin-top: -25px;
             flex-wrap: wrap;
         }
 
@@ -2185,8 +2186,7 @@
                     <!-- PLANETARY MATERIALS SUB-CONTENT -->
                     <div id="pi-content" class="tab-content">
                         <div class="pi-tier-tabs">
-                            <button class="pi-tier-tab active" onclick="filterPI(this, 'all')">All</button>
-                            <button class="pi-tier-tab" onclick="filterPI(this, 'p1')">P1 - Processed</button>
+                            <button class="pi-tier-tab active" onclick="filterPI(this, 'p1')">P1 - Processed</button>
                             <button class="pi-tier-tab" onclick="filterPI(this, 'p2')">P2 - Refined</button>
                             <button class="pi-tier-tab" onclick="filterPI(this, 'p3')">P3 - Specialized</button>
                             <button class="pi-tier-tab" onclick="filterPI(this, 'p4')">P4 - Advanced</button>
@@ -5351,20 +5351,13 @@ Tip: Copy directly from EVE inventory window"></textarea>
             });
         }
 
-        function renderPlanetaryMaterials(inventory, tierFilter = 'all') {
+        function renderPlanetaryMaterials(inventory, tierFilter = 'p1') {
             const grid = document.getElementById('pi-grid');
             grid.innerHTML = '';
 
             Object.entries(PLANETARY_MATERIALS).forEach(([group, materials]) => {
-                const groupKey = group.split(' ')[0].toLowerCase(); // 'p1', 'p2', etc.
-                if (tierFilter !== 'all' && groupKey !== tierFilter) return;
-
-                if (tierFilter === 'all') {
-                    const divider = document.createElement('div');
-                    divider.className = 'ice-group-divider';
-                    divider.textContent = group;
-                    grid.appendChild(divider);
-                }
+                const groupKey = group.split(' ')[0].toLowerCase();
+                if (groupKey !== tierFilter) return;
 
                 materials.forEach(material => {
                     const quantity = inventory[material] || 0;
