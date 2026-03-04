@@ -2128,6 +2128,7 @@
                     <button class="sub-tab active" onclick="showSubTab('minerals')">Minerals</button>
                     <button class="sub-tab" onclick="showSubTab('ice')">Ice Products</button>
                     <button class="sub-tab" onclick="showSubTab('moon')">Moon Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('pi')">Planetary Materials</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" style="display:none;">Salvage</button>
                 </div>
 
@@ -2145,6 +2146,11 @@
                     <!-- MOON MATERIALS SUB-CONTENT -->
                     <div id="moon-content" class="tab-content">
                         <div class="item-grid" id="moon-materials"></div>
+                    </div>
+
+                    <!-- PLANETARY MATERIALS SUB-CONTENT -->
+                    <div id="pi-content" class="tab-content">
+                        <div class="item-grid" id="pi-grid"></div>
                     </div>
 
                     <!-- SALVAGE SUB-CONTENT (hidden initially) -->
@@ -4942,6 +4948,36 @@ Tip: Copy directly from EVE inventory window"></textarea>
             'R64 - Exceptional': ['Promethium', 'Neodymium', 'Dysprosium', 'Thulium']
         };
 
+        const PLANETARY_MATERIALS = {
+            'P1 - Processed': [
+                'Bacteria', 'Biofuels', 'Biomass', 'Chiral Structures', 'Electrolytes',
+                'Industrial Fibers', 'Oxidizing Compound', 'Oxygen', 'Plasmoids',
+                'Precious Metals', 'Proteins', 'Reactive Metals', 'Silicon', 'Toxic Metals', 'Water'
+            ],
+            'P2 - Refined': [
+                'Biocells', 'Construction Blocks', 'Consumer Electronics', 'Coolant',
+                'Data Sheets', 'Enriched Uranium', 'Genetically Enhanced Livestock',
+                'Mechanical Parts', 'Microfiber Shielding', 'Miniature Electronics',
+                'Nanites', 'Oxides', 'Polyaramids', 'Polytextiles', 'Rocket Fuel',
+                'Silicate Glass', 'Superconductors', 'Supertensile Plastics',
+                'Synthetic Oil', 'Test Cultures', 'Transmitter', 'Viral Agent'
+            ],
+            'P3 - Specialized': [
+                'Biotech Research Reports', 'Camera Drones', 'Condensates',
+                'Cryoprotectant Solution', 'Data Chips', 'Gel-Matrix Biopaste',
+                'Guidance Systems', 'Hazmat Detection Systems', 'Hermetic Membranes',
+                'High-Tech Transmitters', 'Industrial Explosives', 'Neocoms',
+                'Nuclear Reactors', 'Planetary Vehicles', 'Robotics', 'Smartfab Units',
+                'Supercomputers', 'Synthetic Synapses', 'Transcranial Microcontrollers',
+                'Ukomi Superconductors', 'Vaccines'
+            ],
+            'P4 - Advanced': [
+                'Broadcast Node', 'Integrity Response Drones', 'Nano-Factory',
+                'Organic Mortar Applicators', 'Recursive Computing Module',
+                'Self-Harmonizing Power Core', 'Sterile Conduits', 'Wetware Mainframe'
+            ],
+        };
+
         const SALVAGE_MATERIALS = {
             'Common': [
                 'Scorched Telemetry Processor', 'Malfunctioning Shield Emitter',
@@ -5020,7 +5056,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         function showSubTab(subTabName) {
             // Hide all sub-content
-            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #salvage-content').forEach(content => {
+            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #salvage-content').forEach(content => {
                 content.classList.remove('active');
             });
 
@@ -5045,6 +5081,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             renderMinerals(inventory);
             renderIceProducts(inventory);
             renderMoonMaterials(inventory);
+            renderPlanetaryMaterials(inventory);
             renderSalvage(inventory);
         }
 
@@ -5269,6 +5306,24 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     const quantity = inventory[material] || 0;
                     const item = createItemCard(material, quantity, getRates(material));
                     container.appendChild(item);
+                });
+            });
+        }
+
+        function renderPlanetaryMaterials(inventory) {
+            const grid = document.getElementById('pi-grid');
+            grid.innerHTML = '';
+
+            Object.entries(PLANETARY_MATERIALS).forEach(([group, materials]) => {
+                const divider = document.createElement('div');
+                divider.className = 'ice-group-divider';
+                divider.textContent = group;
+                grid.appendChild(divider);
+
+                materials.forEach(material => {
+                    const quantity = inventory[material] || 0;
+                    const item = createItemCard(material, quantity, getRates(material));
+                    grid.appendChild(item);
                 });
             });
         }
