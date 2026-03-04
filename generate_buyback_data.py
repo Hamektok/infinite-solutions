@@ -316,23 +316,24 @@ def main():
 
     print(f"  Written to: buyback_data.js")
 
-    # Update cache-busting version in index_final.html and index.html
-    # so browsers always fetch the latest buyback_data.js after a deploy
+    # Update index_final.html cache-busting version, then sync to index.html
+    # index_final.html is the source of truth - index.html is always a copy
+    import re as _re
+    import shutil as _shutil
     version = datetime.now(timezone.utc).strftime('%Y%m%d%H%M')
-    for html_name in ('index_final.html', 'index.html'):
-        html_path = os.path.join(os.path.dirname(__file__), html_name)
-        if not os.path.exists(html_path):
-            continue
-        import re as _re
-        with open(html_path, 'r', encoding='utf-8') as f:
+    final_path = os.path.join(os.path.dirname(__file__), 'index_final.html')
+    index_path = os.path.join(os.path.dirname(__file__), 'index.html')
+    if os.path.exists(final_path):
+        with open(final_path, 'r', encoding='utf-8') as f:
             html = f.read()
         html = _re.sub(
             r'<script src="buyback_data\.js(\?v=[^"]*)?">',
             f'<script src="buyback_data.js?v={version}">',
             html)
-        with open(html_path, 'w', encoding='utf-8') as f:
+        with open(final_path, 'w', encoding='utf-8') as f:
             f.write(html)
-    print(f"  Cache version updated: ?v={version}")
+        _shutil.copy2(final_path, index_path)
+        print(f"  Cache version updated: ?v={version} (index.html synced from index_final.html)")
 
     print("Done!")
 
