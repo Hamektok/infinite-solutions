@@ -442,6 +442,22 @@
             padding-top: 0;
         }
 
+        .ice-group-divider {
+            grid-column: 1 / -1;
+            color: rgba(160, 190, 210, 0.6);
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+            margin-top: 16px;
+        }
+
+        .ice-group-divider:first-child {
+            margin-top: 0;
+        }
+
         .item {
             background: rgba(0, 50, 80, 0.3);
             border: 1px solid rgba(0, 217, 255, 0.3);
@@ -5226,21 +5242,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
             grid.innerHTML = '';
 
             Object.entries(ICE_PRODUCTS).forEach(([group, products]) => {
-                const header = document.createElement('div');
-                header.className = 'salvage-tier-header';
-                header.textContent = group;
-                grid.appendChild(header);
-
-                const groupGrid = document.createElement('div');
-                groupGrid.className = 'item-grid';
+                const divider = document.createElement('div');
+                divider.className = 'ice-group-divider';
+                divider.textContent = group;
+                grid.appendChild(divider);
 
                 products.forEach(product => {
                     const quantity = inventory[product] || 0;
                     const item = createItemCard(product, quantity, getRates(product));
-                    groupGrid.appendChild(item);
+                    grid.appendChild(item);
                 });
-
-                grid.appendChild(groupGrid);
             });
         }
 
