@@ -136,6 +136,7 @@
              border: 1px solid #1a5060; }
 
   .footer-note { margin-top: 10px; color: #3a6080; font-size: 11px; font-style: italic; }
+  .sub-tag { display:block; color:#3a7090; font-size:10px; margin-top:2px; }
 </style>
 </head>
 <body>
@@ -294,9 +295,9 @@
   <!-- Filter row -->
   <div class="filter-row">
     <label>Search:</label>
-    <input type="text" placeholder="Item name&hellip;">
+    <input type="text" id="search-input" placeholder="Item name…">
     <label>Category:</label>
-    <select>
+    <select id="cat-filter">
       <option>All Categories</option>
       <option>Minerals</option>
       <option>Ice Products</option>
@@ -314,6 +315,7 @@
   </div>
 
   <!-- Table -->
+  <div style="color:#3a7090;font-size:11px;margin-bottom:4px;" id="item-count"></div>
   <div class="tree-wrap">
     <table>
       <thead>
@@ -330,105 +332,7 @@
           <th style="width:90px;text-align:center;">Verdict</th>
         </tr>
       </thead>
-      <tbody>
-
-        <tr>
-          <td>Intact Armor Plates</td>
-          <td><span class="cat-tag">Salvaged</span></td>
-          <td class="num">0.01</td>
-          <td class="num">2,128,000</td>
-          <td class="num">21,281</td>
-          <td class="num">2,149,281</td>
-          <td class="num">2,447,200</td>
-          <td class="num">297,919</td>
-          <td class="margin-cell mg-great">12.2%</td>
-          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
-        </tr>
-
-        <tr>
-          <td>Elite Drone AI</td>
-          <td><span class="cat-tag">Salvaged</span></td>
-          <td class="num">0.01</td>
-          <td class="num">2,000,000</td>
-          <td class="num">20,001</td>
-          <td class="num">2,020,001</td>
-          <td class="num">2,300,000</td>
-          <td class="num">279,999</td>
-          <td class="margin-cell mg-great">12.2%</td>
-          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
-        </tr>
-
-        <tr>
-          <td>Integrity Response Drones</td>
-          <td><span class="cat-tag">PI Mat.</span></td>
-          <td class="num">50.00</td>
-          <td class="num">2,192,000</td>
-          <td class="num">28,170</td>
-          <td class="num">2,220,170</td>
-          <td class="num">2,520,800</td>
-          <td class="num">300,630</td>
-          <td class="margin-cell mg-great">11.9%</td>
-          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
-        </tr>
-
-        <tr>
-          <td>Camera Drones</td>
-          <td><span class="cat-tag">PI Mat.</span></td>
-          <td class="num">3.00</td>
-          <td class="num">89,890</td>
-          <td class="num">1,274</td>
-          <td class="num">91,164</td>
-          <td class="num">103,374</td>
-          <td class="num">12,210</td>
-          <td class="margin-cell mg-great">11.8%</td>
-          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
-        </tr>
-
-        <tr>
-          <td>Biotech Research Reports</td>
-          <td><span class="cat-tag">PI Mat.</span></td>
-          <td class="num">3.00</td>
-          <td class="num">102,600</td>
-          <td class="num">1,401</td>
-          <td class="num">104,001</td>
-          <td class="num">117,990</td>
-          <td class="num">13,989</td>
-          <td class="margin-cell mg-great">11.9%</td>
-          <td style="text-align:center;"><span class="verdict v-yes">&#10003; Import</span></td>
-        </tr>
-
-        <tr>
-          <td>Tritanium</td>
-          <td><span class="cat-tag">Minerals</span></td>
-          <td class="num">0.01</td>
-          <td class="num">5.50</td>
-          <td class="num">1.31</td>
-          <td class="num">6.81</td>
-          <td class="num">6.33</td>
-          <td class="num">-0.48</td>
-          <td class="margin-cell mg-neg">-7.6%</td>
-          <td style="text-align:center;"><span class="verdict v-no">&#10007; Avoid</span></td>
-        </tr>
-
-        <tr>
-          <td>Pyerite</td>
-          <td><span class="cat-tag">Minerals</span></td>
-          <td class="num">0.01</td>
-          <td class="num">5.32</td>
-          <td class="num">1.31</td>
-          <td class="num">6.63</td>
-          <td class="num">6.12</td>
-          <td class="num">-0.51</td>
-          <td class="margin-cell mg-neg">-8.3%</td>
-          <td style="text-align:center;"><span class="verdict v-no">&#10007; Avoid</span></td>
-        </tr>
-
-        <tr>
-          <td colspan="10" style="text-align:center;color:#3a6080;padding:6px;font-style:italic;font-size:11px;">
-            &hellip; 140 more rows &hellip;
-          </td>
-        </tr>
-      </tbody>
+      <tbody id="item-tbody"></tbody>
     </table>
   </div>
 
@@ -442,5 +346,40 @@
   </div>
 
 </div>
+
+<script>
+const ITEMS = [["Clear Icicle", "ice_ore", "", 1000.0], ["Glacial Mass", "ice_ore", "", 1000.0], ["Blue Ice", "ice_ore", "", 1000.0], ["White Glaze", "ice_ore", "", 1000.0], ["Glare Crust", "ice_ore", "", 1000.0], ["Dark Glitter", "ice_ore", "", 1000.0], ["Gelidus", "ice_ore", "", 1000.0], ["Krystallos", "ice_ore", "", 1000.0], ["Blue Ice IV-Grade", "ice_ore", "", 1000.0], ["White Glaze IV-Grade", "ice_ore", "", 1000.0], ["Glacial Mass IV-Grade", "ice_ore", "", 1000.0], ["Clear Icicle IV-Grade", "ice_ore", "", 1000.0], ["Compressed Blue Ice", "ice_ore", "", 100.0], ["Compressed Blue Ice IV-Grade", "ice_ore", "", 100.0], ["Compressed Clear Icicle", "ice_ore", "", 100.0], ["Compressed Clear Icicle IV-Grade", "ice_ore", "", 100.0], ["Compressed Dark Glitter", "ice_ore", "", 100.0], ["Compressed Gelidus", "ice_ore", "", 100.0], ["Compressed Glacial Mass", "ice_ore", "", 100.0], ["Compressed Glacial Mass IV-Grade", "ice_ore", "", 100.0], ["Compressed Glare Crust", "ice_ore", "", 100.0], ["Compressed Krystallos", "ice_ore", "", 100.0], ["Compressed White Glaze", "ice_ore", "", 100.0], ["Compressed White Glaze IV-Grade", "ice_ore", "", 100.0], ["Nitrogen Fuel Block", "Ice Products", "Fuel Blocks", 5.0], ["Hydrogen Fuel Block", "Ice Products", "Fuel Blocks", 5.0], ["Helium Fuel Block", "Ice Products", "Fuel Blocks", 5.0], ["Oxygen Fuel Block", "Ice Products", "Fuel Blocks", 5.0], ["Heavy Water", "Ice Products", "Refined Ice", 0.4], ["Liquid Ozone", "Ice Products", "Refined Ice", 0.4], ["Strontium Clathrates", "Ice Products", "Refined Ice", 3.0], ["Oxygen Isotopes", "Ice Products", "Isotopes", 0.03], ["Hydrogen Isotopes", "Ice Products", "Isotopes", 0.03], ["Helium Isotopes", "Ice Products", "Isotopes", 0.03], ["Nitrogen Isotopes", "Ice Products", "Isotopes", 0.03], ["Tritanium", "Minerals", "", 0.01], ["Pyerite", "Minerals", "", 0.01], ["Isogen", "Minerals", "", 0.01], ["Mexallon", "Minerals", "", 0.01], ["Nocxium", "Minerals", "", 0.01], ["Zydrine", "Minerals", "", 0.01], ["Megacyte", "Minerals", "", 0.01], ["Morphite", "Minerals", "", 0.01], ["Atmospheric Gases", "Moon Materials", "Raw", 0.05], ["Evaporite Deposits", "Moon Materials", "Raw", 0.05], ["Hydrocarbons", "Moon Materials", "Raw", 0.05], ["Silicates", "Moon Materials", "Raw", 0.05], ["Cobalt", "Moon Materials", "Raw", 0.05], ["Scandium", "Moon Materials", "Raw", 0.05], ["Tungsten", "Moon Materials", "Raw", 0.05], ["Titanium", "Moon Materials", "Raw", 0.05], ["Chromium", "Moon Materials", "Raw", 0.05], ["Cadmium", "Moon Materials", "Raw", 0.05], ["Platinum", "Moon Materials", "Raw", 0.05], ["Vanadium", "Moon Materials", "Raw", 0.05], ["Technetium", "Moon Materials", "Raw", 0.05], ["Mercury", "Moon Materials", "Raw", 0.05], ["Caesium", "Moon Materials", "Raw", 0.05], ["Hafnium", "Moon Materials", "Raw", 0.05], ["Promethium", "Moon Materials", "Raw", 0.05], ["Neodymium", "Moon Materials", "Raw", 0.05], ["Dysprosium", "Moon Materials", "Raw", 0.05], ["Thulium", "Moon Materials", "Raw", 0.05], ["Titanium Chromide", "Moon Materials", "Processed", 0.2], ["Crystallite Alloy", "Moon Materials", "Processed", 0.2], ["Fernite Alloy", "Moon Materials", "Processed", 0.2], ["Rolled Tungsten Alloy", "Moon Materials", "Processed", 0.2], ["Silicon Diborite", "Moon Materials", "Processed", 0.2], ["Carbon Polymers", "Moon Materials", "Processed", 0.2], ["Ceramic Powder", "Moon Materials", "Processed", 0.2], ["Sulfuric Acid", "Moon Materials", "Processed", 0.2], ["Platinum Technite", "Moon Materials", "Processed", 0.2], ["Caesarium Cadmide", "Moon Materials", "Processed", 0.2], ["Solerium", "Moon Materials", "Processed", 0.2], ["Hexite", "Moon Materials", "Processed", 0.2], ["Hyperflurite", "Moon Materials", "Processed", 0.2], ["Neo Mercurite", "Moon Materials", "Processed", 0.2], ["Dysporite", "Moon Materials", "Processed", 0.2], ["Ferrofluid", "Moon Materials", "Processed", 0.2], ["Fluxed Condensates", "Moon Materials", "Processed", 0.2], ["Vanadium Hafnite", "Moon Materials", "Processed", 0.2], ["Prometium", "Moon Materials", "Processed", 0.2], ["Thulium Hafnite", "Moon Materials", "Processed", 0.2], ["Promethium Mercurite", "Moon Materials", "Processed", 0.2], ["Carbon Fiber", "Moon Materials", "Processed", 0.2], ["Oxy-Organic Solvents", "Moon Materials", "Processed", 0.1], ["Thermosetting Polymer", "Moon Materials", "Processed", 0.2], ["Crystalline Carbonide", "Moon Materials", "Advanced", 0.01], ["Fermionic Condensates", "Moon Materials", "Advanced", 1.3], ["Fernite Carbide", "Moon Materials", "Advanced", 0.01], ["Ferrogel", "Moon Materials", "Advanced", 1.0], ["Fullerides", "Moon Materials", "Advanced", 0.15], ["Hypersynaptic Fibers", "Moon Materials", "Advanced", 0.6], ["Nanotransistors", "Moon Materials", "Advanced", 0.25], ["Phenolic Composites", "Moon Materials", "Advanced", 0.2], ["Sylramic Fibers", "Moon Materials", "Advanced", 0.05], ["Titanium Carbide", "Moon Materials", "Advanced", 0.01], ["Tungsten Carbide", "Moon Materials", "Advanced", 0.01], ["Nonlinear Metamaterials", "Moon Materials", "Advanced", 1.0], ["Photonic Metamaterials", "Moon Materials", "Advanced", 1.0], ["Plasmonic Metamaterials", "Moon Materials", "Advanced", 1.0], ["Terahertz Metamaterials", "Moon Materials", "Advanced", 1.0], ["Zeolites", "moon_ore", "", 10.0], ["Sylvite", "moon_ore", "", 10.0], ["Bitumens", "moon_ore", "", 10.0], ["Coesite", "moon_ore", "", 10.0], ["Brimful Zeolites", "moon_ore", "", 10.0], ["Brimful Sylvite", "moon_ore", "", 10.0], ["Brimful Bitumens", "moon_ore", "", 10.0], ["Brimful Coesite", "moon_ore", "", 10.0], ["Glistening Zeolites", "moon_ore", "", 10.0], ["Glistening Sylvite", "moon_ore", "", 10.0], ["Glistening Bitumens", "moon_ore", "", 10.0], ["Glistening Coesite", "moon_ore", "", 10.0], ["Cobaltite", "moon_ore", "", 10.0], ["Euxenite", "moon_ore", "", 10.0], ["Titanite", "moon_ore", "", 10.0], ["Scheelite", "moon_ore", "", 10.0], ["Copious Cobaltite", "moon_ore", "", 10.0], ["Copious Euxenite", "moon_ore", "", 10.0], ["Copious Titanite", "moon_ore", "", 10.0], ["Copious Scheelite", "moon_ore", "", 10.0], ["Twinkling Cobaltite", "moon_ore", "", 10.0], ["Twinkling Euxenite", "moon_ore", "", 10.0], ["Twinkling Titanite", "moon_ore", "", 10.0], ["Twinkling Scheelite", "moon_ore", "", 10.0], ["Otavite", "moon_ore", "", 10.0], ["Sperrylite", "moon_ore", "", 10.0], ["Vanadinite", "moon_ore", "", 10.0], ["Chromite", "moon_ore", "", 10.0], ["Lavish Otavite", "moon_ore", "", 10.0], ["Lavish Sperrylite", "moon_ore", "", 10.0], ["Lavish Vanadinite", "moon_ore", "", 10.0], ["Lavish Chromite", "moon_ore", "", 10.0], ["Shimmering Otavite", "moon_ore", "", 10.0], ["Shimmering Sperrylite", "moon_ore", "", 10.0], ["Shimmering Vanadinite", "moon_ore", "", 10.0], ["Shimmering Chromite", "moon_ore", "", 10.0], ["Carnotite", "moon_ore", "", 10.0], ["Zircon", "moon_ore", "", 10.0], ["Pollucite", "moon_ore", "", 10.0], ["Cinnabar", "moon_ore", "", 10.0], ["Replete Carnotite", "moon_ore", "", 10.0], ["Replete Zircon", "moon_ore", "", 10.0], ["Replete Pollucite", "moon_ore", "", 10.0], ["Replete Cinnabar", "moon_ore", "", 10.0], ["Glowing Carnotite", "moon_ore", "", 10.0], ["Glowing Zircon", "moon_ore", "", 10.0], ["Glowing Pollucite", "moon_ore", "", 10.0], ["Glowing Cinnabar", "moon_ore", "", 10.0], ["Xenotime", "moon_ore", "", 10.0], ["Monazite", "moon_ore", "", 10.0], ["Loparite", "moon_ore", "", 10.0], ["Ytterbite", "moon_ore", "", 10.0], ["Bountiful Xenotime", "moon_ore", "", 10.0], ["Bountiful Monazite", "moon_ore", "", 10.0], ["Bountiful Loparite", "moon_ore", "", 10.0], ["Bountiful Ytterbite", "moon_ore", "", 10.0], ["Shining Xenotime", "moon_ore", "", 10.0], ["Shining Monazite", "moon_ore", "", 10.0], ["Shining Loparite", "moon_ore", "", 10.0], ["Shining Ytterbite", "moon_ore", "", 10.0], ["Compressed Bitumens", "moon_ore", "", 0.1], ["Compressed Coesite", "moon_ore", "", 0.1], ["Compressed Brimful Bitumens", "moon_ore", "", 0.1], ["Compressed Brimful Coesite", "moon_ore", "", 0.1], ["Compressed Brimful Sylvite", "moon_ore", "", 0.1], ["Compressed Brimful Zeolites", "moon_ore", "", 0.1], ["Compressed Glistening Bitumens", "moon_ore", "", 0.1], ["Compressed Glistening Coesite", "moon_ore", "", 0.1], ["Compressed Glistening Sylvite", "moon_ore", "", 0.1], ["Compressed Glistening Zeolites", "moon_ore", "", 0.1], ["Compressed Sylvite", "moon_ore", "", 0.1], ["Compressed Zeolites", "moon_ore", "", 0.1], ["Compressed Cobaltite", "moon_ore", "", 0.1], ["Compressed Euxenite", "moon_ore", "", 0.1], ["Compressed Scheelite", "moon_ore", "", 0.1], ["Compressed Titanite", "moon_ore", "", 0.1], ["Compressed Copious Cobaltite", "moon_ore", "", 0.1], ["Compressed Copious Euxenite", "moon_ore", "", 0.1], ["Compressed Copious Scheelite", "moon_ore", "", 0.1], ["Compressed Copious Titanite", "moon_ore", "", 0.1], ["Compressed Twinkling Cobaltite", "moon_ore", "", 0.1], ["Compressed Twinkling Euxenite", "moon_ore", "", 0.1], ["Compressed Twinkling Scheelite", "moon_ore", "", 0.1], ["Compressed Twinkling Titanite", "moon_ore", "", 0.1], ["Compressed Chromite", "moon_ore", "", 0.1], ["Compressed Otavite", "moon_ore", "", 0.1], ["Compressed Sperrylite", "moon_ore", "", 0.1], ["Compressed Vanadinite", "moon_ore", "", 0.1], ["Compressed Lavish Chromite", "moon_ore", "", 0.1], ["Compressed Lavish Otavite", "moon_ore", "", 0.1], ["Compressed Lavish Sperrylite", "moon_ore", "", 0.1], ["Compressed Lavish Vanadinite", "moon_ore", "", 0.1], ["Compressed Shimmering Chromite", "moon_ore", "", 0.1], ["Compressed Shimmering Otavite", "moon_ore", "", 0.1], ["Compressed Shimmering Sperrylite", "moon_ore", "", 0.1], ["Compressed Shimmering Vanadinite", "moon_ore", "", 0.1], ["Compressed Carnotite", "moon_ore", "", 0.1], ["Compressed Zircon", "moon_ore", "", 0.1], ["Compressed Pollucite", "moon_ore", "", 0.1], ["Compressed Cinnabar", "moon_ore", "", 0.1], ["Compressed Replete Carnotite", "moon_ore", "", 0.1], ["Compressed Replete Zircon", "moon_ore", "", 0.1], ["Compressed Replete Pollucite", "moon_ore", "", 0.1], ["Compressed Replete Cinnabar", "moon_ore", "", 0.1], ["Compressed Glowing Carnotite", "moon_ore", "", 0.1], ["Compressed Glowing Zircon", "moon_ore", "", 0.1], ["Compressed Glowing Pollucite", "moon_ore", "", 0.1], ["Compressed Glowing Cinnabar", "moon_ore", "", 0.1], ["Compressed Loparite", "moon_ore", "", 0.1], ["Compressed Xenotime", "moon_ore", "", 0.1], ["Compressed Monazite", "moon_ore", "", 0.1], ["Compressed Ytterbite", "moon_ore", "", 0.1], ["Compressed Bountiful Loparite", "moon_ore", "", 0.1], ["Compressed Bountiful Xenotime", "moon_ore", "", 0.1], ["Compressed Bountiful Monazite", "moon_ore", "", 0.1], ["Compressed Bountiful Ytterbite", "moon_ore", "", 0.1], ["Compressed Shining Loparite", "moon_ore", "", 0.1], ["Compressed Shining Xenotime", "moon_ore", "", 0.1], ["Compressed Shining Monazite", "moon_ore", "", 0.1], ["Compressed Shining Ytterbite", "moon_ore", "", 0.1], ["Biocells", "PI Materials", "P2", 0.75], ["Camera Drones", "PI Materials", "P3", 3.0], ["Gel-Matrix Biopaste", "PI Materials", "P3", 3.0], ["Supercomputers", "PI Materials", "P3", 3.0], ["Smartfab Units", "PI Materials", "P3", 3.0], ["Nuclear Reactors", "PI Materials", "P3", 3.0], ["Neocoms", "PI Materials", "P3", 3.0], ["Industrial Explosives", "PI Materials", "P3", 3.0], ["Hermetic Membranes", "PI Materials", "P3", 3.0], ["Cryoprotectant Solution", "PI Materials", "P3", 3.0], ["Chiral Structures", "PI Materials", "P1", 0.19], ["Nanites", "PI Materials", "P2", 0.75], ["Broadcast Node", "PI Materials", "P4", 50.0], ["Integrity Response Drones", "PI Materials", "P4", 50.0], ["Nano-Factory", "PI Materials", "P4", 50.0], ["Organic Mortar Applicators", "PI Materials", "P4", 50.0], ["Recursive Computing Module", "PI Materials", "P4", 50.0], ["Self-Harmonizing Power Core", "PI Materials", "P4", 50.0], ["Sterile Conduits", "PI Materials", "P4", 50.0], ["Wetware Mainframe", "PI Materials", "P4", 50.0], ["Water", "PI Materials", "P1", 0.19], ["Viral Agent", "PI Materials", "P2", 0.75], ["Biomass", "PI Materials", "P1", 0.19], ["Construction Blocks", "PI Materials", "P2", 0.75], ["Superconductors", "PI Materials", "P2", 0.75], ["Miniature Electronics", "PI Materials", "P2", 0.75], ["Planetary Vehicles", "PI Materials", "P3", 3.0], ["Biotech Research Reports", "PI Materials", "P3", 3.0], ["Condensates", "PI Materials", "P3", 3.0], ["Data Chips", "PI Materials", "P3", 3.0], ["Hazmat Detection Systems", "PI Materials", "P3", 3.0], ["High-Tech Transmitters", "PI Materials", "P3", 3.0], ["Synthetic Synapses", "PI Materials", "P3", 3.0], ["Transcranial Microcontrollers", "PI Materials", "P3", 3.0], ["Ukomi Superconductors", "PI Materials", "P3", 3.0], ["Vaccines", "PI Materials", "P3", 3.0], ["Genetically Enhanced Livestock", "PI Materials", "P2", 0.75], ["Microfiber Shielding", "PI Materials", "P2", 0.75], ["Polyaramids", "PI Materials", "P2", 0.75], ["Polytextiles", "PI Materials", "P2", 0.75], ["Silicate Glass", "PI Materials", "P2", 0.75], ["Synthetic Oil", "PI Materials", "P2", 0.75], ["Test Cultures", "PI Materials", "P2", 0.75], ["Bacteria", "PI Materials", "P1", 0.19], ["Biofuels", "PI Materials", "P1", 0.19], ["Electrolytes", "PI Materials", "P1", 0.19], ["Industrial Fibers", "PI Materials", "P1", 0.19], ["Oxidizing Compound", "PI Materials", "P1", 0.19], ["Plasmoids", "PI Materials", "P1", 0.19], ["Precious Metals", "PI Materials", "P1", 0.19], ["Proteins", "PI Materials", "P1", 0.19], ["Reactive Metals", "PI Materials", "P1", 0.19], ["Silicon", "PI Materials", "P1", 0.19], ["Toxic Metals", "PI Materials", "P1", 0.19], ["Enriched Uranium", "PI Materials", "P2", 0.75], ["Oxygen", "PI Materials", "P1", 0.19], ["Mechanical Parts", "PI Materials", "P2", 0.75], ["Coolant", "PI Materials", "P2", 0.75], ["Robotics", "PI Materials", "P3", 3.0], ["Rocket Fuel", "PI Materials", "P2", 0.75], ["Guidance Systems", "PI Materials", "P3", 3.0], ["Consumer Electronics", "PI Materials", "P2", 0.75], ["Transmitter", "PI Materials", "P2", 0.75], ["Supertensile Plastics", "PI Materials", "P2", 0.75], ["Oxides", "PI Materials", "P2", 0.75], ["Scorched Telemetry Processor", "Salvaged Materials", "Common", 0.01], ["Malfunctioning Shield Emitter", "Salvaged Materials", "Common", 0.01], ["Smashed Trigger Unit", "Salvaged Materials", "Common", 0.01], ["Alloyed Tritanium Bar", "Salvaged Materials", "Common", 0.01], ["Broken Drone Transceiver", "Salvaged Materials", "Common", 0.01], ["Damaged Artificial Neural Network", "Salvaged Materials", "Common", 0.01], ["Tripped Power Circuit", "Salvaged Materials", "Common", 0.01], ["Charred Micro Circuit", "Salvaged Materials", "Common", 0.01], ["Contaminated Nanite Compound", "Salvaged Materials", "Uncommon", 0.01], ["Contaminated Lorentz Fluid", "Salvaged Materials", "Uncommon", 0.01], ["Defective Current Pump", "Salvaged Materials", "Uncommon", 0.01], ["Tangled Power Conduit", "Salvaged Materials", "Uncommon", 0.01], ["Burned Logic Circuit", "Salvaged Materials", "Uncommon", 0.01], ["Fried Interface Circuit", "Salvaged Materials", "Uncommon", 0.01], ["Thruster Console", "Salvaged Materials", "Uncommon", 0.01], ["Melted Capacitor Console", "Salvaged Materials", "Uncommon", 0.01], ["Conductive Polymer", "Salvaged Materials", "Uncommon", 0.01], ["Armor Plates", "Salvaged Materials", "Uncommon", 0.01], ["Ward Console", "Salvaged Materials", "Uncommon", 0.01], ["Telemetry Processor", "Salvaged Materials", "Rare", 0.01], ["Current Pump", "Salvaged Materials", "Rare", 0.01], ["Power Conduit", "Salvaged Materials", "Rare", 0.01], ["Single-crystal Superalloy I-beam", "Salvaged Materials", "Rare", 0.01], ["Drone Transceiver", "Salvaged Materials", "Rare", 0.01], ["Artificial Neural Network", "Salvaged Materials", "Rare", 0.01], ["Micro Circuit", "Salvaged Materials", "Rare", 0.01], ["Interface Circuit", "Salvaged Materials", "Rare", 0.01], ["Impetus Console", "Salvaged Materials", "Rare", 0.01], ["Conductive Thermoplastic", "Salvaged Materials", "Rare", 0.01], ["Intact Shield Emitter", "Salvaged Materials", "Very Rare", 0.01], ["Nanite Compound", "Salvaged Materials", "Very Rare", 0.01], ["Lorentz Fluid", "Salvaged Materials", "Very Rare", 0.01], ["Trigger Unit", "Salvaged Materials", "Very Rare", 0.01], ["Power Circuit", "Salvaged Materials", "Very Rare", 0.01], ["Logic Circuit", "Salvaged Materials", "Very Rare", 0.01], ["Capacitor Console", "Salvaged Materials", "Very Rare", 0.01], ["Intact Armor Plates", "Salvaged Materials", "Very Rare", 0.01], ["Enhanced Ward Console", "Salvaged Materials", "Very Rare", 0.01], ["Drone Synaptic Relay Wiring", "Salvaged Materials", "Rogue Drone", 0.01], ["Drone Capillary Fluid", "Salvaged Materials", "Rogue Drone", 0.02], ["Drone Cerebral Fragment", "Salvaged Materials", "Rogue Drone", 0.03], ["Drone Tactical Limb", "Salvaged Materials", "Rogue Drone", 0.07], ["Drone Epidermal Shielding Chunk", "Salvaged Materials", "Rogue Drone", 0.1], ["Drone Coronary Unit", "Salvaged Materials", "Rogue Drone", 0.08], ["Elite Drone AI", "Salvaged Materials", "Rogue Drone", 0.01], ["Drone Graviton Emitter", "Salvaged Materials", "Rogue Drone", 0.01], ["Veldspar", "standard_ore", "", 0.1], ["Veldspar II-Grade", "standard_ore", "", 0.1], ["Veldspar III-Grade", "standard_ore", "", 0.1], ["Veldspar IV-Grade", "standard_ore", "", 0.1], ["Scordite", "standard_ore", "", 0.15], ["Scordite II-Grade", "standard_ore", "", 0.15], ["Scordite III-Grade", "standard_ore", "", 0.15], ["Scordite IV-Grade", "standard_ore", "", 0.15], ["Pyroxeres", "standard_ore", "", 0.3], ["Pyroxeres II-Grade", "standard_ore", "", 0.3], ["Pyroxeres III-Grade", "standard_ore", "", 0.3], ["Pyroxeres IV-Grade", "standard_ore", "", 0.3], ["Plagioclase", "standard_ore", "", 0.35], ["Plagioclase II-Grade", "standard_ore", "", 0.35], ["Plagioclase III-Grade", "standard_ore", "", 0.35], ["Plagioclase IV-Grade", "standard_ore", "", 0.35], ["Omber", "standard_ore", "", 0.6], ["Omber II-Grade", "standard_ore", "", 0.6], ["Omber III-Grade", "standard_ore", "", 0.6], ["Omber IV-Grade", "standard_ore", "", 0.6], ["Kernite", "standard_ore", "", 1.2], ["Kernite II-Grade", "standard_ore", "", 1.2], ["Kernite III-Grade", "standard_ore", "", 1.2], ["Kernite IV-Grade", "standard_ore", "", 1.2], ["Hedbergite", "standard_ore", "", 3.0], ["Hedbergite II-Grade", "standard_ore", "", 3.0], ["Hedbergite III-Grade", "standard_ore", "", 3.0], ["Hedbergite IV-Grade", "standard_ore", "", 3.0], ["Hemorphite", "standard_ore", "", 3.0], ["Hemorphite II-Grade", "standard_ore", "", 3.0], ["Hemorphite III-Grade", "standard_ore", "", 3.0], ["Hemorphite IV-Grade", "standard_ore", "", 3.0], ["Jaspet", "standard_ore", "", 2.0], ["Jaspet II-Grade", "standard_ore", "", 2.0], ["Jaspet III-Grade", "standard_ore", "", 2.0], ["Jaspet IV-Grade", "standard_ore", "", 2.0], ["Gneiss", "standard_ore", "", 5.0], ["Gneiss II-Grade", "standard_ore", "", 5.0], ["Gneiss III-Grade", "standard_ore", "", 5.0], ["Gneiss IV-Grade", "standard_ore", "", 5.0], ["Dark Ochre", "standard_ore", "", 8.0], ["Dark Ochre II-Grade", "standard_ore", "", 8.0], ["Dark Ochre III-Grade", "standard_ore", "", 8.0], ["Dark Ochre IV-Grade", "standard_ore", "", 8.0], ["Crokite", "standard_ore", "", 16.0], ["Crokite II-Grade", "standard_ore", "", 16.0], ["Crokite III-Grade", "standard_ore", "", 16.0], ["Crokite IV-Grade", "standard_ore", "", 16.0], ["Spodumain", "standard_ore", "", 16.0], ["Spodumain II-Grade", "standard_ore", "", 16.0], ["Spodumain III-Grade", "standard_ore", "", 16.0], ["Spodumain IV-Grade", "standard_ore", "", 16.0], ["Bistot", "standard_ore", "", 16.0], ["Bistot II-Grade", "standard_ore", "", 16.0], ["Bistot III-Grade", "standard_ore", "", 16.0], ["Bistot IV-Grade", "standard_ore", "", 16.0], ["Arkonor", "standard_ore", "", 16.0], ["Arkonor II-Grade", "standard_ore", "", 16.0], ["Arkonor III-Grade", "standard_ore", "", 16.0], ["Arkonor IV-Grade", "standard_ore", "", 16.0], ["Mercoxit", "standard_ore", "", 40.0], ["Mercoxit II-Grade", "standard_ore", "", 40.0], ["Mercoxit III-Grade", "standard_ore", "", 40.0], ["Kylixium", "standard_ore", "", 1.2], ["Kylixium II-Grade", "standard_ore", "", 1.2], ["Kylixium III-Grade", "standard_ore", "", 1.2], ["Kylixium IV-Grade", "standard_ore", "", 1.2], ["Nocxite", "standard_ore", "", 4.0], ["Nocxite II-Grade", "standard_ore", "", 4.0], ["Nocxite III-Grade", "standard_ore", "", 4.0], ["Nocxite IV-Grade", "standard_ore", "", 4.0], ["Ueganite", "standard_ore", "", 5.0], ["Ueganite II-Grade", "standard_ore", "", 5.0], ["Ueganite III-Grade", "standard_ore", "", 5.0], ["Ueganite IV-Grade", "standard_ore", "", 5.0], ["Hezorime", "standard_ore", "", 5.0], ["Hezorime II-Grade", "standard_ore", "", 5.0], ["Hezorime III-Grade", "standard_ore", "", 5.0], ["Hezorime IV-Grade", "standard_ore", "", 5.0], ["Griemeer", "standard_ore", "", 0.8], ["Griemeer II-Grade", "standard_ore", "", 0.8], ["Griemeer III-Grade", "standard_ore", "", 0.8], ["Griemeer IV-Grade", "standard_ore", "", 0.8], ["Mordunium", "standard_ore", "", 0.1], ["Mordunium II-Grade", "standard_ore", "", 0.1], ["Mordunium III-Grade", "standard_ore", "", 0.1], ["Mordunium IV-Grade", "standard_ore", "", 0.1], ["Ytirium", "standard_ore", "", 0.6], ["Ytirium II-Grade", "standard_ore", "", 0.6], ["Ytirium III-Grade", "standard_ore", "", 0.6], ["Ytirium IV-Grade", "standard_ore", "", 0.6], ["Eifyrium", "standard_ore", "", 16.0], ["Eifyrium II-Grade", "standard_ore", "", 16.0], ["Eifyrium III-Grade", "standard_ore", "", 16.0], ["Eifyrium IV-Grade", "standard_ore", "", 16.0], ["Ducinium", "standard_ore", "", 16.0], ["Ducinium II-Grade", "standard_ore", "", 16.0], ["Ducinium III-Grade", "standard_ore", "", 16.0], ["Ducinium IV-Grade", "standard_ore", "", 16.0], ["Compressed Veldspar", "standard_ore", "", 0.001], ["Compressed Veldspar II-Grade", "standard_ore", "", 0.001], ["Compressed Veldspar III-Grade", "standard_ore", "", 0.001], ["Compressed Veldspar IV-Grade", "standard_ore", "", 0.001], ["Compressed Scordite", "standard_ore", "", 0.0015], ["Compressed Scordite II-Grade", "standard_ore", "", 0.0015], ["Compressed Scordite III-Grade", "standard_ore", "", 0.0015], ["Compressed Scordite IV-Grade", "standard_ore", "", 0.0015], ["Compressed Pyroxeres", "standard_ore", "", 0.003], ["Compressed Pyroxeres II-Grade", "standard_ore", "", 0.003], ["Compressed Pyroxeres III-Grade", "standard_ore", "", 0.003], ["Compressed Pyroxeres IV-Grade", "standard_ore", "", 0.003], ["Compressed Plagioclase", "standard_ore", "", 0.0035], ["Compressed Plagioclase II-Grade", "standard_ore", "", 0.0035], ["Compressed Plagioclase III-Grade", "standard_ore", "", 0.0035], ["Compressed Plagioclase IV-Grade", "standard_ore", "", 0.0035], ["Compressed Omber", "standard_ore", "", 0.006], ["Compressed Omber II-Grade", "standard_ore", "", 0.006], ["Compressed Omber III-Grade", "standard_ore", "", 0.006], ["Compressed Omber IV-Grade", "standard_ore", "", 0.006], ["Compressed Kernite", "standard_ore", "", 0.012], ["Compressed Kernite II-Grade", "standard_ore", "", 0.012], ["Compressed Kernite III-Grade", "standard_ore", "", 0.012], ["Compressed Kernite IV-Grade", "standard_ore", "", 0.012], ["Compressed Jaspet", "standard_ore", "", 0.02], ["Compressed Jaspet II-Grade", "standard_ore", "", 0.02], ["Compressed Jaspet III-Grade", "standard_ore", "", 0.02], ["Compressed Jaspet IV-Grade", "standard_ore", "", 0.02], ["Compressed Hemorphite", "standard_ore", "", 0.03], ["Compressed Hemorphite II-Grade", "standard_ore", "", 0.03], ["Compressed Hemorphite III-Grade", "standard_ore", "", 0.03], ["Compressed Hemorphite IV-Grade", "standard_ore", "", 0.03], ["Compressed Hedbergite", "standard_ore", "", 0.03], ["Compressed Hedbergite II-Grade", "standard_ore", "", 0.03], ["Compressed Hedbergite III-Grade", "standard_ore", "", 0.03], ["Compressed Hedbergite IV-Grade", "standard_ore", "", 0.03], ["Compressed Gneiss", "standard_ore", "", 0.05], ["Compressed Gneiss II-Grade", "standard_ore", "", 0.05], ["Compressed Gneiss III-Grade", "standard_ore", "", 0.05], ["Compressed Gneiss IV-Grade", "standard_ore", "", 0.05], ["Compressed Dark Ochre", "standard_ore", "", 0.08], ["Compressed Dark Ochre II-Grade", "standard_ore", "", 0.08], ["Compressed Dark Ochre III-Grade", "standard_ore", "", 0.08], ["Compressed Dark Ochre IV-Grade", "standard_ore", "", 0.08], ["Compressed Crokite", "standard_ore", "", 0.16], ["Compressed Crokite II-Grade", "standard_ore", "", 0.16], ["Compressed Crokite III-Grade", "standard_ore", "", 0.16], ["Compressed  Crokite IV-Grade", "standard_ore", "", 0.16], ["Compressed Bistot", "standard_ore", "", 0.16], ["Compressed Bistot II-Grade", "standard_ore", "", 0.16], ["Compressed Bistot III-Grade", "standard_ore", "", 0.16], ["Compressed Bistot IV-Grade", "standard_ore", "", 0.16], ["Compressed Arkonor", "standard_ore", "", 0.16], ["Compressed Arkonor II-Grade", "standard_ore", "", 0.16], ["Compressed Arkonor III-Grade", "standard_ore", "", 0.16], ["Compressed Arkonor IV-Grade", "standard_ore", "", 0.16], ["Compressed Spodumain", "standard_ore", "", 0.16], ["Compressed Spodumain II-Grade", "standard_ore", "", 0.16], ["Compressed Spodumain III-Grade", "standard_ore", "", 0.16], ["Compressed Spodumain IV-Grade", "standard_ore", "", 0.16], ["Compressed Mercoxit", "standard_ore", "", 0.4], ["Compressed Mercoxit II-Grade", "standard_ore", "", 0.4], ["Compressed Mercoxit III-Grade", "standard_ore", "", 0.4], ["Compressed Kylixium", "standard_ore", "", 0.012], ["Compressed Kylixium II-Grade", "standard_ore", "", 0.012], ["Compressed Kylixium III-Grade", "standard_ore", "", 0.012], ["Compressed Kylixium IV-Grade", "standard_ore", "", 0.012], ["Compressed Nocxite", "standard_ore", "", 0.04], ["Compressed Nocxite II-Grade", "standard_ore", "", 0.04], ["Compressed Nocxite III-Grade", "standard_ore", "", 0.04], ["Compressed Nocxite IV-Grade", "standard_ore", "", 0.04], ["Compressed Ueganite", "standard_ore", "", 0.05], ["Compressed Ueganite II-Grade", "standard_ore", "", 0.05], ["Compressed Ueganite III-Grade", "standard_ore", "", 0.05], ["Compressed Ueganite IV-Grade", "standard_ore", "", 0.05], ["Compressed Hezorime", "standard_ore", "", 0.05], ["Compressed Hezorime II-Grade", "standard_ore", "", 0.05], ["Compressed Hezorime III-Grade", "standard_ore", "", 0.05], ["Compressed Hezorime IV-Grade", "standard_ore", "", 0.05], ["Compressed Griemeer", "standard_ore", "", 0.008], ["Compressed Griemeer II-Grade", "standard_ore", "", 0.008], ["Compressed Griemeer III-Grade", "standard_ore", "", 0.008], ["Compressed Griemeer IV-Grade", "standard_ore", "", 0.008], ["Compressed Mordunium", "standard_ore", "", 0.001], ["Compressed Mordunium II-Grade", "standard_ore", "", 0.001], ["Compressed Mordunium III-Grade", "standard_ore", "", 0.001], ["Compressed  Mordunium IV-Grade", "standard_ore", "", 0.001], ["Compressed Ytirium", "standard_ore", "", 0.006], ["Compressed Ytirium II-Grade", "standard_ore", "", 0.006], ["Compressed Ytirium III-Grade", "standard_ore", "", 0.006], ["Compressed Ytirium IV-Grade", "standard_ore", "", 0.006], ["Compressed Eifyrium", "standard_ore", "", 0.16], ["Compressed Eifyrium II-Grade", "standard_ore", "", 0.16], ["Compressed Eifyrium III-Grade", "standard_ore", "", 0.16], ["Compressed Eifyrium IV-Grade", "standard_ore", "", 0.16], ["Compressed Ducinium", "standard_ore", "", 0.16], ["Compressed Ducinium II-Grade", "standard_ore", "", 0.16], ["Compressed Ducinium III-Grade", "standard_ore", "", 0.16], ["Compressed Ducinium IV-Grade", "standard_ore", "", 0.16]];
+
+function renderTable() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const catFilter = document.getElementById('cat-filter').value;
+  const tbody = document.getElementById('item-tbody');
+  tbody.innerHTML = '';
+  let shown = 0;
+  for (const [name, cat, sub, vol] of ITEMS) {
+    if (search && !name.toLowerCase().includes(search)) continue;
+    if (catFilter !== 'All Categories' && cat !== catFilter) continue;
+    const subLabel = sub ? `<span class="sub-tag">${sub}</span>` : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td><span class="cat-tag">${cat}</span>${subLabel}</td>
+      <td class="num">${vol.toFixed(2)}</td>
+      <td class="num">—</td><td class="num">—</td><td class="num">—</td>
+      <td class="num">—</td><td class="num">—</td>
+      <td class="margin-cell">—</td>
+      <td style="text-align:center;">—</td>`;
+    tbody.appendChild(tr);
+    shown++;
+  }
+  document.getElementById('item-count').textContent = shown + ' items';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('search-input').addEventListener('input', renderTable);
+  document.getElementById('cat-filter').addEventListener('change', renderTable);
+  renderTable();
+});
+</script>
 </body>
 </html>
