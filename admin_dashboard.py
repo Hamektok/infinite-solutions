@@ -222,47 +222,60 @@ class AdminDashboard:
 
         vis_frame = ttk.Frame(self.rates_frame, style='Card.TFrame')
         vis_frame.pack(fill='x', padx=15, pady=(0, 8))
-        vis_inner = ttk.Frame(vis_frame)
-        vis_inner.pack(fill='x', padx=15, pady=10)
 
-        ttk.Label(vis_inner, text="Market Tabs:",
+        # Title row: label left, Save button right
+        hdr = ttk.Frame(vis_frame)
+        hdr.pack(fill='x', padx=15, pady=(8, 6))
+        ttk.Label(hdr, text="Market Visibility",
                   font=('Segoe UI', 10, 'bold'),
-                  foreground='#00d9ff').grid(row=0, column=0, sticky='w', padx=(0, 10))
+                  foreground='#00d9ff').pack(side='left')
+        ttk.Button(hdr, text="Save Visibility", style='Save.TButton',
+                   command=self.save_market_visibility).pack(side='right')
+
+        # Per-tab section cards in an equal-width grid
+        sections_row = ttk.Frame(vis_frame)
+        sections_row.pack(fill='x', padx=15, pady=(0, 10))
 
         for col_i, tab_key in enumerate(MARKET_TAB_KEYS):
+            sections_row.columnconfigure(col_i, weight=1)
+            padx = (0, 8) if col_i < len(MARKET_TAB_KEYS) - 1 else 0
+
+            sec = tk.Frame(sections_row, bg='#0a1525',
+                           highlightbackground='#1e3a4a', highlightthickness=1)
+            sec.grid(row=0, column=col_i, padx=padx, sticky='nsew')
+
+            # Tab toggle button (full-width header)
             var = tk.BooleanVar(value=True)
             self.market_tab_vars[tab_key] = var
             btn = tk.Checkbutton(
-                vis_inner, text=MARKET_TAB_LABELS[tab_key], variable=var,
+                sec, text=MARKET_TAB_LABELS[tab_key], variable=var,
                 font=('Segoe UI', 9, 'bold'),
-                bg='#0d1117', fg='#00ff88', selectcolor='#0a2030',
-                activebackground='#0d1117', activeforeground='#00ffff',
-                indicatoron=False, width=14, relief='flat', bd=1,
+                bg='#0a1525', fg='#00ff88', selectcolor='#0a1525',
+                activebackground='#0a1525', activeforeground='#00ffff',
+                indicatoron=False, relief='flat', bd=0,
                 command=lambda k=tab_key: self._on_market_tab_toggle(k))
-            btn.grid(row=0, column=col_i + 1, padx=3)
+            btn.pack(fill='x', padx=6, pady=(6, 4))
             self.market_tab_btns[tab_key] = btn
 
-        ttk.Label(vis_inner, text="Subcategories:",
-                  font=('Segoe UI', 10, 'bold'),
-                  foreground='#00d9ff').grid(row=1, column=0, sticky='w', padx=(0, 10), pady=(6, 0))
+            # Thin separator
+            tk.Frame(sec, bg='#1e3a4a', height=1).pack(fill='x')
 
-        for sub_i, (tab_key, sub_key, label) in enumerate(MARKET_SUBTAB_DEFS):
-            var = tk.BooleanVar(value=True)
-            self.market_subtab_vars[(tab_key, sub_key)] = var
-            btn = tk.Checkbutton(
-                vis_inner, text=label, variable=var,
-                font=('Segoe UI', 9, 'bold'),
-                bg='#0d1117', fg='#00ff88', selectcolor='#0a2030',
-                activebackground='#0d1117', activeforeground='#00ffff',
-                indicatoron=False, width=10, relief='flat', bd=1,
-                command=lambda tk_=tab_key, sk=sub_key: self._on_market_subtab_toggle(tk_, sk))
-            btn.grid(row=1, column=sub_i + 1, padx=2, pady=(6, 0))
-            self.market_subtab_btns[(tab_key, sub_key)] = btn
-
-        ttk.Button(vis_inner, text="Save Visibility", style='Save.TButton',
-                   command=self.save_market_visibility).grid(
-            row=0, column=len(MARKET_TAB_KEYS) + 2, rowspan=2,
-            padx=(20, 0), sticky='ns')
+            # Subcategory toggles
+            sub_frame = tk.Frame(sec, bg='#0a1525')
+            sub_frame.pack(fill='x', padx=4, pady=(4, 6))
+            subcats = [(sk, lbl) for (tk_, sk, lbl) in MARKET_SUBTAB_DEFS if tk_ == tab_key]
+            for sub_key, label in subcats:
+                var2 = tk.BooleanVar(value=True)
+                self.market_subtab_vars[(tab_key, sub_key)] = var2
+                btn2 = tk.Checkbutton(
+                    sub_frame, text=label, variable=var2,
+                    font=('Segoe UI', 8),
+                    bg='#0a1525', fg='#00ff88', selectcolor='#0a1525',
+                    activebackground='#0a1525', activeforeground='#00ffff',
+                    indicatoron=False, relief='flat', bd=0,
+                    command=lambda tk_=tab_key, sk=sub_key: self._on_market_subtab_toggle(tk_, sk))
+                btn2.pack(side='left', padx=2)
+                self.market_subtab_btns[(tab_key, sub_key)] = btn2
 
         # Rates treeview
         tree_frame = ttk.Frame(self.rates_frame)
