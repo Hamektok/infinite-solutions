@@ -2180,6 +2180,11 @@
 
                     <!-- MOON MATERIALS SUB-CONTENT -->
                     <div id="moon-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab moon-tier-tab active" onclick="filterMoon(this, 'raw')">Raw</button>
+                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'processed')">Processed</button>
+                            <button class="pi-tier-tab moon-tier-tab" onclick="filterMoon(this, 'advanced')">Advanced</button>
+                        </div>
                         <div class="item-grid" id="moon-materials"></div>
                     </div>
 
@@ -4982,11 +4987,26 @@ Tip: Copy directly from EVE inventory window"></textarea>
         };
 
         const MOON_MATERIALS = {
-            'R4 - Ubiquitous': ['Atmospheric Gases', 'Evaporite Deposits', 'Hydrocarbons', 'Silicates'],
-            'R8 - Common': ['Cobalt', 'Scandium', 'Tungsten', 'Titanium'],
-            'R16 - Uncommon': ['Chromium', 'Cadmium', 'Platinum', 'Vanadium'],
-            'R32 - Rare': ['Technetium', 'Mercury', 'Caesium', 'Hafnium'],
-            'R64 - Exceptional': ['Promethium', 'Neodymium', 'Dysprosium', 'Thulium']
+            raw: {
+                'R4 - Ubiquitous': ['Atmospheric Gases', 'Evaporite Deposits', 'Hydrocarbons', 'Silicates'],
+                'R8 - Common': ['Cobalt', 'Scandium', 'Tungsten', 'Titanium'],
+                'R16 - Uncommon': ['Chromium', 'Cadmium', 'Platinum', 'Vanadium'],
+                'R32 - Rare': ['Technetium', 'Mercury', 'Caesium', 'Hafnium'],
+                'R64 - Exceptional': ['Promethium', 'Neodymium', 'Dysprosium', 'Thulium'],
+            },
+            processed: [
+                'Titanium Chromide', 'Crystallite Alloy', 'Fernite Alloy', 'Rolled Tungsten Alloy',
+                'Silicon Diborite', 'Carbon Polymers', 'Ceramic Powder', 'Sulfuric Acid',
+                'Platinum Technite', 'Caesarium Cadmide', 'Solerium', 'Hexite', 'Hyperflurite',
+                'Neo Mercurite', 'Dysporite', 'Ferrofluid', 'Fluxed Condensates', 'Vanadium Hafnite',
+                'Prometium', 'Thulium Hafnite', 'Promethium Mercurite', 'Carbon Fiber',
+                'Oxy-Organic Solvents', 'Thermosetting Polymer',
+            ],
+            advanced: [
+                'Crystalline Carbonide', 'Fermionic Condensates', 'Fernite Carbide', 'Ferrogel',
+                'Fullerides', 'Hypersynaptic Fibers', 'Nanotransistors', 'Phenolic Composites',
+                'Sylramic Fibers', 'Titanium Carbide', 'Tungsten Carbide',
+            ],
         };
 
         const PLANETARY_MATERIALS = {
@@ -5333,22 +5353,36 @@ Tip: Copy directly from EVE inventory window"></textarea>
             });
         }
 
-        function renderMoonMaterials(inventory) {
+        function renderMoonMaterials(inventory, tierFilter = 'raw') {
             const container = document.getElementById('moon-materials');
             container.innerHTML = '';
 
-            Object.entries(MOON_MATERIALS).forEach(([group, materials]) => {
-                const divider = document.createElement('div');
-                divider.className = 'ice-group-divider';
-                divider.textContent = group;
-                container.appendChild(divider);
+            if (tierFilter === 'raw') {
+                Object.entries(MOON_MATERIALS.raw).forEach(([group, materials]) => {
+                    const divider = document.createElement('div');
+                    divider.className = 'ice-group-divider';
+                    divider.textContent = group;
+                    container.appendChild(divider);
 
-                materials.forEach(material => {
+                    materials.forEach(material => {
+                        const quantity = inventory[material] || 0;
+                        const item = createItemCard(material, quantity, getRates(material));
+                        container.appendChild(item);
+                    });
+                });
+            } else {
+                MOON_MATERIALS[tierFilter].forEach(material => {
                     const quantity = inventory[material] || 0;
                     const item = createItemCard(material, quantity, getRates(material));
                     container.appendChild(item);
                 });
-            });
+            }
+        }
+
+        function filterMoon(btn, tier) {
+            document.querySelectorAll('.moon-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMoonMaterials(EMBEDDED_DATA.inventory, tier);
         }
 
         function renderPlanetaryMaterials(inventory, tierFilter = 'p1') {
