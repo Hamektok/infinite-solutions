@@ -14,6 +14,16 @@ from datetime import datetime, timezone
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mydatabase.db')
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Predefined market item flags (shown as badges on the site)
+ITEM_FLAGS = [
+    ('out_of_stock', 'Out of Stock',   '#ff3333'),
+    ('low_stock',    'Low Stock',      '#ff8844'),
+    ('hot_item',     'Hot Item',       '#ff4444'),
+    ('new_arrival',  'New Arrival',    '#44aaff'),
+    ('limited',      'Limited Supply', '#cc66ff'),
+    ('popular',      'Popular',        '#44cc88'),
+]
+
 # Map DB category names to display names (must match generate_buyback_data.py)
 CATEGORY_DISPLAY = {
     'minerals': 'Minerals',
@@ -80,6 +90,15 @@ class AdminDashboard:
         # Track unsaved changes
         self.unsaved_changes = {}
 
+        # Competitor intel state (TEST PI Buyback stock)
+        self._test_pi_stock = {}
+        self._test_pi_last_fetch = None
+
+        # Item flags state
+        self._item_flags_db = {}   # type_id -> set of active flag_keys
+        self._pending_flags = set()  # flags for currently selected item (unsaved)
+        self._flags_selected_type_id = None  # type_id of item currently in editor
+
         # Style configuration
         self.style = ttk.Style()
         self.style.theme_use('clam')
@@ -88,6 +107,7 @@ class AdminDashboard:
         # Build UI
         self.build_header()
         self.build_notebook()
+        self._ensure_flags_table()
         self.load_data()
 
     def configure_styles(self):
@@ -288,11 +308,68 @@ class AdminDashboard:
                 btn2.pack(side='left', padx=2)
                 self.market_subtab_btns[(tab_key, sub_key)] = btn2
 
+        # ── Competitor Intel Panel ──────────────────────────────────────────
+        self._intel_expanded = False
+        intel_card = tk.Frame(self.rates_frame, bg='#0d1e10',
+                              highlightbackground='#2a3a1a', highlightthickness=1)
+        intel_card.pack(fill='x', padx=15, pady=(0, 6))
+
+        intel_hdr = tk.Frame(intel_card, bg='#0d1e10')
+        intel_hdr.pack(fill='x', padx=8, pady=(4, 4))
+
+        # Collapse/expand toggle
+        self._intel_toggle_btn = tk.Button(
+            intel_hdr, text='\u25b6', bg='#0d1e10', fg='#ffaa44',
+            font=('Segoe UI', 8), relief='flat', padx=4, pady=0,
+            activebackground='#0d1e10', activeforeground='#ffcc88',
+            command=self._toggle_intel_panel)
+        self._intel_toggle_btn.pack(side='left', padx=(0, 4))
+
+        tk.Label(intel_hdr, text='TEST PI Buyback — Competitor Stock Intel',
+                 bg='#0d1e10', fg='#ffaa44',
+                 font=('Segoe UI', 9, 'bold')).pack(side='left')
+
+        # Summary badge (shows alert counts when collapsed)
+        self._intel_summary_lbl = tk.Label(intel_hdr, text='',
+                                           bg='#0d1e10', fg='#ffcc66',
+                                           font=('Segoe UI', 8))
+        self._intel_summary_lbl.pack(side='left', padx=(8, 0))
+
+        self._intel_last_lbl = tk.Label(intel_hdr, text='not fetched',
+                                        bg='#0d1e10', fg='#445566',
+                                        font=('Segoe UI', 8))
+        self._intel_last_lbl.pack(side='left', padx=(10, 0))
+
+        ctrl = tk.Frame(intel_hdr, bg='#0d1e10')
+        ctrl.pack(side='right')
+        tk.Label(ctrl, text='Flag \u2264', bg='#0d1e10', fg='#aabbcc',
+                 font=('Segoe UI', 8)).pack(side='left', padx=(0, 3))
+        self._intel_threshold_var = tk.IntVar(value=1000)
+        tk.Spinbox(ctrl, from_=0, to=500000, increment=1000,
+                   textvariable=self._intel_threshold_var,
+                   width=7, font=('Segoe UI', 8),
+                   bg='#0a1a0a', fg='#ffaa44', buttonbackground='#1a3020',
+                   insertbackground='#ffaa44', justify='center').pack(side='left', padx=(0, 8))
+        self._intel_threshold_var.trace_add('write', lambda *_: self._test_pi_apply_tree_tags())
+        self._intel_refresh_btn = tk.Button(
+            ctrl, text='\u21bb Refresh', bg='#1a3020', fg='#00ff88',
+            font=('Segoe UI', 8), relief='flat', padx=8, pady=2,
+            activebackground='#2a4030', activeforeground='#00ffaa',
+            command=self._test_pi_refresh)
+        self._intel_refresh_btn.pack(side='left')
+
+        # Content area — hidden by default, shown when toggled
+        self._intel_content = tk.Frame(intel_card, bg='#0d1e10')
+        tk.Label(self._intel_content,
+                 text='Click \u21bb Refresh to load competitor stock data',
+                 bg='#0d1e10', fg='#334455',
+                 font=('Segoe UI', 8, 'italic')).pack(pady=(2, 4))
+
         # Rates treeview
         tree_frame = ttk.Frame(self.rates_frame)
         tree_frame.pack(fill='both', expand=True, padx=15, pady=(0, 10))
 
-        columns = ('category', 'subcategory', 'item', 'current_rate', 'new_rate', 'corp_discount')
+        columns = ('category', 'subcategory', 'item', 'current_rate', 'new_rate', 'corp_discount', 'flags')
         self.rates_tree = ttk.Treeview(tree_frame, columns=columns, show='headings',
                                         selectmode='extended')
 
@@ -302,13 +379,15 @@ class AdminDashboard:
         self.rates_tree.heading('current_rate', text='Alliance %')
         self.rates_tree.heading('new_rate',     text='New Alliance %')
         self.rates_tree.heading('corp_discount',text='Corp Discount  →  Corp Rate')
+        self.rates_tree.heading('flags',        text='Flags')
 
         self.rates_tree.column('category',      width=120, anchor='center')
         self.rates_tree.column('subcategory',   width=110, anchor='center')
         self.rates_tree.column('item',          width=200)
         self.rates_tree.column('current_rate',  width=100, anchor='center')
         self.rates_tree.column('new_rate',      width=120, anchor='center')
-        self.rates_tree.column('corp_discount', width=200, anchor='center')
+        self.rates_tree.column('corp_discount', width=185, anchor='center')
+        self.rates_tree.column('flags',         width=165)
 
         scrollbar = ttk.Scrollbar(tree_frame, orient='vertical',
                                    command=self.rates_tree.yview)
@@ -399,6 +478,26 @@ class AdminDashboard:
         # Update corp rate label whenever either spinbox changes
         self.rate_var.trace_add('write', lambda *_: self._refresh_corp_rate_label())
         self.discount_var.trace_add('write', lambda *_: self._refresh_corp_rate_label())
+
+        # ── Row 3: Item flags ──────────────────────────────────────────────
+        row3 = ttk.Frame(editor)
+        row3.pack(fill='x', padx=20, pady=(0, 12))
+
+        ttk.Label(row3, text="Flags:",
+                  font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 8))
+
+        self._flag_btns = {}
+        for flag_key, flag_label, flag_color in ITEM_FLAGS:
+            btn = tk.Button(row3, text=flag_label,
+                            font=('Segoe UI', 9), width=13,
+                            bg='#1a2030', fg='#445566', relief='flat', padx=4,
+                            activebackground='#2a3040', activeforeground=flag_color,
+                            command=lambda k=flag_key: self._toggle_flag_btn(k))
+            btn.pack(side='left', padx=2)
+            self._flag_btns[flag_key] = btn
+
+        ttk.Button(row3, text="Apply Flags", style='Action.TButton',
+                   command=self._apply_item_flags).pack(side='left', padx=(14, 0))
 
         # Bind selection
         self.rates_tree.bind('<<TreeviewSelect>>', self.on_rate_select)
@@ -988,7 +1087,21 @@ class AdminDashboard:
             ORDER BY tmi.category, tmi.display_order, tmi.type_name
         """)
         rows = cursor.fetchall()
+
+        # Load flags cache
+        try:
+            flag_rows = cursor.execute(
+                "SELECT type_id, flag_key FROM item_flags"
+            ).fetchall()
+            self._item_flags_db = {}
+            for tid, fk in flag_rows:
+                self._item_flags_db.setdefault(tid, set()).add(fk)
+        except Exception:
+            self._item_flags_db = {}
+
         conn.close()
+
+        flag_labels = {key: label for key, label, _ in ITEM_FLAGS}
 
         self.rate_items = {}
         for row_id, type_id, name, category, pct, discount, display_order, mkt_group_id in rows:
@@ -1004,14 +1117,20 @@ class AdminDashboard:
                 subcat = ''
 
             corp_rate = (pct or 0) - (discount or 0)
+            active_flags = self._item_flags_db.get(type_id, set())
+            flags_str = ', '.join(
+                flag_labels[k] for k, _, _ in ITEM_FLAGS if k in active_flags
+            )
             iid = self.rates_tree.insert('', 'end', values=(
                 cat_display, subcat, name, f"{pct}%", f"{pct}%",
-                f"-{discount}%  →  {corp_rate}%"
+                f"-{discount}%  →  {corp_rate}%", flags_str
             ))
             self.rate_items[iid] = {
                 'id': row_id, 'type_id': type_id, 'name': name,
                 'category': category, 'rate': pct, 'discount': discount
             }
+
+        self._test_pi_apply_tree_tags()
 
     def load_market_visibility(self):
         """Load market tab/subtab visibility settings from site_config."""
@@ -1081,6 +1200,176 @@ class AdminDashboard:
             except Exception:
                 pass
         threading.Thread(target=_regen, daemon=True).start()
+
+    # ── TEST PI Buyback competitor intel ────────────────────────────────────
+
+    def _toggle_intel_panel(self):
+        """Collapse or expand the competitor stock detail grid."""
+        self._intel_expanded = not self._intel_expanded
+        if self._intel_expanded:
+            tk.Frame(self._intel_content.master, bg='#1a3a1a',
+                     height=1).pack(fill='x', before=self._intel_content)
+            self._intel_content.pack(fill='x', padx=8, pady=(4, 6))
+            self._intel_toggle_btn.configure(text='\u25bc')
+        else:
+            # Remove the separator line and hide content
+            for w in self._intel_content.master.pack_slaves():
+                if isinstance(w, tk.Frame) and w is not self._intel_content and \
+                        w.cget('height') == 1:
+                    w.pack_forget()
+                    w.destroy()
+            self._intel_content.pack_forget()
+            self._intel_toggle_btn.configure(text='\u25b6')
+
+    def _test_pi_refresh(self):
+        """Fetch competitor stock data from the TEST PI Buyback Google Sheet."""
+        import threading, requests, csv, io as _io
+        self._intel_refresh_btn.configure(state='disabled', text='Fetching\u2026')
+        self._intel_last_lbl.configure(text='Fetching\u2026', fg='#ffcc44')
+        result = {}
+        error_holder = [None]
+
+        def _fetch():
+            try:
+                url = ('https://docs.google.com/spreadsheets/d/'
+                       '1UGdb9mQIrdNprFN9_9g4WDYMh-C8fX5CTlhFBCV6bI4/'
+                       'export?format=csv&gid=684077699')
+                resp = requests.get(url, timeout=20, allow_redirects=True)
+                resp.raise_for_status()
+                reader = csv.DictReader(_io.StringIO(resp.text))
+                for row in reader:
+                    name = row.get('Type', '').strip()
+                    qty_str = row.get('Quantity', '0').strip().replace(',', '')
+                    try:
+                        qty = int(qty_str)
+                    except ValueError:
+                        qty = 0
+                    if name:
+                        result[name] = qty
+            except Exception as exc:
+                error_holder[0] = str(exc)
+            self.root.after(0, lambda: self._test_pi_refresh_done(result, error_holder[0]))
+
+        threading.Thread(target=_fetch, daemon=True).start()
+
+    def _test_pi_refresh_done(self, result, error):
+        """Called on the main thread when the fetch completes."""
+        self._intel_refresh_btn.configure(state='normal', text='\u21bb Refresh')
+        if error:
+            self._intel_last_lbl.configure(
+                text=f'Error: {error[:60]}', fg='#ff6666')
+            return
+        self._test_pi_stock = result
+        self._test_pi_last_fetch = datetime.now()
+        ts = self._test_pi_last_fetch.strftime('%H:%M:%S')
+        self._intel_last_lbl.configure(text=f'Updated {ts}', fg='#556677')
+        self._test_pi_update_intel()
+        self._test_pi_apply_tree_tags()
+
+    def _test_pi_update_intel(self):
+        """Rebuild the competitor stock grid inside the intel panel."""
+        for w in self._intel_content.winfo_children():
+            w.destroy()
+
+        threshold = self._intel_threshold_var.get()
+        self._update_intel_summary(threshold)
+
+        if not self._test_pi_stock:
+            tk.Label(self._intel_content, text='No data loaded.',
+                     bg='#0d1e10', fg='#334455',
+                     font=('Segoe UI', 8, 'italic')).pack(pady=2)
+            return
+
+        # Sort ascending by qty so lowest-stock items appear first
+        items = sorted(self._test_pi_stock.items(), key=lambda x: x[1])
+
+        COLS = 5
+        grid = tk.Frame(self._intel_content, bg='#0d1e10')
+        grid.pack(fill='x', pady=(2, 0))
+        for c in range(COLS):
+            grid.columnconfigure(c, weight=1)
+
+        for i, (name, qty) in enumerate(items):
+            row_i, col_i = divmod(i, COLS)
+            if qty == 0:
+                qty_color = '#ff5555'
+            elif qty <= threshold:
+                qty_color = '#ffaa44'
+            else:
+                qty_color = '#448844'
+
+            cell = tk.Frame(grid, bg='#0d1e10')
+            cell.grid(row=row_i, column=col_i, sticky='ew', padx=4, pady=1)
+
+            short = name if len(name) <= 20 else name[:19] + '\u2026'
+            tk.Label(cell, text=short, bg='#0d1e10', fg='#8899aa',
+                     font=('Segoe UI', 8), anchor='w').pack(side='left')
+            tk.Label(cell, text=f' {qty:,}', bg='#0d1e10', fg=qty_color,
+                     font=('Segoe UI', 8, 'bold'), anchor='e').pack(side='right')
+
+    def _update_intel_summary(self, threshold):
+        """Update the collapsed-view summary badge with current alert counts."""
+        if not self._test_pi_stock:
+            self._intel_summary_lbl.configure(text='')
+            return
+        stock_lower = {k.lower(): v for k, v in self._test_pi_stock.items()}
+        n_out  = sum(1 for q in self._test_pi_stock.values() if q == 0)
+        n_low  = sum(1 for q in self._test_pi_stock.values() if 0 < q <= threshold)
+        n_none = sum(
+            1 for d in self.rate_items.values()
+            if d.get('category') == 'pi_materials'
+            and d.get('name', '').lower() not in stock_lower
+        )
+        parts = []
+        if n_out:
+            parts.append(f'{n_out} out')
+        if n_low:
+            parts.append(f'{n_low} low')
+        if n_none:
+            parts.append(f'{n_none} not carried')
+        summary = ' · '.join(parts) if parts else 'all stocked'
+        color = '#ff8888' if n_out else '#ffcc66' if n_low else '#6688bb' if n_none else '#448844'
+        self._intel_summary_lbl.configure(text=f'({summary})', fg=color)
+
+    def _test_pi_apply_tree_tags(self):
+        """Colour-code PI rows in the rates treeview based on TEST competitor stock."""
+        if not hasattr(self, '_test_pi_stock') or not self._test_pi_stock:
+            return
+        try:
+            threshold = self._intel_threshold_var.get()
+        except Exception:
+            return
+        self._update_intel_summary(threshold)
+
+        self.rates_tree.tag_configure('pi_intel_out',
+            background='#2a0a0a', foreground='#ff8888')
+        self.rates_tree.tag_configure('pi_intel_low',
+            background='#1e1200', foreground='#ffcc66')
+        self.rates_tree.tag_configure('pi_intel_none',
+            background='#0a0d1e', foreground='#6688bb')
+
+        # Categories with active intel feeds — extend this set for future sources
+        intel_categories = {'pi_materials'}
+
+        stock_lower = {k.lower(): v for k, v in self._test_pi_stock.items()}
+
+        for iid in self.rates_tree.get_children():
+            data = self.rate_items.get(iid, {})
+            category = data.get('category', '')
+            if category not in intel_categories:
+                continue
+            name_lower = data.get('name', '').lower()
+            if name_lower not in stock_lower:
+                # Competitor does not carry this item at all
+                self.rates_tree.item(iid, tags=('pi_intel_none',))
+                continue
+            qty = stock_lower[name_lower]
+            if qty == 0:
+                self.rates_tree.item(iid, tags=('pi_intel_out',))
+            elif qty <= threshold:
+                self.rates_tree.item(iid, tags=('pi_intel_low',))
+            else:
+                self.rates_tree.item(iid, tags=())
 
     def load_inventory(self):
         """Load current inventory from database."""
@@ -1801,9 +2090,93 @@ class AdminDashboard:
                 self.selected_item_label.configure(text=item['name'])
                 self.rate_var.set(item['rate'])
                 self.discount_var.set(item['discount'])
+                self._refresh_flag_buttons(item['type_id'])
         else:
             self.selected_item_label.configure(text=f"{len(selection)} items selected")
+            self._refresh_flag_buttons(None)
         # corp_rate_label is updated by trace on rate_var/discount_var
+
+    # ── Item flags helpers ──────────────────────────────────────────────────
+
+    def _ensure_flags_table(self):
+        """Create item_flags table if it doesn't exist."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            conn.execute("""CREATE TABLE IF NOT EXISTS item_flags (
+                type_id INTEGER NOT NULL,
+                flag_key TEXT NOT NULL,
+                PRIMARY KEY (type_id, flag_key)
+            )""")
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
+    def _refresh_flag_buttons(self, type_id):
+        """Update flag button colours to reflect current flags for type_id."""
+        self._flags_selected_type_id = type_id
+        active = self._item_flags_db.get(type_id, set()) if type_id else set()
+        self._pending_flags = set(active)
+        for flag_key, _, flag_color in ITEM_FLAGS:
+            btn = self._flag_btns.get(flag_key)
+            if btn is None:
+                continue
+            if flag_key in active:
+                btn.configure(bg='#2a2030', fg=flag_color,
+                              relief='groove')
+            else:
+                btn.configure(bg='#1a2030', fg='#445566',
+                              relief='flat')
+
+    def _toggle_flag_btn(self, flag_key):
+        """Toggle a flag in the pending set and update button appearance."""
+        if self._flags_selected_type_id is None:
+            return
+        flag_color = next((c for k, _, c in ITEM_FLAGS if k == flag_key), '#ffffff')
+        if flag_key in self._pending_flags:
+            self._pending_flags.discard(flag_key)
+            self._flag_btns[flag_key].configure(bg='#1a2030', fg='#445566',
+                                                 relief='flat')
+        else:
+            self._pending_flags.add(flag_key)
+            self._flag_btns[flag_key].configure(bg='#2a2030', fg=flag_color,
+                                                 relief='groove')
+
+    def _apply_item_flags(self):
+        """Save pending flags to DB for the currently selected item."""
+        type_id = self._flags_selected_type_id
+        if type_id is None:
+            return
+        try:
+            conn = sqlite3.connect(DB_PATH, timeout=5)
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM item_flags WHERE type_id = ?", (type_id,))
+            for fk in self._pending_flags:
+                cursor.execute(
+                    "INSERT OR IGNORE INTO item_flags (type_id, flag_key) VALUES (?, ?)",
+                    (type_id, fk))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            self.update_status(f"Error saving flags: {e}")
+            return
+
+        # Update in-memory cache
+        self._item_flags_db[type_id] = set(self._pending_flags)
+
+        # Refresh the Flags cell in the treeview
+        flag_labels = {key: label for key, label, _ in ITEM_FLAGS}
+        flags_str = ', '.join(
+            flag_labels[k] for k, _, _ in ITEM_FLAGS if k in self._pending_flags
+        )
+        for iid, data in self.rate_items.items():
+            if data['type_id'] == type_id:
+                vals = list(self.rates_tree.item(iid, 'values'))
+                vals[6] = flags_str
+                self.rates_tree.item(iid, values=vals)
+                break
+
+        self.update_status(f"Flags saved")
 
     def _refresh_corp_rate_label(self):
         """Update the live Corp Rate readout label."""
@@ -4119,6 +4492,9 @@ class AdminDashboard:
             "ALTER TABLE consignment_sales ADD COLUMN source_contract_id INTEGER",
             "ALTER TABLE consignment_sales ADD COLUMN auto_logged INTEGER DEFAULT 0",
             "ALTER TABLE lx_zoj_inventory   ADD COLUMN container_item_id INTEGER",
+            "ALTER TABLE consignors ADD COLUMN corp_donation_opted INTEGER DEFAULT 0",
+            "ALTER TABLE consignors ADD COLUMN corp_donation_pct REAL DEFAULT 0",
+            "ALTER TABLE consignment_sales ADD COLUMN corp_donation_isk REAL DEFAULT 0",
         ]:
             try:
                 conn.execute(sql)
@@ -4161,7 +4537,7 @@ class AdminDashboard:
                    command=self._consign_toggle_active).pack(side='left', padx=(0, 4))
 
         c_cols = ('slot_type', 'name', 'item', 'current_qty', 'max_units',
-                  'list_price', 'their_pct', 'my_pct', 'demand', 'start_date', 'status', 'owed')
+                  'list_price', 'their_pct', 'my_pct', 'donate', 'demand', 'start_date', 'status', 'owed')
         self.consign_tree = ttk.Treeview(top_inner, columns=c_cols, show='headings',
                                          selectmode='browse', height=6)
         for cid, hd, w, a in [
@@ -4173,6 +4549,7 @@ class AdminDashboard:
             ('list_price', 'Price/Unit',       110, 'e'),
             ('their_pct',  'Their %',           65, 'e'),
             ('my_pct',     'My %',              55, 'e'),
+            ('donate',     'Corp Don.',         68, 'e'),
             ('demand',     'Demand',            70, 'c'),
             ('start_date', 'Since',            100, 'c'),
             ('status',     'Status',            70, 'c'),
@@ -4219,9 +4596,12 @@ class AdminDashboard:
         self._consign_owed_lbl.pack(side='left', padx=(0, 16))
         self._consign_paid_lbl = tk.Label(stb, text='Total Paid Out: —', background='#0a2030',
                                           foreground='#66d9ff', font=('Segoe UI', 9))
-        self._consign_paid_lbl.pack(side='left')
+        self._consign_paid_lbl.pack(side='left', padx=(0, 16))
+        self._consign_corp_lbl = tk.Label(stb, text='Corp Donation Owed: —', background='#0a2030',
+                                          foreground='#ff9944', font=('Segoe UI', 9))
+        self._consign_corp_lbl.pack(side='left')
 
-        s_cols = ('date', 'qty', 'price_unit', 'total', 'their_isk', 'my_isk', 'paid', 'notes')
+        s_cols = ('date', 'qty', 'price_unit', 'total', 'their_isk', 'corp_don', 'my_isk', 'paid', 'notes')
         self.sales_tree = ttk.Treeview(bot_inner, columns=s_cols, show='headings',
                                         selectmode='extended', height=10)
         for cid, hd, w, a in [
@@ -4230,6 +4610,7 @@ class AdminDashboard:
             ('price_unit', 'Price/Unit',     125, 'e'),
             ('total',      'Total ISK',      135, 'e'),
             ('their_isk',  'Their Share',    135, 'e'),
+            ('corp_don',   'Corp Don.',      110, 'e'),
             ('my_isk',     'My Share',       120, 'e'),
             ('paid',       'Paid',            90, 'c'),
             ('notes',      'Notes',          220, 'w'),
@@ -4337,7 +4718,8 @@ class AdminDashboard:
                    c.consignor_pct, c.start_date, c.active,
                    COALESCE(SUM(CASE WHEN s.paid=0 THEN s.consignor_isk ELSE 0 END), 0),
                    c.slot_type, c.slot_priority, c.max_units, c.demand_tier,
-                   COALESCE(c.current_qty, 0)
+                   COALESCE(c.current_qty, 0),
+                   COALESCE(c.corp_donation_opted, 0), COALESCE(c.corp_donation_pct, 0)
             FROM consignors c
             LEFT JOIN consignment_sales s ON s.consignor_id = c.id
             GROUP BY c.id
@@ -4350,7 +4732,8 @@ class AdminDashboard:
         shared_groups = defaultdict(list)
         for row in rows:
             cid, name, item, price, their_pct, start, active, owed, \
-                slot_type, priority, max_units, demand, cur_qty = row
+                slot_type, priority, max_units, demand, cur_qty, \
+                don_opted, don_pct = row
             if (slot_type or 'shared') == 'shared' and active:
                 shared_groups[item].append(row)
 
@@ -4366,7 +4749,8 @@ class AdminDashboard:
 
         for row in rows:
             cid, name, item, price, their_pct, start, active, owed, \
-                slot_type, priority, max_units, demand, cur_qty = row
+                slot_type, priority, max_units, demand, cur_qty, \
+                don_opted, don_pct = row
             slot_type  = slot_type  or 'shared'
             demand     = demand     or 'medium'
             my_pct     = round(100.0 - their_pct, 1)
@@ -4377,6 +4761,7 @@ class AdminDashboard:
             d_label    = _demand_label.get(demand, demand)
             d_tag      = _demand_tag.get(demand, 'd_medium')
             type_label = _slot_label.get(slot_type, slot_type)
+            donate_str = f"{don_pct:.1f}%" if don_opted else '—'
 
             # Insert combined-stock summary row for shared items with 2+ active suppliers
             if slot_type == 'shared' and item not in combined_inserted:
@@ -4391,7 +4776,7 @@ class AdminDashboard:
                         f'({len(group)} suppliers)',
                         item,
                         f"{combined_qty:,}" if combined_qty else '—',
-                        '—', price_str, '—', '—',
+                        '—', price_str, '—', '—', '—',
                         d_label,
                         '—',
                         '▶ Combined',
@@ -4405,7 +4790,7 @@ class AdminDashboard:
                 type_label, name, item,
                 cur_str, max_str, price_str,
                 f"{their_pct:.1f}%", f"{my_pct:.1f}%",
-                d_label, start,
+                donate_str, d_label, start,
                 'Active' if active else 'Inactive',
                 owed_str,
             ))
@@ -4425,7 +4810,8 @@ class AdminDashboard:
         conn = sqlite3.connect(DB_PATH)
         rows = conn.execute("""
             SELECT id, sale_date, quantity, price_per_unit,
-                   total_isk, consignor_isk, broker_isk, paid, paid_date, notes
+                   total_isk, consignor_isk, broker_isk, paid, paid_date, notes,
+                   COALESCE(corp_donation_isk, 0)
             FROM consignment_sales
             WHERE consignor_id = ?
             ORDER BY sale_date DESC, id DESC
@@ -4436,17 +4822,21 @@ class AdminDashboard:
         paid_total = conn.execute(
             "SELECT COALESCE(SUM(consignor_isk),0) FROM consignment_sales WHERE consignor_id=? AND paid=1",
             (cid,)).fetchone()[0]
+        corp_owed = conn.execute(
+            "SELECT COALESCE(SUM(corp_donation_isk),0) FROM consignment_sales WHERE consignor_id=? AND paid=0",
+            (cid,)).fetchone()[0]
         conn.close()
 
         self.sales_tree.delete(*self.sales_tree.get_children())
-        for idx, (sid, date, qty, ppu, total, their_isk, my_isk, paid, paid_date, notes) in enumerate(rows):
+        for idx, (sid, date, qty, ppu, total, their_isk, my_isk, paid, paid_date, notes, corp_don) in enumerate(rows):
             alt      = 'row_a' if idx % 2 == 0 else 'row_b'
             paid_tag = 'paid' if paid else 'unpaid'
             paid_str = f"\u2713 {paid_date[:10] if paid_date else ''}" if paid else '\u2014'
+            corp_don_str = f"{corp_don:,.2f}" if corp_don else '—'
             self.sales_tree.insert('', 'end', iid=str(sid), tags=(paid_tag, alt), values=(
                 date[:10], qty,
                 f"{ppu:,.2f}", f"{total:,.2f}",
-                f"{their_isk:,.2f}", f"{my_isk:,.2f}",
+                f"{their_isk:,.2f}", corp_don_str, f"{my_isk:,.2f}",
                 paid_str, notes or '',
             ))
 
@@ -4454,6 +4844,8 @@ class AdminDashboard:
             text=f"Owed: {owed:,.2f} ISK" if owed else "Owed: 0 ISK")
         self._consign_paid_lbl.configure(
             text=f"Total Paid Out: {paid_total:,.2f} ISK" if paid_total else "Total Paid Out: 0 ISK")
+        self._consign_corp_lbl.configure(
+            text=f"Corp Donation Owed: {corp_owed:,.2f} ISK" if corp_owed else "Corp Donation Owed: 0 ISK")
         self._consign_load_consignors()
 
     def _consign_add_dialog(self, consignor_id=None):
@@ -4464,13 +4856,15 @@ class AdminDashboard:
             existing = conn.execute(
                 "SELECT character_name, item_name, item_type_id, list_price, "
                 "consignor_pct, start_date, notes, slot_type, slot_priority, "
-                "max_units, demand_tier, current_qty FROM consignors WHERE id=?",
+                "max_units, demand_tier, current_qty, "
+                "COALESCE(corp_donation_opted,0), COALESCE(corp_donation_pct,0) "
+                "FROM consignors WHERE id=?",
                 (consignor_id,)).fetchone()
             conn.close()
 
         dlg = tk.Toplevel(self.root)
         dlg.title('Edit Consignor' if existing else 'Add Consignor')
-        dlg.geometry('460x640')
+        dlg.geometry('460x730')
         dlg.configure(background='#0a1520')
         dlg.resizable(False, False)
         dlg.grab_set()
@@ -4568,6 +4962,34 @@ class AdminDashboard:
                            selectcolor='#0a1520', activebackground='#0a1520',
                            font=('Segoe UI', 10)).pack(side='left', padx=(0, 12))
 
+        # ── Corp Donation ──────────────────────────────────────────────────
+        tk.Frame(dlg, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
+        tk.Label(dlg, text='Corp Donation (Optional)', background='#0a1520',
+                 foreground='#ff9944', font=('Segoe UI', 9, 'bold')).pack(anchor='w', padx=16, pady=(6, 2))
+
+        don_opted_var = tk.IntVar(value=int(existing[12]) if existing else 0)
+        don_pct_var   = tk.StringVar(value=f"{existing[13]:.1f}" if existing and existing[13] else '0.0')
+
+        don_row = tk.Frame(dlg, background='#0a1520')
+        don_row.pack(anchor='w', padx=16)
+        tk.Radiobutton(don_row, text='No donation', variable=don_opted_var, value=0,
+                       background='#0a1520', foreground='#88d0e8',
+                       selectcolor='#0a1520', activebackground='#0a1520',
+                       font=('Segoe UI', 10)).pack(side='left', padx=(0, 16))
+        tk.Radiobutton(don_row, text='Donate to corp', variable=don_opted_var, value=1,
+                       background='#0a1520', foreground='#ff9944',
+                       selectcolor='#0a1520', activebackground='#0a1520',
+                       font=('Segoe UI', 10)).pack(side='left')
+
+        don_pct_row = tk.Frame(dlg, background='#0a1520')
+        don_pct_row.pack(anchor='w', padx=16, pady=(4, 0))
+        tk.Label(don_pct_row, text='Donation %:', **lbl_cfg).pack(side='left', padx=(0, 6))
+        don_pct_entry = ttk.Entry(don_pct_row, textvariable=don_pct_var, width=8)
+        don_pct_entry.pack(side='left')
+        tk.Label(don_pct_row, text='of consignor\'s share', **sub_cfg).pack(side='left', padx=(6, 0))
+        tk.Label(dlg, text='Donation is deducted from the consignor\'s share per sale.',
+                 **sub_cfg).pack(anchor='w', padx=16)
+
         # ── Notes ─────────────────────────────────────────────────────────
         tk.Frame(dlg, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
         tk.Label(dlg, text='Notes', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
@@ -4593,6 +5015,8 @@ class AdminDashboard:
                 max_units = int(max_var.get()) if max_var.get().strip().isdigit() else None
                 cur_qty   = int(qty_var.get()) if qty_var.get().strip().isdigit() else 0
                 demand    = dem_var.get()
+                don_opted = don_opted_var.get()
+                don_pct   = float(don_pct_var.get()) if don_opted else 0.0
                 if not name or not item:
                     messagebox.showerror('Error', 'Character Name and Item are required.', parent=dlg)
                     return
@@ -4601,18 +5025,22 @@ class AdminDashboard:
                     conn.execute(
                         "UPDATE consignors SET character_name=?, item_name=?, item_type_id=?, "
                         "list_price=?, consignor_pct=?, start_date=?, notes=?, "
-                        "slot_type=?, slot_priority=?, max_units=?, demand_tier=?, current_qty=? "
+                        "slot_type=?, slot_priority=?, max_units=?, demand_tier=?, current_qty=?, "
+                        "corp_donation_opted=?, corp_donation_pct=? "
                         "WHERE id=?",
                         (name, item, type_id, price, pct, date, notes,
-                         slot_type, priority, max_units, demand, cur_qty, consignor_id))
+                         slot_type, priority, max_units, demand, cur_qty,
+                         don_opted, don_pct, consignor_id))
                 else:
                     conn.execute(
                         "INSERT INTO consignors (character_name, item_name, item_type_id, "
                         "list_price, consignor_pct, start_date, notes, "
-                        "slot_type, slot_priority, max_units, demand_tier, current_qty) "
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                        "slot_type, slot_priority, max_units, demand_tier, current_qty, "
+                        "corp_donation_opted, corp_donation_pct) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                         (name, item, type_id, price, pct, date, notes,
-                         slot_type, priority, max_units, demand, cur_qty))
+                         slot_type, priority, max_units, demand, cur_qty,
+                         don_opted, don_pct))
                 conn.commit()
                 conn.close()
                 dlg.destroy()
@@ -4653,14 +5081,22 @@ class AdminDashboard:
             return
         cid       = int(sel[0])
         vals      = self.consign_tree.item(sel[0])['values']
-        name      = vals[0]
-        item      = vals[1]
-        their_pct = str(vals[3]).replace('%', '').strip()
-        raw_price = str(vals[2]).replace(',', '').strip()
+        name      = vals[1]
+        item      = vals[2]
+        their_pct = str(vals[6]).replace('%', '').strip()
+        raw_price = str(vals[5]).replace(',', '').strip()
+
+        # Fetch donation settings for this consignor
+        _dconn = sqlite3.connect(DB_PATH)
+        _drow  = _dconn.execute(
+            "SELECT COALESCE(corp_donation_opted,0), COALESCE(corp_donation_pct,0) "
+            "FROM consignors WHERE id=?", (cid,)).fetchone()
+        _dconn.close()
+        don_opted, don_pct = _drow if _drow else (0, 0.0)
 
         dlg = tk.Toplevel(self.root)
         dlg.title(f'Log Sale \u2014 {name}')
-        dlg.geometry('400x310')
+        dlg.geometry('400x330' if don_opted else '400x310')
         dlg.configure(background='#0a1520')
         dlg.resizable(False, False)
         dlg.grab_set()
@@ -4668,6 +5104,9 @@ class AdminDashboard:
         lbl_cfg = dict(background='#0a1520', foreground='#88d0e8', font=('Segoe UI', 10))
         tk.Label(dlg, text=f'Item: {item}', background='#0a1520',
                  foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=16, pady=(12, 6))
+        if don_opted:
+            tk.Label(dlg, text=f'Corp donation: {don_pct:.1f}% of consignor share', background='#0a1520',
+                     foreground='#ff9944', font=('Segoe UI', 8, 'italic')).pack(anchor='w', padx=16, pady=(0, 4))
 
         def labeled_entry(label, default='', width=24):
             tk.Label(dlg, text=label, **lbl_cfg).pack(anchor='w', padx=16, pady=(4, 2))
@@ -4686,14 +5125,21 @@ class AdminDashboard:
 
         def update_preview(*_):
             try:
-                qty       = int(qty_var.get())
-                price     = float(price_var.get())
-                their_f   = float(their_pct) / 100.0
-                total     = qty * price
-                their_isk = total * their_f
-                my_isk    = total * (1.0 - their_f)
-                preview.configure(
-                    text=f"Total: {total:,.2f}  \u2192  {name}: {their_isk:,.2f}  |  Me: {my_isk:,.2f}")
+                qty          = int(qty_var.get())
+                price        = float(price_var.get())
+                their_f      = float(their_pct) / 100.0
+                total        = qty * price
+                gross_their  = total * their_f
+                my_isk       = total - gross_their
+                donation_isk = gross_their * don_pct / 100.0 if don_opted else 0.0
+                their_net    = gross_their - donation_isk
+                if don_opted:
+                    preview.configure(
+                        text=f"Total: {total:,.2f}  \u2192  {name}: {their_net:,.2f}  "
+                             f"|  Corp: {donation_isk:,.2f}  |  Me: {my_isk:,.2f}")
+                else:
+                    preview.configure(
+                        text=f"Total: {total:,.2f}  \u2192  {name}: {their_net:,.2f}  |  Me: {my_isk:,.2f}")
             except ValueError:
                 preview.configure(text='')
 
@@ -4702,20 +5148,23 @@ class AdminDashboard:
 
         def save():
             try:
-                qty       = int(qty_var.get())
-                price     = float(price_var.get())
-                date      = date_var.get().strip()
-                notes     = notes_var.get().strip()
-                their_f   = float(their_pct) / 100.0
-                total     = round(qty * price, 2)
-                their_isk = round(total * their_f, 2)
-                my_isk    = round(total * (1.0 - their_f), 2)
+                qty          = int(qty_var.get())
+                price        = float(price_var.get())
+                date         = date_var.get().strip()
+                notes        = notes_var.get().strip()
+                their_f      = float(their_pct) / 100.0
+                total        = round(qty * price, 2)
+                gross_their  = total * their_f
+                my_isk       = round(total - gross_their, 2)
+                donation_isk = round(gross_their * don_pct / 100.0, 2) if don_opted else 0.0
+                their_isk    = round(gross_their - donation_isk, 2)
                 conn = sqlite3.connect(DB_PATH)
                 conn.execute(
                     "INSERT INTO consignment_sales "
                     "(consignor_id, sale_date, quantity, price_per_unit, total_isk, "
-                    "consignor_isk, broker_isk, paid, notes) VALUES (?,?,?,?,?,?,?,0,?)",
-                    (cid, date, qty, price, total, their_isk, my_isk, notes))
+                    "consignor_isk, broker_isk, corp_donation_isk, paid, notes) "
+                    "VALUES (?,?,?,?,?,?,?,?,0,?)",
+                    (cid, date, qty, price, total, their_isk, my_isk, donation_isk, notes))
                 conn.commit()
                 conn.close()
                 dlg.destroy()
@@ -4775,7 +5224,8 @@ class AdminDashboard:
 
         # Get active consignors that have a type_id set
         consignors = conn.execute(
-            "SELECT id, character_name, item_type_id, consignor_pct "
+            "SELECT id, character_name, item_type_id, consignor_pct, "
+            "COALESCE(corp_donation_opted,0), COALESCE(corp_donation_pct,0) "
             "FROM consignors WHERE item_type_id IS NOT NULL AND active=1"
         ).fetchall()
         if not consignors:
@@ -4869,7 +5319,7 @@ class AdminDashboard:
                         new_pending += 1
                 else:
                     # Exclusive slot — auto-log directly
-                    c_id, c_name, _, c_pct = consignor_list[0]
+                    c_id, c_name, _, c_pct, c_don_opted, c_don_pct = consignor_list[0]
                     item_weighted = qty * ci.get('unit_cost', 0)
                     if total_weighted > 0:
                         attributed = contract_price * (item_weighted / total_weighted)
@@ -4877,18 +5327,21 @@ class AdminDashboard:
                         attributed = contract_price / max(len(items), 1)
                         skipped += 1
 
-                    per_unit  = round(attributed / qty, 2)
-                    total_isk = round(attributed, 2)
-                    their_isk = round(total_isk * c_pct / 100.0, 2)
-                    my_isk    = round(total_isk - their_isk, 2)
+                    per_unit     = round(attributed / qty, 2)
+                    total_isk    = round(attributed, 2)
+                    gross_their  = total_isk * c_pct / 100.0
+                    my_isk       = round(total_isk - gross_their, 2)
+                    don_isk      = round(gross_their * c_don_pct / 100.0, 2) if c_don_opted else 0.0
+                    their_isk    = round(gross_their - don_isk, 2)
 
                     conn.execute(
                         "INSERT INTO consignment_sales "
                         "(consignor_id, sale_date, quantity, price_per_unit, total_isk, "
-                        "consignor_isk, broker_isk, paid, notes, source_contract_id, auto_logged) "
-                        "VALUES (?,?,?,?,?,?,?,0,?,?,1)",
+                        "consignor_isk, broker_isk, corp_donation_isk, paid, notes, "
+                        "source_contract_id, auto_logged) "
+                        "VALUES (?,?,?,?,?,?,?,?,0,?,?,1)",
                         (c_id, sale_date, qty, per_unit, total_isk,
-                         their_isk, my_isk,
+                         their_isk, my_isk, don_isk,
                          f"Auto | contract {contract_id}", contract_id))
                     new_entries += 1
 

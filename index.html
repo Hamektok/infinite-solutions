@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603040441"></script>
+    <script src="buyback_data.js?v=202603051855"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -296,6 +296,100 @@
             font-weight: 600;
         }
 
+        /* ===== PARTNER PROGRAM PROMO ===== */
+        .partner-promo {
+            background: linear-gradient(135deg, #0d1200 0%, #1a1600 50%, #0d1000 100%);
+            border-bottom: 1px solid rgba(255, 204, 68, 0.3);
+            padding: 13px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .partner-promo::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; top: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,204,68,0.55), transparent);
+        }
+        .partner-promo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 10% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 25% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+                radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.25) 0%, transparent 100%),
+                radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.2) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .partner-promo-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .partner-promo-badge {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: rgba(255, 204, 68, 0.12);
+            color: #ffcc44;
+            border: 1px solid rgba(255, 204, 68, 0.45);
+            padding: 3px 10px;
+            border-radius: 2px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(255, 204, 68, 0.12);
+        }
+        .partner-promo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #d4c870;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .partner-promo-sub {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            color: #6a7a5a;
+            margin-top: 3px;
+            line-height: 1.3;
+        }
+        .partner-promo-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            background: rgba(255, 204, 68, 0.1);
+            color: #ffcc44;
+            border: 1px solid rgba(255, 204, 68, 0.4);
+            padding: 9px 22px;
+            border-radius: 3px;
+            white-space: nowrap;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 12px rgba(255, 204, 68, 0.08);
+        }
+        .partner-promo-btn:hover {
+            background: rgba(255, 204, 68, 0.2);
+            border-color: rgba(255, 204, 68, 0.75);
+            color: #ffe580;
+            box-shadow: 0 0 20px rgba(255, 204, 68, 0.22);
+        }
+
         /* ===== MAIN TAB NAVIGATION ===== */
         .main-tabs {
             display: flex;
@@ -547,6 +641,41 @@
         .ally-label  { color: #6fb3d0; }
         .corp-price  { color: #ffd700; font-weight: 700; }
         .ally-price  { color: #00aabb; font-weight: 600; }
+
+        /* Partner program vacancy badge */
+        .partner-slot-badge {
+            font-family: 'Orbitron', monospace;
+            font-size: 9px;
+            letter-spacing: 0.5px;
+            color: #ffcc44;
+            border: 1px solid rgba(255, 204, 68, 0.4);
+            background: rgba(255, 204, 68, 0.07);
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        /* Item flag badges */
+        .item-flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 7px;
+            padding-top: 7px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .item-flag {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid;
+            padding: 1px 7px;
+            border-radius: 3px;
+            opacity: 0.9;
+        }
 
         /* ===== BLUEPRINT TABLE SECTION ===== */
         .blueprint-section {
@@ -2147,6 +2276,18 @@
                 <div class="tagline">Materials, Resources & Manufacturing</div>
             </div>
 
+            <!-- PARTNER PROGRAM PROMO BANNER -->
+            <div class="partner-promo">
+                <div class="partner-promo-left">
+                    <span class="partner-promo-badge">&#9733; Now Open</span>
+                    <div>
+                        <div class="partner-promo-text">Infinite Solutions Partner Program</div>
+                        <div class="partner-promo-sub">Earn ISK from your production — we handle the market. Exclusive to Infinite Directive members.</div>
+                    </div>
+                </div>
+                <a href="partner-program.html" class="partner-promo-btn">Learn More &rsaquo;</a>
+            </div>
+
             <!-- MAIN TAB NAVIGATION -->
             <div class="main-tabs">
                 <button class="main-tab active" onclick="showMainTab('market')">Materials & Resources Market</button>
@@ -3082,8 +3223,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zircon": 62,
                         "Zydrine": 0
             },
-            "blueprintsLastUpdated": "Mar 04, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Mar 04, 2026 18:08 EVE"
+            "blueprintsLastUpdated": "Mar 05, 2026 08:00 EVE",
+            "inventoryLastUpdated": "Mar 05, 2026 18:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5356,6 +5497,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         // Build name→{allianceRate, corpRate} lookup from buyback_data.js
         const SELL_RATE_LOOKUP = {};
+        const PARTNER_SLOT_LOOKUP = {};
+        const FLAG_LOOKUP = {};
+        const FLAG_DEFS = {
+            'out_of_stock': { label: 'Out of Stock',   color: '#ff3333' },
+            'low_stock':    { label: 'Low Stock',       color: '#ff8844' },
+            'hot_item':     { label: 'Hot Item',        color: '#ff5555' },
+            'new_arrival':  { label: 'New Arrival',     color: '#44aaff' },
+            'limited':      { label: 'Limited Supply',  color: '#cc66ff' },
+            'popular':      { label: 'Popular',         color: '#44cc88' },
+        };
         if (typeof BUYBACK_DATA !== 'undefined' && BUYBACK_DATA.items) {
             BUYBACK_DATA.items.forEach(item => {
                 if (item.sellRate != null) {
@@ -5363,6 +5514,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         alliance: item.sellRate,
                         corp: item.corpRate != null ? item.corpRate : item.sellRate,
                     };
+                }
+                if (item.partnerSlot && item.slotOpen) {
+                    PARTNER_SLOT_LOOKUP[item.name] = true;
+                }
+                if (item.flags && item.flags.length) {
+                    FLAG_LOOKUP[item.name] = item.flags;
                 }
             });
         }
@@ -5512,6 +5669,11 @@ Tip: Copy directly from EVE inventory window"></textarea>
             const formattedQty = quantity.toLocaleString();
             const qtyClass = quantity === 0 ? 'detail-value out-of-stock' : 'detail-value';
 
+            // Partner program vacancy badge
+            const slotBadge = PARTNER_SLOT_LOOKUP[name]
+                ? `<div class="partner-slot-badge">&#9733; Partner Slot &mdash; Available</div>`
+                : '';
+
             let priceRows = '';
             if (rates) {
                 const corpLabel  = `${rates.corp}% JBV`;
@@ -5533,7 +5695,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     </div>`;
             }
 
+            // Item flag badges
+            const itemFlags = FLAG_LOOKUP[name] || [];
+            const flagsHtml = itemFlags.length
+                ? `<div class="item-flags">${itemFlags.map(f => FLAG_DEFS[f]
+                    ? `<span class="item-flag" style="color:${FLAG_DEFS[f].color};border-color:${FLAG_DEFS[f].color}">${FLAG_DEFS[f].label}</span>`
+                    : '').join('')}</div>`
+                : '';
+
             item.innerHTML = `
+                ${slotBadge}
                 <div class="item-name">${name}</div>
                 <div class="item-details">
                     <div class="detail-row">
@@ -5541,6 +5712,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <span class="${qtyClass}">${formattedQty} units</span>
                     </div>
                     ${priceRows}
+                    ${flagsHtml}
                 </div>
             `;
 
