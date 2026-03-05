@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-05 20:25 UTC
+// Generated: 2026-03-05 20:35 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -364,7 +364,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 16701.19,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 4247,
@@ -522,7 +524,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 100000000,
       "avgJitaBuy": 17.37,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 37,
@@ -578,7 +582,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 50000,
       "avgJitaBuy": 905.03,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 40,
@@ -606,7 +612,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 5000,
       "avgJitaBuy": 19143.38,
-      "flags": []
+      "flags": [
+        "low_stock"
+      ]
     },
     {
       "typeId": 16634,
@@ -648,7 +656,9 @@ const BUYBACK_DATA = {
       "accepted": true,
       "quota": 100000,
       "avgJitaBuy": 575.92,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16636,
@@ -732,7 +742,9 @@ const BUYBACK_DATA = {
       "accepted": true,
       "quota": 25000,
       "avgJitaBuy": 5329.46,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16643,
@@ -760,7 +772,9 @@ const BUYBACK_DATA = {
       "accepted": true,
       "quota": 25000,
       "avgJitaBuy": 7040.49,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16642,
@@ -802,7 +816,9 @@ const BUYBACK_DATA = {
       "accepted": true,
       "quota": 12500,
       "avgJitaBuy": 3434.51,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16647,
@@ -816,7 +832,9 @@ const BUYBACK_DATA = {
       "accepted": true,
       "quota": 12500,
       "avgJitaBuy": 5042.85,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16648,
@@ -830,7 +848,9 @@ const BUYBACK_DATA = {
       "accepted": true,
       "quota": 12500,
       "avgJitaBuy": 8890.39,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16652,
@@ -7721,5 +7741,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-05 20:25 UTC"
+  "generated": "2026-03-05 20:35 UTC"
 };
