@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-05 20:35 UTC
+// Generated: 2026-03-05 21:36 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -510,7 +510,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 100000000,
       "avgJitaBuy": 3.87,
-      "flags": []
+      "flags": [
+        "popular"
+      ]
     },
     {
       "typeId": 35,
@@ -7741,5 +7743,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-05 20:35 UTC"
+  "generated": "2026-03-05 21:36 UTC"
 };
