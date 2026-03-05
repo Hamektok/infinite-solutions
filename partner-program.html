@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partner Program — Infinite Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #080f1a;
+  --bg-card:     #0c1828;
+  --gold:        #ffcc44;
+  --gold-dim:    rgba(255,204,68,0.11);
+  --gold-border: rgba(255,204,68,0.28);
+  --cyan:        #00d9ff;
+  --cyan-dim:    rgba(0,217,255,0.08);
+  --cyan-border: rgba(0,217,255,0.22);
+  --green:       #44dd88;
+  --text:        #a8c8dc;
+  --text-bright: #d4eaf5;
+  --text-muted:  #4a6e84;
+  --border:      rgba(0,217,255,0.14);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Rajdhani', sans-serif; background: var(--bg); color: var(--text); font-size: 1rem; line-height: 1.6; }
+a { color: var(--cyan); text-decoration: none; }
+a:hover { color: #fff; }
+strong { color: var(--text-bright); font-weight: 700; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(5,10,20,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+.nav-brand { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; color: var(--gold); text-transform: uppercase; }
+.nav-brand span { color: rgba(255,255,255,0.4); font-weight: 400; }
+.nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+.nav-links a { font-family: 'Orbitron', monospace; font-size: 0.57rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-muted); transition: color 0.2s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-cta { font-family: 'Orbitron', monospace; font-size: 0.57rem; letter-spacing: 0.13em; text-transform: uppercase; background: var(--gold); color: #080f1a !important; padding: 8px 18px; border-radius: 3px; font-weight: 700; transition: background 0.2s, transform 0.15s; }
+.nav-cta:hover { background: #ffe066; transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 96px 40px 88px; text-align: center;
+  background:
+    radial-gradient(ellipse 75% 55% at 50% 100%, rgba(0,40,80,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 8% 30%,   rgba(0,30,70,0.4)  0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 92% 20%,  rgba(40,0,80,0.3)  0%, transparent 60%),
+    var(--bg);
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at  5%  9%, rgba(255,255,255,0.55) 0%, transparent 100%),
+    radial-gradient(1px 1px at 13% 25%, rgba(255,255,255,0.40) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22%  5%, rgba(255,255,255,0.45) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 42%, rgba(255,255,255,0.38) 0%, transparent 100%),
+    radial-gradient(1px 1px at 38% 15%, rgba(255,255,255,0.50) 0%, transparent 100%),
+    radial-gradient(1px 1px at 47% 63%, rgba(255,255,255,0.40) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 27%, rgba(255,255,255,0.45) 0%, transparent 100%),
+    radial-gradient(1px 1px at 63% 75%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 71% 12%, rgba(255,255,255,0.50) 0%, transparent 100%),
+    radial-gradient(1px 1px at 79% 50%, rgba(255,255,255,0.40) 0%, transparent 100%),
+    radial-gradient(1px 1px at 87% 84%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 94% 37%, rgba(255,255,255,0.50) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at  9% 55%, rgba(190,215,255,0.65) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 43% 90%, rgba(190,215,255,0.60) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 74% 20%, rgba(190,215,255,0.65) 0%, transparent 100%),
+    radial-gradient(2px 2px at 28% 68%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(2px 2px at 89% 57%, rgba(255,255,255,0.70) 0%, transparent 100%);
+}
+.hero::after { content: ''; position: absolute; top: 0; left: 8%; right: 8%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); opacity: 0.45; }
+.hero-inner { position: relative; z-index: 1; max-width: 840px; margin: 0 auto; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; font-family: 'Orbitron', monospace; font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cyan); margin-bottom: 22px; }
+.hero-eyebrow::before, .hero-eyebrow::after { content: ''; width: 30px; height: 1px; background: rgba(0,217,255,0.45); }
+.hero h1 { font-family: 'Orbitron', monospace; font-size: clamp(1.9rem, 4vw, 3.1rem); font-weight: 900; line-height: 1.1; letter-spacing: 0.03em; color: #fff; text-shadow: 0 0 60px rgba(255,204,68,0.2); margin-bottom: 12px; }
+.hero h1 .gold { color: var(--gold); }
+.hero .tagline { font-size: 1.18rem; color: var(--text); letter-spacing: 0.05em; margin-bottom: 14px; font-weight: 500; }
+.hero .tagline em { color: var(--cyan); font-style: normal; }
+.hero .corp-note { display: inline-block; font-family: 'Orbitron', monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold-border); padding: 6px 18px; border-radius: 2px; margin-bottom: 32px; }
+.hero-ctas { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.btn-primary { font-family: 'Orbitron', monospace; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; background: var(--gold); color: #080f1a; padding: 13px 32px; border-radius: 3px; border: none; cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 0 22px rgba(255,204,68,0.22); }
+.btn-primary:hover { background: #ffe066; transform: translateY(-2px); box-shadow: 0 0 34px rgba(255,204,68,0.38); color: #080f1a; }
+.btn-secondary { font-family: 'Orbitron', monospace; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; background: transparent; color: var(--cyan); padding: 13px 32px; border-radius: 3px; border: 1px solid rgba(0,217,255,0.38); cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { background: rgba(0,217,255,0.07); border-color: var(--cyan); transform: translateY(-2px); color: #fff; }
+
+/* ── SECTIONS ── */
+section { padding: 80px 40px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label { font-family: 'Orbitron', monospace; font-size: 0.57rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--cyan); margin-bottom: 10px; }
+.section-title { font-family: 'Orbitron', monospace; font-size: clamp(1.1rem, 2.5vw, 1.7rem); font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 14px; }
+.section-title .gold { color: var(--gold); }
+.section-intro { font-size: 1.03rem; color: var(--text); max-width: 740px; line-height: 1.75; margin-bottom: 48px; }
+
+/* ── INTRO BAND ── */
+.intro-band { background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 56px 40px; }
+.intro-band .section-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.intro-text h2 { font-family: 'Orbitron', monospace; font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 18px; line-height: 1.25; }
+.intro-text h2 .gold { color: var(--gold); }
+.intro-text p { font-size: 1rem; color: var(--text); line-height: 1.78; margin-bottom: 14px; }
+.pilot-notice { margin-top: 20px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 5px; padding: 14px 18px; font-size: 0.92rem; color: #c8a830; line-height: 1.6; }
+.pilot-notice strong { color: var(--gold); }
+.quick-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.stat-card { background: var(--cyan-dim); border: 1px solid var(--cyan-border); border-radius: 6px; padding: 22px 20px 20px; text-align: center; }
+.stat-value { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 900; color: var(--gold); line-height: 1; margin-bottom: 7px; text-shadow: 0 0 18px rgba(255,204,68,0.28); }
+.stat-label { font-size: 0.83rem; color: var(--text-muted); line-height: 1.35; }
+
+/* ── STEPS ── */
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.step-card { background: var(--bg-card); border: 1px solid var(--cyan-border); border-radius: 6px; padding: 28px 22px; position: relative; transition: border-color 0.25s, transform 0.2s; }
+.step-card:hover { border-color: rgba(0,217,255,0.44); transform: translateY(-3px); }
+.step-card::before { content: ''; position: absolute; top: 0; left: 18%; right: 18%; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,217,255,0.38), transparent); }
+.step-num { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--gold); background: var(--gold-dim); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: var(--gold); margin-bottom: 16px; box-shadow: 0 0 12px rgba(255,204,68,0.18); }
+.step-icon { width: 48px; height: 48px; margin-bottom: 16px; }
+.step-title { font-family: 'Orbitron', monospace; font-size: 0.63rem; font-weight: 700; color: #fff; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px; line-height: 1.45; }
+.step-body { font-size: 0.93rem; color: var(--text); line-height: 1.65; }
+.step-note { display: inline-block; margin-top: 10px; font-size: 0.82rem; color: var(--gold); background: var(--gold-dim); border: 1px solid rgba(255,204,68,0.2); border-radius: 3px; padding: 4px 10px; }
+
+/* ── ACCEPT ── */
+.accept-section { background: var(--bg-card); }
+.accept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.accept-card { border-radius: 6px; padding: 28px 26px; position: relative; }
+.accept-card.yes { background: rgba(0,217,255,0.04); border: 1px solid var(--cyan-border); }
+.accept-card.no  { background: rgba(255,80,80,0.04); border: 1px solid rgba(255,80,80,0.2); }
+.accept-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 6px 6px 0 0; }
+.accept-card.yes::before { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+.accept-card.no::before  { background: linear-gradient(90deg, transparent, rgba(255,80,80,0.6), transparent); }
+.accept-badge { display: inline-block; font-family: 'Orbitron', monospace; font-size: 0.57rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; margin-bottom: 14px; }
+.accept-badge.yes { background: rgba(0,217,255,0.1); color: var(--cyan); border: 1px solid var(--cyan-border); }
+.accept-badge.no  { background: rgba(255,80,80,0.1); color: #ff6060; border: 1px solid rgba(255,80,80,0.3); }
+.accept-card h3 { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
+.accept-card.yes h3 { color: var(--cyan); }
+.accept-card.no  h3 { color: #ff6060; }
+.accept-card p { font-size: 0.95rem; color: var(--text); line-height: 1.7; margin-bottom: 16px; }
+.tier-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.tier-pill { font-family: 'Orbitron', monospace; font-size: 0.62rem; font-weight: 700; padding: 6px 14px; border-radius: 3px; letter-spacing: 0.08em; }
+.tier-pill.p1 { background: rgba(0,217,255,0.10); color: #66ddff; border: 1px solid rgba(0,217,255,0.3); }
+.tier-pill.p2 { background: rgba(68,221,136,0.10); color: #44dd88; border: 1px solid rgba(68,221,136,0.3); }
+.tier-pill.p3 { background: rgba(255,204,68,0.10); color: var(--gold); border: 1px solid rgba(255,204,68,0.3); }
+.tier-pill.p4 { background: rgba(200,100,255,0.10); color: #cc88ff; border: 1px solid rgba(200,100,255,0.3); }
+.tier-pill.p0 { background: rgba(255,80,80,0.08); color: #ff6060; border: 1px solid rgba(255,80,80,0.25); text-decoration: line-through; opacity: 0.65; }
+.coming-soon { margin-top: 16px; font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+.coming-soon span { color: var(--cyan); font-style: normal; }
+
+/* ── SLOT TYPES ── */
+.slot-types { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.slot-card { border-radius: 6px; padding: 30px 28px; position: relative; overflow: hidden; }
+.slot-card.exclusive { background: rgba(255,204,68,0.04); border: 1px solid var(--gold-border); }
+.slot-card.shared    { background: var(--cyan-dim); border: 1px solid var(--cyan-border); }
+.slot-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.slot-card.exclusive::before { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.slot-card.shared::before    { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+.slot-badge { display: inline-block; font-family: 'Orbitron', monospace; font-size: 0.57rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 13px; border-radius: 2px; margin-bottom: 14px; }
+.slot-badge.exclusive { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+.slot-badge.shared    { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-border); }
+.slot-card h3 { font-family: 'Orbitron', monospace; font-size: 1.05rem; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
+.slot-card.exclusive h3 { color: var(--gold); }
+.slot-card.shared h3    { color: var(--cyan); }
+.slot-card p { font-size: 0.95rem; color: var(--text); line-height: 1.72; margin-bottom: 16px; }
+.slot-list { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
+.slot-list li { font-size: 0.92rem; color: var(--text); display: flex; align-items: flex-start; gap: 10px; line-height: 1.45; }
+.slot-list li::before { content: '▸'; flex-shrink: 0; margin-top: 2px; }
+.slot-card.exclusive .slot-list li::before { color: var(--gold); }
+.slot-card.shared    .slot-list li::before { color: var(--cyan); }
+.slot-pricing-tag { font-family: 'Orbitron', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; padding: 5px 12px; border-radius: 2px; display: inline-block; margin-top: 4px; }
+.slot-pricing-tag.flat { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+.slot-pricing-tag.comm { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-border); }
+
+/* ── PRICING ── */
+.pricing-section { background: var(--bg-card); }
+.pricing-models { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+.pricing-card { background: var(--bg); border-radius: 6px; padding: 28px 26px; position: relative; }
+.pricing-card.flat { border: 1px solid var(--gold-border); }
+.pricing-card.comm { border: 1px solid var(--cyan-border); }
+.pricing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 6px 6px 0 0; }
+.pricing-card.flat::before { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.pricing-card.comm::before { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+.pricing-card h3 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; }
+.pricing-card.flat h3 { color: var(--gold); }
+.pricing-card.comm h3 { color: var(--cyan); }
+.pricing-card .rec { font-family: 'Orbitron', monospace; font-size: 0.55rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; display: block; }
+.pricing-card p { font-size: 0.93rem; color: var(--text); line-height: 1.72; margin-bottom: 12px; }
+.pricing-card p:last-child { margin-bottom: 0; }
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.pc-col h5 { font-family: 'Orbitron', monospace; font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+.pc-col.pro h5 { color: var(--green); }
+.pc-col.con h5 { color: #ff7777; }
+.pc-col ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.pc-col ul li { font-size: 0.84rem; color: var(--text); line-height: 1.4; display: flex; align-items: flex-start; gap: 6px; }
+.pc-col ul li::before { flex-shrink: 0; margin-top: 1px; font-size: 0.75rem; }
+.pc-col.pro ul li::before { content: '✓'; color: var(--green); }
+.pc-col.con ul li::before { content: '–'; color: #ff7777; }
+.pricing-pilot { background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 6px; padding: 22px 26px; }
+.pricing-pilot h4 { font-family: 'Orbitron', monospace; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.pricing-pilot p { font-size: 0.94rem; color: #c8a830; line-height: 1.7; }
+
+/* ── FEES ── */
+.fees-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.fee-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 28px 24px; }
+.fee-tag { display: inline-block; font-family: 'Orbitron', monospace; font-size: 0.62rem; font-weight: 700; padding: 4px 12px; border-radius: 2px; margin-bottom: 12px; letter-spacing: 0.1em; }
+.fee-tag.zero       { background: rgba(68,221,136,0.1); color: #44dd88; border: 1px solid rgba(68,221,136,0.28); }
+.fee-tag.negotiated { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+.fee-tag.optional   { background: rgba(170,136,255,0.1); color: #bb99ff; border: 1px solid rgba(170,136,255,0.28); }
+.fee-card h4 { font-family: 'Orbitron', monospace; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+.fee-card.none h4 { color: #44dd88; }
+.fee-card.comm h4 { color: var(--gold); }
+.fee-card.opt  h4 { color: #bb99ff; }
+.fee-card p { font-size: 0.92rem; color: var(--text); line-height: 1.72; }
+
+/* ── HANDLE ── */
+.handle-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.handle-group h4 { font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cyan); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--cyan-border); }
+.handle-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+.handle-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.94rem; color: var(--text); line-height: 1.5; }
+.handle-list li .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); flex-shrink: 0; margin-top: 7px; box-shadow: 0 0 6px rgba(0,217,255,0.55); }
+
+/* ── FAQ ── */
+.faq-list { display: flex; flex-direction: column; gap: 10px; }
+.faq-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; transition: border-color 0.2s; }
+.faq-item.open { border-color: rgba(0,217,255,0.34); }
+.faq-q { width: 100%; background: none; border: none; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; text-align: left; }
+.faq-q-text { font-family: 'Rajdhani', sans-serif; font-size: 1.04rem; font-weight: 700; color: var(--text-bright); line-height: 1.35; }
+.faq-chevron { flex-shrink: 0; width: 20px; height: 20px; color: var(--cyan); transition: transform 0.25s; }
+.faq-item.open .faq-chevron { transform: rotate(180deg); }
+.faq-a { display: none; padding: 0 24px 20px; font-size: 0.95rem; color: var(--text); line-height: 1.75; border-top: 1px solid var(--border); padding-top: 16px; }
+.faq-item.open .faq-a { display: block; }
+
+/* ── APPLY ── */
+.apply-section { background: radial-gradient(ellipse 60% 70% at 50% 100%, rgba(0,50,100,0.38) 0%, transparent 70%), var(--bg); border-top: 1px solid var(--border); text-align: center; }
+.apply-section .section-intro { margin: 0 auto 40px; }
+.contact-card { background: var(--bg-card); border: 1px solid var(--gold-border); border-radius: 6px; padding: 30px 38px; text-align: center; }
+.contact-card-label { font-family: 'Orbitron', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; display: block; }
+.contact-methods { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+.contact-method-row { display: flex; align-items: center; gap: 14px; background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); border-radius: 5px; padding: 12px 16px; text-align: left; }
+.contact-method-row.preferred { border-color: var(--gold-border); background: var(--gold-dim); }
+.contact-rank { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.07); color: var(--text-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.contact-method-row.preferred .contact-rank { background: var(--gold); color: #000; }
+.contact-method-row strong { display: block; color: var(--text-bright); font-size: 0.9rem; }
+.contact-method-note { font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 2px; }
+.apply-note { font-size: 0.88rem; color: var(--text-muted); max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+/* ── FOOTER ── */
+footer { background: rgba(4,8,16,0.95); border-top: 1px solid var(--border); padding: 26px 40px; text-align: center; }
+footer p { font-size: 0.83rem; color: var(--text-muted); letter-spacing: 0.06em; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  section { padding: 60px 24px; }
+  nav { padding: 0 24px; }
+  .hero { padding: 68px 24px 58px; }
+  .intro-band { padding: 48px 24px; }
+  .intro-band .section-inner,
+  .accept-grid,
+  .slot-types,
+  .pricing-models,
+  .handle-cols { grid-template-columns: 1fr; gap: 24px; }
+  .fees-grid { grid-template-columns: 1fr; }
+  .steps-grid { grid-template-columns: 1fr 1fr; }
+  .quick-stats { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .steps-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .pros-cons { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-brand">Infinite Solutions <span>/ Partner Program</span></div>
+  <ul class="nav-links">
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#slots">Slot Types</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#fees">Fees</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#apply" class="nav-cta">Get Involved</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">EVE Online &nbsp;·&nbsp; Infinite Directive</div>
+    <h1>The <span class="gold">Infinite Solutions</span><br>Partner Program</h1>
+    <p class="tagline">
+      You produce it. We move it. <em>You get paid — without lifting a finger on the market.</em>
+    </p>
+    <div class="corp-note">&#9733; &nbsp; Open to Infinite Directive Members Only &nbsp; &#9733;</div>
+    <div class="hero-ctas">
+      <a href="#apply" class="btn-primary">Get Involved</a>
+      <a href="#how-it-works" class="btn-secondary">See How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── INTRO BAND ── -->
+<div class="intro-band">
+  <div class="section-inner">
+    <div class="intro-text">
+      <h2>A professional sales channel<br><span class="gold">for Infinite Directive producers</span></h2>
+      <p>
+        The Partner Program is a private service run through Infinite Solutions, available exclusively to members of Infinite Directive. It is built around a simple idea: if you produce goods, you shouldn't have to spend equal time figuring out how to sell them.
+      </p>
+      <p>
+        You deliver your commodities via Item Exchange Contract. We handle pricing research, contract management, and payouts. You earn from your production without touching the market side at all.
+      </p>
+      <p>
+        The program is launching with Planetary Industry commodities as the first category, with additional commodity types planned as the program grows and evolves.
+      </p>
+      <div class="pilot-notice">
+        <strong>Currently in Pilot Phase</strong> — All slots are open. As we collect market data and establish velocity, the program structure will evolve. Your participation directly shapes how it develops.
+      </div>
+    </div>
+    <div class="quick-stats">
+      <div class="stat-card">
+        <div class="stat-value">ALL</div>
+        <div class="stat-label">Slots currently<br>available</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Upfront fees<br>to join</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">P1–P4</div>
+        <div class="stat-label">PI tiers<br>accepted at launch</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">2</div>
+        <div class="stat-label">Slot types<br>available</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label">The Process</div>
+    <h2 class="section-title">How it works — <span class="gold">start to payout</span></h2>
+    <p class="section-intro">
+      Six steps from first contact to ISK in your wallet. The program is intentionally designed to put as little on you as possible once you're set up.
+    </p>
+    <div class="steps-grid">
+
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="6" y="8" width="28" height="22" rx="3" stroke="#00d9ff" stroke-width="1.8" fill="rgba(0,217,255,0.07)"/><path d="M6 36 L14 30 H34" stroke="#00d9ff" stroke-width="1.6" stroke-linejoin="round"/><line x1="12" y1="16" x2="28" y2="16" stroke="#00d9ff" stroke-width="1.4" opacity="0.6"/><line x1="12" y1="21" x2="28" y2="21" stroke="#00d9ff" stroke-width="1.4" opacity="0.6"/><line x1="12" y1="26" x2="20" y2="26" stroke="#00d9ff" stroke-width="1.4" opacity="0.6"/><circle cx="40" cy="14" r="7" fill="rgba(0,217,255,0.1)" stroke="#00d9ff" stroke-width="1.5"/><path d="M37 14 L39.5 16.5 L44 11" stroke="#00d9ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-title">Reach Out &amp; Apply</div>
+        <div class="step-body">
+          Get in touch with <strong>Hamektok Hakaari</strong> — Discord is the quickest route, but in-game chat works just as well. Let us know what you produce, your rough monthly output, and what you're looking for. No obligation required to start the conversation.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="7" width="20" height="26" rx="2" stroke="#ffcc44" stroke-width="1.8" fill="rgba(255,204,68,0.07)"/><line x1="12" y1="14" x2="24" y2="14" stroke="#ffcc44" stroke-width="1.3" opacity="0.6"/><line x1="12" y1="19" x2="24" y2="19" stroke="#ffcc44" stroke-width="1.3" opacity="0.6"/><line x1="12" y1="24" x2="20" y2="24" stroke="#ffcc44" stroke-width="1.3" opacity="0.6"/><line x1="12" y1="29" x2="24" y2="29" stroke="#ffcc44" stroke-width="1" opacity="0.4"/><circle cx="36" cy="36" r="10" fill="rgba(0,217,255,0.08)" stroke="#00d9ff" stroke-width="1.8"/><path d="M31 36 L34.5 39.5 L41 33" stroke="#00d9ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-title">Terms Agreed Together</div>
+        <div class="step-body">
+          We agree on your item, slot type, rate structure, and expected volume. During the pilot, each partner starts with <strong>one item slot</strong> to ensure every member gets a fair chance to participate. Additional slots open after the pilot phase.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="4" y="9" width="17" height="22" rx="2" stroke="#00d9ff" stroke-width="1.8" fill="rgba(0,217,255,0.07)"/><rect x="7" y="13" width="11" height="4" rx="1" fill="rgba(0,217,255,0.2)" stroke="#00d9ff" stroke-width="1"/><rect x="7" y="20" width="11" height="4" rx="1" fill="rgba(0,217,255,0.2)" stroke="#00d9ff" stroke-width="1"/><rect x="27" y="17" width="17" height="22" rx="2" stroke="#ffcc44" stroke-width="1.8" fill="rgba(255,204,68,0.07)"/><path d="M21 20 L26 20" stroke="#fff" stroke-width="1.6" stroke-dasharray="2 1.5" opacity="0.5"/><path d="M23.5 17.5 L27 20 L23.5 22.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/><line x1="30" y1="24" x2="41" y2="24" stroke="#ffcc44" stroke-width="1" opacity="0.45"/><line x1="30" y1="29" x2="41" y2="29" stroke="#ffcc44" stroke-width="1" opacity="0.45"/><line x1="30" y1="34" x2="37" y2="34" stroke="#ffcc44" stroke-width="1" opacity="0.45"/></svg>
+        </div>
+        <div class="step-title">Send Your Item Exchange Contract</div>
+        <div class="step-body">
+          Create an in-game <strong>Item Exchange Contract</strong> and address it to <strong>Rax Hakaari</strong>. Contracts must go to this character specifically — it keeps a clean paper trail in our system and gives you a clear record on your end as well.
+        </div>
+        <span class="step-note">&#9888; Always contract to Rax Hakaari</span>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="6" y="8" width="36" height="28" rx="3" stroke="#ffcc44" stroke-width="1.8" fill="rgba(255,204,68,0.06)"/><line x1="6" y1="16" x2="42" y2="16" stroke="#ffcc44" stroke-width="1" opacity="0.35"/><rect x="10" y="20" width="10" height="4" rx="1" fill="rgba(255,204,68,0.2)" stroke="#ffcc44" stroke-width="1"/><rect x="10" y="28" width="10" height="4" rx="1" fill="rgba(255,204,68,0.2)" stroke="#ffcc44" stroke-width="1"/><line x1="24" y1="22" x2="38" y2="22" stroke="#ffcc44" stroke-width="1.2" opacity="0.5"/><line x1="24" y1="30" x2="38" y2="30" stroke="#ffcc44" stroke-width="1.2" opacity="0.5"/><circle cx="38" cy="38" r="8" fill="rgba(68,221,136,0.1)" stroke="#44dd88" stroke-width="1.8"/><path d="M34.5 38 L37 40.5 L42 35.5" stroke="#44dd88" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-title">Contract Accepted &amp; Logged</div>
+        <div class="step-body">
+          Once the contract is accepted, your delivery is recorded against your account in our system. This establishes the foundation of your payout record — every unit you send in is tracked from the moment it arrives.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">5</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="5" y="30" width="7" height="14" rx="1" fill="rgba(0,217,255,0.18)" stroke="#00d9ff" stroke-width="1.4"/><rect x="16" y="22" width="7" height="22" rx="1" fill="rgba(0,217,255,0.28)" stroke="#00d9ff" stroke-width="1.4"/><rect x="27" y="14" width="7" height="30" rx="1" fill="rgba(0,217,255,0.38)" stroke="#00d9ff" stroke-width="1.4"/><rect x="38" y="8" width="7" height="36" rx="1" fill="rgba(0,217,255,0.48)" stroke="#00d9ff" stroke-width="1.4"/><path d="M8.5 30 L19.5 22 L30.5 13 L41.5 7" stroke="#ffcc44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="41.5" cy="7" r="3" fill="#ffcc44"/><line x1="3" y1="44" x2="47" y2="44" stroke="rgba(0,217,255,0.25)" stroke-width="1"/></svg>
+        </div>
+        <div class="step-title">Priced &amp; Listed for Sale</div>
+        <div class="step-body">
+          Your goods are listed via Item Exchange Contract at a price informed by current regional market conditions. We keep tabs on supply, demand, and competitive pricing to make sure your goods are positioned to move — not sit.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">6</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="5" y="17" width="36" height="26" rx="4" stroke="#ffcc44" stroke-width="1.8" fill="rgba(255,204,68,0.07)"/><rect x="29" y="25" width="14" height="10" rx="2" stroke="#ffcc44" stroke-width="1.4" fill="rgba(255,204,68,0.12)"/><circle cx="36" cy="30" r="2.5" fill="#ffcc44" opacity="0.8"/><text x="11" y="35" font-family="'Orbitron',monospace" font-size="9" font-weight="700" fill="#ffcc44" letter-spacing="0.5">ISK</text><path d="M44 9 L44 3 M41 6 L44 3 L47 6" stroke="#ffcc44" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="44" y1="9" x2="44" y2="17" stroke="#ffcc44" stroke-width="1.4" stroke-dasharray="2 2"/></svg>
+        </div>
+        <div class="step-title">ISK Paid to Your Wallet</div>
+        <div class="step-body">
+          Your share of each sale is transferred directly to your character in-game. During the pilot, payments go out as sales come in. As volume grows, a regular payout cadence will be established and communicated to all partners.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT WE ACCEPT ── -->
+<section class="accept-section">
+  <div class="section-inner">
+    <div class="section-label">Accepted Goods</div>
+    <h2 class="section-title">What we <span class="gold">do and don't accept</span></h2>
+    <p class="section-intro">
+      The program is launching with Planetary Industry commodities. Additional categories will be introduced as the program grows. For now, here is what qualifies.
+    </p>
+    <div class="accept-grid">
+      <div class="accept-card yes">
+        <div class="accept-badge yes">&#10003; &nbsp; Accepted at Launch</div>
+        <h3>Planetary Industry — Processed Tiers</h3>
+        <p>All processed and refined PI tiers are welcome. Whether you're running basic refinery chains or operating advanced factory planets, there is a slot for you. Goods must be processed to at least P1 before they're eligible.</p>
+        <div class="tier-list">
+          <span class="tier-pill p1">P1 — Refined</span>
+          <span class="tier-pill p2">P2 — Processed</span>
+          <span class="tier-pill p3">P3 — Specialized</span>
+          <span class="tier-pill p4">P4 — Advanced</span>
+        </div>
+        <p class="coming-soon">Additional commodity categories — <span>coming as the program expands</span></p>
+      </div>
+      <div class="accept-card no">
+        <div class="accept-badge no">&#10005; &nbsp; Not Accepted</div>
+        <h3>Raw Planetary Extracts</h3>
+        <p>P0 raw extracts are not accepted. They are far too bulky to handle efficiently and there is no current demand for them through this channel. Run your extracts through at least one processing step — even basic P1 refining — before bringing them into the program.</p>
+        <div class="tier-list">
+          <span class="tier-pill p0">P0 — Raw Extracts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SLOT TYPES ── -->
+<section id="slots">
+  <div class="section-inner">
+    <div class="section-label">Slot Types</div>
+    <h2 class="section-title">Choose the arrangement <span class="gold">that fits your output</span></h2>
+    <p class="section-intro">
+      Two slot types are available. The right choice depends on how consistently you produce and whether you want to be the sole supplier of your item or share that space with other members. Each slot type pairs naturally with a different pricing model — more on that below.
+    </p>
+    <div class="slot-types">
+      <div class="slot-card exclusive">
+        <div class="slot-badge exclusive">&#9733; Exclusive</div>
+        <h3>Exclusive Slot</h3>
+        <p>
+          You are the <strong>sole supplier</strong> of your chosen item through the program. No other partner consigns the same commodity while your slot is active, giving your goods priority positioning and buyers a single reliable source.
+        </p>
+        <ul class="slot-list">
+          <li>Your item is reserved — no competing partner stock</li>
+          <li>Best suited to consistent, committed producers</li>
+          <li>Stronger positioning and more predictable sales flow</li>
+          <li>Expected volume is agreed upfront and forms the basis of your rate</li>
+        </ul>
+        <div class="slot-pricing-tag flat">Default Pricing: Flat Rate</div>
+      </div>
+      <div class="slot-card shared">
+        <div class="slot-badge shared">&#9670; Shared</div>
+        <h3>Shared Slot</h3>
+        <p>
+          Multiple members can supply the same item. Each partner's contribution is tracked individually and attributed accurately. A natural fit for <strong>part-time or variable producers</strong> who still want access to a managed sales channel without a heavy volume commitment.
+        </p>
+        <ul class="slot-list">
+          <li>Multiple partners can supply the same commodity</li>
+          <li>Sales tracked and attributed per partner individually</li>
+          <li>Minimum batch sizes agreed per item during onboarding — keeps the process clean for everyone</li>
+          <li>Volume estimates discussed upfront, not enforced as a hard floor</li>
+        </ul>
+        <div class="slot-pricing-tag comm">Default Pricing: Commission Per Sale</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING MODELS ── -->
+<section id="pricing" class="pricing-section">
+  <div class="section-inner">
+    <div class="section-label">Pricing Models</div>
+    <h2 class="section-title">How you get <span class="gold">charged for the service</span></h2>
+    <p class="section-intro">
+      Two pricing models are available. The default recommendation pairs naturally with each slot type, but both are negotiable. Here is how they work, and why you might choose one over the other.
+    </p>
+
+    <div class="pricing-models">
+
+      <div class="pricing-card flat">
+        <h3>Flat Rate</h3>
+        <span class="rec">Recommended for Exclusive Slots</span>
+        <p>
+          A fixed periodic fee agreed at onboarding, based on your expected monthly volume, item tier, and slot type. You pay the same amount regardless of how many units sell in a given period.
+        </p>
+        <p>
+          This model rewards partners who stock their slot consistently. The more product you put through, the lower your effective cost per unit — which directly incentivizes keeping your slot well-stocked. It also gives both parties predictable numbers to plan around.
+        </p>
+        <div class="pros-cons">
+          <div class="pc-col pro">
+            <h5>Works Well When</h5>
+            <ul>
+              <li>You produce consistently at a known volume</li>
+              <li>You want predictable, fixed costs</li>
+              <li>You're committed to keeping the slot stocked</li>
+            </ul>
+          </div>
+          <div class="pc-col con">
+            <h5>Less Ideal When</h5>
+            <ul>
+              <li>Your output is irregular or uncertain</li>
+              <li>You're not sure yet how much you can commit to</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pricing-card comm">
+        <h3>Commission Per Sale</h3>
+        <span class="rec">Recommended for Shared Slots</span>
+        <p>
+          A percentage of each sale, deducted from the proceeds. You only pay when you earn — if nothing sells, nothing is owed. The rate is agreed individually based on the item and arrangement.
+        </p>
+        <p>
+          This model aligns both parties' interests directly — more sales means more for everyone. It scales naturally with output, making it fair for partners whose production varies month to month, and lower-commitment for those just getting started.
+        </p>
+        <div class="pros-cons">
+          <div class="pc-col pro">
+            <h5>Works Well When</h5>
+            <ul>
+              <li>Your output varies or is hard to predict</li>
+              <li>You want shared risk — pay only when you earn</li>
+              <li>You're new to the program and want flexibility</li>
+            </ul>
+          </div>
+          <div class="pc-col con">
+            <h5>Less Ideal When</h5>
+            <ul>
+              <li>You produce high volume and want a lower effective rate</li>
+              <li>You prefer fixed, predictable costs for planning</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pricing-pilot">
+      <h4>During the Pilot Phase</h4>
+      <p>
+        While market data is being collected and velocity is being established, all partners will operate on a <strong>flat rate</strong> regardless of slot type. This keeps things simple while we learn what moves, what doesn't, and at what pace. Once the pilot phase concludes, partners will have the option to transition to the model that best suits their arrangement — or negotiate a hybrid approach. All of this will be discussed openly as we reach that point.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEES ── -->
+<section id="fees">
+  <div class="section-inner">
+    <div class="section-label">Fees &amp; Costs</div>
+    <h2 class="section-title">Transparent costs — <span class="gold">no surprises</span></h2>
+    <p class="section-intro">
+      Simple principle: you only pay when you are part of the program or when you earn. No hidden costs, no fine print.
+    </p>
+    <div class="fees-grid">
+      <div class="fee-card none">
+        <div class="fee-tag zero">Zero Entry Cost</div>
+        <h4>No Joining or Setup Fee</h4>
+        <p>
+          There is no cost to apply or to get set up in the program. The conversation, the onboarding, and the slot itself do not cost you anything upfront. Costs only apply once the arrangement is active and agreed.
+        </p>
+      </div>
+      <div class="fee-card comm">
+        <div class="fee-tag negotiated">Agreed Individually</div>
+        <h4>Flat Rate or Commission</h4>
+        <p>
+          Your service fee is either a flat periodic rate or a commission per sale — agreed individually during onboarding based on your item, slot type, and expected volume. During the pilot, all partners run on flat rate. After the pilot, the right model for your arrangement will be discussed and agreed openly.
+        </p>
+      </div>
+      <div class="fee-card opt">
+        <div class="fee-tag optional">100% Optional</div>
+        <h4>Corp Donation</h4>
+        <p>
+          Partners may voluntarily contribute a portion of their earnings as a donation to the corporation. This is entirely opt-in — you decide whether to participate and you set the percentage yourself. It has no bearing on your service fee or slot terms.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT WE HANDLE ── -->
+<section id="responsibilities" style="background: var(--bg-card);">
+  <div class="section-inner">
+    <div class="section-label">Our Responsibilities</div>
+    <h2 class="section-title">Everything we <span class="gold">take off your plate</span></h2>
+    <p class="section-intro">
+      Once your contract lands and the arrangement is active, here is what we own from that point forward.
+    </p>
+    <div class="handle-cols">
+      <div class="handle-group">
+        <h4>Receiving &amp; Recording</h4>
+        <ul class="handle-list">
+          <li><span class="dot"></span>Accepting your Item Exchange Contracts via Rax Hakaari promptly</li>
+          <li><span class="dot"></span>Logging your delivery against your account in our system</li>
+          <li><span class="dot"></span>Maintaining a clean record of everything received, sold, and owed</li>
+          <li><span class="dot"></span>Providing transaction records to you on request at any time</li>
+        </ul>
+      </div>
+      <div class="handle-group">
+        <h4>Contract Management</h4>
+        <ul class="handle-list">
+          <li><span class="dot"></span>Creating and managing Item Exchange Contracts to move your goods</li>
+          <li><span class="dot"></span>Monitoring regional trends, pricing, and competitive conditions</li>
+          <li><span class="dot"></span>Adjusting contract pricing as market conditions shift</li>
+          <li><span class="dot"></span>Coordinating trade hub options with you if local demand requires it</li>
+        </ul>
+      </div>
+      <div class="handle-group">
+        <h4>Tracking &amp; Transparency</h4>
+        <ul class="handle-list">
+          <li><span class="dot"></span>Logging every sale against your account individually</li>
+          <li><span class="dot"></span>Tracking exactly what you are owed at all times</li>
+          <li><span class="dot"></span>Calculating your payout accurately against agreed terms</li>
+          <li><span class="dot"></span>Keeping a clear record of all payments made to you</li>
+        </ul>
+      </div>
+      <div class="handle-group">
+        <h4>Payouts</h4>
+        <ul class="handle-list">
+          <li><span class="dot"></span>ISK transferred directly to your character in-game</li>
+          <li><span class="dot"></span>Paid out as sales come in during the pilot phase</li>
+          <li><span class="dot"></span>Formal payout schedule established as volume grows</li>
+          <li><span class="dot"></span>Unsold stock returned to you via contract if you exit the program</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section id="faq">
+  <div class="section-inner">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">Questions — <span class="gold">straight answers</span></h2>
+    <p class="section-intro">
+      The most common things people ask before getting started. More will be added as the program runs and real questions come in.
+    </p>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Do I need to be in Infinite Directive to participate?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          Yes. Infinite Solutions is a private service available exclusively to members of Infinite Directive. If you are not yet a member of the corporation, you would need to join first. For questions about joining Infinite Directive, please reach out through the corporation's recruitment channels — that process is separate from this program and Hamektok Hakaari is not involved in recruitment.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Is there a minimum production requirement?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          There is no hard minimum during the pilot phase. However, you will be asked to provide an estimate of your expected monthly volume during onboarding — this helps set fair terms and forms the basis of your rate. Minimum batch sizes per contract will also be agreed per item to keep the process manageable. Shared slots are always available if your output is lower or varies.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">What goods do you accept?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          The program is launching with Planetary Industry commodities. P1 through P4 are accepted. P0 raw extracts are not — they are too bulky and there is no current demand for them through this channel. Process your extracts through at least one refining step before bringing them in. Additional commodity categories will be added as the program grows beyond the pilot phase.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">How many items can I consign?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          At launch, each partner starts with <strong>one item slot</strong>. This is intentional — it gives every member a fair chance to claim a slot before anyone takes multiple. Once the pilot phase is established and we have a clearer view of capacity, additional slots will be made available.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Who do I send my contract to?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          All Item Exchange Contracts must be addressed to <strong>Rax Hakaari</strong>. This is not optional — routing contracts through this character ensures a clean paper trail is created in our tracking system and gives you a clear record on your end as well. Contracts sent to any other character cannot be processed.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">What if my items don't sell?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          If goods are sitting due to genuinely low demand, we will work together to find a path forward — including the option to move them through a major trade hub so that you still earn from your production time. Any change in approach is discussed and agreed with you before it happens. Your goods remain yours throughout.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">When and how do I get paid?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          Your share is transferred directly as ISK to your character in-game. During the pilot phase, payments go out as sales come in — you are not waiting on a fixed schedule. As the program picks up volume, a formal and regular payout cadence will be introduced and shared with all partners.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">What happens if I run out of stock on an exclusive slot?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          The flat rate covers lane reservation — not units delivered — so the fee applies whether the slot is stocked or empty. That said, life happens. If you know you are going dry, reach out in advance and a short grace window can be arranged. What we ask is that you communicate; the rate is there to ensure the slot is taken seriously, not to penalise genuine situations. Extended dry periods without contact will lead to a conversation about whether the slot is still right for you.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Can I leave the program?</span>
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">
+          Yes, at any time. Your goods are always yours. Any unsold stock will be returned to you via Item Exchange Contract. Any fees already paid in association with your slot are non-refundable, but there are no exit penalties and no pressure. Just reach out and we will sort it cleanly.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── APPLY ── -->
+<section id="apply" class="apply-section">
+  <div class="section-inner">
+    <div class="section-label">Get Started</div>
+    <h2 class="section-title">Ready to <span class="gold">get involved?</span></h2>
+    <p class="section-intro">
+      Getting started is just a conversation. All slots are open and there is no obligation in reaching out. The quickest way to connect is Discord — in-game chat and EVE Mail are available if that is easier.
+    </p>
+    <div class="contact-card" style="max-width:560px; margin: 0 auto 28px;">
+      <span class="contact-card-label">Hamektok Hakaari &nbsp;·&nbsp; Rax Hakaari</span>
+      <div class="contact-methods">
+        <div class="contact-method-row preferred">
+          <span class="contact-rank">1</span>
+          <div>
+            <strong>Discord</strong>
+            <span class="contact-method-note">Fastest — find us in the corp Discord</span>
+          </div>
+        </div>
+        <div class="contact-method-row">
+          <span class="contact-rank">2</span>
+          <div>
+            <strong>In-Game Chat</strong>
+            <span class="contact-method-note">Open a direct chat in EVE Online</span>
+          </div>
+        </div>
+        <div class="contact-method-row">
+          <span class="contact-rank">3</span>
+          <div>
+            <strong>EVE Mail</strong>
+            <span class="contact-method-note">Use as a last resort if the others aren't available</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="apply-note">
+      Not sure if the program is right for you, or have a question before committing to anything? Reach out anyway. There is no pressure and no obligation in asking.
+    </p>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>
+    Infinite Solutions Partner Program &nbsp;·&nbsp; A private service for Infinite Directive members &nbsp;·&nbsp; EVE Online
+  </p>
+</footer>
+
+<script>
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+</script>
+
+</body>
+</html>
