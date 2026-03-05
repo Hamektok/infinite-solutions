@@ -209,6 +209,17 @@ def get_buyback_data():
     """)
     market_visibility_raw = {row[0]: row[1] for row in cursor.fetchall()}
 
+    # ── Item flags lookup (from item_flags DB table) ───────────────────────
+    try:
+        _flag_rows = cursor.execute(
+            "SELECT type_id, flag_key FROM item_flags"
+        ).fetchall()
+        flags_by_type = {}
+        for _tid, _fk in _flag_rows:
+            flags_by_type.setdefault(_tid, []).append(_fk)
+    except Exception:
+        flags_by_type = {}
+
     conn.close()
 
     # Identify all ore type_ids that need mineral-value calculation
@@ -224,17 +235,6 @@ def get_buyback_data():
         with open(_slots_path) as _sf:
             for _s in json.load(_sf):
                 slot_lookup[_s['name']] = _s
-
-    # ── Item flags lookup (from item_flags DB table) ───────────────────────
-    try:
-        _flag_rows = cursor.execute(
-            "SELECT type_id, flag_key FROM item_flags"
-        ).fetchall()
-        flags_by_type = {}
-        for _tid, _fk in _flag_rows:
-            flags_by_type.setdefault(_tid, []).append(_fk)
-    except Exception:
-        flags_by_type = {}
 
     # Build output data
     buyback_items = []

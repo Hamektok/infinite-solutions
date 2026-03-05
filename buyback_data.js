@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-05 20:16 UTC
+// Generated: 2026-03-05 20:25 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -476,7 +476,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 788.2,
-      "flags": []
+      "flags": [
+        "low_stock"
+      ]
     },
     {
       "typeId": 17888,
@@ -490,7 +492,9 @@ const BUYBACK_DATA = {
       "accepted": true,
       "quota": 0,
       "avgJitaBuy": 679.97,
-      "flags": []
+      "flags": [
+        "low_stock"
+      ]
     },
     {
       "typeId": 34,
@@ -7717,5 +7721,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-05 20:16 UTC"
+  "generated": "2026-03-05 20:25 UTC"
 };
