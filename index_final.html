@@ -656,25 +656,30 @@
             text-align: center;
         }
 
-        /* Item flag badges */
+        /* Item flag banners */
+        @keyframes flagPulse {
+            0%, 100% { opacity: 1;    box-shadow: 0 2px 10px var(--flag-glow, transparent); }
+            50%       { opacity: 0.82; box-shadow: 0 2px 26px var(--flag-glow, transparent); }
+        }
         .item-flags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 7px;
-            padding-top: 7px;
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            margin: -20px -22px 14px -22px;
+            border-radius: 5px 5px 0 0;
+            overflow: hidden;
         }
         .item-flag {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 11px;
+            display: block;
+            font-family: 'Orbitron', monospace;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.3px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid;
-            padding: 1px 7px;
-            border-radius: 3px;
-            opacity: 0.9;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 8px 14px;
+            color: #ffffff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        .item-flag-urgent {
+            animation: flagPulse 2s ease-in-out infinite;
         }
 
         /* ===== BLUEPRINT TABLE SECTION ===== */
@@ -5500,12 +5505,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
         const PARTNER_SLOT_LOOKUP = {};
         const FLAG_LOOKUP = {};
         const FLAG_DEFS = {
-            'out_of_stock': { label: 'Out of Stock',   color: '#ff3333' },
-            'low_stock':    { label: 'Low Stock',       color: '#ff8844' },
-            'hot_item':     { label: 'Hot Item',        color: '#ff5555' },
-            'new_arrival':  { label: 'New Arrival',     color: '#44aaff' },
-            'limited':      { label: 'Limited Supply',  color: '#cc66ff' },
-            'popular':      { label: 'Popular',         color: '#44cc88' },
+            'out_of_stock': { label: '⊗  Out of Stock',   bg: '#bb0e0e', glow: '#ff3333', urgent: true  },
+            'low_stock':    { label: '⚠  Low Stock',       bg: '#b84a00', glow: '#ff8800', urgent: true  },
+            'hot_item':     { label: '▲  Hot Item',        bg: '#aa1122', glow: '#ff4455', urgent: true  },
+            'new_arrival':  { label: '✦  New Arrival',     bg: '#0d5fa8', glow: '#44aaff', urgent: false },
+            'limited':      { label: '◆  Limited Supply',  bg: '#6b1faa', glow: '#cc66ff', urgent: true  },
+            'popular':      { label: '★  Popular',          bg: '#0e7a44', glow: '#33cc77', urgent: false },
         };
         if (typeof BUYBACK_DATA !== 'undefined' && BUYBACK_DATA.items) {
             BUYBACK_DATA.items.forEach(item => {
@@ -5695,15 +5700,20 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     </div>`;
             }
 
-            // Item flag badges
+            // Item flag banners
             const itemFlags = FLAG_LOOKUP[name] || [];
             const flagsHtml = itemFlags.length
-                ? `<div class="item-flags">${itemFlags.map(f => FLAG_DEFS[f]
-                    ? `<span class="item-flag" style="color:${FLAG_DEFS[f].color};border-color:${FLAG_DEFS[f].color}">${FLAG_DEFS[f].label}</span>`
-                    : '').join('')}</div>`
+                ? `<div class="item-flags">${itemFlags.map(f => {
+                    const def = FLAG_DEFS[f];
+                    if (!def) return '';
+                    const urgentClass = def.urgent ? ' item-flag-urgent' : '';
+                    const glowStyle   = def.urgent ? `;--flag-glow:${def.glow}` : '';
+                    return `<span class="item-flag${urgentClass}" style="background:${def.bg}${glowStyle}">${def.label}</span>`;
+                  }).join('')}</div>`
                 : '';
 
             item.innerHTML = `
+                ${flagsHtml}
                 ${slotBadge}
                 <div class="item-name">${name}</div>
                 <div class="item-details">
@@ -5712,7 +5722,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <span class="${qtyClass}">${formattedQty} units</span>
                     </div>
                     ${priceRows}
-                    ${flagsHtml}
                 </div>
             `;
 
