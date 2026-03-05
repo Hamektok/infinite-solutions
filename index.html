@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603051850"></script>
+    <script src="buyback_data.js?v=202603051855"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -5500,11 +5500,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
         const PARTNER_SLOT_LOOKUP = {};
         const FLAG_LOOKUP = {};
         const FLAG_DEFS = {
-            'low_stock':   { label: 'Low Stock',      color: '#ff8844' },
-            'hot_item':    { label: 'Hot Item',        color: '#ff5555' },
-            'new_arrival': { label: 'New Arrival',     color: '#44aaff' },
-            'limited':     { label: 'Limited Supply',  color: '#cc66ff' },
-            'popular':     { label: 'Popular',         color: '#44cc88' },
+            'out_of_stock': { label: 'Out of Stock',   color: '#ff3333' },
+            'low_stock':    { label: 'Low Stock',       color: '#ff8844' },
+            'hot_item':     { label: 'Hot Item',        color: '#ff5555' },
+            'new_arrival':  { label: 'New Arrival',     color: '#44aaff' },
+            'limited':      { label: 'Limited Supply',  color: '#cc66ff' },
+            'popular':      { label: 'Popular',         color: '#44cc88' },
         };
         if (typeof BUYBACK_DATA !== 'undefined' && BUYBACK_DATA.items) {
             BUYBACK_DATA.items.forEach(item => {

@@ -217,6 +217,25 @@ def get_buyback_data():
     )
     ore_mineral_values = compute_ore_mineral_values(ore_type_ids, avg_prices, refining_efficiency)
 
+    # ── Partner slot lookup (from slots_config.json) ──────────────────────
+    _slots_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'slots_config.json')
+    slot_lookup = {}
+    if os.path.exists(_slots_path):
+        with open(_slots_path) as _sf:
+            for _s in json.load(_sf):
+                slot_lookup[_s['name']] = _s
+
+    # ── Item flags lookup (from item_flags DB table) ───────────────────────
+    try:
+        _flag_rows = cursor.execute(
+            "SELECT type_id, flag_key FROM item_flags"
+        ).fetchall()
+        flags_by_type = {}
+        for _tid, _fk in _flag_rows:
+            flags_by_type.setdefault(_tid, []).append(_fk)
+    except Exception:
+        flags_by_type = {}
+
     # Build output data
     buyback_items = []
     for type_id, type_name, category, display_order, price_pct, accepted, rate, quota, alliance_disc in items:
@@ -258,6 +277,15 @@ def get_buyback_data():
                 if display_order in order_range:
                     item['tier'] = tier_name
                     break
+
+        # Partner program slot status
+        slot = slot_lookup.get(type_name)
+        if slot:
+            item['partnerSlot'] = True
+            item['slotOpen'] = (slot.get('status') == 'open' and not slot.get('lessee'))
+
+        # Item flags
+        item['flags'] = flags_by_type.get(type_id, [])
 
         buyback_items.append(item)
 
