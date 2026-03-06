@@ -38,6 +38,20 @@ CATEGORY_DISPLAY = {
 # Reverse lookup: display name -> DB category key
 CATEGORY_DB_KEY = {v: k for k, v in CATEGORY_DISPLAY.items()}
 
+# TEST Alliance Buyback competitor intel — Google Sheet source
+_COMP_SHEET_ID = '1UGdb9mQIrdNprFN9_9g4WDYMh-C8fX5CTlhFBCV6bI4'
+COMP_TABS = [
+    ('Minerals, Gas',        '604363953'),
+    ('Moon Goo, Composites', '498403852'),
+    ('Ore, Ice',             '1641474510'),
+    ('PI',                   '684077699'),
+]
+# DB categories covered by the competitor sheet (for tree tag colouring)
+COMP_INTEL_CATEGORIES = {
+    'minerals', 'ice_products', 'moon_materials', 'pi_materials',
+    'standard_ore', 'ice_ore', 'moon_ore',
+}
+
 # Market tab visibility
 MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials']
 MARKET_TAB_LABELS = {
@@ -90,8 +104,8 @@ class AdminDashboard:
         # Track unsaved changes
         self.unsaved_changes = {}
 
-        # Competitor intel state (TEST PI Buyback stock)
-        self._test_pi_stock = {}
+        # Competitor intel state (TEST Buyback stock — all sheet tabs)
+        self._test_comp_stock = {}   # {tab_label: {item_name: qty}}
         self._test_pi_last_fetch = None
 
         # Item flags state
@@ -183,7 +197,7 @@ class AdminDashboard:
 
         # Tab 3: Blueprint Library
         self.bp_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.bp_frame, text='  Blueprint Library  ')
+        self.notebook.add(self.bp_frame, text='  Blueprint Library  ', state='hidden')
         self.build_blueprint_tab()
 
         # Tab 4: Inventory Overview
@@ -206,7 +220,12 @@ class AdminDashboard:
         self.notebook.add(self.ore_import_frame, text='  Ore Import  ')
         self.build_ore_import_tab()
 
-        # Tab 8: Consignments
+        # Tab 8: Reaction Analysis
+        self.reaction_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.reaction_frame, text='  Reactions  ')
+        self.build_reaction_tab()
+
+        # Tab 9: Consignments
         self.consign_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.consign_frame, text='  Consignments  ')
         self._build_consignment_tab()
@@ -325,7 +344,7 @@ class AdminDashboard:
             command=self._toggle_intel_panel)
         self._intel_toggle_btn.pack(side='left', padx=(0, 4))
 
-        tk.Label(intel_hdr, text='TEST PI Buyback — Competitor Stock Intel',
+        tk.Label(intel_hdr, text='TEST Buyback — Competitor Stock Intel',
                  bg='#0d1e10', fg='#ffaa44',
                  font=('Segoe UI', 9, 'bold')).pack(side='left')
 
@@ -350,12 +369,12 @@ class AdminDashboard:
                    width=7, font=('Segoe UI', 8),
                    bg='#0a1a0a', fg='#ffaa44', buttonbackground='#1a3020',
                    insertbackground='#ffaa44', justify='center').pack(side='left', padx=(0, 8))
-        self._intel_threshold_var.trace_add('write', lambda *_: self._test_pi_apply_tree_tags())
+        self._intel_threshold_var.trace_add('write', lambda *_: self._test_comp_apply_tree_tags())
         self._intel_refresh_btn = tk.Button(
             ctrl, text='\u21bb Refresh', bg='#1a3020', fg='#00ff88',
             font=('Segoe UI', 8), relief='flat', padx=8, pady=2,
             activebackground='#2a4030', activeforeground='#00ffaa',
-            command=self._test_pi_refresh)
+            command=self._test_comp_refresh)
         self._intel_refresh_btn.pack(side='left')
 
         # Content area — hidden by default, shown when toggled
@@ -1130,7 +1149,7 @@ class AdminDashboard:
                 'category': category, 'rate': pct, 'discount': discount
             }
 
-        self._test_pi_apply_tree_tags()
+        self._test_comp_apply_tree_tags()
 
     def load_market_visibility(self):
         """Load market tab/subtab visibility settings from site_config."""
@@ -1201,7 +1220,7 @@ class AdminDashboard:
                 pass
         threading.Thread(target=_regen, daemon=True).start()
 
-    # ── TEST PI Buyback competitor intel ────────────────────────────────────
+    # ── TEST Buyback competitor intel (Minerals, Moon Goo, Ore/Ice, PI) ────
 
     def _toggle_intel_panel(self):
         """Collapse or expand the competitor stock detail grid."""
@@ -1221,8 +1240,16 @@ class AdminDashboard:
             self._intel_content.pack_forget()
             self._intel_toggle_btn.configure(text='\u25b6')
 
-    def _test_pi_refresh(self):
-        """Fetch competitor stock data from the TEST PI Buyback Google Sheet."""
+    def _merge_comp_stock(self):
+        """Return a flat {name_lower: qty} dict merged from all fetched sheet tabs."""
+        merged = {}
+        for tab_data in self._test_comp_stock.values():
+            for name, qty in tab_data.items():
+                merged[name.lower()] = qty
+        return merged
+
+    def _test_comp_refresh(self):
+        """Fetch competitor stock data from all TEST Buyback Google Sheet tabs."""
         import threading, requests, csv, io as _io
         self._intel_refresh_btn.configure(state='disabled', text='Fetching\u2026')
         self._intel_last_lbl.configure(text='Fetching\u2026', fg='#ffcc44')
@@ -1231,94 +1258,106 @@ class AdminDashboard:
 
         def _fetch():
             try:
-                url = ('https://docs.google.com/spreadsheets/d/'
-                       '1UGdb9mQIrdNprFN9_9g4WDYMh-C8fX5CTlhFBCV6bI4/'
-                       'export?format=csv&gid=684077699')
-                resp = requests.get(url, timeout=20, allow_redirects=True)
-                resp.raise_for_status()
-                reader = csv.DictReader(_io.StringIO(resp.text))
-                for row in reader:
-                    name = row.get('Type', '').strip()
-                    qty_str = row.get('Quantity', '0').strip().replace(',', '')
-                    try:
-                        qty = int(qty_str)
-                    except ValueError:
-                        qty = 0
-                    if name:
-                        result[name] = qty
+                for tab_label, gid in COMP_TABS:
+                    url = (f'https://docs.google.com/spreadsheets/d/'
+                           f'{_COMP_SHEET_ID}/export?format=csv&gid={gid}')
+                    resp = requests.get(url, timeout=20, allow_redirects=True)
+                    resp.raise_for_status()
+                    reader = csv.DictReader(_io.StringIO(resp.text))
+                    tab_data = {}
+                    for row in reader:
+                        name = row.get('Type', '').strip()
+                        qty_str = row.get('Quantity', '0').strip().replace(',', '')
+                        try:
+                            qty = int(float(qty_str))
+                        except ValueError:
+                            qty = 0
+                        if name:
+                            tab_data[name] = qty
+                    result[tab_label] = tab_data
             except Exception as exc:
                 error_holder[0] = str(exc)
-            self.root.after(0, lambda: self._test_pi_refresh_done(result, error_holder[0]))
+            self.root.after(0, lambda: self._test_comp_refresh_done(result, error_holder[0]))
 
         threading.Thread(target=_fetch, daemon=True).start()
 
-    def _test_pi_refresh_done(self, result, error):
-        """Called on the main thread when the fetch completes."""
+    def _test_comp_refresh_done(self, result, error):
+        """Called on the main thread when the multi-tab fetch completes."""
         self._intel_refresh_btn.configure(state='normal', text='\u21bb Refresh')
         if error:
             self._intel_last_lbl.configure(
                 text=f'Error: {error[:60]}', fg='#ff6666')
             return
-        self._test_pi_stock = result
+        self._test_comp_stock = result
         self._test_pi_last_fetch = datetime.now()
         ts = self._test_pi_last_fetch.strftime('%H:%M:%S')
-        self._intel_last_lbl.configure(text=f'Updated {ts}', fg='#556677')
-        self._test_pi_update_intel()
-        self._test_pi_apply_tree_tags()
+        total = sum(len(d) for d in result.values())
+        self._intel_last_lbl.configure(text=f'Updated {ts}  ({total} items)', fg='#556677')
+        self._test_comp_update_intel()
+        self._test_comp_apply_tree_tags()
 
-    def _test_pi_update_intel(self):
-        """Rebuild the competitor stock grid inside the intel panel."""
+    def _test_comp_update_intel(self):
+        """Rebuild the competitor stock grid, grouped by sheet tab."""
         for w in self._intel_content.winfo_children():
             w.destroy()
 
         threshold = self._intel_threshold_var.get()
         self._update_intel_summary(threshold)
 
-        if not self._test_pi_stock:
+        if not self._test_comp_stock:
             tk.Label(self._intel_content, text='No data loaded.',
                      bg='#0d1e10', fg='#334455',
                      font=('Segoe UI', 8, 'italic')).pack(pady=2)
             return
 
-        # Sort ascending by qty so lowest-stock items appear first
-        items = sorted(self._test_pi_stock.items(), key=lambda x: x[1])
-
         COLS = 5
-        grid = tk.Frame(self._intel_content, bg='#0d1e10')
-        grid.pack(fill='x', pady=(2, 0))
-        for c in range(COLS):
-            grid.columnconfigure(c, weight=1)
+        for tab_label, tab_data in self._test_comp_stock.items():
+            if not tab_data:
+                continue
+            # Section header
+            tk.Label(self._intel_content, text=tab_label,
+                     bg='#0d1e10', fg='#ffcc44',
+                     font=('Segoe UI', 8, 'bold')).pack(anchor='w', padx=6, pady=(5, 1))
+            tk.Frame(self._intel_content, bg='#2a3a1a', height=1).pack(fill='x', padx=6, pady=(0, 2))
 
-        for i, (name, qty) in enumerate(items):
-            row_i, col_i = divmod(i, COLS)
-            if qty == 0:
-                qty_color = '#ff5555'
-            elif qty <= threshold:
-                qty_color = '#ffaa44'
-            else:
-                qty_color = '#448844'
+            # Sort ascending by qty so lowest-stock items appear first
+            items = sorted(tab_data.items(), key=lambda x: x[1])
 
-            cell = tk.Frame(grid, bg='#0d1e10')
-            cell.grid(row=row_i, column=col_i, sticky='ew', padx=4, pady=1)
+            grid = tk.Frame(self._intel_content, bg='#0d1e10')
+            grid.pack(fill='x', padx=2, pady=(0, 2))
+            for c in range(COLS):
+                grid.columnconfigure(c, weight=1)
 
-            short = name if len(name) <= 20 else name[:19] + '\u2026'
-            tk.Label(cell, text=short, bg='#0d1e10', fg='#8899aa',
-                     font=('Segoe UI', 8), anchor='w').pack(side='left')
-            tk.Label(cell, text=f' {qty:,}', bg='#0d1e10', fg=qty_color,
-                     font=('Segoe UI', 8, 'bold'), anchor='e').pack(side='right')
+            for i, (name, qty) in enumerate(items):
+                row_i, col_i = divmod(i, COLS)
+                if qty == 0:
+                    qty_color = '#ff5555'
+                elif qty <= threshold:
+                    qty_color = '#ffaa44'
+                else:
+                    qty_color = '#448844'
+
+                cell = tk.Frame(grid, bg='#0d1e10')
+                cell.grid(row=row_i, column=col_i, sticky='ew', padx=4, pady=1)
+
+                short = name if len(name) <= 20 else name[:19] + '\u2026'
+                tk.Label(cell, text=short, bg='#0d1e10', fg='#8899aa',
+                         font=('Segoe UI', 8), anchor='w').pack(side='left')
+                tk.Label(cell, text=f' {qty:,}', bg='#0d1e10', fg=qty_color,
+                         font=('Segoe UI', 8, 'bold'), anchor='e').pack(side='right')
 
     def _update_intel_summary(self, threshold):
         """Update the collapsed-view summary badge with current alert counts."""
-        if not self._test_pi_stock:
+        if not self._test_comp_stock:
             self._intel_summary_lbl.configure(text='')
             return
-        stock_lower = {k.lower(): v for k, v in self._test_pi_stock.items()}
-        n_out  = sum(1 for q in self._test_pi_stock.values() if q == 0)
-        n_low  = sum(1 for q in self._test_pi_stock.values() if 0 < q <= threshold)
+        merged = self._merge_comp_stock()
+        n_out  = sum(1 for q in merged.values() if q == 0)
+        n_low  = sum(1 for q in merged.values() if 0 < q <= threshold)
         n_none = sum(
             1 for d in self.rate_items.values()
-            if d.get('category') == 'pi_materials'
-            and d.get('name', '').lower() not in stock_lower
+            if d.get('category') in COMP_INTEL_CATEGORIES
+            and d.get('name', '').lower() not in merged
         )
         parts = []
         if n_out:
@@ -1331,9 +1370,9 @@ class AdminDashboard:
         color = '#ff8888' if n_out else '#ffcc66' if n_low else '#6688bb' if n_none else '#448844'
         self._intel_summary_lbl.configure(text=f'({summary})', fg=color)
 
-    def _test_pi_apply_tree_tags(self):
-        """Colour-code PI rows in the rates treeview based on TEST competitor stock."""
-        if not hasattr(self, '_test_pi_stock') or not self._test_pi_stock:
+    def _test_comp_apply_tree_tags(self):
+        """Colour-code rows in the rates treeview based on TEST competitor stock."""
+        if not hasattr(self, '_test_comp_stock') or not self._test_comp_stock:
             return
         try:
             threshold = self._intel_threshold_var.get()
@@ -1348,15 +1387,12 @@ class AdminDashboard:
         self.rates_tree.tag_configure('pi_intel_none',
             background='#0a0d1e', foreground='#6688bb')
 
-        # Categories with active intel feeds — extend this set for future sources
-        intel_categories = {'pi_materials'}
-
-        stock_lower = {k.lower(): v for k, v in self._test_pi_stock.items()}
+        stock_lower = self._merge_comp_stock()
 
         for iid in self.rates_tree.get_children():
             data = self.rate_items.get(iid, {})
             category = data.get('category', '')
-            if category not in intel_categories:
+            if category not in COMP_INTEL_CATEGORIES:
                 continue
             name_lower = data.get('name', '').lower()
             if name_lower not in stock_lower:
@@ -3347,6 +3383,7 @@ class AdminDashboard:
         tk.Label(param_inner, text="Buy From", **lbl_cfg).grid(row=2, column=0, sticky='w', padx=(0, 4))
         self.ore_buy_var = tk.StringVar(value=self._get_config('ore_param_buy_basis', 'JSV  (instant)'))
         self.ore_buy_var.trace_add('write', lambda *_: self._set_config('ore_param_buy_basis', self.ore_buy_var.get()))
+        self.ore_buy_var.trace_add('write', lambda *_: self._update_ore_jbv_columns())
         ttk.Combobox(param_inner, textvariable=self.ore_buy_var, width=18,
                      values=['JSV  (instant)', 'JBV  (place order)'],
                      state='readonly').grid(row=3, column=0, sticky='w', padx=(0, 10))
@@ -3525,10 +3562,11 @@ class AdminDashboard:
 
         ttk.Label(frow, text="Sort:").pack(side='left', padx=(0, 4))
         self.ore_sort_display_var = tk.StringVar(value='Margin %')
-        ttk.Combobox(frow, textvariable=self.ore_sort_display_var, width=16,
+        self.ore_sort_cb = ttk.Combobox(frow, textvariable=self.ore_sort_display_var, width=16,
                      values=['Margin %', 'Profit/Unit', 'Landed/Unit', 'Value/Unit', 'Deviation %',
                              'Max Bid', 'Sug Bid', 'Bid Headroom', 'Volatility %'],
-                     state='readonly').pack(side='left')
+                     state='readonly')
+        self.ore_sort_cb.pack(side='left')
         self.ore_sort_display_var.trace_add('write', lambda *_: self._filter_active_ore_view())
 
         # ── Treeview container ───────────────────────────────────────────
@@ -3632,6 +3670,396 @@ class AdminDashboard:
         self._ore_view         = 'ore'
         self._ore_prices_snap  = {}
         self._ore_refine_eff   = 1.0
+        self.root.after(0, self._update_ore_jbv_columns)
+
+    # ── Reaction Analysis tab ────────────────────────────────────────────────
+
+    def build_reaction_tab(self):
+        """Build the Reaction Analysis tab (import vs react cost comparison)."""
+        self._reaction_formulas = {}   # product_type_id -> formula dict (loaded lazily)
+        self._reaction_rows     = []   # computed row dicts for sorting/filtering
+
+        outer = ttk.Frame(self.reaction_frame, style='Card.TFrame')
+        outer.pack(fill='both', expand=True)
+
+        # ── Parameters card ──────────────────────────────────────────────────
+        pcf = ttk.Frame(outer, style='Card.TFrame')
+        pcf.pack(fill='x', padx=12, pady=(8, 4))
+        tk.Label(pcf, text='REACTION PARAMETERS',
+                 background='#0a2030', foreground='#ffcc44',
+                 font=('Segoe UI', 8, 'bold')).pack(anchor='w', padx=8, pady=(6, 4))
+
+        prow = ttk.Frame(pcf, style='Card.TFrame')
+        prow.pack(fill='x', padx=8, pady=(0, 8))
+
+        lbl_cfg = dict(background='#0a2030', foreground='#aabbcc', font=('Segoe UI', 8))
+        ent_w   = 9
+
+        def _param(parent, label, default, config_key, col):
+            tk.Label(parent, text=label, **lbl_cfg).grid(row=0, column=col*2,   sticky='w', padx=(0 if col==0 else 12, 4))
+            var = tk.StringVar(value=self._get_config(config_key, default))
+            var.trace_add('write', lambda *_: self._set_config(config_key, var.get()))
+            ttk.Entry(parent, textvariable=var, width=ent_w).grid(row=0, column=col*2+1, sticky='w')
+            return var
+
+        self._rxn_ship_var    = _param(prow, 'Shipping (ISK/m³)', '125',  'rxn_ship_rate',  0)
+        self._rxn_collat_var  = _param(prow, 'Collateral %',       '1.0',  'rxn_collat_pct', 1)
+        self._rxn_sci_var     = _param(prow, 'Sys Cost Index %',   '6.14', 'rxn_sci',        2)
+        self._rxn_scc_var     = _param(prow, 'SCC Surcharge %',    '4.00', 'rxn_scc',        3)
+        self._rxn_tax_var     = _param(prow, 'Facility Tax %',     '0.5',  'rxn_tax',        4)
+        self._rxn_me_var      = _param(prow, 'Tatara ME %',        '1.0',  'rxn_me',         5)
+
+        ttk.Button(prow, text='\u27f3  Calculate',
+                   style='Action.TButton',
+                   command=self._calc_reactions).grid(row=0, column=12, padx=(18, 0))
+
+        # Price age label
+        self._rxn_price_lbl = tk.Label(prow,
+            text='\u26a0 Click Calculate to load',
+            background='#0a2030', foreground='#ffcc44', font=('Segoe UI', 8))
+        self._rxn_price_lbl.grid(row=0, column=13, padx=(10, 0))
+
+        # Row 2: sell target + input basis
+        tk.Label(prow, text='Local Sell % of JBV', **lbl_cfg).grid(
+            row=1, column=0, sticky='w', pady=(6, 0))
+        self._rxn_sell_pct_var = tk.StringVar(value=self._get_config('rxn_sell_pct', '95.0'))
+        self._rxn_sell_pct_var.trace_add('write',
+            lambda *_: self._set_config('rxn_sell_pct', self._rxn_sell_pct_var.get()))
+        ttk.Entry(prow, textvariable=self._rxn_sell_pct_var, width=ent_w).grid(
+            row=1, column=1, sticky='w', pady=(6, 0))
+
+        tk.Label(prow, text='Input Basis', **lbl_cfg).grid(
+            row=1, column=2, sticky='w', padx=(12, 4), pady=(6, 0))
+        self._rxn_input_basis_var = tk.StringVar(value=self._get_config('rxn_input_basis', 'JSV'))
+        self._rxn_input_basis_var.trace_add('write',
+            lambda *_: self._set_config('rxn_input_basis', self._rxn_input_basis_var.get()))
+        ttk.Combobox(prow, textvariable=self._rxn_input_basis_var, width=7,
+                     values=['JSV', 'JBV'], state='readonly').grid(
+            row=1, column=3, sticky='w', pady=(6, 0))
+
+        # ── Sort row ──────────────────────────────────────────────────────────
+        frow = ttk.Frame(outer, style='Card.TFrame')
+        frow.pack(fill='x', padx=12, pady=(0, 4))
+
+        tk.Label(frow, text='Sort:', background='#0a2030',
+                 foreground='#aabbcc', font=('Segoe UI', 8)).pack(side='left', padx=(4, 4))
+        self._rxn_sort_var = tk.StringVar(value='React Margin %')
+        ttk.Combobox(frow, textvariable=self._rxn_sort_var, width=16,
+                     values=['Item', 'React Margin %'], state='readonly').pack(side='left')
+        self._rxn_sort_var.trace_add('write', lambda *_: self._rxn_populate_trees())
+
+        # ── Two side-by-side treeviews ────────────────────────────────────────
+        tables_frame = ttk.Frame(outer, style='Card.TFrame')
+        tables_frame.pack(fill='both', expand=True, padx=12, pady=(0, 8))
+
+        cols = ('item', 'jita_sell', 'react_margin', 'inputs')
+        col_defs = [
+            ('item',         'Item',           180, 'w'),
+            ('jita_sell',    'JSV/u',           90, 'e'),
+            ('react_margin', 'React Margin %', 100, 'e'),
+            ('inputs',       'Key Inputs',     220, 'w'),
+        ]
+        tag_cfg = [
+            ('win',      {'foreground': '#00ff88'}),
+            ('marginal', {'foreground': '#ffcc44'}),
+            ('loss',     {'foreground': '#ff4444'}),
+            ('row_a',    {'background': '#0a2030'}),
+            ('row_b',    {'background': '#0d2535'}),
+        ]
+
+        def _make_tree(parent, title):
+            tk.Label(parent, text=title, background='#0a2030', foreground='#7799bb',
+                     font=('Segoe UI', 8, 'bold')).pack(anchor='w', padx=6, pady=(4, 2))
+            tf = ttk.Frame(parent)
+            tf.pack(fill='both', expand=True)
+            tree = ttk.Treeview(tf, columns=cols, show='headings', selectmode='browse')
+            for cid, heading, width, anchor in col_defs:
+                tree.heading(cid, text=heading,
+                             command=lambda c=cid: self._rxn_sort_col(c))
+                tree.column(cid, width=width, minwidth=40, anchor=anchor)
+            for tag, cfg in tag_cfg:
+                tree.tag_configure(tag, **cfg)
+            vsb = ttk.Scrollbar(tf, orient='vertical', command=tree.yview)
+            tree.configure(yscrollcommand=vsb.set)
+            vsb.pack(side='right', fill='y')
+            tree.pack(fill='both', expand=True)
+            return tree
+
+        lf = ttk.Frame(tables_frame, style='Card.TFrame')
+        lf.pack(side='left', fill='both', expand=True, padx=(0, 4))
+        self._rxn_proc_tree = _make_tree(lf, '── Processed Moon Materials ──')
+
+        rf = ttk.Frame(tables_frame, style='Card.TFrame')
+        rf.pack(side='left', fill='both', expand=True, padx=(4, 0))
+        self._rxn_adv_tree = _make_tree(rf, '── Advanced (Composite) Materials ──')
+
+    def _load_reaction_formulas(self):
+        """Parse blueprints.jsonl and extract Processed + Advanced moon reaction formulas."""
+        import json, math, sqlite3
+
+        # Blueprint typeIDs for Processed (Intermediate) moon reactions bp 46166-46186
+        # and Advanced (Composite) moon reactions bp 46204-46218.
+        # Unrefined variants (46187-46203) and old Simple/Complex Reactions (17941+) excluded.
+        PROCESSED_BP_RANGE = range(46166, 46187)
+        ADVANCED_BP_RANGE  = range(46204, 46219)
+
+        bp_data = {}
+        with open(os.path.join(PROJECT_DIR, 'sde', 'blueprints.jsonl'), 'r', encoding='utf-8') as f:
+            for line in f:
+                obj = json.loads(line)
+                bp_id = obj['blueprintTypeID']
+                if bp_id in PROCESSED_BP_RANGE or bp_id in ADVANCED_BP_RANGE:
+                    if 'reaction' in obj.get('activities', {}):
+                        bp_data[bp_id] = obj['activities']['reaction']
+
+        conn = sqlite3.connect(DB_PATH)
+        c    = conn.cursor()
+
+        # Collect all type_ids we need to name
+        all_ids = set()
+        for data in bp_data.values():
+            for m in data.get('materials', []): all_ids.add(m['typeID'])
+            for p in data.get('products',  []): all_ids.add(p['typeID'])
+
+        ph = ','.join('?'*len(all_ids))
+        c.execute(f'SELECT type_id, type_name, volume FROM inv_types WHERE type_id IN ({ph})',
+                  list(all_ids))
+        type_info = {r[0]: {'name': r[1], 'vol': r[2] or 0.0} for r in c.fetchall()}
+        conn.close()
+
+        # Fuel block type IDs
+        FUEL_IDS = {4051, 4246, 4247, 4312}
+
+        self._reaction_formulas = {}
+        for bp_id, data in bp_data.items():
+            products = data.get('products', [])
+            if not products:
+                continue
+            p         = products[0]
+            prod_id   = p['typeID']
+            out_qty   = p['quantity']
+            tier      = 'Processed' if bp_id in PROCESSED_BP_RANGE else 'Advanced'
+
+            inputs     = []
+            fuel_entry = None
+            for m in data.get('materials', []):
+                if m['typeID'] in FUEL_IDS:
+                    fuel_entry = (m['typeID'], m['quantity'])
+                else:
+                    inputs.append((m['typeID'], m['quantity']))
+
+            prod_info = type_info.get(prod_id, {})
+            self._reaction_formulas[prod_id] = {
+                'bp_id':    bp_id,
+                'tier':     tier,
+                'name':     prod_info.get('name', str(prod_id)),
+                'vol':      prod_info.get('vol', 0.0),
+                'out_qty':  out_qty,
+                'inputs':   inputs,   # [(type_id, base_qty), ...]
+                'fuel':     fuel_entry,
+                'type_info': type_info,
+            }
+
+    def _calc_reactions(self):
+        """Fetch Jita prices, compute import vs react cost, populate treeview."""
+        import math, sqlite3
+
+        if not self._reaction_formulas:
+            self._load_reaction_formulas()
+
+        try:
+            ship_rate  = float(self._rxn_ship_var.get())
+            collat_pct = float(self._rxn_collat_var.get()) / 100.0
+            sci        = float(self._rxn_sci_var.get())    / 100.0
+            scc        = float(self._rxn_scc_var.get())    / 100.0
+            tax        = float(self._rxn_tax_var.get())    / 100.0
+            me_pct     = float(self._rxn_me_var.get())     / 100.0
+            sell_pct   = float(self._rxn_sell_pct_var.get()) / 100.0
+        except ValueError:
+            messagebox.showerror('Invalid Input', 'All parameters must be numeric.')
+            return
+
+        use_jsv   = self._rxn_input_basis_var.get().upper() == 'JSV'
+        # me_factor: ratio of inputs consumed after structure ME bonus
+        me_factor = 1.0 - me_pct   # e.g. 0.99 for 1% ME
+
+        # Collect all type_ids we need prices for
+        all_ids = set()
+        for f in self._reaction_formulas.values():
+            for tid, _ in f['inputs']:
+                all_ids.add(tid)
+            if f['fuel']:
+                all_ids.add(f['fuel'][0])
+        all_ids.update(self._reaction_formulas.keys())
+
+        conn   = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        ph = ','.join('?'*len(all_ids))
+        cursor.execute(f"""
+            SELECT type_id, best_buy, best_sell
+            FROM market_price_snapshots mps
+            WHERE type_id IN ({ph})
+              AND timestamp = (SELECT MAX(timestamp) FROM market_price_snapshots
+                               WHERE type_id = mps.type_id)
+        """, list(all_ids))
+        prices = {r[0]: (r[1] or 0.0, r[2] or 0.0) for r in cursor.fetchall()}
+
+        cursor.execute('SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id IN (%s)' % ph,
+                       list(all_ids))
+        snap_ts = cursor.fetchone()[0]
+        conn.close()
+
+        if snap_ts:
+            self._rxn_price_lbl.configure(
+                text=f'Prices: {snap_ts[:19].replace("T", " ")} UTC', foreground='#00ff88')
+        else:
+            self._rxn_price_lbl.configure(
+                text='\u26a0 No price data — fetch market prices first', foreground='#ffaa44')
+
+        type_info = {}
+        for f in self._reaction_formulas.values():
+            type_info.update(f['type_info'])
+
+        self._reaction_rows = []
+
+        for prod_id, f in self._reaction_formulas.items():
+            out_qty   = f['out_qty']
+            prod_sell = prices.get(prod_id, (0.0, 0.0))[1]   # Jita JSV (what we pay to import)
+            prod_jbv  = prices.get(prod_id, (0.0, 0.0))[0]   # Jita JBV (basis for local sell price)
+            prod_vol  = f['vol']
+
+            # ── Local sell price (our revenue per unit) ───────────────────
+            your_sell = prod_jbv * sell_pct if prod_jbv > 0 else None
+
+            # ── Import cost (buy at JSV + ship finished product) ──────────
+            if prod_sell <= 0:
+                import_cost = None
+            else:
+                prod_jita_split = (prod_jbv + prod_sell) / 2.0 if prod_jbv > 0 else prod_sell
+                ship_per_unit   = prod_vol * ship_rate
+                collat_per_unit = prod_jita_split * collat_pct
+                import_cost     = prod_sell + ship_per_unit + collat_per_unit
+
+            # ── React cost ───────────────────────────────────────────────
+            # Buy inputs at JSV (or JBV), ship inputs to Tatara, pay job cost
+            input_mat_cost  = 0.0   # ISK for all material inputs (per run)
+            input_ship_cost = 0.0   # shipping + collateral for inputs (per run)
+            input_eiv       = 0.0   # estimated item value for job cost calc
+            input_names     = []
+            missing_price   = False
+
+            for tid, base_qty in f['inputs']:
+                adj_qty = math.ceil(base_qty * me_factor)
+                jbv, jsl = prices.get(tid, (0.0, 0.0))
+                in_price = jsl if use_jsv else jbv
+                if in_price <= 0:
+                    missing_price = True
+                    break
+                jita_split = (jbv + jsl) / 2.0 if (jbv > 0 and jsl > 0) else (jbv or jsl)
+                vol = type_info.get(tid, {}).get('vol', 0.0)
+
+                input_mat_cost  += in_price * adj_qty
+                input_ship_cost += (vol * adj_qty * ship_rate +
+                                    jita_split * adj_qty * collat_pct)
+                input_eiv       += in_price * adj_qty
+                input_names.append(type_info.get(tid, {}).get('name', str(tid)))
+
+            # Fuel blocks (ME applies but typically stays the same: ceil(5×0.99)=5)
+            fuel_cost = 0.0
+            if f['fuel'] and not missing_price:
+                ftid, fqty = f['fuel']
+                adj_fqty  = math.ceil(fqty * me_factor)
+                fjbv, fjsl = prices.get(ftid, (0.0, 0.0))
+                fuel_price = fjsl if use_jsv else fjbv
+                fjita_split = (fjbv + fjsl) / 2.0 if (fjbv > 0 and fjsl > 0) else (fjbv or fjsl)
+                fuel_vol   = type_info.get(ftid, {}).get('vol', 0.0)
+                fuel_cost  = fuel_price * adj_fqty
+                fuel_ship  = (fuel_vol * adj_fqty * ship_rate +
+                              fjita_split * adj_fqty * collat_pct)
+                input_eiv += fuel_price * adj_fqty
+                input_ship_cost += fuel_ship
+
+            if missing_price or input_mat_cost <= 0:
+                react_cost = None
+            else:
+                job_cost   = input_eiv * sci * (1.0 + scc) * (1.0 + tax)
+                total_run  = input_mat_cost + fuel_cost + input_ship_cost + job_cost
+                react_cost = total_run / out_qty
+
+            # ── Margins ───────────────────────────────────────────────────
+            if your_sell and your_sell > 0:
+                react_margin  = (your_sell - react_cost)  / your_sell * 100.0 if react_cost  else None
+                import_margin = (your_sell - import_cost) / your_sell * 100.0 if import_cost else None
+            else:
+                react_margin  = None
+                import_margin = None
+
+            margin_adv = (react_margin - import_margin) \
+                if (react_margin is not None and import_margin is not None) else None
+
+            self._reaction_rows.append({
+                'prod_id':      prod_id,
+                'name':         f['name'],
+                'tier':         f['tier'],
+                'jita_sell':    prod_sell,
+                'react_cost':   react_cost,
+                'react_margin': react_margin,
+                'inputs':       ', '.join(input_names),
+            })
+
+        self._rxn_populate_trees()
+
+    def _rxn_populate_trees(self):
+        """Sort rows and populate both Processed and Advanced treeviews."""
+        if not self._reaction_rows:
+            return
+
+        srt = self._rxn_sort_var.get()
+        sort_key_map = {
+            'Item':           ('name',         False),
+            'React Margin %': ('react_margin', True),
+        }
+        sk, rev = sort_key_map.get(srt, ('react_margin', True))
+
+        def sorted_rows(tier):
+            rows = [r for r in self._reaction_rows if r['tier'] == tier]
+            return sorted(rows,
+                          key=lambda r: (r[sk] is None,
+                                         -(r[sk] or 0) if rev else (r[sk] or '')))
+
+        def populate(tree, tier):
+            tree.delete(*tree.get_children())
+            for idx, r in enumerate(sorted_rows(tier)):
+                rm = r['react_margin']
+                if rm is None:
+                    color_tag = 'marginal'
+                elif rm >= 5.0:
+                    color_tag = 'win'
+                elif rm > 0.0:
+                    color_tag = 'marginal'
+                else:
+                    color_tag = 'loss'
+                jsv = r['jita_sell']
+                alt = 'row_a' if idx % 2 == 0 else 'row_b'
+                tree.insert('', 'end', tags=(color_tag, alt), values=(
+                    r['name'],
+                    f'{jsv:,.2f}' if jsv else '\u2014',
+                    f'{rm:+.1f}%'  if rm  is not None else '\u2014',
+                    r['inputs'],
+                ))
+
+        populate(self._rxn_proc_tree, 'Processed')
+        populate(self._rxn_adv_tree,  'Advanced')
+
+    def _rxn_sort_col(self, col):
+        """Map treeview column click to sort dropdown."""
+        col_sort_map = {
+            'item':         'Item',
+            'react_margin': 'React Margin %',
+        }
+        if col in col_sort_map:
+            self._rxn_sort_var.set(col_sort_map[col])
 
     def _make_collapsible_section(self, parent, title, fg_color, expanded=True):
         """Create a collapsible section header + content frame. Returns content frame."""
@@ -4011,27 +4439,31 @@ class AdminDashboard:
             value_pu = prod_value / portion          # refine value per unit
             ship_pu  = volume * ship_rate            # fixed shipping per unit (doesn't scale with price)
 
-            # max_bid: max market price per unit to hit target_margin
-            #   value_pu = (price * buy_pct * (1+broker+collat) + ship_pu) * (1+target_margin)
-            #   => price = (value_pu/(1+target_margin) - ship_pu) / (buy_pct*(1+broker+collat))
-            price_factor = buy_pct * (1.0 + effective_broker + collat_pct)
-            if price_factor > 0:
-                _mb = (value_pu / (1.0 + target_margin_rate) - ship_pu) / price_factor
-                max_bid = round(_mb, 2) if _mb > 0 else None
+            # max_bid: max ISK/unit to place on buy order to hit target_margin
+            #   value_pu = (bid * (1+broker+collat) + ship_pu) * (1+target_margin)
+            #   where bid = price_ref * buy_pct  =>  price_ref = bid / buy_pct
+            #   => bid = (value_pu/(1+target_margin) - ship_pu) / (1+broker+collat)
+            cost_factor = 1.0 + effective_broker + collat_pct
+            if cost_factor > 0:
+                _mb_isk = (value_pu / (1.0 + target_margin_rate) - ship_pu) / cost_factor
+                max_bid = round(_mb_isk, 2) if _mb_isk > 0 else None
+                # reference Jita price threshold (for OVER check and bid_room)
+                max_bid_ref = round(_mb_isk / buy_pct, 2) if (buy_pct > 0 and _mb_isk > 0) else None
             else:
-                max_bid = None
+                max_bid     = None
+                max_bid_ref = None
 
-            # sug_bid: conservative entry — stay at or slightly below N-day avg, capped at max_bid
+            # sug_bid: conservative entry ISK — stay at or slightly below N-day avg bid, capped at max_bid
             if max_bid is not None and avg_bb is not None and avg_bb > 0:
-                sug_bid = round(min(max_bid, avg_bb * 0.99), 2)
+                sug_bid = round(min(max_bid, avg_bb * buy_pct * 0.99), 2)
             elif max_bid is not None:
                 sug_bid = max_bid
             else:
                 sug_bid = None
 
-            # bid_room: how far below max_bid the current market sits (positive = room to pay more)
-            if max_bid is not None and raw_price > 0:
-                bid_room = round((max_bid - raw_price) / raw_price * 100, 2)
+            # bid_room: how far max_bid_ref is above current Jita price (positive = room to bid more)
+            if max_bid_ref is not None and raw_price > 0:
+                bid_room = round((max_bid_ref - raw_price) / raw_price * 100, 2)
             else:
                 bid_room = None
 
@@ -4065,10 +4497,11 @@ class AdminDashboard:
                 'ore_cat':    ore_cat,
                 'compressed': is_compressed,
                 # Buy order analysis
-                'max_bid':    max_bid,
-                'sug_bid':    sug_bid,
-                'bid_room':   bid_room,
-                'volatility': volatility,
+                'max_bid':     max_bid,      # actual max ISK/unit to bid
+                'max_bid_ref': max_bid_ref,  # Jita price threshold (for OVER check)
+                'sug_bid':     sug_bid,
+                'bid_room':    bid_room,
+                'volatility':  volatility,
             })
 
         self._ore_prices_snap = prices
@@ -4082,6 +4515,21 @@ class AdminDashboard:
             self._filter_product_tree()
         else:
             self._filter_ore_tree()
+
+    def _update_ore_jbv_columns(self):
+        """Show/hide JBV-only columns and sort options based on selected buy basis."""
+        is_jbv = 'JBV' in self.ore_buy_var.get()
+        all_cols  = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev',
+                     'max_bid', 'sug_bid', 'bid_room', 'volatility')
+        base_cols = ('name', 'jita_buy', 'logistics', 'landed', 'value', 'profit', 'margin', 'dev')
+        self.ore_tree['displaycolumns'] = all_cols if is_jbv else base_cols
+
+        all_sort  = ['Margin %', 'Profit/Unit', 'Landed/Unit', 'Value/Unit', 'Deviation %',
+                     'Max Bid', 'Sug Bid', 'Bid Headroom', 'Volatility %']
+        base_sort = ['Margin %', 'Profit/Unit', 'Landed/Unit', 'Value/Unit', 'Deviation %']
+        self.ore_sort_cb['values'] = all_sort if is_jbv else base_sort
+        if not is_jbv and self.ore_sort_display_var.get() in ('Max Bid', 'Sug Bid', 'Bid Headroom', 'Volatility %'):
+            self.ore_sort_display_var.set('Margin %')
 
     def _filter_ore_tree(self):
         """Apply search/show/sort/type filters and repopulate the treeview."""
@@ -4180,8 +4628,9 @@ class AdminDashboard:
             bid_room_str = f"{bid_room:+.1f}%"  if bid_room   is not None else '—'
             volat_str    = f"{volatility:.1f}%" if volatility is not None else '—'
 
-            # Flag if current market price is already above max bid (can't hit target margin)
-            if max_bid is not None and r['jita_buy'] > max_bid:
+            # Flag if current Jita price is above the max_bid_ref threshold (can't hit target margin)
+            max_bid_ref = r.get('max_bid_ref')
+            if max_bid is not None and max_bid_ref is not None and r['jita_buy'] > max_bid_ref:
                 max_bid_str = f'OVER ({max_bid:,.2f})'
 
             tags = tuple(t for t in (tag, alt, dev_tag) if t)

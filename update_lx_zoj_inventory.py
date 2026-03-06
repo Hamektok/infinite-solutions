@@ -488,6 +488,57 @@ def _update_container_names_in_db(conn, esi_names):
     print(f"[OK] Updated {len(esi_names)} container name(s) in DB")
 
 
+def snapshot_test_comp(conn):
+    """Fetch TEST Buyback Google Sheet and store a competitor stock snapshot."""
+    import csv, io as _io
+
+    SHEET_ID = '1UGdb9mQIrdNprFN9_9g4WDYMh-C8fX5CTlhFBCV6bI4'
+    TABS = [
+        ('Minerals, Gas',        '604363953'),
+        ('Moon Goo, Composites', '498403852'),
+        ('Ore, Ice',             '1641474510'),
+        ('PI',                   '684077699'),
+    ]
+
+    snapshot_time = datetime.now(timezone.utc).isoformat()
+    cursor = conn.cursor()
+    rows_inserted = 0
+
+    print('\n>>> Snapshotting TEST Buyback competitor stock...')
+    for tab_label, gid in TABS:
+        url = (f'https://docs.google.com/spreadsheets/d/'
+               f'{SHEET_ID}/export?format=csv&gid={gid}')
+        try:
+            resp = requests.get(url, timeout=20, allow_redirects=True)
+            resp.raise_for_status()
+            reader = csv.DictReader(_io.StringIO(resp.text))
+            tab_count = 0
+            for row in reader:
+                name = row.get('Type', '').strip()
+                qty_str = row.get('Quantity', '0').strip().replace(',', '')
+                try:
+                    qty = int(float(qty_str))
+                except ValueError:
+                    qty = 0
+                if not name:
+                    continue
+                cursor.execute(
+                    'INSERT INTO test_comp_snapshots '
+                    '(snapshot_timestamp, tab_label, item_name, quantity) '
+                    'VALUES (?, ?, ?, ?)',
+                    (snapshot_time, tab_label, name, qty)
+                )
+                tab_count += 1
+                rows_inserted += 1
+            print(f'  {tab_label}: {tab_count} items')
+        except Exception as e:
+            print(f'  [WARN] Could not fetch tab "{tab_label}": {e}')
+
+    conn.commit()
+    print(f'[OK] Competitor snapshot stored: {rows_inserted} items at {snapshot_time}')
+    return snapshot_time
+
+
 def main():
     """
     Update LX-ZOJ inventory from ESI.
@@ -553,6 +604,9 @@ def main():
 
         # Update each consignor's current_qty from their assigned container
         sync_consignor_quantities(conn)
+
+        # Snapshot TEST Buyback competitor stock (no auth needed — public sheet)
+        snapshot_test_comp(conn)
 
         # Update HTML file (regenerates from database, so we don't need to pass inventory)
         html_success = update_html_inventory(None)
