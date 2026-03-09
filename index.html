@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603090414"></script>
+    <script src="buyback_data.js?v=202603091355"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -653,6 +653,14 @@
             padding: 3px 8px;
             border-radius: 3px;
             margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .supplied-by {
+            font-size: 10px;
+            color: #4a6a7a;
+            font-style: italic;
+            margin-top: 5px;
             text-align: center;
         }
 
@@ -3229,7 +3237,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 112113
             },
             "blueprintsLastUpdated": "Mar 09, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Mar 09, 2026 12:08 EVE"
+            "inventoryLastUpdated": "Mar 09, 2026 14:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5504,6 +5512,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
         const SELL_RATE_LOOKUP = {};
         const PARTNER_SLOT_LOOKUP = {};
         const FLAG_LOOKUP = {};
+        const SUPPLIER_LOOKUP = {};
         const FLAG_DEFS = {
             'out_of_stock': { label: '⊗  Out of Stock',   bg: '#bb0e0e', glow: '#ff3333', urgent: true  },
             'low_stock':    { label: '⚠  Low Stock',       bg: '#b84a00', glow: '#ff8800', urgent: true  },
@@ -5525,6 +5534,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 }
                 if (item.flags && item.flags.length) {
                     FLAG_LOOKUP[item.name] = item.flags;
+                }
+                if (item.suppliedBy) {
+                    SUPPLIER_LOOKUP[item.name] = item.suppliedBy;
                 }
             });
         }
@@ -5679,6 +5691,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 ? `<div class="partner-slot-badge">&#9733; Partner Slot &mdash; Available</div>`
                 : '';
 
+            // Supplied by (partner program consignor)
+            const supplier = SUPPLIER_LOOKUP[name];
+            const suppliedByHtml = supplier
+                ? `<div class="supplied-by">Supplied by ${supplier}</div>`
+                : '';
+
             let priceRows = '';
             if (rates) {
                 const corpLabel  = `${rates.corp}% JBV`;
@@ -5723,6 +5741,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     </div>
                     ${priceRows}
                 </div>
+                ${suppliedByHtml}
             `;
 
             return item;
