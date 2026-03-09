@@ -14,8 +14,63 @@ import webbrowser
 from datetime import date
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mydatabase.db')
-PORT    = 8877
+DB_PATH        = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mydatabase.db')
+AGREEMENTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'consignor_agreements')
+PORT           = 8877
+
+
+def generate_agreement_text(data: dict, consignor_pct: float, don_opted: bool, don_pct: float) -> str:
+    """Return a Discord-formatted agreement string."""
+    comm_pct   = float(data['commission_pct'])
+    slot_label = 'Exclusive' if data.get('slot_type') == 'exclusive' else 'Shared'
+
+    lines = [
+        '**━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━**',
+        '**Infinite Solutions — Partner Program Agreement**',
+        '**━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━**',
+        f'**Consignor:** {data["character_name"]}',
+        f'**Item:** {data["item_name"]}',
+        f'**Slot Type:** {slot_label}',
+        f'**Effective Date:** {data["start_date"]}',
+        '',
+        '**— Commercial Terms —**',
+        f'• Corp Commission: **{comm_pct:.1f}%**',
+        f'• Your Share: **{consignor_pct:.1f}%**',
+    ]
+
+    if data.get('list_price'):
+        lines.append(f'• List Price: **{float(data["list_price"]):,.2f} ISK/unit**')
+    if data.get('max_units'):
+        lines.append(f'• Monthly Supply Cap: **{int(data["max_units"]):,} units**')
+    if don_opted and don_pct > 0:
+        lines.append(f'• Corp Donation: **{don_pct:.1f}%** of your share per sale *(voluntary)*')
+
+    demand_label = data.get('demand_tier', 'medium').capitalize()
+    lines.append(f'• Demand Tier: {demand_label}')
+
+    if data.get('notes', '').strip():
+        lines += ['', '**— Notes —**', f'*{data["notes"].strip()}*']
+
+    lines += [
+        '',
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+        'This agreement is on file with **Infinite Solutions** at **LX-ZOJ**.',
+        'Contact **Hamektok Hakaari** with any questions.',
+    ]
+
+    return '\n'.join(lines)
+
+
+def save_agreement_file(char_name: str, item_name: str, start_date: str, text: str) -> str:
+    """Write agreement to consignor_agreements/ and return the file path."""
+    os.makedirs(AGREEMENTS_DIR, exist_ok=True)
+    safe_char = ''.join(c if c.isalnum() or c in ' -_' else '_' for c in char_name).strip()
+    safe_item = ''.join(c if c.isalnum() or c in ' -_' else '_' for c in item_name).strip()
+    filename  = f'{start_date}_{safe_char}_{safe_item}.txt'
+    filepath  = os.path.join(AGREEMENTS_DIR, filename)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(text)
+    return filepath
 
 # ── PI items by tier (type_id, display name) ──────────────────────────────────
 PI_TIERS = [
@@ -242,22 +297,52 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   .submit-note { color: var(--muted); font-size: 0.78rem; margin-top: 10px; }
 
   /* SUCCESS */
-  #success-screen { display: none; text-align: center; padding: 60px 20px; animation: fadeIn 0.4s ease; }
+  #success-screen { display: none; padding: 40px 0 60px; animation: fadeIn 0.4s ease; }
+  .success-top { text-align: center; margin-bottom: 28px; }
   #success-screen .check-icon {
     width: 72px; height: 72px; border-radius: 50%;
     background: rgba(68,221,136,0.12); border: 2px solid var(--green);
     display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; margin: 0 auto 24px;
+    font-size: 2rem; margin: 0 auto 20px;
   }
-  #success-screen h2 { font-family: 'Orbitron',monospace; color: var(--green); font-size: 1.1rem; letter-spacing: 0.08em; margin-bottom: 12px; }
-  #success-screen p { color: var(--dim); max-width: 440px; margin: 0 auto 20px; }
+  #success-screen h2 { font-family: 'Orbitron',monospace; color: var(--green); font-size: 1.1rem; letter-spacing: 0.08em; margin-bottom: 8px; }
+  #success-screen .sub { color: var(--dim); font-size: 0.9rem; margin-bottom: 4px; }
+  #success-screen .saved-path { color: var(--muted); font-size: 0.78rem; font-style: italic; }
+
+  /* Discord agreement block */
+  .agreement-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .agreement-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .agreement-card-header span {
+    font-family: 'Orbitron',monospace; font-size: 0.58rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+  }
+  .btn-copy {
+    font-family: 'Orbitron',monospace; font-size: 0.58rem; letter-spacing: 0.1em;
+    padding: 6px 18px; background: transparent;
+    border: 1px solid var(--accent); color: var(--accent);
+    border-radius: 5px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-copy:hover { background: rgba(102,217,255,0.12); }
+  .btn-copy.copied { border-color: var(--green); color: var(--green); }
+  #discord-text {
+    width: 100%; background: #060d16; border: 1px solid var(--border);
+    border-radius: 6px; color: #c8dde8; font-family: 'Consolas','Courier New',monospace;
+    font-size: 0.82rem; line-height: 1.6; padding: 14px; resize: vertical;
+    min-height: 260px; outline: none;
+  }
   .btn-another {
     font-family: 'Orbitron',monospace; font-size: 0.65rem; letter-spacing: 0.12em;
     padding: 10px 28px; background: transparent;
-    border: 1px solid var(--accent); color: var(--accent);
-    border-radius: 6px; cursor: pointer; transition: all 0.15s;
+    border: 1px solid var(--border2); color: var(--dim);
+    border-radius: 6px; cursor: pointer; transition: all 0.15s; display: block; margin: 0 auto;
   }
-  .btn-another:hover { background: rgba(102,217,255,0.1); }
+  .btn-another:hover { border-color: var(--accent); color: var(--accent); }
 
   @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
 </style>
@@ -411,10 +496,22 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
   <!-- SUCCESS -->
   <div id="success-screen">
-    <div class="check-icon">✓</div>
-    <h2>Consignor Added</h2>
-    <p id="success-detail"></p>
-    <button class="btn-another" onclick="resetForm()">Add Another Consignor</button>
+    <div class="success-top">
+      <div class="check-icon">✓</div>
+      <h2>Consignor Added</h2>
+      <p class="sub" id="success-detail"></p>
+      <p class="saved-path" id="saved-path"></p>
+    </div>
+
+    <div class="agreement-card">
+      <div class="agreement-card-header">
+        <span>Discord Agreement Message</span>
+        <button class="btn-copy" id="copy-btn" onclick="copyAgreement()">Copy to Clipboard</button>
+      </div>
+      <textarea id="discord-text" readonly spellcheck="false"></textarea>
+    </div>
+
+    <button class="btn-another" onclick="resetForm()">+ Add Another Consignor</button>
   </div>
 
 </div>
@@ -552,6 +649,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         const commLabel = (100 - commPct).toFixed(1) + '% to consignor';
         document.getElementById('success-detail').textContent =
           charName + ' — ' + itemName + ' — ' + slotLabel + ' — ' + commLabel;
+        document.getElementById('discord-text').value = result.discord_msg || '';
+        document.getElementById('saved-path').textContent =
+          result.saved_to ? 'Saved to consignor_agreements/' + result.saved_to : '';
+        document.getElementById('copy-btn').textContent = 'Copy to Clipboard';
+        document.getElementById('copy-btn').classList.remove('copied');
         document.getElementById('success-screen').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
@@ -567,6 +669,22 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   });
 
   function show(id) { document.getElementById(id).classList.add('show'); }
+
+  function copyAgreement() {
+    const ta  = document.getElementById('discord-text');
+    const btn = document.getElementById('copy-btn');
+    navigator.clipboard.writeText(ta.value).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy to Clipboard';
+        btn.classList.remove('copied');
+      }, 2500);
+    }).catch(() => {
+      ta.select();
+      document.execCommand('copy');
+    });
+  }
 
   // ── Reset for another entry ────────────────────────────────────────────────
   function resetForm() {
@@ -640,7 +758,19 @@ class Handler(BaseHTTPRequestHandler):
             )
             conn.commit()
             conn.close()
-            self._respond(200, 'application/json', b'{"status":"ok"}')
+
+            consignor_pct = round(100.0 - float(data['commission_pct']), 4)
+            discord_msg   = generate_agreement_text(data, consignor_pct, bool(don_opted), don_pct)
+            filepath      = save_agreement_file(
+                data['character_name'], data['item_name'], data['start_date'], discord_msg
+            )
+
+            body = json.dumps({
+                'status':      'ok',
+                'discord_msg': discord_msg,
+                'saved_to':    os.path.basename(filepath),
+            }).encode()
+            self._respond(200, 'application/json', body)
         except Exception as ex:
             body = json.dumps({'status': 'error', 'message': str(ex)}).encode()
             self._respond(200, 'application/json', body)

@@ -220,6 +220,23 @@ def get_buyback_data():
     except Exception:
         flags_by_type = {}
 
+    # ── Active consignor lookup (item_type_id → primary character_name) ────
+    # For shared slots multiple consignors may supply the same item;
+    # lowest slot_priority wins (primary supplier shown on site).
+    try:
+        _consignor_rows = cursor.execute(
+            """SELECT item_type_id, character_name
+               FROM consignors
+               WHERE active = 1
+               ORDER BY item_type_id, COALESCE(slot_priority, 999) ASC"""
+        ).fetchall()
+        consignor_by_type = {}
+        for _tid, _name in _consignor_rows:
+            if _tid not in consignor_by_type:   # first = lowest priority = primary
+                consignor_by_type[_tid] = _name
+    except Exception:
+        consignor_by_type = {}
+
     conn.close()
 
     # Identify all ore type_ids that need mineral-value calculation
@@ -283,6 +300,11 @@ def get_buyback_data():
         if slot:
             item['partnerSlot'] = True
             item['slotOpen'] = (slot.get('status') == 'open' and not slot.get('lessee'))
+
+        # Supplied by (active consignor)
+        supplier = consignor_by_type.get(type_id)
+        if supplier:
+            item['suppliedBy'] = supplier
 
         # Item flags
         item['flags'] = flags_by_type.get(type_id, [])

@@ -110,8 +110,9 @@ class AdminDashboard:
 
         # Item flags state
         self._item_flags_db = {}   # type_id -> set of active flag_keys
-        self._pending_flags = set()  # flags for currently selected item (unsaved)
-        self._flags_selected_type_id = None  # type_id of item currently in editor
+        self._pending_flags = set()  # flags for currently selected item(s) (unsaved)
+        self._flags_selected_type_id = None  # type_id of single selected item
+        self._flags_active_iids = []  # treeview iids of all selected items for bulk apply
 
         # Style configuration
         self.style = ttk.Style()
@@ -245,6 +246,11 @@ class AdminDashboard:
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
 
+        # Tab 12: Build Requests
+        self.build_req_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.build_req_frame, text='  Build Requests  ')
+        self._build_build_requests_tab()
+
     def build_rates_tab(self):
         """Build the Market Rates management tab."""
         # Top controls
@@ -377,6 +383,12 @@ class AdminDashboard:
             command=self._test_comp_refresh)
         self._intel_refresh_btn.pack(side='left')
 
+        tk.Button(
+            ctrl, text='\U0001f4ca Charts', bg='#1a2030', fg='#00d9ff',
+            font=('Segoe UI', 8), relief='flat', padx=8, pady=2,
+            activebackground='#2a3040', activeforeground='#44eeff',
+            command=self._open_intel_charts).pack(side='left', padx=(6, 0))
+
         # Content area — hidden by default, shown when toggled
         self._intel_content = tk.Frame(intel_card, bg='#0d1e10')
         tk.Label(self._intel_content,
@@ -502,8 +514,9 @@ class AdminDashboard:
         row3 = ttk.Frame(editor)
         row3.pack(fill='x', padx=20, pady=(0, 12))
 
-        ttk.Label(row3, text="Flags:",
-                  font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 8))
+        self._flags_label = ttk.Label(row3, text="Flags:",
+                                       font=('Segoe UI', 10, 'bold'))
+        self._flags_label.pack(side='left', padx=(0, 8))
 
         self._flag_btns = {}
         for flag_key, flag_label, flag_color in ITEM_FLAGS:
@@ -1295,6 +1308,18 @@ class AdminDashboard:
         self._intel_last_lbl.configure(text=f'Updated {ts}  ({total} items)', fg='#556677')
         self._test_comp_update_intel()
         self._test_comp_apply_tree_tags()
+
+    def _open_intel_charts(self):
+        """Generate and open the competitor intel HTML chart report."""
+        import subprocess
+        script = os.path.join(PROJECT_DIR, 'generate_intel_charts.py')
+        try:
+            subprocess.Popen([sys.executable, script],
+                             creationflags=subprocess.CREATE_NO_WINDOW
+                             if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0)
+            self.update_status('Intel charts report opened in browser.')
+        except Exception as e:
+            self.update_status(f'Could not open charts: {e}')
 
     def _test_comp_update_intel(self):
         """Rebuild the competitor stock grid, grouped by sheet tab."""
@@ -2119,6 +2144,7 @@ class AdminDashboard:
         """Handle rate row selection (single or multi)."""
         selection = self.rates_tree.selection()
         if not selection:
+            self._refresh_flag_buttons([])
             return
         if len(selection) == 1:
             item = self.rate_items.get(selection[0])
@@ -2126,10 +2152,9 @@ class AdminDashboard:
                 self.selected_item_label.configure(text=item['name'])
                 self.rate_var.set(item['rate'])
                 self.discount_var.set(item['discount'])
-                self._refresh_flag_buttons(item['type_id'])
         else:
             self.selected_item_label.configure(text=f"{len(selection)} items selected")
-            self._refresh_flag_buttons(None)
+        self._refresh_flag_buttons(list(selection))
         # corp_rate_label is updated by trace on rate_var/discount_var
 
     # ── Item flags helpers ──────────────────────────────────────────────────
@@ -2148,10 +2173,27 @@ class AdminDashboard:
         except Exception:
             pass
 
-    def _refresh_flag_buttons(self, type_id):
-        """Update flag button colours to reflect current flags for type_id."""
-        self._flags_selected_type_id = type_id
-        active = self._item_flags_db.get(type_id, set()) if type_id else set()
+    def _refresh_flag_buttons(self, iids):
+        """Update flag button colours to reflect current flags.
+
+        iids — list of selected treeview iids.
+        Single-select: loads that item's current flags.
+        Multi-select:  neutral state (blank); Apply Flags writes to all selected.
+        """
+        self._flags_active_iids = iids
+        if len(iids) == 1:
+            item = self.rate_items.get(iids[0])
+            type_id = item['type_id'] if item else None
+            self._flags_selected_type_id = type_id
+            active = self._item_flags_db.get(type_id, set()) if type_id else set()
+            self._flags_label.configure(text="Flags:")
+        else:
+            self._flags_selected_type_id = None
+            active = set()
+            if iids:
+                self._flags_label.configure(text=f"Flags ({len(iids)} items):")
+            else:
+                self._flags_label.configure(text="Flags:")
         self._pending_flags = set(active)
         for flag_key, _, flag_color in ITEM_FLAGS:
             btn = self._flag_btns.get(flag_key)
@@ -2166,7 +2208,7 @@ class AdminDashboard:
 
     def _toggle_flag_btn(self, flag_key):
         """Toggle a flag in the pending set and update button appearance."""
-        if self._flags_selected_type_id is None:
+        if not self._flags_active_iids:
             return
         flag_color = next((c for k, _, c in ITEM_FLAGS if k == flag_key), '#ffffff')
         if flag_key in self._pending_flags:
@@ -2179,40 +2221,47 @@ class AdminDashboard:
                                                  relief='groove')
 
     def _apply_item_flags(self):
-        """Save pending flags to DB for the currently selected item."""
-        type_id = self._flags_selected_type_id
-        if type_id is None:
+        """Save pending flags to DB for all currently selected items."""
+        if not self._flags_active_iids:
             return
+
+        # Gather (iid, type_id) pairs for all selected rows
+        targets = []
+        for iid in self._flags_active_iids:
+            item = self.rate_items.get(iid)
+            if item:
+                targets.append((iid, item['type_id']))
+        if not targets:
+            return
+
         try:
             conn = sqlite3.connect(DB_PATH, timeout=5)
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM item_flags WHERE type_id = ?", (type_id,))
-            for fk in self._pending_flags:
-                cursor.execute(
-                    "INSERT OR IGNORE INTO item_flags (type_id, flag_key) VALUES (?, ?)",
-                    (type_id, fk))
+            for _, type_id in targets:
+                cursor.execute("DELETE FROM item_flags WHERE type_id = ?", (type_id,))
+                for fk in self._pending_flags:
+                    cursor.execute(
+                        "INSERT OR IGNORE INTO item_flags (type_id, flag_key) VALUES (?, ?)",
+                        (type_id, fk))
             conn.commit()
             conn.close()
         except Exception as e:
             self.update_status(f"Error saving flags: {e}")
             return
 
-        # Update in-memory cache
-        self._item_flags_db[type_id] = set(self._pending_flags)
-
-        # Refresh the Flags cell in the treeview
+        # Update in-memory cache and treeview for all targets
         flag_labels = {key: label for key, label, _ in ITEM_FLAGS}
         flags_str = ', '.join(
             flag_labels[k] for k, _, _ in ITEM_FLAGS if k in self._pending_flags
         )
-        for iid, data in self.rate_items.items():
-            if data['type_id'] == type_id:
-                vals = list(self.rates_tree.item(iid, 'values'))
-                vals[6] = flags_str
-                self.rates_tree.item(iid, values=vals)
-                break
+        for iid, type_id in targets:
+            self._item_flags_db[type_id] = set(self._pending_flags)
+            vals = list(self.rates_tree.item(iid, 'values'))
+            vals[6] = flags_str
+            self.rates_tree.item(iid, values=vals)
 
-        self.update_status(f"Flags saved")
+        count = len(targets)
+        self.update_status(f"Flags saved for {count} item{'s' if count != 1 else ''}")
 
     def _refresh_corp_rate_label(self):
         """Update the live Corp Rate readout label."""
@@ -4905,6 +4954,15 @@ class AdminDashboard:
                 notes              TEXT
             )
         """)
+        # All known hangar containers discovered via ESI
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS known_containers (
+                item_id    INTEGER PRIMARY KEY,
+                name       TEXT,
+                ignored    INTEGER NOT NULL DEFAULT 0,
+                last_seen  TEXT
+            )
+        """)
         # Shared-slot sales pending manual attribution
         conn.execute("""
             CREATE TABLE IF NOT EXISTS consignment_pending_sales (
@@ -4984,25 +5042,25 @@ class AdminDashboard:
                    command=self._consign_edit_dialog).pack(side='left', padx=(0, 4))
         ttk.Button(ctb, text='Toggle Active',
                    command=self._consign_toggle_active).pack(side='left', padx=(0, 4))
+        ttk.Button(ctb, text='Containers\u2026',
+                   command=self._consign_open_containers_dialog).pack(side='left', padx=(12, 4))
+        ttk.Button(ctb, text='Pending\u2026',
+                   command=self._consign_open_pending_dialog).pack(side='left', padx=(0, 4))
 
         c_cols = ('slot_type', 'name', 'item', 'current_qty', 'max_units',
-                  'list_price', 'their_pct', 'my_pct', 'donate', 'demand', 'start_date', 'status', 'owed')
+                  'list_price', 'demand', 'status', 'owed')
         self.consign_tree = ttk.Treeview(top_inner, columns=c_cols, show='headings',
                                          selectmode='browse', height=6)
         for cid, hd, w, a in [
             ('slot_type',  'Type',             90, 'c'),
-            ('name',       'Consignor',        140, 'w'),
-            ('item',       'Item',             170, 'w'),
-            ('current_qty','In Slot',           70, 'e'),
-            ('max_units',  'Max Units',         75, 'e'),
-            ('list_price', 'Price/Unit',       110, 'e'),
-            ('their_pct',  'Their %',           65, 'e'),
-            ('my_pct',     'My %',              55, 'e'),
-            ('donate',     'Corp Don.',         68, 'e'),
-            ('demand',     'Demand',            70, 'c'),
-            ('start_date', 'Since',            100, 'c'),
-            ('status',     'Status',            70, 'c'),
-            ('owed',       'ISK Owed',         120, 'e'),
+            ('name',       'Consignor',        150, 'w'),
+            ('item',       'Item',             180, 'w'),
+            ('current_qty','In Slot',           75, 'e'),
+            ('max_units',  'Max Units',         80, 'e'),
+            ('list_price', 'Price/Unit',       120, 'e'),
+            ('demand',     'Demand',            75, 'c'),
+            ('status',     'Status',            75, 'c'),
+            ('owed',       'ISK Owed',         130, 'e'),
         ]:
             self.consign_tree.heading(cid, text=hd)
             self.consign_tree.column(cid, width=w, minwidth=40, anchor=a)
@@ -5039,7 +5097,7 @@ class AdminDashboard:
         ttk.Button(stb, text='Delete Selected',
                    command=self._consign_delete_sales).pack(side='left', padx=(0, 4))
         ttk.Button(stb, text='\u21ba Sync Contracts',
-                   command=self._consign_sync_contracts).pack(side='left', padx=(0, 16))
+                   command=self._consign_sync_contracts).pack(side='left', padx=(0, 8))
         self._consign_owed_lbl = tk.Label(stb, text='Owed: —', background='#0a2030',
                                           foreground='#ffcc44', font=('Segoe UI', 9, 'bold'))
         self._consign_owed_lbl.pack(side='left', padx=(0, 16))
@@ -5078,86 +5136,10 @@ class AdminDashboard:
         s_hsb.pack(side='bottom', fill='x')
         self.sales_tree.pack(fill='both', expand=True)
 
-        # ── MIDDLE: Container Assignments ─────────────────────────────────
-        cont_card = ttk.Frame(pane, style='Card.TFrame')
-        pane.add(cont_card, minsize=120)
-
-        cont_inner = ttk.Frame(cont_card, style='Card.TFrame')
-        cont_inner.pack(fill='both', expand=True, padx=10, pady=8)
-
-        ctb2 = ttk.Frame(cont_inner, style='Card.TFrame')
-        ctb2.pack(fill='x', pady=(0, 6))
-        tk.Label(ctb2, text='Container Assignments', background='#0a2030',
-                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
-        ttk.Button(ctb2, text='+ Assign Container',
-                   command=self._consign_assign_container_dialog).pack(side='left', padx=(0, 4))
-        ttk.Button(ctb2, text='Remove',
-                   command=self._consign_remove_container).pack(side='left', padx=(0, 4))
-        ttk.Button(ctb2, text='\u21ba Refresh Names',
-                   command=self._consign_refresh_container_names).pack(side='left', padx=(0, 16))
-        tk.Label(ctb2, text='Assign a named hangar container to a consignor — qty auto-updates on sync.',
-                 background='#0a2030', foreground='#668899',
-                 font=('Segoe UI', 8)).pack(side='left')
-
-        cc_cols = ('consignor', 'item', 'container_id', 'container_name', 'notes')
-        self.container_tree = ttk.Treeview(cont_inner, columns=cc_cols, show='headings',
-                                           selectmode='browse', height=4)
-        for cid, hd, w, a in [
-            ('consignor',      'Consignor',        140, 'w'),
-            ('item',           'Item',             170, 'w'),
-            ('container_id',   'Container ID',     130, 'e'),
-            ('container_name', 'ESI Name',         200, 'w'),
-            ('notes',          'Notes',            260, 'w'),
-        ]:
-            self.container_tree.heading(cid, text=hd)
-            self.container_tree.column(cid, width=w, minwidth=40, anchor=a)
-
-        cc_vsb = ttk.Scrollbar(cont_inner, orient='vertical', command=self.container_tree.yview)
-        self.container_tree.configure(yscrollcommand=cc_vsb.set)
-        cc_vsb.pack(side='right', fill='y')
-        self.container_tree.pack(fill='both', expand=True)
-
-        # ── BOTTOM: Pending Sales (Shared Slot Attribution) ───────────────
-        pend_card = ttk.Frame(pane, style='Card.TFrame')
-        pane.add(pend_card, minsize=120)
-
-        pend_inner = ttk.Frame(pend_card, style='Card.TFrame')
-        pend_inner.pack(fill='both', expand=True, padx=10, pady=8)
-
-        ptb = ttk.Frame(pend_inner, style='Card.TFrame')
-        ptb.pack(fill='x', pady=(0, 6))
-        tk.Label(ptb, text='Pending Attribution', background='#0a2030',
-                 foreground='#ff9944', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
-        ttk.Button(ptb, text='Split / Attribute',
-                   command=self._consign_split_dialog).pack(side='left', padx=(0, 4))
-        ttk.Button(ptb, text='Delete Selected',
-                   command=self._consign_delete_pending).pack(side='left', padx=(0, 16))
-        tk.Label(ptb, text='Shared-slot sales awaiting manual attribution to individual consignors.',
-                 background='#0a2030', foreground='#668899',
-                 font=('Segoe UI', 8)).pack(side='left')
-
-        ps_cols = ('sale_date', 'item_name', 'total_qty', 'total_isk', 'notes')
-        self.pending_tree = ttk.Treeview(pend_inner, columns=ps_cols, show='headings',
-                                         selectmode='browse', height=4)
-        for cid, hd, w, a in [
-            ('sale_date',  'Sale Date',   110, 'c'),
-            ('item_name',  'Item',        200, 'w'),
-            ('total_qty',  'Total Qty',    90, 'e'),
-            ('total_isk',  'Total ISK',   140, 'e'),
-            ('notes',      'Notes',       340, 'w'),
-        ]:
-            self.pending_tree.heading(cid, text=hd)
-            self.pending_tree.column(cid, width=w, minwidth=40, anchor=a)
-        self.pending_tree.tag_configure('pending_row', foreground='#ff9944')
-
-        ps_vsb = ttk.Scrollbar(pend_inner, orient='vertical', command=self.pending_tree.yview)
-        self.pending_tree.configure(yscrollcommand=ps_vsb.set)
-        ps_vsb.pack(side='right', fill='y')
-        self.pending_tree.pack(fill='both', expand=True)
+        self.container_tree = None  # created on demand in _consign_open_containers_dialog
+        self.pending_tree   = None  # created on demand in _consign_open_pending_dialog
 
         self._consign_load_consignors()
-        self._consign_load_containers()
-        self._consign_load_pending()
 
     def _consign_load_consignors(self):
         """Load consignors into the treeview, with combined-stock rows for shared items."""
@@ -5225,9 +5207,7 @@ class AdminDashboard:
                         f'({len(group)} suppliers)',
                         item,
                         f"{combined_qty:,}" if combined_qty else '—',
-                        '—', price_str, '—', '—', '—',
-                        d_label,
-                        '—',
+                        '—', price_str, d_label,
                         '▶ Combined',
                         f"{combined_owed:,.2f}" if combined_owed else '—',
                     ))
@@ -5238,8 +5218,7 @@ class AdminDashboard:
             self.consign_tree.insert('', 'end', iid=str(cid), tags=tags, values=(
                 type_label, name, item,
                 cur_str, max_str, price_str,
-                f"{their_pct:.1f}%", f"{my_pct:.1f}%",
-                donate_str, d_label, start,
+                d_label,
                 'Active' if active else 'Inactive',
                 owed_str,
             ))
@@ -5295,7 +5274,6 @@ class AdminDashboard:
             text=f"Total Paid Out: {paid_total:,.2f} ISK" if paid_total else "Total Paid Out: 0 ISK")
         self._consign_corp_lbl.configure(
             text=f"Corp Donation Owed: {corp_owed:,.2f} ISK" if corp_owed else "Corp Donation Owed: 0 ISK")
-        self._consign_load_consignors()
 
     def _consign_add_dialog(self, consignor_id=None):
         """Add or edit a consignor record."""
@@ -5313,27 +5291,52 @@ class AdminDashboard:
 
         dlg = tk.Toplevel(self.root)
         dlg.title('Edit Consignor' if existing else 'Add Consignor')
-        dlg.geometry('460x730')
+        dlg.geometry('480x620')
         dlg.configure(background='#0a1520')
-        dlg.resizable(False, False)
+        dlg.resizable(True, True)
+        dlg.minsize(420, 380)
         dlg.grab_set()
+
+        # ── Scrollable content area ────────────────────────────────────────
+        vsb    = ttk.Scrollbar(dlg, orient='vertical')
+        canvas = tk.Canvas(dlg, background='#0a1520', highlightthickness=0,
+                           yscrollcommand=vsb.set)
+        vsb.configure(command=canvas.yview)
+        vsb.pack(side='right', fill='y')
+        canvas.pack(side='left', fill='both', expand=True)
+
+        inner = tk.Frame(canvas, background='#0a1520')
+        _cw   = canvas.create_window((0, 0), window=inner, anchor='nw')
+
+        def _on_inner_cfg(e):
+            canvas.configure(scrollregion=canvas.bbox('all'))
+        def _on_canvas_cfg(e):
+            canvas.itemconfig(_cw, width=e.width)
+        def _on_wheel(e):
+            canvas.yview_scroll(-1 * (e.delta // 120), 'units')
+
+        inner.bind('<Configure>', _on_inner_cfg)
+        canvas.bind('<Configure>', _on_canvas_cfg)
+        canvas.bind_all('<MouseWheel>', _on_wheel)
+        dlg.bind('<Destroy>', lambda e: canvas.unbind_all('<MouseWheel>'))
+        # ──────────────────────────────────────────────────────────────────
 
         lbl_cfg = dict(background='#0a1520', foreground='#88d0e8', font=('Segoe UI', 10))
         sub_cfg = dict(background='#0a1520', foreground='#3a7090', font=('Segoe UI', 8, 'italic'))
 
         def labeled_entry(label, default='', width=32):
-            tk.Label(dlg, text=label, **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+            tk.Label(inner, text=label, **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
             var = tk.StringVar(value=default)
-            ttk.Entry(dlg, textvariable=var, width=width).pack(anchor='w', padx=16)
+            ttk.Entry(inner, textvariable=var, width=width).pack(anchor='w', padx=16)
             return var
 
         name_var = labeled_entry('Character Name',       existing[0] if existing else '')
         item_var = labeled_entry('Item Being Consigned', existing[1] if existing else '')
 
         # Type ID row with live name preview
-        tk.Label(dlg, text='Item Type ID  (for contract sync)', **lbl_cfg).pack(
+        tk.Label(inner, text='Item Type ID  (for contract sync)', **lbl_cfg).pack(
             anchor='w', padx=16, pady=(6, 2))
-        tid_row = tk.Frame(dlg, background='#0a1520')
+        tid_row = tk.Frame(inner, background='#0a1520')
         tid_row.pack(anchor='w', padx=16)
         tid_var = tk.StringVar(value=str(existing[2]) if existing and existing[2] else '')
         ttk.Entry(tid_row, textvariable=tid_var, width=12).pack(side='left', padx=(0, 8))
@@ -5362,12 +5365,12 @@ class AdminDashboard:
                                   existing[5] if existing else datetime.now().strftime('%Y-%m-%d'))
 
         # ── Slot type ─────────────────────────────────────────────────────
-        tk.Frame(dlg, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
-        tk.Label(dlg, text='Slot Configuration', background='#0a1520',
+        tk.Frame(inner, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
+        tk.Label(inner, text='Slot Configuration', background='#0a1520',
                  foreground='#00d9ff', font=('Segoe UI', 9, 'bold')).pack(anchor='w', padx=16, pady=(6, 2))
 
         slot_var = tk.StringVar(value=existing[7] if existing and existing[7] else 'shared')
-        slot_row = tk.Frame(dlg, background='#0a1520')
+        slot_row = tk.Frame(inner, background='#0a1520')
         slot_row.pack(anchor='w', padx=16)
         tk.Radiobutton(slot_row, text='◈ Shared  (multiple suppliers)',
                        variable=slot_var, value='shared',
@@ -5381,7 +5384,7 @@ class AdminDashboard:
                        font=('Segoe UI', 10)).pack(side='left')
 
         # Priority + Max units row
-        pm_row = tk.Frame(dlg, background='#0a1520')
+        pm_row = tk.Frame(inner, background='#0a1520')
         pm_row.pack(anchor='w', padx=16, pady=(6, 0))
         tk.Label(pm_row, text='Priority (1=primary):', **lbl_cfg).pack(side='left', padx=(0, 6))
         pri_var = tk.StringVar(value=str(existing[8]) if existing and existing[8] else '1')
@@ -5389,20 +5392,20 @@ class AdminDashboard:
         tk.Label(pm_row, text='Max Units in Slot:', **lbl_cfg).pack(side='left', padx=(0, 6))
         max_var = tk.StringVar(value=str(existing[9]) if existing and existing[9] else '')
         ttk.Entry(pm_row, textvariable=max_var, width=10).pack(side='left')
-        tk.Label(dlg, text='For shared slots: lower priority number = listed first. '
+        tk.Label(inner, text='For shared slots: lower priority number = listed first. '
                  'Leave Max Units blank for unlimited.',
                  **sub_cfg).pack(anchor='w', padx=16)
 
         # Current qty + demand tier row
-        tk.Label(dlg, text='Current Qty in Slot', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+        tk.Label(inner, text='Current Qty in Slot', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
         qty_var = tk.StringVar(value=str(existing[11]) if existing and existing[11] else '0')
-        ttk.Entry(dlg, textvariable=qty_var, width=12).pack(anchor='w', padx=16)
-        tk.Label(dlg, text='Update when you restock or confirm contract qty.',
+        ttk.Entry(inner, textvariable=qty_var, width=12).pack(anchor='w', padx=16)
+        tk.Label(inner, text='Update when you restock or confirm contract qty.',
                  **sub_cfg).pack(anchor='w', padx=16)
 
-        tk.Label(dlg, text='Demand Tier', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+        tk.Label(inner, text='Demand Tier', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
         dem_var = tk.StringVar(value=existing[10] if existing and existing[10] else 'medium')
-        dem_row = tk.Frame(dlg, background='#0a1520')
+        dem_row = tk.Frame(inner, background='#0a1520')
         dem_row.pack(anchor='w', padx=16)
         for val, lbl, fg in [('low', '▼ Low', '#66d9ff'), ('medium', '◆ Medium', '#ffcc44'),
                               ('high', '▲ High', '#ff6666')]:
@@ -5412,14 +5415,14 @@ class AdminDashboard:
                            font=('Segoe UI', 10)).pack(side='left', padx=(0, 12))
 
         # ── Corp Donation ──────────────────────────────────────────────────
-        tk.Frame(dlg, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
-        tk.Label(dlg, text='Corp Donation (Optional)', background='#0a1520',
+        tk.Frame(inner, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
+        tk.Label(inner, text='Corp Donation (Optional)', background='#0a1520',
                  foreground='#ff9944', font=('Segoe UI', 9, 'bold')).pack(anchor='w', padx=16, pady=(6, 2))
 
         don_opted_var = tk.IntVar(value=int(existing[12]) if existing else 0)
         don_pct_var   = tk.StringVar(value=f"{existing[13]:.1f}" if existing and existing[13] else '0.0')
 
-        don_row = tk.Frame(dlg, background='#0a1520')
+        don_row = tk.Frame(inner, background='#0a1520')
         don_row.pack(anchor='w', padx=16)
         tk.Radiobutton(don_row, text='No donation', variable=don_opted_var, value=0,
                        background='#0a1520', foreground='#88d0e8',
@@ -5430,22 +5433,22 @@ class AdminDashboard:
                        selectcolor='#0a1520', activebackground='#0a1520',
                        font=('Segoe UI', 10)).pack(side='left')
 
-        don_pct_row = tk.Frame(dlg, background='#0a1520')
+        don_pct_row = tk.Frame(inner, background='#0a1520')
         don_pct_row.pack(anchor='w', padx=16, pady=(4, 0))
         tk.Label(don_pct_row, text='Donation %:', **lbl_cfg).pack(side='left', padx=(0, 6))
         don_pct_entry = ttk.Entry(don_pct_row, textvariable=don_pct_var, width=8)
         don_pct_entry.pack(side='left')
         tk.Label(don_pct_row, text='of consignor\'s share', **sub_cfg).pack(side='left', padx=(6, 0))
-        tk.Label(dlg, text='Donation is deducted from the consignor\'s share per sale.',
+        tk.Label(inner, text='Donation is deducted from the consignor\'s share per sale.',
                  **sub_cfg).pack(anchor='w', padx=16)
 
         # ── Notes ─────────────────────────────────────────────────────────
-        tk.Frame(dlg, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
-        tk.Label(dlg, text='Notes', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
-        notes_txt = tk.Text(dlg, width=46, height=3, background='#0d2535',
+        tk.Frame(inner, background='#1a3040', height=1).pack(fill='x', padx=16, pady=(10, 0))
+        tk.Label(inner, text='Notes', **lbl_cfg).pack(anchor='w', padx=16, pady=(6, 2))
+        notes_txt = tk.Text(inner, width=46, height=3, background='#0d2535',
                             foreground='#ccddee', insertbackground='white',
                             font=('Segoe UI', 9), relief='flat')
-        notes_txt.pack(anchor='w', padx=16)
+        notes_txt.pack(anchor='w', padx=16, pady=(0, 12))
         if existing and existing[6]:
             notes_txt.insert('1.0', existing[6])
 
@@ -5497,8 +5500,12 @@ class AdminDashboard:
             except ValueError as e:
                 messagebox.showerror('Error', f'Invalid value: {e}', parent=dlg)
 
-        btn_row = tk.Frame(dlg, background='#0a1520')
-        btn_row.pack(pady=10)
+        # Fixed Save/Cancel bar — packed into dlg (outside scroll canvas)
+        btn_bar = tk.Frame(dlg, background='#0a1520')
+        btn_bar.pack(side='bottom', fill='x')
+        tk.Frame(btn_bar, background='#1a3040', height=1).pack(fill='x')
+        btn_row = tk.Frame(btn_bar, background='#0a1520')
+        btn_row.pack(pady=8)
         ttk.Button(btn_row, text='Save', style='Action.TButton', command=save).pack(side='left', padx=6)
         ttk.Button(btn_row, text='Cancel', command=dlg.destroy).pack(side='left', padx=6)
 
@@ -5810,6 +5817,128 @@ class AdminDashboard:
         self._consign_load_sales()
         self._consign_load_pending()
 
+    # ── Container / Pending dialog openers ───────────────────────────────
+
+    def _consign_open_containers_dialog(self):
+        """Open a popup window for container assignment management."""
+        dlg = tk.Toplevel(self.root)
+        dlg.title('Container Assignments')
+        dlg.geometry('860x260')
+        dlg.configure(background='#0a1520')
+
+        inner = ttk.Frame(dlg, style='Card.TFrame')
+        inner.pack(fill='both', expand=True, padx=10, pady=8)
+
+        tb = ttk.Frame(inner, style='Card.TFrame')
+        tb.pack(fill='x', pady=(0, 6))
+        tk.Label(tb, text='Container Assignments', background='#0a2030',
+                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
+
+        cc_cols = ('consignor', 'item', 'container_id', 'container_name', 'notes')
+        tree = ttk.Treeview(inner, columns=cc_cols, show='headings', selectmode='browse', height=8)
+        for col_id, hd, w, a in [
+            ('consignor',      'Consignor',    150, 'w'),
+            ('item',           'Item',         180, 'w'),
+            ('container_id',   'Container ID', 135, 'e'),
+            ('container_name', 'ESI Name',     200, 'w'),
+            ('notes',          'Notes',        260, 'w'),
+        ]:
+            tree.heading(col_id, text=hd)
+            tree.column(col_id, width=w, minwidth=40, anchor=a)
+
+        vsb = ttk.Scrollbar(inner, orient='vertical', command=tree.yview)
+        tree.configure(yscrollcommand=vsb.set)
+
+        self.container_tree = tree
+
+        def _reload():
+            self._consign_load_containers()
+
+        def _remove():
+            sel = tree.selection()
+            if not sel:
+                return
+            if not messagebox.askyesno('Confirm',
+                                       'Remove this container assignment?\n'
+                                       '(Does not affect the actual in-game container.)',
+                                       parent=dlg):
+                return
+            row_id = int(sel[0])
+            conn = sqlite3.connect(DB_PATH)
+            conn.execute("DELETE FROM consignor_containers WHERE id=?", (row_id,))
+            conn.commit()
+            conn.close()
+            _reload()
+            self._consign_load_consignors()
+
+        def _on_close():
+            self.container_tree = None
+            dlg.destroy()
+
+        ttk.Button(tb, text='+ Assign Container',
+                   command=lambda: self._consign_assign_container_dialog(reload_cb=_reload)
+                   ).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Remove', command=_remove).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='\u21ba Refresh Names',
+                   command=lambda: self._consign_refresh_container_names(reload_cb=_reload)
+                   ).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Manage All',
+                   command=self._consign_manage_containers_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Close', command=_on_close).pack(side='right')
+
+        vsb.pack(side='right', fill='y')
+        tree.pack(fill='both', expand=True)
+        dlg.protocol('WM_DELETE_WINDOW', _on_close)
+        _reload()
+
+    def _consign_open_pending_dialog(self):
+        """Open a popup window for shared-slot pending attribution."""
+        dlg = tk.Toplevel(self.root)
+        dlg.title('Pending Attribution')
+        dlg.geometry('860x300')
+        dlg.configure(background='#0a1520')
+
+        inner = ttk.Frame(dlg, style='Card.TFrame')
+        inner.pack(fill='both', expand=True, padx=10, pady=8)
+
+        tb = ttk.Frame(inner, style='Card.TFrame')
+        tb.pack(fill='x', pady=(0, 6))
+        tk.Label(tb, text='Pending Attribution', background='#0a2030',
+                 foreground='#ff9944', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
+
+        ps_cols = ('sale_date', 'item_name', 'total_qty', 'total_isk', 'notes')
+        tree = ttk.Treeview(inner, columns=ps_cols, show='headings', selectmode='browse', height=10)
+        for col_id, hd, w, a in [
+            ('sale_date',  'Sale Date',  110, 'c'),
+            ('item_name',  'Item',       220, 'w'),
+            ('total_qty',  'Total Qty',   90, 'e'),
+            ('total_isk',  'Total ISK',  150, 'e'),
+            ('notes',      'Notes',      360, 'w'),
+        ]:
+            tree.heading(col_id, text=hd)
+            tree.column(col_id, width=w, minwidth=40, anchor=a)
+        tree.tag_configure('pending_row', foreground='#ff9944')
+
+        vsb = ttk.Scrollbar(inner, orient='vertical', command=tree.yview)
+        tree.configure(yscrollcommand=vsb.set)
+
+        self.pending_tree = tree
+
+        def _on_close():
+            self.pending_tree = None
+            dlg.destroy()
+
+        ttk.Button(tb, text='Split / Attribute',
+                   command=self._consign_split_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Delete Selected',
+                   command=self._consign_delete_pending).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Close', command=_on_close).pack(side='right')
+
+        vsb.pack(side='right', fill='y')
+        tree.pack(fill='both', expand=True)
+        dlg.protocol('WM_DELETE_WINDOW', _on_close)
+        self._consign_load_pending()
+
     # ── Container assignment methods ──────────────────────────────────────
 
     def _consign_load_containers(self):
@@ -5824,22 +5953,35 @@ class AdminDashboard:
         """).fetchall()
         conn.close()
 
-        self.container_tree.delete(*self.container_tree.get_children())
-        for row_id, consignor, item, cid, cname, notes in rows:
-            self.container_tree.insert('', 'end', iid=str(row_id), values=(
-                consignor,
-                item,
-                cid,
-                cname or '(no name yet)',
-                notes or '',
-            ))
+        try:
+            if self.container_tree is None:
+                return
+            self.container_tree.delete(*self.container_tree.get_children())
+            for row_id, consignor, item, cid, cname, notes in rows:
+                self.container_tree.insert('', 'end', iid=str(row_id), values=(
+                    consignor,
+                    item,
+                    cid,
+                    cname or '(no name yet)',
+                    notes or '',
+                ))
+        except Exception:
+            pass
 
-    def _consign_assign_container_dialog(self):
-        """Dialog to assign a hangar container item_id to a consignor."""
+    def _consign_assign_container_dialog(self, reload_cb=None):
+        """Dialog to assign a hangar container to a consignor, picked from known_containers."""
         conn = sqlite3.connect(DB_PATH)
         consignors = conn.execute(
             "SELECT id, character_name, item_name FROM consignors WHERE active=1 ORDER BY item_name, character_name"
         ).fetchall()
+        # Available containers: known, not ignored, not already assigned
+        available = conn.execute("""
+            SELECT kc.item_id, kc.name
+            FROM known_containers kc
+            WHERE kc.ignored = 0
+              AND kc.item_id NOT IN (SELECT container_item_id FROM consignor_containers)
+            ORDER BY kc.name, kc.item_id
+        """).fetchall()
         conn.close()
 
         if not consignors:
@@ -5850,7 +5992,7 @@ class AdminDashboard:
 
         dlg = tk.Toplevel(self.root)
         dlg.title('Assign Container to Consignor')
-        dlg.geometry('440x300')
+        dlg.geometry('460x310')
         dlg.configure(background='#0a1520')
         dlg.grab_set()
 
@@ -5873,21 +6015,32 @@ class AdminDashboard:
         if c_labels:
             consignor_cb.current(0)
 
-        tk.Label(frm, text='Container Item ID:', **_lkw).grid(row=1, column=0, sticky='w', pady=4)
-        cid_var = tk.StringVar()
-        tk.Entry(frm, textvariable=cid_var, width=24, **_ekw).grid(
-            row=1, column=1, sticky='w', padx=(8, 0), pady=4)
+        tk.Label(frm, text='Container:', **_lkw).grid(row=1, column=0, sticky='w', pady=4)
+        container_var = tk.StringVar()
+        if available:
+            cont_labels = [f"{r[1] or '(unnamed)'} — {r[0]}" for r in available]
+            cont_cb = ttk.Combobox(frm, textvariable=container_var, values=cont_labels,
+                                   width=36, state='readonly')
+            cont_cb.grid(row=1, column=1, sticky='ew', padx=(8, 0), pady=4)
+            cont_cb.current(0)
+            hint = ('Select a container from the list above.\n'
+                    'Run \u21ba Refresh Names to update after creating new containers in-game.')
+        else:
+            # Fallback: manual entry
+            cont_cb = None
+            tk.Entry(frm, textvariable=container_var, width=24, **_ekw).grid(
+                row=1, column=1, sticky='w', padx=(8, 0), pady=4)
+            hint = ('No available containers found. Run \u21ba Refresh Names to sync from ESI,\n'
+                    'or enter the Container Item ID manually.')
 
-        tk.Label(frm, text='Notes (optional):', **_lkw).grid(row=2, column=0, sticky='w', pady=4)
+        tk.Label(frm, text=hint, background='#0a1520', foreground='#556677',
+                 font=('Segoe UI', 8), justify='left').grid(
+            row=2, column=0, columnspan=2, sticky='w', pady=(2, 4))
+
+        tk.Label(frm, text='Notes (optional):', **_lkw).grid(row=3, column=0, sticky='w', pady=4)
         notes_var = tk.StringVar()
         tk.Entry(frm, textvariable=notes_var, width=36, **_ekw).grid(
-            row=2, column=1, sticky='ew', padx=(8, 0), pady=4)
-
-        tk.Label(frm,
-                 text='Find the Item ID by right-clicking the container\n'
-                      'in-game → Show Info, or via ESI asset list.',
-                 background='#0a1520', foreground='#556677',
-                 font=('Segoe UI', 8)).grid(row=3, column=0, columnspan=2, sticky='w', pady=(4, 0))
+            row=3, column=1, sticky='ew', padx=(8, 0), pady=4)
 
         frm.columnconfigure(1, weight=1)
 
@@ -5895,17 +6048,27 @@ class AdminDashboard:
             idx = consignor_cb.current()
             if idx < 0:
                 return
-            cid_txt = cid_var.get().strip()
-            if not cid_txt.isdigit():
-                messagebox.showerror('Invalid', 'Container Item ID must be a number.', parent=dlg)
-                return
             consignor_id = consignors[idx][0]
+
+            if cont_cb is not None:
+                sel = cont_cb.current()
+                if sel < 0:
+                    messagebox.showerror('Invalid', 'Select a container.', parent=dlg)
+                    return
+                item_id = available[sel][0]
+            else:
+                cid_txt = container_var.get().strip()
+                if not cid_txt.isdigit():
+                    messagebox.showerror('Invalid', 'Container Item ID must be a number.', parent=dlg)
+                    return
+                item_id = int(cid_txt)
+
             conn2 = sqlite3.connect(DB_PATH)
             try:
                 conn2.execute(
                     "INSERT INTO consignor_containers (consignor_id, container_item_id, notes) "
                     "VALUES (?,?,?)",
-                    (consignor_id, int(cid_txt), notes_var.get().strip() or None))
+                    (consignor_id, item_id, notes_var.get().strip() or None))
                 conn2.commit()
             except Exception as e:
                 messagebox.showerror('Error', f'Could not save: {e}', parent=dlg)
@@ -5913,12 +6076,101 @@ class AdminDashboard:
                 return
             conn2.close()
             dlg.destroy()
-            self._consign_load_containers()
+            if reload_cb:
+                reload_cb()
 
         bf = tk.Frame(dlg, background='#0a1520')
         bf.pack(pady=12)
         ttk.Button(bf, text='Save', style='Action.TButton', command=_save).pack(side='left', padx=4)
         ttk.Button(bf, text='Cancel', command=dlg.destroy).pack(side='left', padx=4)
+
+    def _consign_manage_containers_dialog(self):
+        """Dialog showing all known containers with ignore/unignore and assign actions."""
+        dlg = tk.Toplevel(self.root)
+        dlg.title('Manage All Containers')
+        dlg.geometry('660x380')
+        dlg.configure(background='#0a1520')
+        dlg.grab_set()
+
+        tk.Label(dlg, text='All Known Containers', background='#0a1520',
+                 foreground='#66d9ff', font=('Segoe UI', 11, 'bold')).pack(pady=(12, 4))
+        tk.Label(dlg,
+                 text='Containers discovered via ESI sync. Ignored containers are hidden from the '
+                      'assign picker but kept here so you can reactivate them later.',
+                 background='#0a1520', foreground='#556677',
+                 font=('Segoe UI', 8), wraplength=620, justify='left').pack(padx=20, pady=(0, 8))
+
+        tree_frame = tk.Frame(dlg, background='#0a1520')
+        tree_frame.pack(fill='both', expand=True, padx=12)
+
+        cols = ('name', 'item_id', 'assigned_to', 'status')
+        tv = ttk.Treeview(tree_frame, columns=cols, show='headings', selectmode='browse', height=10)
+        for cid, hd, w, a in [
+            ('name',        'ESI Name',   200, 'w'),
+            ('item_id',     'Item ID',    130, 'e'),
+            ('assigned_to', 'Assigned To',200, 'w'),
+            ('status',      'Status',      90, 'w'),
+        ]:
+            tv.heading(cid, text=hd)
+            tv.column(cid, width=w, minwidth=40, anchor=a)
+
+        tv.tag_configure('ignored', foreground='#445566')
+        tv.tag_configure('assigned', foreground='#66cc88')
+
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical', command=tv.yview)
+        tv.configure(yscrollcommand=vsb.set)
+        vsb.pack(side='right', fill='y')
+        tv.pack(fill='both', expand=True)
+
+        def _load():
+            tv.delete(*tv.get_children())
+            conn = sqlite3.connect(DB_PATH)
+            rows = conn.execute("""
+                SELECT kc.item_id, kc.name, kc.ignored,
+                       c.character_name, c.item_name
+                FROM known_containers kc
+                LEFT JOIN consignor_containers cc ON cc.container_item_id = kc.item_id
+                LEFT JOIN consignors c            ON c.id = cc.consignor_id
+                ORDER BY kc.ignored, kc.name, kc.item_id
+            """).fetchall()
+            conn.close()
+            for item_id, name, ignored, char_name, item_name in rows:
+                assigned = f"{char_name} — {item_name}" if char_name else ''
+                if ignored:
+                    status, tag = 'Ignored', 'ignored'
+                elif assigned:
+                    status, tag = 'Assigned', 'assigned'
+                else:
+                    status, tag = 'Available', ''
+                tv.insert('', 'end', iid=str(item_id),
+                          values=(name or '(unnamed)', item_id, assigned, status),
+                          tags=(tag,))
+
+        _load()
+
+        bf = tk.Frame(dlg, background='#0a1520')
+        bf.pack(pady=8)
+
+        def _toggle_ignore():
+            sel = tv.selection()
+            if not sel:
+                return
+            item_id = int(sel[0])
+            conn = sqlite3.connect(DB_PATH)
+            row = conn.execute("SELECT ignored FROM known_containers WHERE item_id=?",
+                               (item_id,)).fetchone()
+            if row is None:
+                conn.close()
+                return
+            new_val = 0 if row[0] else 1
+            conn.execute("UPDATE known_containers SET ignored=? WHERE item_id=?",
+                         (new_val, item_id))
+            conn.commit()
+            conn.close()
+            _load()
+
+        ttk.Button(bf, text='Toggle Ignore', command=_toggle_ignore).pack(side='left', padx=4)
+        ttk.Button(bf, text='Close', command=dlg.destroy).pack(side='left', padx=4)
 
     def _consign_remove_container(self):
         """Remove the selected container assignment."""
@@ -5936,7 +6188,7 @@ class AdminDashboard:
         conn.close()
         self._consign_load_containers()
 
-    def _consign_refresh_container_names(self):
+    def _consign_refresh_container_names(self, reload_cb=None):
         """Trigger update_lx_zoj_inventory.py in a background thread to refresh ESI names."""
         import threading, subprocess as _sp
 
@@ -5950,15 +6202,18 @@ class AdminDashboard:
                 ok = result.returncode == 0
             except Exception:
                 ok = False
-            self.root.after(0, lambda: (
-                self._consign_load_containers(),
-                self._consign_load_consignors(),
+
+            def _after():
+                if reload_cb:
+                    reload_cb()
+                self._consign_load_consignors()
                 messagebox.showinfo(
                     'Refresh Names',
                     'Container names refreshed from ESI.' if ok
                     else 'ESI refresh failed — check console output.',
                     parent=self.root)
-            ))
+
+            self.root.after(0, _after)
 
         threading.Thread(target=_run, daemon=True).start()
         messagebox.showinfo('Refresh Names',
@@ -5977,20 +6232,27 @@ class AdminDashboard:
         ).fetchall()
         conn.close()
 
-        self.pending_tree.delete(*self.pending_tree.get_children())
-        for row_id, sale_date, item_name, qty, isk, notes in rows:
-            self.pending_tree.insert('', 'end', iid=str(row_id),
-                                     tags=('pending_row',),
-                                     values=(
-                                         sale_date or '',
-                                         item_name or '',
-                                         f'{qty:,}',
-                                         f'{isk:,.2f}',
-                                         notes or '',
-                                     ))
+        try:
+            if self.pending_tree is None:
+                return
+            self.pending_tree.delete(*self.pending_tree.get_children())
+            for row_id, sale_date, item_name, qty, isk, notes in rows:
+                self.pending_tree.insert('', 'end', iid=str(row_id),
+                                         tags=('pending_row',),
+                                         values=(
+                                             sale_date or '',
+                                             item_name or '',
+                                             f'{qty:,}',
+                                             f'{isk:,.2f}',
+                                             notes or '',
+                                         ))
+        except Exception:
+            pass
 
     def _consign_delete_pending(self):
         """Delete the selected pending sale."""
+        if self.pending_tree is None:
+            return
         sel = self.pending_tree.selection()
         if not sel:
             return
@@ -6013,6 +6275,8 @@ class AdminDashboard:
         Shows all active consignors for that item type, lets you enter how many
         units to attribute to each, and optionally uses priority-based FIFO auto-fill.
         """
+        if self.pending_tree is None:
+            return
         sel = self.pending_tree.selection()
         if not sel:
             messagebox.showinfo('Split', 'Select a pending sale first.', parent=self.root)
@@ -7168,6 +7432,927 @@ class AdminDashboard:
             self.status_label.configure(foreground='#ff6666')
         else:
             self.status_label.configure(foreground='#00ff88')
+
+
+    # ══════════════════════════════════════════════════════════════════════
+    # BUILD REQUESTS TAB (Tab 12)
+    # ══════════════════════════════════════════════════════════════════════
+
+    def _build_build_requests_tab(self):
+        """Build the Build Requests management tab."""
+        import sys as _sys
+        _sys.path.insert(0, os.path.join(PROJECT_DIR, 'scripts'))
+        from bom_engine import expand_bom, calc_totals
+        self._bom_expand   = expand_bom
+        self._bom_totals   = calc_totals
+        self._bs_bom_data  = None   # current expanded BOM
+        self._bs_req_id    = None   # currently loaded request id
+
+        BG = '#0a1520'
+        outer = tk.Frame(self.build_req_frame, background=BG)
+        outer.pack(fill='both', expand=True, padx=15, pady=10)
+
+        tk.Label(outer, text='Build Requests', background=BG,
+                 foreground='#88d0e8', font=('Segoe UI', 13, 'bold')).pack(anchor='w', pady=(0, 8))
+
+        pane = tk.PanedWindow(outer, orient='vertical', background='#1a3040',
+                              sashrelief='flat', sashwidth=6, sashpad=2)
+        pane.pack(fill='both', expand=True)
+
+        # ── TOP: Request Queue ────────────────────────────────────────────
+        top_card = ttk.Frame(pane, style='Card.TFrame')
+        pane.add(top_card, minsize=180)
+
+        top_inner = ttk.Frame(top_card, style='Card.TFrame')
+        top_inner.pack(fill='both', expand=True, padx=10, pady=8)
+
+        # Toolbar
+        tb = ttk.Frame(top_inner, style='Card.TFrame')
+        tb.pack(fill='x', pady=(0, 6))
+
+        tk.Label(tb, text='Request Queue', background='#0a2030',
+                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
+
+        # Status filter
+        tk.Label(tb, text='Filter:', background='#0a2030',
+                 foreground='#88d0e8', font=('Segoe UI', 9)).pack(side='left')
+        self._bs_filter_var = tk.StringVar(value='active')
+        filter_cb = ttk.Combobox(tb, textvariable=self._bs_filter_var, width=12,
+                                  state='readonly',
+                                  values=['active', 'all', 'pending', 'quoted', 'accepted',
+                                          'assigned', 'in_progress', 'delivered', 'complete', 'cancelled'])
+        filter_cb.pack(side='left', padx=(2, 8))
+        filter_cb.bind('<<ComboboxSelected>>', lambda _: self._bs_load_requests())
+
+        ttk.Button(tb, text='⟳ Refresh', command=self._bs_load_requests).pack(side='left', padx=(0, 16))
+
+        # Action buttons
+        ttk.Button(tb, text='Quote',
+                   command=self._bs_open_quote).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Assign Builder',
+                   command=self._bs_assign_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Mark Delivered',
+                   command=self._bs_mark_delivered).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Cancel',
+                   command=self._bs_cancel_request).pack(side='left', padx=(0, 16))
+        ttk.Button(tb, text='View Details',
+                   command=self._bs_view_details).pack(side='left', padx=(0, 4))
+
+        # Request treeview
+        req_cols = ('req_id', 'customer', 'item', 'qty', 'status', 'quote', 'builder', 'deadline', 'submitted')
+        self._bs_tree = ttk.Treeview(top_inner, columns=req_cols, show='headings',
+                                      selectmode='browse', height=7)
+        for cid, hd, w, a in [
+            ('req_id',    'REQ#',      60,  'c'),
+            ('customer',  'Customer',  130, 'w'),
+            ('item',      'Item',      180, 'w'),
+            ('qty',       'Qty',        45, 'e'),
+            ('status',    'Status',     90, 'c'),
+            ('quote',     'Quote ISK', 130, 'e'),
+            ('builder',   'Builder',   110, 'w'),
+            ('deadline',  'Deadline',   90, 'c'),
+            ('submitted', 'Submitted',  90, 'c'),
+        ]:
+            self._bs_tree.heading(cid, text=hd,
+                                  command=lambda c=cid: self._bs_sort(c))
+            self._bs_tree.column(cid, width=w, minwidth=30, anchor=a)
+
+        # Row colours by status
+        self._bs_tree.tag_configure('pending',     foreground='#8899bb')
+        self._bs_tree.tag_configure('quoted',      foreground='#ffcc44')
+        self._bs_tree.tag_configure('accepted',    foreground='#00d9ff')
+        self._bs_tree.tag_configure('assigned',    foreground='#aaddff')
+        self._bs_tree.tag_configure('in_progress', foreground='#bb88ff')
+        self._bs_tree.tag_configure('delivered',   foreground='#88ffbb')
+        self._bs_tree.tag_configure('complete',    foreground='#00ff88')
+        self._bs_tree.tag_configure('cancelled',   foreground='#666666')
+        self._bs_tree.tag_configure('row_a',       background='#0a1e2e')
+        self._bs_tree.tag_configure('row_b',       background='#0d2535')
+
+        req_vsb = ttk.Scrollbar(top_inner, orient='vertical', command=self._bs_tree.yview)
+        self._bs_tree.configure(yscrollcommand=req_vsb.set)
+        req_vsb.pack(side='right', fill='y')
+        self._bs_tree.pack(fill='both', expand=True)
+        self._bs_tree.bind('<Double-1>', lambda _: self._bs_open_quote())
+
+        # ── BOTTOM: sub-notebook (Quote Tool | Builder Pool) ──────────────
+        bot_card = ttk.Frame(pane, style='Card.TFrame')
+        pane.add(bot_card, minsize=260)
+
+        self._bs_subnb = ttk.Notebook(bot_card)
+        self._bs_subnb.pack(fill='both', expand=True, padx=6, pady=6)
+
+        # ── Quote Tool tab ────────────────────────────────────────────────
+        qt_frame = ttk.Frame(self._bs_subnb, style='Card.TFrame')
+        self._bs_subnb.add(qt_frame, text='  Quote Tool  ')
+        self._bs_build_quote_panel(qt_frame)
+
+        # ── Builder Pool tab ──────────────────────────────────────────────
+        bp_frame = ttk.Frame(self._bs_subnb, style='Card.TFrame')
+        self._bs_subnb.add(bp_frame, text='  Builder Pool  ')
+        self._bs_build_builder_panel(bp_frame)
+
+        # Initial load
+        self._bs_load_requests()
+
+    # ── Quote Tool panel ──────────────────────────────────────────────────
+
+    def _bs_build_quote_panel(self, parent):
+        BG = '#0a2030'
+        inner = tk.Frame(parent, background=BG)
+        inner.pack(fill='both', expand=True, padx=8, pady=6)
+
+        # Context label
+        self._bs_qt_ctx = tk.Label(inner, text='Select a pending request and click Quote',
+                                    background=BG, foreground='#446688',
+                                    font=('Segoe UI', 10, 'italic'))
+        self._bs_qt_ctx.pack(anchor='w', pady=(0, 6))
+
+        # Split: materials left, summary right
+        split = tk.Frame(inner, background=BG)
+        split.pack(fill='both', expand=True)
+
+        # ── Left: BOM treeview ────────────────────────────────────────────
+        left = tk.Frame(split, background=BG)
+        left.pack(side='left', fill='both', expand=True)
+
+        # Basis controls
+        basis_bar = tk.Frame(left, background=BG)
+        basis_bar.pack(fill='x', pady=(0, 4))
+        tk.Label(basis_bar, text='Set all:', background=BG,
+                 foreground='#668899', font=('Segoe UI', 9)).pack(side='left')
+        ttk.Button(basis_bar, text='JBV',
+                   command=lambda: self._bs_set_all_basis('JBV')).pack(side='left', padx=2)
+        ttk.Button(basis_bar, text='JSV',
+                   command=lambda: self._bs_set_all_basis('JSV')).pack(side='left', padx=2)
+        ttk.Button(basis_bar, text='Reset',
+                   command=self._bs_reset_basis).pack(side='left', padx=(2, 12))
+        ttk.Button(basis_bar, text='Toggle Selected',
+                   command=self._bs_toggle_selected_basis).pack(side='left', padx=2)
+        self._bs_basis_summary = tk.Label(basis_bar, text='', background=BG,
+                                           foreground='#446688', font=('Segoe UI', 9))
+        self._bs_basis_summary.pack(side='right')
+
+        # Materials treeview
+        mat_cols = ('name', 'qty', 'basis', 'unit_price', 'total')
+        self._bs_mat_tree = ttk.Treeview(left, columns=mat_cols, show='headings',
+                                          selectmode='browse', height=8)
+        for cid, hd, w, a in [
+            ('name',       'Material',   220, 'w'),
+            ('qty',        'Qty',         90, 'e'),
+            ('basis',      'Basis',       55, 'c'),
+            ('unit_price', 'Unit Price', 130, 'e'),
+            ('total',      'Total ISK',  140, 'e'),
+        ]:
+            self._bs_mat_tree.heading(cid, text=hd)
+            self._bs_mat_tree.column(cid, width=w, minwidth=30, anchor=a)
+
+        self._bs_mat_tree.tag_configure('jbv',      foreground='#00ff88')
+        self._bs_mat_tree.tag_configure('jsv',      foreground='#00d9ff')
+        self._bs_mat_tree.tag_configure('no_price', foreground='#ff6666')
+        self._bs_mat_tree.tag_configure('row_a',    background='#0a1e2e')
+        self._bs_mat_tree.tag_configure('row_b',    background='#0d2535')
+
+        mat_vsb = ttk.Scrollbar(left, orient='vertical', command=self._bs_mat_tree.yview)
+        self._bs_mat_tree.configure(yscrollcommand=mat_vsb.set)
+        mat_vsb.pack(side='right', fill='y')
+        self._bs_mat_tree.pack(fill='both', expand=True)
+
+        # Job costs summary below treeview
+        jobs_frame = tk.Frame(left, background=BG)
+        jobs_frame.pack(fill='x', pady=(4, 0))
+        self._bs_jobs_lbl = tk.Label(jobs_frame, text='', background=BG,
+                                      foreground='#bb88ff', font=('Segoe UI', 9),
+                                      justify='left', anchor='w')
+        self._bs_jobs_lbl.pack(side='left')
+
+        # ── Right: Quote summary ──────────────────────────────────────────
+        right = tk.Frame(split, background='#0a1828', width=220)
+        right.pack(side='right', fill='y', padx=(10, 0))
+        right.pack_propagate(False)
+
+        def _lrow(label, var_attr, color='#cce6ff'):
+            row = tk.Frame(right, background='#0a1828')
+            row.pack(fill='x', padx=10, pady=2)
+            tk.Label(row, text=label, background='#0a1828',
+                     foreground='#668899', font=('Segoe UI', 9), anchor='w').pack(side='left')
+            lbl = tk.Label(row, text='—', background='#0a1828',
+                           foreground=color, font=('Segoe UI', 9, 'bold'), anchor='e')
+            lbl.pack(side='right')
+            setattr(self, var_attr, lbl)
+
+        tk.Label(right, text='Quote Builder', background='#0a1828',
+                 foreground='#00d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=10, pady=(8, 6))
+
+        _lrow('JBV Materials',  '_bs_lbl_jbv',  '#00ff88')
+        _lrow('JSV Materials',  '_bs_lbl_jsv',  '#00d9ff')
+        _lrow('Job Costs',      '_bs_lbl_jobs', '#bb88ff')
+
+        sep = tk.Frame(right, background='#1a3040', height=1)
+        sep.pack(fill='x', padx=10, pady=4)
+
+        _lrow('Subtotal',  '_bs_lbl_sub')
+
+        # Markup row
+        mu_row = tk.Frame(right, background='#0a1828')
+        mu_row.pack(fill='x', padx=10, pady=4)
+        tk.Label(mu_row, text='Markup %', background='#0a1828',
+                 foreground='#668899', font=('Segoe UI', 9)).pack(side='left')
+        self._bs_markup_var = tk.DoubleVar(value=15.0)
+        mu_spin = tk.Spinbox(mu_row, from_=0, to=100, increment=1,
+                             textvariable=self._bs_markup_var, width=5,
+                             background='#0a2030', foreground='#cce6ff',
+                             font=('Segoe UI', 9),
+                             command=self._bs_recalc)
+        mu_spin.pack(side='right')
+        self._bs_markup_var.trace_add('write', lambda *_: self._bs_recalc())
+
+        sep2 = tk.Frame(right, background='#1a3040', height=1)
+        sep2.pack(fill='x', padx=10, pady=4)
+
+        _lrow('Final Quote',   '_bs_lbl_quote', '#ffcc44')
+        _lrow('Corp Margin',   '_bs_lbl_margin', '#00ff88')
+        _lrow('Builder (~70%)', '_bs_lbl_builder', '#bb88ff')
+
+        sep3 = tk.Frame(right, background='#1a3040', height=1)
+        sep3.pack(fill='x', padx=10, pady=6)
+
+        self._bs_save_btn = ttk.Button(right, text='Save Quote',
+                                        style='Save.TButton',
+                                        command=self._bs_save_quote,
+                                        state='disabled')
+        self._bs_save_btn.pack(fill='x', padx=10, pady=2)
+
+        ttk.Button(right, text='Send Discord Notification',
+                   command=self._bs_send_discord).pack(fill='x', padx=10, pady=2)
+
+    # ── Builder Pool panel ────────────────────────────────────────────────
+
+    def _bs_build_builder_panel(self, parent):
+        BG = '#0a2030'
+        inner = tk.Frame(parent, background=BG)
+        inner.pack(fill='both', expand=True, padx=8, pady=6)
+
+        # Toolbar
+        tb = tk.Frame(inner, background=BG)
+        tb.pack(fill='x', pady=(0, 6))
+        tk.Label(tb, text='Builder Pool', background=BG,
+                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
+        ttk.Button(tb, text='+ Add Builder',
+                   command=self._bs_add_builder_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Edit',
+                   command=self._bs_edit_builder_dialog).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Toggle Active',
+                   command=self._bs_toggle_builder_active).pack(side='left', padx=(0, 4))
+        ttk.Button(tb, text='Log Payment',
+                   command=self._bs_log_payment_dialog).pack(side='left', padx=(0, 16))
+        ttk.Button(tb, text='⟳ Refresh',
+                   command=self._bs_load_builders).pack(side='left')
+
+        # Builder treeview
+        b_cols = ('name', 'active', 'specs', 'cut_pct', 'owed', 'total_earned')
+        self._bs_builder_tree = ttk.Treeview(inner, columns=b_cols, show='headings',
+                                              selectmode='browse', height=8)
+        for cid, hd, w, a in [
+            ('name',         'Character',    160, 'w'),
+            ('active',       'Active',        55, 'c'),
+            ('specs',        'Specialisations', 200, 'w'),
+            ('cut_pct',      'Cut %',          55, 'e'),
+            ('owed',         'ISK Owed',      140, 'e'),
+            ('total_earned', 'Total Earned',  140, 'e'),
+        ]:
+            self._bs_builder_tree.heading(cid, text=hd)
+            self._bs_builder_tree.column(cid, width=w, minwidth=30, anchor=a)
+
+        self._bs_builder_tree.tag_configure('active',   foreground='#00ff88')
+        self._bs_builder_tree.tag_configure('inactive', foreground='#666666')
+
+        b_vsb = ttk.Scrollbar(inner, orient='vertical', command=self._bs_builder_tree.yview)
+        self._bs_builder_tree.configure(yscrollcommand=b_vsb.set)
+        b_vsb.pack(side='right', fill='y')
+        self._bs_builder_tree.pack(fill='both', expand=True)
+
+        self._bs_load_builders()
+
+    # ── Data loading ──────────────────────────────────────────────────────
+
+    def _bs_load_requests(self):
+        """Reload the request queue treeview from DB."""
+        filt = self._bs_filter_var.get()
+        conn = sqlite3.connect(DB_PATH)
+        cur  = conn.cursor()
+
+        if filt == 'all':
+            cur.execute('''SELECT r.id, r.customer_name, r.item_name, r.quantity,
+                                  r.status, r.quote_price, r.deadline, r.created_at,
+                                  b.character_name AS builder_name
+                           FROM build_requests r
+                           LEFT JOIN build_builders b ON r.builder_id = b.id
+                           ORDER BY r.created_at DESC''')
+        elif filt == 'active':
+            cur.execute('''SELECT r.id, r.customer_name, r.item_name, r.quantity,
+                                  r.status, r.quote_price, r.deadline, r.created_at,
+                                  b.character_name AS builder_name
+                           FROM build_requests r
+                           LEFT JOIN build_builders b ON r.builder_id = b.id
+                           WHERE r.status NOT IN ('complete', 'cancelled')
+                           ORDER BY r.created_at DESC''')
+        else:
+            cur.execute('''SELECT r.id, r.customer_name, r.item_name, r.quantity,
+                                  r.status, r.quote_price, r.deadline, r.created_at,
+                                  b.character_name AS builder_name
+                           FROM build_requests r
+                           LEFT JOIN build_builders b ON r.builder_id = b.id
+                           WHERE r.status = ?
+                           ORDER BY r.created_at DESC''', (filt,))
+        rows = cur.fetchall()
+        conn.close()
+
+        self._bs_tree.delete(*self._bs_tree.get_children())
+        for i, r in enumerate(rows):
+            rid, cust, item, qty, status, quote, deadline, created, builder = r
+            quote_str   = f'{quote:,.0f}' if quote else '—'
+            deadline_str = deadline[:10] if deadline else '—'
+            created_str  = created[:10] if created else '—'
+            builder_str  = builder or '—'
+            tags = (status, 'row_a' if i % 2 == 0 else 'row_b')
+            self._bs_tree.insert('', 'end', iid=str(rid), tags=tags,
+                                 values=(f'REQ-{rid:04d}', cust, item, qty, status,
+                                         quote_str, builder_str, deadline_str, created_str))
+
+    def _bs_load_builders(self):
+        """Reload the builder pool treeview."""
+        conn = sqlite3.connect(DB_PATH)
+        cur  = conn.cursor()
+        cur.execute('''SELECT b.id, b.character_name, b.active,
+                              b.specializations, b.default_builder_pct,
+                              COALESCE(SUM(CASE WHEN p.paid=0 THEN p.isk_owed ELSE 0 END), 0) AS owed,
+                              COALESCE(SUM(p.isk_owed), 0) AS total_earned
+                       FROM build_builders b
+                       LEFT JOIN build_payouts p ON p.builder_id = b.id
+                       GROUP BY b.id
+                       ORDER BY b.active DESC, b.character_name''')
+        rows = cur.fetchall()
+        conn.close()
+
+        self._bs_builder_tree.delete(*self._bs_builder_tree.get_children())
+        for r in rows:
+            bid, name, active, specs_json, cut, owed, earned = r
+            try:
+                specs = ', '.join(json.loads(specs_json or '[]'))
+            except Exception:
+                specs = specs_json or ''
+            tag = 'active' if active else 'inactive'
+            self._bs_builder_tree.insert('', 'end', iid=str(bid), tags=(tag,),
+                                         values=(name, '✓' if active else '—',
+                                                 specs, f'{cut:.0f}%',
+                                                 f'{owed:,.0f}',
+                                                 f'{earned:,.0f}'))
+
+    # ── Quote Tool logic ──────────────────────────────────────────────────
+
+    def _bs_selected_req_id(self):
+        sel = self._bs_tree.selection()
+        if not sel:
+            messagebox.showinfo('Build Requests', 'Select a request first.')
+            return None
+        return int(sel[0])
+
+    def _bs_open_quote(self):
+        """Expand BOM and populate the quote tool for the selected request."""
+        rid = self._bs_selected_req_id()
+        if rid is None:
+            return
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        req = conn.execute('SELECT * FROM build_requests WHERE id = ?', (rid,)).fetchone()
+        conn.close()
+
+        if not req:
+            return
+
+        self._bs_req_id = rid
+        self._bs_subnb.select(0)  # switch to Quote Tool tab
+
+        self._bs_qt_ctx.configure(
+            text=f'REQ-{rid:04d}  ·  {req["item_name"]} ×{req["quantity"]}  '
+                 f'|  ME10  ·  SCI {self._get_cfg("mfg_sci", "?")}%  ·  Tax {self._get_cfg("mfg_facility_tax", "?")}%',
+            foreground='#88d0e8'
+        )
+
+        if req['markup_pct']:
+            self._bs_markup_var.set(req['markup_pct'])
+
+        if not req['item_type_id']:
+            messagebox.showwarning('Quote Tool',
+                                   f'No type_id stored for "{req["item_name"]}" — '
+                                   f'cannot auto-expand BOM.\nEnter quote manually.')
+            return
+
+        result = self._bom_expand(req['item_type_id'], req['quantity'], DB_PATH)
+        if not result['ok']:
+            messagebox.showerror('BOM Error', result['error'])
+            return
+
+        self._bs_bom_data = result
+        self._bs_render_bom()
+        self._bs_recalc()
+        self._bs_save_btn.configure(state='normal')
+
+    def _bs_render_bom(self):
+        """Populate the materials treeview from current BOM data."""
+        if not self._bs_bom_data:
+            return
+        mats = self._bs_bom_data['materials']
+        self._bs_mat_tree.delete(*self._bs_mat_tree.get_children())
+
+        jbv_count = jsv_count = no_price = 0
+        for i, m in enumerate(mats):
+            price = m['jbv'] if m['basis'] == 'JBV' else m['jsv']
+            eff   = price * (m['pct'] / 100)
+            total = m['qty'] * eff
+
+            if not m['has_price']:
+                tag   = 'no_price'
+                p_str = 'NO PRICE'
+                t_str = '—'
+                no_price += 1
+            elif m['basis'] == 'JBV':
+                tag   = 'jbv'
+                p_str = f'{eff:,.2f}'
+                t_str = f'{total:,.0f}'
+                jbv_count += 1
+            else:
+                tag   = 'jsv'
+                p_str = f'{eff:,.2f}'
+                t_str = f'{total:,.0f}'
+                jsv_count += 1
+
+            row_tag = 'row_a' if i % 2 == 0 else 'row_b'
+            self._bs_mat_tree.insert('', 'end', iid=str(i), tags=(tag, row_tag),
+                                     values=(m['name'], f'{m["qty"]:,}',
+                                             m['basis'], p_str, t_str))
+
+        # Job costs summary
+        jobs = self._bs_bom_data['jobs']
+        job_lines = [f'{j["name"]} ×{j["runs"]}  →  {j["job_cost"]/1e6:.2f}M ISK'
+                     for j in sorted(jobs, key=lambda x: x['depth'])]
+        self._bs_jobs_lbl.configure(
+            text='Jobs: ' + '   |   '.join(job_lines[:4]) +
+                 (f'  (+{len(job_lines)-4} more)' if len(job_lines) > 4 else '')
+        )
+        self._bs_basis_summary.configure(
+            text=f'{jbv_count} JBV · {jsv_count} JSV' +
+                 (f' · {no_price} ⚠ no price' if no_price else '')
+        )
+
+    def _bs_recalc(self):
+        """Recalculate totals and update the summary panel."""
+        if not self._bs_bom_data:
+            return
+        t = self._bom_totals(self._bs_bom_data['materials'], self._bs_bom_data['jobs'])
+
+        try:
+            markup = float(self._bs_markup_var.get())
+        except Exception:
+            markup = 15.0
+
+        quote  = t['subtotal'] * (1 + markup / 100)
+        margin = quote - t['subtotal']
+        conn   = sqlite3.connect(DB_PATH)
+        build_pct = float(conn.execute(
+            "SELECT value FROM site_config WHERE key='build_default_builder_pct'"
+        ).fetchone()[0] or 70)
+        conn.close()
+        builder_cut = quote * (build_pct / 100)
+
+        def fmt(n): return f'{n:,.0f} ISK'
+        self._bs_lbl_jbv.configure(text=fmt(t['jbv_mat']))
+        self._bs_lbl_jsv.configure(text=fmt(t['jsv_mat']))
+        self._bs_lbl_jobs.configure(text=fmt(t['job_cost']))
+        self._bs_lbl_sub.configure(text=fmt(t['subtotal']))
+        self._bs_lbl_quote.configure(text=fmt(quote))
+        self._bs_lbl_margin.configure(text=fmt(margin))
+        self._bs_lbl_builder.configure(text=fmt(builder_cut))
+
+    def _bs_set_all_basis(self, basis):
+        if not self._bs_bom_data:
+            return
+        for m in self._bs_bom_data['materials']:
+            m['basis'] = basis
+        self._bs_render_bom()
+        self._bs_recalc()
+
+    def _bs_reset_basis(self):
+        if not self._bs_bom_data:
+            return
+        for m in self._bs_bom_data['materials']:
+            m['basis'] = 'JBV' if m['has_local_price'] else 'JSV'
+        self._bs_render_bom()
+        self._bs_recalc()
+
+    def _bs_toggle_selected_basis(self):
+        if not self._bs_bom_data:
+            return
+        sel = self._bs_mat_tree.selection()
+        if not sel:
+            return
+        idx = int(sel[0])
+        m = self._bs_bom_data['materials'][idx]
+        m['basis'] = 'JSV' if m['basis'] == 'JBV' else 'JBV'
+        self._bs_render_bom()
+        self._bs_recalc()
+
+    # ── Save / actions ────────────────────────────────────────────────────
+
+    def _bs_save_quote(self):
+        if not self._bs_bom_data or not self._bs_req_id:
+            return
+        t = self._bom_totals(self._bs_bom_data['materials'], self._bs_bom_data['jobs'])
+        try:
+            markup = float(self._bs_markup_var.get())
+        except Exception:
+            markup = 15.0
+        quote = t['subtotal'] * (1 + markup / 100)
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(
+            '''UPDATE build_requests
+               SET status='quoted', materials_cost_est=?, job_cost_est=?,
+                   markup_pct=?, quote_price=?, updated_at=datetime('now')
+               WHERE id=?''',
+            (t['jbv_mat'] + t['jsv_mat'], t['job_cost'], markup, quote, self._bs_req_id)
+        )
+        conn.commit()
+        conn.close()
+        self._bs_load_requests()
+        self.update_status(f'Quote saved for REQ-{self._bs_req_id:04d}: {quote:,.0f} ISK')
+        messagebox.showinfo('Quote Saved',
+                            f'REQ-{self._bs_req_id:04d} → quoted\n'
+                            f'Quote: {quote:,.0f} ISK\n\n'
+                            f'Use "Send Discord Notification" to notify the customer.')
+
+    def _bs_send_discord(self):
+        if not self._bs_req_id:
+            return
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        req = conn.execute('SELECT * FROM build_requests WHERE id=?', (self._bs_req_id,)).fetchone()
+        webhook = conn.execute(
+            "SELECT value FROM site_config WHERE key='build_discord_webhook'"
+        ).fetchone()
+        conn.close()
+
+        if not webhook or not webhook[0]:
+            messagebox.showwarning('Discord',
+                                   'No webhook configured.\n'
+                                   'Set build_discord_webhook in site_config.')
+            return
+
+        import urllib.request
+        msg = (f'**Build Quote — REQ-{req["id"]:04d}**\n'
+               f'Customer: {req["customer_name"]}\n'
+               f'Item: **{req["item_name"]}** ×{req["quantity"]}\n'
+               f'Quote: **{req["quote_price"]:,.0f} ISK**\n'
+               f'Delivery: {req["delivery_location"]}\n'
+               f'Lookup token: `{req["lookup_token"]}`\n'
+               f'Reply Accept to confirm. Quote valid 48h.')
+        try:
+            data = json.dumps({'content': msg}).encode()
+            req2 = urllib.request.Request(webhook[0], data=data,
+                                          headers={'Content-Type': 'application/json'})
+            urllib.request.urlopen(req2, timeout=8)
+            self.update_status('Discord notification sent.')
+        except Exception as e:
+            messagebox.showerror('Discord Error', str(e))
+
+    def _bs_assign_dialog(self):
+        rid = self._bs_selected_req_id()
+        if rid is None:
+            return
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        req      = conn.execute('SELECT * FROM build_requests WHERE id=?', (rid,)).fetchone()
+        builders = conn.execute(
+            'SELECT id, character_name, default_builder_pct FROM build_builders WHERE active=1 ORDER BY character_name'
+        ).fetchall()
+        conn.close()
+
+        if not builders:
+            messagebox.showinfo('Assign Builder',
+                                'No active builders in the pool.\nAdd builders in the Builder Pool tab first.')
+            return
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title(f'Assign Builder — REQ-{rid:04d}')
+        dlg.geometry('380x260')
+        dlg.configure(bg='#0a1520')
+        dlg.grab_set()
+
+        tk.Label(dlg, text=f'REQ-{rid:04d}: {req["item_name"]} ×{req["quantity"]}',
+                 background='#0a1520', foreground='#cce6ff',
+                 font=('Segoe UI', 11, 'bold')).pack(pady=(14, 4), padx=16, anchor='w')
+
+        tk.Label(dlg, text='Select builder:', background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 10)).pack(padx=16, anchor='w')
+
+        builder_names = [b['character_name'] for b in builders]
+        builder_ids   = [b['id'] for b in builders]
+        builder_pcts  = [b['default_builder_pct'] for b in builders]
+
+        sel_var = tk.StringVar(value=builder_names[0])
+        cb = ttk.Combobox(dlg, textvariable=sel_var, values=builder_names,
+                           state='readonly', width=28)
+        cb.pack(padx=16, pady=6, anchor='w')
+
+        pct_frame = tk.Frame(dlg, background='#0a1520')
+        pct_frame.pack(fill='x', padx=16, pady=4)
+        tk.Label(pct_frame, text='Builder cut %:', background='#0a1520',
+                 foreground='#88d0e8', font=('Segoe UI', 10)).pack(side='left')
+        pct_var = tk.DoubleVar(value=builder_pcts[0])
+        pct_spin = tk.Spinbox(pct_frame, from_=0, to=100, increment=5,
+                              textvariable=pct_var, width=6,
+                              background='#0a2030', foreground='#cce6ff', font=('Segoe UI', 10))
+        pct_spin.pack(side='left', padx=6)
+
+        def on_builder_change(*_):
+            idx = builder_names.index(sel_var.get())
+            pct_var.set(builder_pcts[idx])
+        sel_var.trace_add('write', on_builder_change)
+
+        def do_assign():
+            idx = builder_names.index(sel_var.get())
+            bid = builder_ids[idx]
+            pct = float(pct_var.get())
+            conn2 = sqlite3.connect(DB_PATH)
+            conn2.execute(
+                '''UPDATE build_requests
+                   SET builder_id=?, builder_pct=?, status='assigned',
+                       assigned_at=datetime('now'), updated_at=datetime('now')
+                   WHERE id=?''',
+                (bid, pct, rid)
+            )
+            conn2.commit()
+            conn2.close()
+            dlg.destroy()
+            self._bs_load_requests()
+            self.update_status(f'REQ-{rid:04d} assigned to {sel_var.get()}')
+
+        btn_row = tk.Frame(dlg, background='#0a1520')
+        btn_row.pack(pady=14)
+        ttk.Button(btn_row, text='Assign', style='Save.TButton',
+                   command=do_assign).pack(side='left', padx=6)
+        ttk.Button(btn_row, text='Cancel',
+                   command=dlg.destroy).pack(side='left', padx=6)
+
+    def _bs_mark_delivered(self):
+        rid = self._bs_selected_req_id()
+        if rid is None:
+            return
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        req = conn.execute('SELECT * FROM build_requests WHERE id=?', (rid,)).fetchone()
+
+        price_str = f'{req["quote_price"]:,.0f}' if req['quote_price'] else '?'
+        if not messagebox.askyesno('Mark Delivered',
+                                   f'Mark REQ-{rid:04d} as delivered?\n'
+                                   f'Item: {req["item_name"]} ×{req["quantity"]}\n'
+                                   f'Quote: {price_str} ISK\n\n'
+                                   f'This will create a payout record for the builder.'):
+            conn.close()
+            return
+
+        # Update request
+        conn.execute(
+            '''UPDATE build_requests
+               SET status='delivered', contract_price_actual=quote_price,
+                   completed_at=datetime('now'), updated_at=datetime('now')
+               WHERE id=?''', (rid,)
+        )
+        # Create payout record if builder assigned
+        if req['builder_id'] and req['quote_price'] and req['builder_pct']:
+            isk_owed = req['quote_price'] * (req['builder_pct'] / 100)
+            conn.execute(
+                'INSERT INTO build_payouts (builder_id, request_id, isk_owed, paid) VALUES (?,?,?,0)',
+                (req['builder_id'], rid, isk_owed)
+            )
+        conn.commit()
+        conn.close()
+        self._bs_load_requests()
+        self._bs_load_builders()
+        self.update_status(f'REQ-{rid:04d} marked delivered.')
+
+    def _bs_cancel_request(self):
+        rid = self._bs_selected_req_id()
+        if rid is None:
+            return
+        if messagebox.askyesno('Cancel Request', f'Cancel REQ-{rid:04d}?'):
+            conn = sqlite3.connect(DB_PATH)
+            conn.execute(
+                "UPDATE build_requests SET status='cancelled', updated_at=datetime('now') WHERE id=?",
+                (rid,)
+            )
+            conn.commit()
+            conn.close()
+            self._bs_load_requests()
+            self.update_status(f'REQ-{rid:04d} cancelled.')
+
+    def _bs_view_details(self):
+        rid = self._bs_selected_req_id()
+        if rid is None:
+            return
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        req = conn.execute('SELECT * FROM build_requests WHERE id=?', (rid,)).fetchone()
+        conn.close()
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title(f'REQ-{rid:04d} Details')
+        dlg.geometry('460x340')
+        dlg.configure(bg='#0a1520')
+        dlg.grab_set()
+
+        def row(label, value, color='#cce6ff'):
+            f = tk.Frame(dlg, background='#0a1520')
+            f.pack(fill='x', padx=18, pady=2)
+            tk.Label(f, text=label, background='#0a1520', foreground='#668899',
+                     font=('Segoe UI', 9), width=18, anchor='w').pack(side='left')
+            tk.Label(f, text=str(value or '—'), background='#0a1520', foreground=color,
+                     font=('Segoe UI', 10)).pack(side='left')
+
+        tk.Label(dlg, text=f'REQ-{rid:04d}  ·  {req["item_name"]}',
+                 background='#0a1520', foreground='#00d9ff',
+                 font=('Segoe UI', 13, 'bold')).pack(pady=(14, 10), padx=18, anchor='w')
+
+        row('Customer',   req['customer_name'])
+        row('Quantity',   req['quantity'])
+        row('Status',     req['status'], '#ffcc44')
+        row('Delivery',   req['delivery_location'])
+        row('Deadline',   req['deadline'])
+        row('Lookup Token', req['lookup_token'], '#00d9ff')
+        row('Quote Price', f'{req["quote_price"]:,.0f} ISK' if req['quote_price'] else '—', '#ffcc44')
+        row('Submitted',  req['created_at'][:16] if req['created_at'] else '—')
+        if req['notes']:
+            tk.Label(dlg, text='Notes:', background='#0a1520', foreground='#668899',
+                     font=('Segoe UI', 9)).pack(anchor='w', padx=18, pady=(8, 2))
+            tk.Label(dlg, text=req['notes'], background='#0a1520', foreground='#aabbcc',
+                     font=('Segoe UI', 10), wraplength=400, justify='left').pack(anchor='w', padx=18)
+
+        ttk.Button(dlg, text='Close', command=dlg.destroy).pack(pady=12)
+
+    def _bs_sort(self, col):
+        """Sort the request treeview by column."""
+        items = [(self._bs_tree.set(k, col), k) for k in self._bs_tree.get_children('')]
+        items.sort(key=lambda x: x[0])
+        for idx, (_, k) in enumerate(items):
+            self._bs_tree.move(k, '', idx)
+
+    # ── Builder pool actions ──────────────────────────────────────────────
+
+    def _bs_add_builder_dialog(self):
+        self._bs_builder_form_dialog(None)
+
+    def _bs_edit_builder_dialog(self):
+        sel = self._bs_builder_tree.selection()
+        if not sel:
+            messagebox.showinfo('Builder Pool', 'Select a builder to edit.')
+            return
+        self._bs_builder_form_dialog(int(sel[0]))
+
+    def _bs_builder_form_dialog(self, builder_id):
+        existing = None
+        if builder_id:
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            existing = conn.execute('SELECT * FROM build_builders WHERE id=?', (builder_id,)).fetchone()
+            conn.close()
+
+        dlg = tk.Toplevel(self.root)
+        dlg.title('Add Builder' if not existing else f'Edit — {existing["character_name"]}')
+        dlg.geometry('380x320')
+        dlg.configure(bg='#0a1520')
+        dlg.grab_set()
+
+        fields = {}
+        def field(label, default=''):
+            f = tk.Frame(dlg, background='#0a1520')
+            f.pack(fill='x', padx=16, pady=4)
+            tk.Label(f, text=label, background='#0a1520', foreground='#88d0e8',
+                     font=('Segoe UI', 10), width=18, anchor='w').pack(side='left')
+            e = tk.Entry(f, background='#0a2030', foreground='#cce6ff',
+                         insertbackground='#cce6ff', font=('Segoe UI', 10), width=22)
+            e.insert(0, str(default))
+            e.pack(side='left')
+            return e
+
+        fields['name'] = field('Character Name', existing['character_name'] if existing else '')
+        fields['char_id'] = field('Character ID', existing['character_id'] if existing else '')
+        fields['cut']  = field('Default Cut %',  existing['default_builder_pct'] if existing else '70')
+        fields['specs'] = field('Specialisations',
+                                ', '.join(json.loads(existing['specializations'] or '[]')) if existing else '')
+
+        notes_frame = tk.Frame(dlg, background='#0a1520')
+        notes_frame.pack(fill='x', padx=16, pady=4)
+        tk.Label(notes_frame, text='Notes', background='#0a1520', foreground='#88d0e8',
+                 font=('Segoe UI', 10), width=18, anchor='w').pack(side='left')
+        notes_e = tk.Text(notes_frame, background='#0a2030', foreground='#cce6ff',
+                          font=('Segoe UI', 10), width=22, height=3)
+        if existing and existing['notes']:
+            notes_e.insert('1.0', existing['notes'])
+        notes_e.pack(side='left')
+
+        def save():
+            name  = fields['name'].get().strip()
+            cid   = fields['char_id'].get().strip() or None
+            cut   = float(fields['cut'].get() or 70)
+            specs_raw = [s.strip() for s in fields['specs'].get().split(',') if s.strip()]
+            specs = json.dumps(specs_raw)
+            notes = notes_e.get('1.0', 'end').strip()
+            if not name:
+                messagebox.showerror('Validation', 'Character name is required.')
+                return
+            conn2 = sqlite3.connect(DB_PATH)
+            if existing:
+                conn2.execute(
+                    '''UPDATE build_builders SET character_name=?, character_id=?,
+                       default_builder_pct=?, specializations=?, notes=? WHERE id=?''',
+                    (name, cid, cut, specs, notes, builder_id)
+                )
+            else:
+                conn2.execute(
+                    '''INSERT INTO build_builders
+                       (character_name, character_id, default_builder_pct, specializations, notes, active)
+                       VALUES (?,?,?,?,?,1)''',
+                    (name, cid, cut, specs, notes)
+                )
+            conn2.commit()
+            conn2.close()
+            dlg.destroy()
+            self._bs_load_builders()
+
+        btn_row = tk.Frame(dlg, background='#0a1520')
+        btn_row.pack(pady=12)
+        ttk.Button(btn_row, text='Save', style='Save.TButton', command=save).pack(side='left', padx=6)
+        ttk.Button(btn_row, text='Cancel', command=dlg.destroy).pack(side='left', padx=6)
+
+    def _bs_toggle_builder_active(self):
+        sel = self._bs_builder_tree.selection()
+        if not sel:
+            messagebox.showinfo('Builder Pool', 'Select a builder first.')
+            return
+        bid = int(sel[0])
+        conn = sqlite3.connect(DB_PATH)
+        cur  = conn.cursor()
+        cur.execute('SELECT active FROM build_builders WHERE id=?', (bid,))
+        current = cur.fetchone()[0]
+        conn.execute('UPDATE build_builders SET active=? WHERE id=?', (0 if current else 1, bid))
+        conn.commit()
+        conn.close()
+        self._bs_load_builders()
+
+    def _bs_log_payment_dialog(self):
+        sel = self._bs_builder_tree.selection()
+        if not sel:
+            messagebox.showinfo('Log Payment', 'Select a builder first.')
+            return
+        bid  = int(sel[0])
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        builder = conn.execute('SELECT * FROM build_builders WHERE id=?', (bid,)).fetchone()
+        owed_rows = conn.execute(
+            '''SELECT p.id, r.item_name, r.quantity, p.isk_owed
+               FROM build_payouts p
+               JOIN build_requests r ON r.id = p.request_id
+               WHERE p.builder_id=? AND p.paid=0''', (bid,)
+        ).fetchall()
+        conn.close()
+
+        if not owed_rows:
+            messagebox.showinfo('Log Payment', f'{builder["character_name"]} has no unpaid payouts.')
+            return
+
+        total_owed = sum(r['isk_owed'] for r in owed_rows)
+        if messagebox.askyesno('Log Payment',
+                               f'Mark ALL unpaid for {builder["character_name"]} as paid?\n'
+                               f'Total: {total_owed:,.0f} ISK\n'
+                               f'({len(owed_rows)} payout(s))'):
+            conn2 = sqlite3.connect(DB_PATH)
+            conn2.execute(
+                "UPDATE build_payouts SET paid=1, paid_date=date('now') WHERE builder_id=? AND paid=0",
+                (bid,)
+            )
+            conn2.commit()
+            conn2.close()
+            self._bs_load_builders()
+            self.update_status(f'Payment logged for {builder["character_name"]}: {total_owed:,.0f} ISK')
+
+    def _get_cfg(self, key, default=''):
+        conn = sqlite3.connect(DB_PATH)
+        row  = conn.execute('SELECT value FROM site_config WHERE key=?', (key,)).fetchone()
+        conn.close()
+        return row[0] if row else default
 
 
 def main():

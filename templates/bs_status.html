@@ -1,0 +1,182 @@
+{% extends "bs_base.html" %}
+{% set active_tab = "status" %}
+
+{% block title %}Request Status — Infinite Directive{% endblock %}
+
+{% block content %}
+
+<!-- ── Lookup bar ─────────────────────────────────────────────── -->
+<div class="section">
+    <div class="section-title">Check Request Status</div>
+    <div class="section-sub">Enter your lookup token from the confirmation page</div>
+
+    <form method="GET" action="{{ url_for('status_index') }}" class="lookup-bar">
+        <div class="field" style="flex:0 0 300px">
+            <label>Lookup Token</label>
+            <input type="text" name="token" value="{{ token }}"
+                   placeholder="XXXX-XXXX-XX"
+                   style="font-family:'Orbitron',sans-serif;font-size:14px;letter-spacing:2px;text-transform:uppercase">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Look Up</button>
+    </form>
+
+    {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+</div>
+
+<!-- ── Request detail ─────────────────────────────────────────── -->
+{% if req %}
+{% set status = req['status'] %}
+{% set statuses = ['pending', 'quoted', 'accepted', 'assigned', 'in_progress', 'delivered', 'complete'] %}
+
+<div class="section">
+    <!-- Header row -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+        <div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:#446688;letter-spacing:2px;margin-bottom:4px">
+                REQ-{{ '%04d' % req['id'] }} &nbsp;·&nbsp; {{ req['lookup_token'] }}
+            </div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:22px;color:#cce6ff">
+                {{ req['item_name'] }}
+                {% if req['quantity'] > 1 %}
+                <span style="color:#668899">&nbsp;×{{ req['quantity'] }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div style="text-align:right">
+            <span class="badge b-{{ status }}">{{ status.replace('_', ' ').upper() }}</span>
+            <div style="font-size:12px;color:#446688;margin-top:6px">
+                Submitted {{ req['created_at'][:10] if req['created_at'] else '—' }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Status tracker -->
+    {% set step_map = {
+        'pending':     0,
+        'quoted':      1,
+        'accepted':    2,
+        'assigned':    3,
+        'in_progress': 4,
+        'delivered':   5,
+        'complete':    6,
+        'cancelled':   -1
+    } %}
+    {% set cur_step = step_map.get(status, 0) %}
+    {% set steps = ['Pending', 'Quoted', 'Accepted', 'Assigned', 'Building', 'Delivered', 'Complete'] %}
+
+    {% if status != 'cancelled' %}
+    <div class="status-track">
+        {% for s in steps %}
+        {% set i = loop.index0 %}
+        {% set done   = i < cur_step %}
+        {% set active = i == cur_step %}
+        <div class="status-step {% if done %}done{% endif %}">
+            <div class="step-dot {% if done %}done{% elif active %}active{% endif %}">
+                {% if done %}✓{% elif active %}●{% else %}○{% endif %}
+            </div>
+            <div class="step-label {% if done %}done{% elif active %}active{% endif %}">{{ s }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-error" style="margin-bottom:20px">This request has been cancelled.</div>
+    {% endif %}
+
+    <!-- Detail grid -->
+    <div class="detail-grid">
+        <div class="detail-item">
+            <label>Customer</label>
+            <div class="val">{{ req['customer_name'] or '—' }}</div>
+        </div>
+        <div class="detail-item">
+            <label>Delivery Location</label>
+            <div class="val">{{ req['delivery_location'] or '—' }}</div>
+        </div>
+        <div class="detail-item">
+            <label>Deadline</label>
+            <div class="val">{{ req['deadline'] or 'Flexible' }}</div>
+        </div>
+        <div class="detail-item">
+            <label>Submitted</label>
+            <div class="val">{{ req['created_at'][:10] if req['created_at'] else '—' }}</div>
+        </div>
+    </div>
+
+    <!-- Quote (shown once quoted+) -->
+    {% if req['quote_price'] %}
+    <div style="border-top:1px solid rgba(0,217,255,0.15);padding-top:18px;margin-top:6px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:#446688;letter-spacing:2px;margin-bottom:12px">
+            Quote
+        </div>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>Quote Price</label>
+                <div class="val isk">{{ '{:,.0f}'.format(req['quote_price']) }} ISK</div>
+            </div>
+            {% if req['materials_cost_est'] %}
+            <div class="detail-item">
+                <label>Materials Est.</label>
+                <div class="val">{{ '{:,.0f}'.format(req['materials_cost_est']) }} ISK</div>
+            </div>
+            {% endif %}
+            {% if req['job_cost_est'] %}
+            <div class="detail-item">
+                <label>Job Costs Est.</label>
+                <div class="val">{{ '{:,.0f}'.format(req['job_cost_est']) }} ISK</div>
+            </div>
+            {% endif %}
+            <div class="detail-item">
+                <label>Markup</label>
+                <div class="val">{{ req['markup_pct'] or 15 }}%</div>
+            </div>
+        </div>
+        {% if status == 'quoted' %}
+        <div class="alert alert-info" style="margin-top:12px">
+            Quote sent via Discord. Reply <strong>Accept</strong> to confirm and we'll assign a builder.
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Delivery info (shown once delivered+) -->
+    {% if status in ['delivered', 'complete'] and req['contract_price_actual'] %}
+    <div style="border-top:1px solid rgba(0,217,255,0.15);padding-top:18px;margin-top:6px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:#446688;letter-spacing:2px;margin-bottom:12px">
+            Delivery
+        </div>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>Contract Price</label>
+                <div class="val isk">{{ '{:,.0f}'.format(req['contract_price_actual']) }} ISK</div>
+            </div>
+            <div class="detail-item">
+                <label>Completed</label>
+                <div class="val green">{{ req['completed_at'][:10] if req['completed_at'] else '—' }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Notes -->
+    {% if req['notes'] %}
+    <div style="border-top:1px solid rgba(0,217,255,0.1);padding-top:16px;margin-top:6px">
+        <label>Your Notes</label>
+        <div style="font-size:15px;color:#aabbcc;margin-top:6px;line-height:1.5">{{ req['notes'] }}</div>
+    </div>
+    {% endif %}
+
+    <!-- CTA -->
+    <div style="margin-top:22px;display:flex;gap:14px;align-items:center">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">New Request</a>
+        {% if status == 'pending' %}
+        <span style="font-size:14px;color:#446688">We'll contact you on Discord once your quote is ready.</span>
+        {% elif status == 'complete' %}
+        <span style="font-size:14px;color:#00ff88">Build complete — thank you for your business!</span>
+        {% endif %}
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
