@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-09 16:58 UTC
+// Generated: 2026-03-09 17:20 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -3347,7 +3347,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 8304.59,
       "partnerSlot": true,
-      "slotOpen": true,
+      "slotOpen": false,
       "suppliedBy": "Cural Azaph",
       "flags": [
         "out_of_stock"
@@ -7876,5 +7876,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-09 16:58 UTC"
+  "generated": "2026-03-09 17:20 UTC"
 };
