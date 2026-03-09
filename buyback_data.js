@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-09 04:07 UTC
+// Generated: 2026-03-09 04:14 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -608,7 +608,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 5000,
       "avgJitaBuy": 19477.0,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16634,
@@ -664,7 +666,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 0,
       "avgJitaBuy": 371.05,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16640,
@@ -856,7 +860,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 6250,
       "avgJitaBuy": 66434.18,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16651,
@@ -870,7 +876,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 6250,
       "avgJitaBuy": 61123.04,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16650,
@@ -884,7 +892,9 @@ const BUYBACK_DATA = {
       "accepted": false,
       "quota": 6250,
       "avgJitaBuy": 53536.46,
-      "flags": []
+      "flags": [
+        "out_of_stock"
+      ]
     },
     {
       "typeId": 16653,
@@ -7863,5 +7873,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-09 04:07 UTC"
+  "generated": "2026-03-09 04:14 UTC"
 };
