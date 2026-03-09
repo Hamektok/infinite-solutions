@@ -1,0 +1,15 @@
+{% extends "bs_base.html" %}
+
+{% block title %}{{ title }} — Infinite Directive Build Service{% endblock %}
+
+{% block content %}
+<div class="section" style="text-align:center;padding:48px">
+    <div style="font-family:'Orbitron',sans-serif;font-size:13px;color:#cc4444;letter-spacing:3px;margin-bottom:14px">
+        {{ title | upper }}
+    </div>
+    <div style="font-size:16px;color:#aabbcc;max-width:480px;margin:0 auto 28px;line-height:1.6">
+        {{ message }}
+    </div>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
+</div>
+{% endblock %}

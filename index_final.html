@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603052025"></script>
+    <script src="buyback_data.js?v=202603091720"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -656,25 +656,38 @@
             text-align: center;
         }
 
-        /* Item flag badges */
+        .supplied-by {
+            font-size: 10px;
+            color: #4a6a7a;
+            font-style: italic;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* Item flag banners */
+        @keyframes flagPulse {
+            0%, 100% { opacity: 1;    box-shadow: 0 2px 10px var(--flag-glow, transparent); }
+            50%       { opacity: 0.82; box-shadow: 0 2px 26px var(--flag-glow, transparent); }
+        }
         .item-flags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 7px;
-            padding-top: 7px;
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            margin: -20px -22px 14px -22px;
+            border-radius: 5px 5px 0 0;
+            overflow: hidden;
         }
         .item-flag {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 11px;
+            display: block;
+            font-family: 'Orbitron', monospace;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.3px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid;
-            padding: 1px 7px;
-            border-radius: 3px;
-            opacity: 0.9;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 8px 14px;
+            color: #ffffff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        .item-flag-urgent {
+            animation: flagPulse 2s ease-in-out infinite;
         }
 
         /* ===== BLUEPRINT TABLE SECTION ===== */
@@ -2291,7 +2304,7 @@
             <!-- MAIN TAB NAVIGATION -->
             <div class="main-tabs">
                 <button class="main-tab active" onclick="showMainTab('market')">Materials & Resources Market</button>
-                <button class="main-tab" onclick="showMainTab('blueprints')">Blueprint Library</button>
+                <button class="main-tab" onclick="window.open('https://1337servers.com/blueprints/','_blank')" title="Created by Aldent Rendrag">Infinite Directive Blueprint Registry ↗</button>
                 <button class="main-tab" onclick="showMainTab('buyback')">Buyback Program</button>
             </div>
 
@@ -2691,14 +2704,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
         // ============================================
         const EMBEDDED_DATA = {
             "inventory": {
-                        "Alloyed Tritanium Bar": 21,
+                        "Alloyed Tritanium Bar": 30,
                         "Arkonor": 0,
                         "Arkonor II-Grade": 0,
                         "Arkonor III-Grade": 0,
                         "Arkonor IV-Grade": 0,
                         "Armor Plates": 3,
-                        "Artificial Neural Network": 1,
-                        "Atmospheric Gases": 120848,
+                        "Artificial Neural Network": 4,
+                        "Atmospheric Gases": 108952,
                         "Bacteria": 0,
                         "Biocells": 0,
                         "Biofuels": 0,
@@ -2720,9 +2733,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Brimful Sylvite": 0,
                         "Brimful Zeolites": 0,
                         "Broadcast Node": 0,
-                        "Broken Drone Transceiver": 62,
-                        "Burned Logic Circuit": 107,
-                        "Cadmium": 8654,
+                        "Broken Drone Transceiver": 69,
+                        "Burned Logic Circuit": 155,
+                        "Cadmium": 38294,
                         "Caesarium Cadmide": 0,
                         "Caesium": 0,
                         "Camera Drones": 0,
@@ -2731,14 +2744,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Carbon Polymers": 0,
                         "Carnotite": 64,
                         "Ceramic Powder": 0,
-                        "Charred Micro Circuit": 52,
+                        "Charred Micro Circuit": 93,
                         "Chiral Structures": 0,
                         "Chromite": 0,
-                        "Chromium": 0,
+                        "Chromium": 4491,
                         "Cinnabar": 0,
                         "Clear Icicle": 0,
                         "Clear Icicle IV-Grade": 0,
-                        "Cobalt": 19838,
+                        "Cobalt": 23306,
                         "Cobaltite": 0,
                         "Coesite": 0,
                         "Compressed Arkonor": 6,
@@ -2913,12 +2926,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Zeolites": 84,
                         "Compressed Zircon": 0,
                         "Condensates": 0,
-                        "Conductive Polymer": 6,
-                        "Conductive Thermoplastic": 0,
+                        "Conductive Polymer": 45,
+                        "Conductive Thermoplastic": 1,
                         "Construction Blocks": 0,
                         "Consumer Electronics": 0,
-                        "Contaminated Lorentz Fluid": 4,
-                        "Contaminated Nanite Compound": 6,
+                        "Contaminated Lorentz Fluid": 14,
+                        "Contaminated Nanite Compound": 13,
                         "Coolant": 0,
                         "Copious Cobaltite": 0,
                         "Copious Euxenite": 0,
@@ -2931,8 +2944,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Cryoprotectant Solution": 0,
                         "Crystalline Carbonide": 0,
                         "Crystallite Alloy": 0,
-                        "Current Pump": 0,
-                        "Damaged Artificial Neural Network": 34,
+                        "Current Pump": 1,
+                        "Damaged Artificial Neural Network": 60,
                         "Dark Glitter": 0,
                         "Dark Ochre": 0,
                         "Dark Ochre II-Grade": 0,
@@ -2947,30 +2960,30 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Drone Graviton Emitter": 0,
                         "Drone Synaptic Relay Wiring": 59,
                         "Drone Tactical Limb": 70,
-                        "Drone Transceiver": 0,
+                        "Drone Transceiver": 6,
                         "Ducinium": 0,
                         "Ducinium II-Grade": 0,
                         "Ducinium III-Grade": 0,
                         "Ducinium IV-Grade": 0,
                         "Dysporite": 0,
-                        "Dysprosium": 5751,
+                        "Dysprosium": 0,
                         "Eifyrium": 0,
                         "Eifyrium II-Grade": 0,
                         "Eifyrium III-Grade": 0,
                         "Eifyrium IV-Grade": 0,
                         "Electrolytes": 0,
                         "Elite Drone AI": 1,
-                        "Enhanced Ward Console": 0,
+                        "Enhanced Ward Console": 2,
                         "Enriched Uranium": 0,
                         "Euxenite": 0,
-                        "Evaporite Deposits": 147153,
+                        "Evaporite Deposits": 139340,
                         "Fermionic Condensates": 0,
                         "Fernite Alloy": 0,
                         "Fernite Carbide": 0,
                         "Ferrofluid": 0,
                         "Ferrogel": 0,
                         "Fluxed Condensates": 0,
-                        "Fried Interface Circuit": 156,
+                        "Fried Interface Circuit": 212,
                         "Fullerides": 0,
                         "Gel-Matrix Biopaste": 0,
                         "Gelidus": 0,
@@ -2997,7 +3010,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Guidance Systems": 0,
                         "Hafnium": 0,
                         "Hazmat Detection Systems": 0,
-                        "Heavy Water": 1360997,
+                        "Heavy Water": 1622330,
                         "Hedbergite": 0,
                         "Hedbergite II-Grade": 0,
                         "Hedbergite III-Grade": 0,
@@ -3015,7 +3028,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Hezorime III-Grade": 0,
                         "Hezorime IV-Grade": 0,
                         "High-Tech Transmitters": 0,
-                        "Hydrocarbons": 0,
+                        "Hydrocarbons": 385209,
                         "Hydrogen Fuel Block": 0,
                         "Hydrogen Isotopes": 0,
                         "Hyperflurite": 0,
@@ -3023,11 +3036,11 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Impetus Console": 0,
                         "Industrial Explosives": 0,
                         "Industrial Fibers": 0,
-                        "Intact Armor Plates": 0,
+                        "Intact Armor Plates": 2,
                         "Intact Shield Emitter": 7,
                         "Integrity Response Drones": 0,
-                        "Interface Circuit": 1,
-                        "Isogen": 962699,
+                        "Interface Circuit": 3,
+                        "Isogen": 2838569,
                         "Jaspet": 0,
                         "Jaspet II-Grade": 0,
                         "Jaspet III-Grade": 0,
@@ -3045,20 +3058,20 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Lavish Otavite": 0,
                         "Lavish Sperrylite": 0,
                         "Lavish Vanadinite": 0,
-                        "Liquid Ozone": 1856856,
+                        "Liquid Ozone": 2300812,
                         "Logic Circuit": 6,
                         "Loparite": 56,
-                        "Lorentz Fluid": 0,
-                        "Malfunctioning Shield Emitter": 11,
+                        "Lorentz Fluid": 9,
+                        "Malfunctioning Shield Emitter": 53,
                         "Mechanical Parts": 0,
-                        "Megacyte": 16484,
+                        "Megacyte": 2384,
                         "Melted Capacitor Console": 5,
                         "Mercoxit": 0,
                         "Mercoxit II-Grade": 0,
                         "Mercoxit III-Grade": 0,
                         "Mercury": 0,
-                        "Mexallon": 3085891,
-                        "Micro Circuit": 0,
+                        "Mexallon": 4023103,
+                        "Micro Circuit": 8,
                         "Microfiber Shielding": 0,
                         "Miniature Electronics": 0,
                         "Monazite": 0,
@@ -3066,21 +3079,21 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Mordunium II-Grade": 0,
                         "Mordunium III-Grade": 0,
                         "Mordunium IV-Grade": 0,
-                        "Morphite": 633,
+                        "Morphite": 0,
                         "Nanite Compound": 0,
                         "Nanites": 0,
                         "Nano-Factory": 0,
                         "Nanotransistors": 0,
                         "Neo Mercurite": 0,
                         "Neocoms": 0,
-                        "Neodymium": 23968,
+                        "Neodymium": 0,
                         "Nitrogen Fuel Block": 0,
-                        "Nitrogen Isotopes": 15102,
+                        "Nitrogen Isotopes": 255605,
                         "Nocxite": 0,
                         "Nocxite II-Grade": 0,
                         "Nocxite III-Grade": 0,
                         "Nocxite IV-Grade": 0,
-                        "Nocxium": 650170,
+                        "Nocxium": 799020,
                         "Nonlinear Metamaterials": 0,
                         "Nuclear Reactors": 0,
                         "Omber": 0,
@@ -3094,7 +3107,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Oxy-Organic Solvents": 0,
                         "Oxygen": 0,
                         "Oxygen Fuel Block": 0,
-                        "Oxygen Isotopes": 295856,
+                        "Oxygen Isotopes": 399352,
                         "Phenolic Composites": 0,
                         "Photonic Metamaterials": 0,
                         "Plagioclase": 0,
@@ -3104,19 +3117,19 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Planetary Vehicles": 0,
                         "Plasmoids": 0,
                         "Plasmonic Metamaterials": 0,
-                        "Platinum": 0,
+                        "Platinum": 5918,
                         "Platinum Technite": 0,
                         "Pollucite": 0,
                         "Polyaramids": 0,
                         "Polytextiles": 0,
-                        "Power Circuit": 0,
+                        "Power Circuit": 3,
                         "Power Conduit": 0,
                         "Precious Metals": 0,
-                        "Promethium": 7948,
+                        "Promethium": 0,
                         "Promethium Mercurite": 0,
                         "Prometium": 0,
                         "Proteins": 0,
-                        "Pyerite": 0,
+                        "Pyerite": 42659396,
                         "Pyroxeres": 0,
                         "Pyroxeres II-Grade": 0,
                         "Pyroxeres III-Grade": 0,
@@ -3130,9 +3143,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Robotics": 0,
                         "Rocket Fuel": 0,
                         "Rolled Tungsten Alloy": 0,
-                        "Scandium": 9148,
+                        "Scandium": 20984,
                         "Scheelite": 0,
-                        "Scorched Telemetry Processor": 83,
+                        "Scorched Telemetry Processor": 142,
                         "Scordite": 0,
                         "Scordite II-Grade": 0,
                         "Scordite III-Grade": 0,
@@ -3147,12 +3160,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Shining Xenotime": 0,
                         "Shining Ytterbite": 0,
                         "Silicate Glass": 0,
-                        "Silicates": 116773,
+                        "Silicates": 0,
                         "Silicon": 0,
                         "Silicon Diborite": 0,
                         "Single-crystal Superalloy I-beam": 0,
                         "Smartfab Units": 0,
-                        "Smashed Trigger Unit": 4,
+                        "Smashed Trigger Unit": 8,
                         "Solerium": 0,
                         "Sperrylite": 0,
                         "Spodumain": 0,
@@ -3160,7 +3173,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Spodumain III-Grade": 0,
                         "Spodumain IV-Grade": 0,
                         "Sterile Conduits": 0,
-                        "Strontium Clathrates": 125194,
+                        "Strontium Clathrates": 188960,
                         "Sulfuric Acid": 0,
                         "Supercomputers": 0,
                         "Superconductors": 0,
@@ -3175,7 +3188,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Terahertz Metamaterials": 0,
                         "Test Cultures": 0,
                         "Thermosetting Polymer": 0,
-                        "Thruster Console": 1,
+                        "Thruster Console": 2,
                         "Thulium": 13717,
                         "Thulium Hafnite": 0,
                         "Titanite": 0,
@@ -3185,10 +3198,10 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Toxic Metals": 0,
                         "Transcranial Microcontrollers": 0,
                         "Transmitter": 0,
-                        "Trigger Unit": 0,
-                        "Tripped Power Circuit": 110,
-                        "Tritanium": 228258910,
-                        "Tungsten": 17156,
+                        "Trigger Unit": 6,
+                        "Tripped Power Circuit": 171,
+                        "Tritanium": 249688876,
+                        "Tungsten": 18094,
                         "Tungsten Carbide": 0,
                         "Twinkling Cobaltite": 0,
                         "Twinkling Euxenite": 0,
@@ -3201,14 +3214,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Ukomi Superconductors": 0,
                         "Vaccines": 0,
                         "Vanadinite": 0,
-                        "Vanadium": 9923,
+                        "Vanadium": 11673,
                         "Vanadium Hafnite": 0,
                         "Veldspar": 0,
                         "Veldspar II-Grade": 0,
                         "Veldspar III-Grade": 0,
                         "Veldspar IV-Grade": 0,
                         "Viral Agent": 0,
-                        "Ward Console": 36,
+                        "Ward Console": 105,
                         "Water": 0,
                         "Wetware Mainframe": 0,
                         "White Glaze": 0,
@@ -3221,10 +3234,10 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Ytterbite": 58,
                         "Zeolites": 0,
                         "Zircon": 62,
-                        "Zydrine": 0
+                        "Zydrine": 112113
             },
-            "blueprintsLastUpdated": "Mar 05, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Mar 05, 2026 20:08 EVE"
+            "blueprintsLastUpdated": "Mar 09, 2026 08:00 EVE",
+            "inventoryLastUpdated": "Mar 09, 2026 16:56 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5202,7 +5215,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             ],
             'P2 - Refined': [
                 'Biocells', 'Construction Blocks', 'Consumer Electronics', 'Coolant',
-                'Data Sheets', 'Enriched Uranium', 'Genetically Enhanced Livestock',
+                'Enriched Uranium', 'Genetically Enhanced Livestock',
                 'Mechanical Parts', 'Microfiber Shielding', 'Miniature Electronics',
                 'Nanites', 'Oxides', 'Polyaramids', 'Polytextiles', 'Rocket Fuel',
                 'Silicate Glass', 'Superconductors', 'Supertensile Plastics',
@@ -5499,13 +5512,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
         const SELL_RATE_LOOKUP = {};
         const PARTNER_SLOT_LOOKUP = {};
         const FLAG_LOOKUP = {};
+        const SUPPLIER_LOOKUP = {};
         const FLAG_DEFS = {
-            'out_of_stock': { label: 'Out of Stock',   color: '#ff3333' },
-            'low_stock':    { label: 'Low Stock',       color: '#ff8844' },
-            'hot_item':     { label: 'Hot Item',        color: '#ff5555' },
-            'new_arrival':  { label: 'New Arrival',     color: '#44aaff' },
-            'limited':      { label: 'Limited Supply',  color: '#cc66ff' },
-            'popular':      { label: 'Popular',         color: '#44cc88' },
+            'out_of_stock': { label: '⊗  Out of Stock',   bg: '#bb0e0e', glow: '#ff3333', urgent: true  },
+            'low_stock':    { label: '⚠  Low Stock',       bg: '#b84a00', glow: '#ff8800', urgent: true  },
+            'hot_item':     { label: '▲  Hot Item',        bg: '#aa1122', glow: '#ff4455', urgent: true  },
+            'new_arrival':  { label: '✦  New Arrival',     bg: '#0d5fa8', glow: '#44aaff', urgent: false },
+            'limited':      { label: '◆  Limited Supply',  bg: '#6b1faa', glow: '#cc66ff', urgent: true  },
+            'popular':      { label: '★  Popular',          bg: '#0e7a44', glow: '#33cc77', urgent: false },
         };
         if (typeof BUYBACK_DATA !== 'undefined' && BUYBACK_DATA.items) {
             BUYBACK_DATA.items.forEach(item => {
@@ -5520,6 +5534,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 }
                 if (item.flags && item.flags.length) {
                     FLAG_LOOKUP[item.name] = item.flags;
+                }
+                if (item.suppliedBy) {
+                    SUPPLIER_LOOKUP[item.name] = item.suppliedBy;
                 }
             });
         }
@@ -5674,6 +5691,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 ? `<div class="partner-slot-badge">&#9733; Partner Slot &mdash; Available</div>`
                 : '';
 
+            // Supplied by (partner program consignor)
+            const supplier = SUPPLIER_LOOKUP[name];
+            const suppliedByHtml = supplier
+                ? `<div class="supplied-by">Supplied by ${supplier}</div>`
+                : '';
+
             let priceRows = '';
             if (rates) {
                 const corpLabel  = `${rates.corp}% JBV`;
@@ -5695,15 +5718,20 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     </div>`;
             }
 
-            // Item flag badges
+            // Item flag banners
             const itemFlags = FLAG_LOOKUP[name] || [];
             const flagsHtml = itemFlags.length
-                ? `<div class="item-flags">${itemFlags.map(f => FLAG_DEFS[f]
-                    ? `<span class="item-flag" style="color:${FLAG_DEFS[f].color};border-color:${FLAG_DEFS[f].color}">${FLAG_DEFS[f].label}</span>`
-                    : '').join('')}</div>`
+                ? `<div class="item-flags">${itemFlags.map(f => {
+                    const def = FLAG_DEFS[f];
+                    if (!def) return '';
+                    const urgentClass = def.urgent ? ' item-flag-urgent' : '';
+                    const glowStyle   = def.urgent ? `;--flag-glow:${def.glow}` : '';
+                    return `<span class="item-flag${urgentClass}" style="background:${def.bg}${glowStyle}">${def.label}</span>`;
+                  }).join('')}</div>`
                 : '';
 
             item.innerHTML = `
+                ${flagsHtml}
                 ${slotBadge}
                 <div class="item-name">${name}</div>
                 <div class="item-details">
@@ -5712,8 +5740,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         <span class="${qtyClass}">${formattedQty} units</span>
                     </div>
                     ${priceRows}
-                    ${flagsHtml}
                 </div>
+                ${suppliedByHtml}
             `;
 
             return item;

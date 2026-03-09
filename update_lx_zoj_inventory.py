@@ -32,6 +32,9 @@ CHARACTER_ID = 2114278577
 # LX-ZOJ Structure ID
 LX_ZOJ_STRUCTURE_ID = 1027625808467
 
+# EVE container type IDs (Secure Containers, GSCs, etc.)
+CONTAINER_TYPE_IDS = {3462, 3463, 3464, 3465, 3466, 11489, 17366, 33003, 33005, 33007, 33009, 33011}
+
 # ============================================
 # FUNCTIONS
 # ============================================
@@ -488,6 +491,101 @@ def _update_container_names_in_db(conn, esi_names):
     print(f"[OK] Updated {len(esi_names)} container name(s) in DB")
 
 
+def update_known_containers(conn, all_assets, esi_names, snapshot_time):
+    """
+    Upsert all container-type items found in the LX-ZOJ hangar into known_containers.
+    Includes empty containers (not just those with items inside).
+    Preserves the 'ignored' flag — never resets it.
+    """
+    all_item_ids = {a['item_id'] for a in all_assets}
+    items_with_children = {
+        a['location_id'] for a in all_assets
+        if a.get('location_id') in all_item_ids
+    }
+
+    hangar_containers = [
+        a for a in all_assets
+        if (a.get('location_id') == LX_ZOJ_STRUCTURE_ID
+            and a.get('location_flag') == 'Hangar'
+            and (a['item_id'] in items_with_children
+                 or a.get('type_id') in CONTAINER_TYPE_IDS))
+    ]
+
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS known_containers (
+            item_id    INTEGER PRIMARY KEY,
+            name       TEXT,
+            ignored    INTEGER NOT NULL DEFAULT 0,
+            last_seen  TEXT
+        )
+    """)
+    for asset in hangar_containers:
+        item_id = asset['item_id']
+        name = esi_names.get(item_id)
+        cursor.execute("""
+            INSERT INTO known_containers (item_id, name, ignored, last_seen)
+            VALUES (?, ?, 0, ?)
+            ON CONFLICT(item_id) DO UPDATE SET
+                name      = COALESCE(excluded.name, known_containers.name),
+                last_seen = excluded.last_seen
+        """, (item_id, name, snapshot_time))
+
+    conn.commit()
+    print(f"[OK] Known containers updated: {len(hangar_containers)} container(s)")
+
+
+def snapshot_test_comp(conn):
+    """Fetch TEST Buyback Google Sheet and store a competitor stock snapshot."""
+    import csv, io as _io
+
+    SHEET_ID = '1UGdb9mQIrdNprFN9_9g4WDYMh-C8fX5CTlhFBCV6bI4'
+    TABS = [
+        ('Minerals, Gas',        '604363953'),
+        ('Moon Goo, Composites', '498403852'),
+        ('Ore, Ice',             '1641474510'),
+        ('PI',                   '684077699'),
+    ]
+
+    snapshot_time = datetime.now(timezone.utc).isoformat()
+    cursor = conn.cursor()
+    rows_inserted = 0
+
+    print('\n>>> Snapshotting TEST Buyback competitor stock...')
+    for tab_label, gid in TABS:
+        url = (f'https://docs.google.com/spreadsheets/d/'
+               f'{SHEET_ID}/export?format=csv&gid={gid}')
+        try:
+            resp = requests.get(url, timeout=20, allow_redirects=True)
+            resp.raise_for_status()
+            reader = csv.DictReader(_io.StringIO(resp.text))
+            tab_count = 0
+            for row in reader:
+                name = row.get('Type', '').strip()
+                qty_str = row.get('Quantity', '0').strip().replace(',', '')
+                try:
+                    qty = int(float(qty_str))
+                except ValueError:
+                    qty = 0
+                if not name:
+                    continue
+                cursor.execute(
+                    'INSERT INTO test_comp_snapshots '
+                    '(snapshot_timestamp, tab_label, item_name, quantity) '
+                    'VALUES (?, ?, ?, ?)',
+                    (snapshot_time, tab_label, name, qty)
+                )
+                tab_count += 1
+                rows_inserted += 1
+            print(f'  {tab_label}: {tab_count} items')
+        except Exception as e:
+            print(f'  [WARN] Could not fetch tab "{tab_label}": {e}')
+
+    conn.commit()
+    print(f'[OK] Competitor snapshot stored: {rows_inserted} items at {snapshot_time}')
+    return snapshot_time
+
+
 def main():
     """
     Update LX-ZOJ inventory from ESI.
@@ -529,18 +627,30 @@ def main():
         # Filter to LX-ZOJ hangar only (now annotates _container_item_id on each item)
         lx_zoj_items = filter_lx_zoj_items(all_assets)
 
-        # Collect all top-level container item_ids present in this snapshot
+        # Collect ALL container item_ids in the hangar (including empty ones)
+        all_item_ids_set = {a['item_id'] for a in all_assets}
+        items_with_children_set = {
+            a['location_id'] for a in all_assets
+            if a.get('location_id') in all_item_ids_set
+        }
         container_ids = {
-            a['_container_item_id'] for a in lx_zoj_items
-            if a.get('_container_item_id') is not None
+            a['item_id'] for a in all_assets
+            if (a.get('location_id') == LX_ZOJ_STRUCTURE_ID
+                and a.get('location_flag') == 'Hangar'
+                and (a['item_id'] in items_with_children_set
+                     or a.get('type_id') in CONTAINER_TYPE_IDS))
         }
 
-        # Fetch custom ESI names for those containers
+        # Fetch custom ESI names for all hangar containers
         esi_names = fetch_container_names_from_esi(headers, container_ids)
 
         # Update container names stored in the DB (if we have any assignments)
         if container_ids:
             _update_container_names_in_db(conn, esi_names)
+
+        # Update known_containers table with all discovered hangar containers
+        update_known_containers(conn, all_assets, esi_names,
+                                datetime.now(timezone.utc).isoformat())
 
         # Match against tracked items (aggregate by type_id for the site display)
         inventory = match_tracked_inventory(lx_zoj_items, tracked_items)
@@ -553,6 +663,9 @@ def main():
 
         # Update each consignor's current_qty from their assigned container
         sync_consignor_quantities(conn)
+
+        # Snapshot TEST Buyback competitor stock (no auth needed — public sheet)
+        snapshot_test_comp(conn)
 
         # Update HTML file (regenerates from database, so we don't need to pass inventory)
         html_success = update_html_inventory(None)

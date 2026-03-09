@@ -1,0 +1,233 @@
+{% extends "bs_base.html" %}
+{% set active_tab = "request" %}
+
+{% block title %}New Build Request — Infinite Directive{% endblock %}
+
+{% block content %}
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('submit_request') }}" id="buildForm">
+
+    <!-- ── Request Type ──────────────────────────────── -->
+    <div class="section">
+        <div class="section-title">Request Type</div>
+        <div class="section-sub">Order a single item or a complete doctrine fit</div>
+
+        <div class="toggle-row">
+            <button type="button" class="toggle-btn active" id="btnSingle" onclick="setMode('single')">
+                Single Item
+            </button>
+            <button type="button" class="toggle-btn" id="btnFit" onclick="setMode('fit')">
+                Doctrine Fit
+            </button>
+        </div>
+        <input type="hidden" name="is_doctrine_fit" id="isDoctrineFit" value="0">
+        <input type="hidden" name="doctrine_fit_id" id="doctrineFitId" value="">
+
+        <!-- Single item search -->
+        <div id="singlePanel">
+            <div class="form-grid">
+                <div class="field">
+                    <label>Item to Build</label>
+                    <div class="item-search-wrap">
+                        <input type="text" id="itemSearch" placeholder="Search ships, modules…"
+                               autocomplete="off" oninput="searchItems(this.value)">
+                        <div class="item-dropdown" id="itemDropdown" style="display:none"></div>
+                    </div>
+                    <input type="hidden" name="item_name"    id="itemName">
+                    <input type="hidden" name="item_type_id" id="itemTypeId">
+                </div>
+                <div class="field">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" id="qty" value="1" min="1" max="999">
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctrine fit selector -->
+        <div id="fitPanel" style="display:none">
+            <div class="fit-grid" id="fitGrid">
+                <div style="color:#446688;font-size:14px">Loading doctrine fits…</div>
+            </div>
+            <div class="form-grid" style="margin-top:12px">
+                <div class="field">
+                    <label>Number of Fits</label>
+                    <input type="number" name="quantity" id="fitQty" value="1" min="1" max="50">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Delivery & Timing ─────────────────────────── -->
+    <div class="section">
+        <div class="section-title">Delivery Details</div>
+        <div class="section-sub">Where and when you need it</div>
+
+        <div class="form-grid-3">
+            <div class="field">
+                <label>Delivery Location</label>
+                <select name="delivery_location">
+                    <option value="LX-ZOJ Sotiyo">LX-ZOJ Sotiyo (default)</option>
+                    <option value="Jita 4-4">Jita 4-4 (hauling surcharge)</option>
+                    <option value="Other">Other — specify in notes</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Deadline (optional)</label>
+                <input type="date" name="deadline" min="{{ today }}">
+            </div>
+            <div class="field">
+                <!-- spacer -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Customer Info ─────────────────────────────── -->
+    <div class="section">
+        <div class="section-title">Your Details</div>
+        <div class="section-sub">
+            {% if character_name %}
+                Logged in as <span style="color:#00ff88">{{ character_name }}</span> — character name auto-filled.
+            {% else %}
+                <a href="{{ url_for('auth_login', next='/') }}" style="color:#00d9ff">Login with EVE Online</a>
+                to auto-fill, or enter your character name manually.
+            {% endif %}
+        </div>
+
+        <div class="form-grid">
+            <div class="field">
+                <label>Character Name</label>
+                <input type="text" name="customer_name"
+                       value="{{ character_name or '' }}"
+                       {% if character_name %}readonly style="opacity:0.7"{% endif %}
+                       placeholder="Your in-game character name" required>
+            </div>
+            <div class="field">
+                <!-- spacer -->
+            </div>
+            <div class="field full">
+                <label>Notes / Special Instructions</label>
+                <textarea name="notes" placeholder="Preferred fittings, specific BPC ME%, urgency, anything else…"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Submit ────────────────────────────────────── -->
+    <div style="display:flex;gap:16px;align-items:center">
+        <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+            Submit Request
+        </button>
+        <span style="font-size:14px;color:#446688">
+            Hamektok will review and send you a quote within 24h via Discord.
+        </span>
+    </div>
+
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const TODAY = new Date().toISOString().split('T')[0];
+    document.querySelector('input[type="date"]').min = TODAY;
+
+    // ── Mode toggle ─────────────────────────────────────────────────
+    function setMode(mode) {
+        const isFit = mode === 'fit';
+        document.getElementById('singlePanel').style.display = isFit ? 'none' : 'block';
+        document.getElementById('fitPanel').style.display   = isFit ? 'block' : 'none';
+        document.getElementById('isDoctrineFit').value = isFit ? '1' : '0';
+        document.getElementById('btnSingle').classList.toggle('active', !isFit);
+        document.getElementById('btnFit').classList.toggle('active', isFit);
+        if (isFit) loadFits();
+        checkReady();
+    }
+
+    // ── Item search ─────────────────────────────────────────────────
+    let searchTimer = null;
+    function searchItems(q) {
+        clearTimeout(searchTimer);
+        if (q.length < 2) {
+            document.getElementById('itemDropdown').style.display = 'none';
+            return;
+        }
+        searchTimer = setTimeout(() => {
+            fetch(`/api/items?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(items => renderDropdown(items));
+        }, 200);
+    }
+
+    function renderDropdown(items) {
+        const dd = document.getElementById('itemDropdown');
+        if (!items.length) { dd.style.display = 'none'; return; }
+        dd.innerHTML = items.map(it =>
+            `<div onclick="selectItem(${it.id}, '${it.name.replace(/'/g,"\\'")}')">
+                ${it.name}<span class="item-group">${it.group}</span>
+            </div>`
+        ).join('');
+        dd.style.display = 'block';
+    }
+
+    function selectItem(id, name) {
+        document.getElementById('itemSearch').value  = name;
+        document.getElementById('itemName').value    = name;
+        document.getElementById('itemTypeId').value  = id;
+        document.getElementById('itemDropdown').style.display = 'none';
+        checkReady();
+    }
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.item-search-wrap'))
+            document.getElementById('itemDropdown').style.display = 'none';
+    });
+
+    // ── Doctrine fits ───────────────────────────────────────────────
+    let fitsLoaded = false;
+    function loadFits() {
+        if (fitsLoaded) return;
+        fetch('/api/doctrine-fits')
+            .then(r => r.json())
+            .then(fits => {
+                fitsLoaded = true;
+                const grid = document.getElementById('fitGrid');
+                if (!fits.length) {
+                    grid.innerHTML = '<div style="color:#446688">No doctrine fits on file.</div>';
+                    return;
+                }
+                grid.innerHTML = fits.map(f =>
+                    `<div class="fit-card" id="fit-${f.id}"
+                          onclick="selectFit(${f.id}, '${f.fit_name.replace(/'/g,"\\'")}')">
+                        <div>
+                            <div class="fit-name">${f.fit_name}</div>
+                            <div class="fit-class">${f.ship_class || ''}</div>
+                        </div>
+                        <div class="fit-count">${f.ship_name}</div>
+                    </div>`
+                ).join('');
+            });
+    }
+
+    function selectFit(id, name) {
+        document.querySelectorAll('.fit-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById(`fit-${id}`).classList.add('selected');
+        document.getElementById('doctrineFitId').value = id;
+        document.getElementById('itemName').value = name;
+        checkReady();
+    }
+
+    // ── Submit gate ─────────────────────────────────────────────────
+    function checkReady() {
+        const isFit = document.getElementById('isDoctrineFit').value === '1';
+        const hasItem = isFit
+            ? !!document.getElementById('doctrineFitId').value
+            : !!document.getElementById('itemName').value;
+        document.getElementById('submitBtn').disabled = !hasItem;
+    }
+
+    document.getElementById('itemSearch').addEventListener('input', checkReady);
+</script>
+{% endblock %}

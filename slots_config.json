@@ -5,7 +5,7 @@
     "name": "Biocells",
     "status": "open",
     "lessee": null,
-    "price": "6,844,053"
+    "price": "0"
   },
   {
     "type_id": 2345,
@@ -13,7 +13,7 @@
     "name": "Camera Drones",
     "status": "open",
     "lessee": null,
-    "price": "1,543,904"
+    "price": "0"
   },
   {
     "type_id": 2348,
@@ -21,7 +21,7 @@
     "name": "Gel-Matrix Biopaste",
     "status": "open",
     "lessee": null,
-    "price": "27,610,684"
+    "price": "0"
   },
   {
     "type_id": 2349,
@@ -29,7 +29,7 @@
     "name": "Supercomputers",
     "status": "open",
     "lessee": null,
-    "price": "2,728,118"
+    "price": "0"
   },
   {
     "type_id": 2351,
@@ -37,7 +37,7 @@
     "name": "Smartfab Units",
     "status": "open",
     "lessee": null,
-    "price": "1,566,015"
+    "price": "0"
   },
   {
     "type_id": 2352,
@@ -45,7 +45,7 @@
     "name": "Nuclear Reactors",
     "status": "open",
     "lessee": null,
-    "price": "2,567,608"
+    "price": "0"
   },
   {
     "type_id": 2354,
@@ -53,7 +53,7 @@
     "name": "Neocoms",
     "status": "open",
     "lessee": null,
-    "price": "1,633,874"
+    "price": "0"
   },
   {
     "type_id": 2360,
@@ -61,7 +61,7 @@
     "name": "Industrial Explosives",
     "status": "open",
     "lessee": null,
-    "price": "1,937,292"
+    "price": "0"
   },
   {
     "type_id": 2361,
@@ -69,7 +69,7 @@
     "name": "Hermetic Membranes",
     "status": "open",
     "lessee": null,
-    "price": "4,321,886"
+    "price": "0"
   },
   {
     "type_id": 2367,
@@ -77,7 +77,7 @@
     "name": "Cryoprotectant Solution",
     "status": "open",
     "lessee": null,
-    "price": "26,727,415"
+    "price": "0"
   },
   {
     "type_id": 2401,
@@ -85,15 +85,15 @@
     "name": "Chiral Structures",
     "status": "open",
     "lessee": null,
-    "price": "5,618,790"
+    "price": "0"
   },
   {
     "type_id": 2463,
     "category": "pi_materials",
     "name": "Nanites",
-    "status": "open",
-    "lessee": null,
-    "price": "9,406,457"
+    "status": "closed",
+    "lessee": "Cural Azaph",
+    "price": "0"
   },
   {
     "type_id": 2867,
@@ -101,7 +101,7 @@
     "name": "Broadcast Node",
     "status": "open",
     "lessee": null,
-    "price": "30,050,541"
+    "price": "0"
   },
   {
     "type_id": 2868,
@@ -109,7 +109,7 @@
     "name": "Integrity Response Drones",
     "status": "open",
     "lessee": null,
-    "price": "32,100,955"
+    "price": "0"
   },
   {
     "type_id": 2869,
@@ -117,7 +117,7 @@
     "name": "Nano-Factory",
     "status": "open",
     "lessee": null,
-    "price": "13,470,613"
+    "price": "0"
   },
   {
     "type_id": 2870,
@@ -125,7 +125,7 @@
     "name": "Organic Mortar Applicators",
     "status": "open",
     "lessee": null,
-    "price": "16,014,362"
+    "price": "0"
   },
   {
     "type_id": 2871,
@@ -133,7 +133,7 @@
     "name": "Recursive Computing Module",
     "status": "open",
     "lessee": null,
-    "price": "9,362,556"
+    "price": "0"
   },
   {
     "type_id": 2872,
@@ -141,7 +141,7 @@
     "name": "Self-Harmonizing Power Core",
     "status": "open",
     "lessee": null,
-    "price": "33,828,316"
+    "price": "0"
   },
   {
     "type_id": 2875,
@@ -149,15 +149,15 @@
     "name": "Sterile Conduits",
     "status": "open",
     "lessee": null,
-    "price": "12,086,921"
+    "price": "0"
   },
   {
     "type_id": 2876,
     "category": "pi_materials",
     "name": "Wetware Mainframe",
-    "status": "open",
-    "lessee": null,
-    "price": "35,225,239"
+    "status": "closed",
+    "lessee": "Rax Hakaari",
+    "price": "0"
   },
   {
     "type_id": 3645,
@@ -165,7 +165,7 @@
     "name": "Water",
     "status": "open",
     "lessee": null,
-    "price": "7,355,851"
+    "price": "0"
   },
   {
     "type_id": 3775,
@@ -173,7 +173,7 @@
     "name": "Viral Agent",
     "status": "open",
     "lessee": null,
-    "price": "8,510,103"
+    "price": "0"
   },
   {
     "type_id": 3779,
@@ -181,7 +181,7 @@
     "name": "Biomass",
     "status": "open",
     "lessee": null,
-    "price": "6,697,452"
+    "price": "0"
   },
   {
     "type_id": 3828,
@@ -189,7 +189,7 @@
     "name": "Construction Blocks",
     "status": "open",
     "lessee": null,
-    "price": "7,691,920"
+    "price": "0"
   },
   {
     "type_id": 9838,
@@ -197,7 +197,7 @@
     "name": "Superconductors",
     "status": "open",
     "lessee": null,
-    "price": "8,898,761"
+    "price": "0"
   },
   {
     "type_id": 9842,
@@ -205,7 +205,7 @@
     "name": "Miniature Electronics",
     "status": "open",
     "lessee": null,
-    "price": "8,151,794"
+    "price": "0"
   },
   {
     "type_id": 9846,
@@ -213,7 +213,7 @@
     "name": "Planetary Vehicles",
     "status": "open",
     "lessee": null,
-    "price": "1,974,241"
+    "price": "0"
   },
   {
     "type_id": 2358,
@@ -221,7 +221,7 @@
     "name": "Biotech Research Reports",
     "status": "open",
     "lessee": null,
-    "price": "1,571,490"
+    "price": "0"
   },
   {
     "type_id": 2344,
@@ -229,7 +229,7 @@
     "name": "Condensates",
     "status": "open",
     "lessee": null,
-    "price": "1,141,490"
+    "price": "0"
   },
   {
     "type_id": 17392,
@@ -237,7 +237,7 @@
     "name": "Data Chips",
     "status": "open",
     "lessee": null,
-    "price": "3,676,225"
+    "price": "0"
   },
   {
     "type_id": 2366,
@@ -245,7 +245,7 @@
     "name": "Hazmat Detection Systems",
     "status": "open",
     "lessee": null,
-    "price": "1,342,075"
+    "price": "0"
   },
   {
     "type_id": 17898,
@@ -253,7 +253,7 @@
     "name": "High-Tech Transmitters",
     "status": "open",
     "lessee": null,
-    "price": "3,259,918"
+    "price": "0"
   },
   {
     "type_id": 2346,
@@ -261,7 +261,7 @@
     "name": "Synthetic Synapses",
     "status": "open",
     "lessee": null,
-    "price": "22,291,885"
+    "price": "0"
   },
   {
     "type_id": 12836,
@@ -269,7 +269,7 @@
     "name": "Transcranial Microcontrollers",
     "status": "open",
     "lessee": null,
-    "price": "19,495,213"
+    "price": "0"
   },
   {
     "type_id": 17136,
@@ -277,7 +277,7 @@
     "name": "Ukomi Superconductors",
     "status": "open",
     "lessee": null,
-    "price": "11,994,876"
+    "price": "0"
   },
   {
     "type_id": 28974,
@@ -285,7 +285,7 @@
     "name": "Vaccines",
     "status": "open",
     "lessee": null,
-    "price": "1,024,571"
+    "price": "0"
   },
   {
     "type_id": 15317,
@@ -293,7 +293,7 @@
     "name": "Genetically Enhanced Livestock",
     "status": "open",
     "lessee": null,
-    "price": "2,395,241"
+    "price": "0"
   },
   {
     "type_id": 2327,
@@ -301,7 +301,7 @@
     "name": "Microfiber Shielding",
     "status": "open",
     "lessee": null,
-    "price": "4,068,334"
+    "price": "0"
   },
   {
     "type_id": 2321,
@@ -309,7 +309,7 @@
     "name": "Polyaramids",
     "status": "open",
     "lessee": null,
-    "price": "4,268,201"
+    "price": "0"
   },
   {
     "type_id": 3695,
@@ -317,7 +317,7 @@
     "name": "Polytextiles",
     "status": "open",
     "lessee": null,
-    "price": "1,461,839"
+    "price": "0"
   },
   {
     "type_id": 3697,
@@ -325,7 +325,7 @@
     "name": "Silicate Glass",
     "status": "open",
     "lessee": null,
-    "price": "3,630,339"
+    "price": "0"
   },
   {
     "type_id": 3691,
@@ -333,7 +333,7 @@
     "name": "Synthetic Oil",
     "status": "open",
     "lessee": null,
-    "price": "7,257,890"
+    "price": "0"
   },
   {
     "type_id": 2319,
@@ -341,7 +341,7 @@
     "name": "Test Cultures",
     "status": "open",
     "lessee": null,
-    "price": "10,814,131"
+    "price": "0"
   },
   {
     "type_id": 2393,
@@ -349,7 +349,7 @@
     "name": "Bacteria",
     "status": "open",
     "lessee": null,
-    "price": "5,018,322"
+    "price": "0"
   },
   {
     "type_id": 2396,
@@ -357,7 +357,7 @@
     "name": "Biofuels",
     "status": "open",
     "lessee": null,
-    "price": "2,318,490"
+    "price": "0"
   },
   {
     "type_id": 2390,
@@ -365,7 +365,7 @@
     "name": "Electrolytes",
     "status": "open",
     "lessee": null,
-    "price": "4,656,977"
+    "price": "0"
   },
   {
     "type_id": 2397,
@@ -373,7 +373,7 @@
     "name": "Industrial Fibers",
     "status": "open",
     "lessee": null,
-    "price": "4,929,669"
+    "price": "0"
   },
   {
     "type_id": 2392,
@@ -381,7 +381,7 @@
     "name": "Oxidizing Compound",
     "status": "open",
     "lessee": null,
-    "price": "5,966,882"
+    "price": "0"
   },
   {
     "type_id": 2389,
@@ -389,7 +389,7 @@
     "name": "Plasmoids",
     "status": "open",
     "lessee": null,
-    "price": "4,042,209"
+    "price": "0"
   },
   {
     "type_id": 2399,
@@ -397,15 +397,15 @@
     "name": "Precious Metals",
     "status": "open",
     "lessee": null,
-    "price": "7,155,830"
+    "price": "0"
   },
   {
     "type_id": 2395,
     "category": "pi_materials",
     "name": "Proteins",
-    "status": "open",
-    "lessee": null,
-    "price": "3,857,786"
+    "status": "closed",
+    "lessee": "Terra Rendrag",
+    "price": "0"
   },
   {
     "type_id": 2398,
@@ -413,7 +413,7 @@
     "name": "Reactive Metals",
     "status": "open",
     "lessee": null,
-    "price": "5,307,523"
+    "price": "0"
   },
   {
     "type_id": 9828,
@@ -421,7 +421,7 @@
     "name": "Silicon",
     "status": "open",
     "lessee": null,
-    "price": "4,410,656"
+    "price": "0"
   },
   {
     "type_id": 2400,
@@ -429,7 +429,7 @@
     "name": "Toxic Metals",
     "status": "open",
     "lessee": null,
-    "price": "2,844,541"
+    "price": "0"
   },
   {
     "type_id": 44,
@@ -437,7 +437,7 @@
     "name": "Enriched Uranium",
     "status": "open",
     "lessee": null,
-    "price": "10,750,285"
+    "price": "0"
   },
   {
     "type_id": 3683,
@@ -445,7 +445,7 @@
     "name": "Oxygen",
     "status": "open",
     "lessee": null,
-    "price": "6,334,609"
+    "price": "0"
   },
   {
     "type_id": 3689,
@@ -453,7 +453,7 @@
     "name": "Mechanical Parts",
     "status": "open",
     "lessee": null,
-    "price": "18,207,041"
+    "price": "0"
   },
   {
     "type_id": 9832,
@@ -461,7 +461,7 @@
     "name": "Coolant",
     "status": "open",
     "lessee": null,
-    "price": "20,260,205"
+    "price": "0"
   },
   {
     "type_id": 9848,
@@ -469,7 +469,7 @@
     "name": "Robotics",
     "status": "open",
     "lessee": null,
-    "price": "55,729,023"
+    "price": "0"
   },
   {
     "type_id": 9830,
@@ -477,7 +477,7 @@
     "name": "Rocket Fuel",
     "status": "open",
     "lessee": null,
-    "price": "10,435,360"
+    "price": "0"
   },
   {
     "type_id": 9834,
@@ -485,7 +485,7 @@
     "name": "Guidance Systems",
     "status": "open",
     "lessee": null,
-    "price": "13,919,366"
+    "price": "0"
   },
   {
     "type_id": 9836,
@@ -493,7 +493,7 @@
     "name": "Consumer Electronics",
     "status": "open",
     "lessee": null,
-    "price": "7,703,867"
+    "price": "0"
   },
   {
     "type_id": 9840,
@@ -501,7 +501,7 @@
     "name": "Transmitter",
     "status": "open",
     "lessee": null,
-    "price": "8,748,997"
+    "price": "0"
   },
   {
     "type_id": 2312,
@@ -509,7 +509,7 @@
     "name": "Supertensile Plastics",
     "status": "open",
     "lessee": null,
-    "price": "11,326,125"
+    "price": "0"
   },
   {
     "type_id": 2317,
@@ -517,6 +517,6 @@
     "name": "Oxides",
     "status": "open",
     "lessee": null,
-    "price": "4,262,984"
+    "price": "0"
   }
 ]
