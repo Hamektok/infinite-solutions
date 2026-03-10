@@ -83,15 +83,18 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     n_stock = len(items_stock)
     n_all   = len(items_all)
 
-    # Pre-measure columns
-    _d_tmp     = ImageDraw.Draw(Image.new('RGB', (1, 1)))
-    pct_max_w  = tw(_d_tmp, '100%', f_price)
-    GAP        = 10
-    QTY_GAP    = 10
-    RIGHT_W    = pct_max_w + GAP + pct_max_w + 4
-    COL_W      = IMG_W - PAD * 2
-    # Name column sized to actual longest name in this category, not worst-case
-    NAME_W     = max((tw(_d_tmp, name, f_item) for name, *_ in items_stock), default=80) + 4
+    # Pre-measure fixed column widths for right-side block
+    _d_tmp    = ImageDraw.Draw(Image.new('RGB', (1, 1)))
+    pct_col_w = tw(_d_tmp, '100%',   f_price)   # width of widest % value
+    qty_col_w = tw(_d_tmp, '999.9M', f_price)   # width of widest qty value
+    GAP       = 14                               # gap between every column
+    RIGHT_EDGE = IMG_W - PAD - 4
+    # Right-to-left column anchors (right edge of each column)
+    corp_right = RIGHT_EDGE
+    ally_right = corp_right - pct_col_w - GAP
+    qty_right  = ally_right - pct_col_w - GAP
+    # Name takes all remaining space to the left of qty column
+    NAME_W     = qty_right - qty_col_w - GAP - (PAD + 12)
 
     total_h = BANNER_H + ROW_H + n_stock * ROW_H + ROW_H + FOOTER_H
 
@@ -128,13 +131,10 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     # ── Column headers ────────────────────────────────────────────────────────
     y = BANNER_H
     d.rectangle([0, y, IMG_W, y + ROW_H], fill=BG2)
-    d.text((PAD + 12, y + 4), 'Item', font=f_small, fill=DIM)
-    right = IMG_W - PAD - 4
-    d.text((right, y + 4), 'Corp', font=f_small, fill=DIM, anchor='ra')
-    corp_hdr_w = tw(d, 'Corp', f_small)
-    ally_x = right - corp_hdr_w - GAP
-    d.text((ally_x, y + 4), 'Alliance', font=f_small, fill=DIM, anchor='ra')
-    d.text((PAD + 12 + NAME_W + QTY_GAP, y + 4), 'Qty', font=f_small, fill=DIM)
+    d.text((PAD + 12,  y + 4), 'Item',     font=f_small, fill=DIM)
+    d.text((qty_right, y + 4), 'Qty',      font=f_small, fill=DIM, anchor='ra')
+    d.text((ally_right,y + 4), 'Alliance', font=f_small, fill=DIM, anchor='ra')
+    d.text((corp_right,y + 4), 'Corp',     font=f_small, fill=DIM, anchor='ra')
     y += ROW_H
 
     # ── Item rows ─────────────────────────────────────────────────────────────
@@ -142,29 +142,22 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
         row_bg = BG if i % 2 == 0 else BG2
         d.rectangle([0, y, IMG_W, y + ROW_H], fill=row_bg)
 
-        cx    = PAD
-        right = IMG_W - PAD - 4
-
         # Dot
-        d.ellipse([cx, y + 6, cx + 8, y + 14], fill=GREEN)
+        d.ellipse([PAD, y + 6, PAD + 8, y + 14], fill=GREEN)
 
-        # Name
+        # Name — truncated to fit its column
         disp = truncate(d, name, f_item, NAME_W)
-        d.text((cx + 12, y + 3), disp, font=f_item, fill=WHITE)
+        d.text((PAD + 12, y + 3), disp, font=f_item, fill=WHITE)
 
-        # Qty — left-anchored just after the name column
-        qty_str = fmt_qty(qty)
-        qty_x   = PAD + 12 + NAME_W + QTY_GAP
-        d.text((qty_x, y + 4), qty_str, font=f_price, fill=GREEN)
+        # Qty — right-aligned at qty column anchor
+        d.text((qty_right, y + 4), fmt_qty(qty), font=f_price, fill=GREEN, anchor='ra')
 
-        # Prices
+        # Prices — right-aligned at their column anchors
         if price_pct is not None:
-            corp_str = f'{price_pct - alliance_disc:.0f}%'
-            ally_str = f'{price_pct:.0f}%'
-            d.text((right, y + 4), corp_str, font=f_price, fill=GOLD,  anchor='ra')
-            corp_w = tw(d, corp_str, f_price)
-            d.text((right - corp_w - GAP, y + 4), ally_str,
+            d.text((ally_right, y + 4), f'{price_pct:.0f}%',
                    font=f_price, fill=ACCENT, anchor='ra')
+            d.text((corp_right, y + 4), f'{price_pct - alliance_disc:.0f}%',
+                   font=f_price, fill=GOLD,   anchor='ra')
 
         y += ROW_H
 
