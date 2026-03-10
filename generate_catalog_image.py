@@ -32,6 +32,12 @@ GREEN   = ( 50, 210, 120)
 ACCENT  = (  0, 175, 255)
 GOLD    = (255, 200,  50)
 
+# Flag badge colours
+FLAG_WTB_BG   = ( 60,  35,   0)   # dark amber bg for WTB badge
+FLAG_WTB_FG   = (255, 160,  40)   # bright amber text
+FLAG_QUOTA_BG = (  0,  22,  50)   # dark blue bg for quota badge
+FLAG_QUOTA_FG = ( 80, 170, 255)   # light blue text
+
 CAT_COLOURS = {
     'minerals':      (  0, 175, 255),
     'ice_products':  ( 40, 200, 200),
@@ -73,6 +79,14 @@ def fmt_qty(n):
     if n >= 1_000_000:     return f'{n/1_000_000:.1f}M'
     if n >= 1_000:         return f'{n/1_000:.1f}K'
     return f'{n:,}'
+
+
+def _draw_flag(d, x, y, text, fg, bg, font):
+    """Draw a small flat badge at (x, y+4) inside a 20-px row. Returns badge right-edge x."""
+    fw = tw(d, text, font) + 6
+    d.rectangle([x, y + 4, x + fw, y + 15], fill=bg)
+    d.text((x + 3, y + 5), text, font=font, fill=fg)
+    return x + fw + 3   # next badge x (with 3-px gap)
 
 
 def make_category_image(cat, items_stock, items_all, ts_str, fonts):
@@ -138,16 +152,31 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     y += ROW_H
 
     # ── Item rows ─────────────────────────────────────────────────────────────
-    for i, (name, qty, price_pct, alliance_disc) in enumerate(items_stock):
+    for i, (name, qty, price_pct, alliance_disc, buyback, quota) in enumerate(items_stock):
         row_bg = BG if i % 2 == 0 else BG2
         d.rectangle([0, y, IMG_W, y + ROW_H], fill=row_bg)
 
         # Dot
         d.ellipse([PAD, y + 6, PAD + 8, y + 14], fill=GREEN)
 
-        # Name — truncated to fit its column
-        disp = truncate(d, name, f_item, NAME_W)
+        # Measure flag badge widths so the name can be truncated correctly
+        flag_w = 0
+        if buyback:
+            flag_w += tw(d, 'WTB', f_small) + 6 + 3
+        if quota > 0:
+            flag_w += tw(d, fmt_qty(quota), f_small) + 6 + 3
+
+        # Name — truncated to leave room for flags
+        name_avail = NAME_W - flag_w
+        disp = truncate(d, name, f_item, name_avail)
         d.text((PAD + 12, y + 3), disp, font=f_item, fill=WHITE)
+
+        # Flags — drawn immediately after the (possibly truncated) name
+        fx = PAD + 12 + tw(d, disp, f_item) + 5
+        if buyback:
+            fx = _draw_flag(d, fx, y, 'WTB', FLAG_WTB_FG, FLAG_WTB_BG, f_small)
+        if quota > 0:
+            fx = _draw_flag(d, fx, y, fmt_qty(quota), FLAG_QUOTA_FG, FLAG_QUOTA_BG, f_small)
 
         # Qty — right-aligned at qty column anchor
         d.text((qty_right, y + 4), fmt_qty(qty), font=f_price, fill=GREEN, anchor='ra')
@@ -212,7 +241,9 @@ def main():
         SELECT t.category, t.type_name, t.display_order,
                COALESCE(MAX(i.quantity), 0) AS qty,
                t.price_percentage,
-               COALESCE(t.alliance_discount, 0) AS alliance_discount
+               COALESCE(t.alliance_discount, 0) AS alliance_discount,
+               COALESCE(t.buyback_accepted, 0) AS buyback_accepted,
+               COALESCE(t.buyback_quota,    0) AS buyback_quota
         FROM tracked_market_items t
         LEFT JOIN lx_zoj_inventory i
                ON i.type_id = t.type_id
@@ -236,14 +267,14 @@ def main():
     cat_all   = defaultdict(list)
     cat_stock = defaultdict(list)
 
-    for cat, name, disp_ord, qty, price_pct, alliance_disc in rows:
+    for cat, name, disp_ord, qty, price_pct, alliance_disc, buyback, quota in rows:
         if cat not in SHOW_CATS or not cat_visible.get(cat, True):
             continue
         if cat == 'ice_products'   and not ice_sub_visible(disp_ord):
             continue
         if cat == 'moon_materials' and not moon_sub_visible(disp_ord):
             continue
-        entry = (name, qty, price_pct, alliance_disc)
+        entry = (name, qty, price_pct, alliance_disc, buyback, quota)
         cat_all[cat].append(entry)
         if qty > 0:
             cat_stock[cat].append(entry)
