@@ -68,6 +68,12 @@ def truncate(draw, text, font, max_px):
         text = text[:-1]
     return text + '…'
 
+def fmt_qty(n):
+    if n >= 1_000_000_000: return f'{n/1_000_000_000:.1f}B'
+    if n >= 1_000_000:     return f'{n/1_000_000:.1f}M'
+    if n >= 1_000:         return f'{n/1_000:.1f}K'
+    return f'{n:,}'
+
 
 def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     f_banner, f_sub, f_head, f_item, f_small, f_price = fonts
@@ -77,13 +83,15 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     n_stock = len(items_stock)
     n_all   = len(items_all)
 
-    # Pre-measure right block: two % values + gap
+    # Pre-measure columns
     _d_tmp     = ImageDraw.Draw(Image.new('RGB', (1, 1)))
     pct_max_w  = tw(_d_tmp, '100%', f_price)
+    qty_max_w  = tw(_d_tmp, '999.9M', f_price)
     GAP        = 10
+    QTY_GAP    = 8
     RIGHT_W    = pct_max_w + GAP + pct_max_w + 4
     COL_W      = IMG_W - PAD * 2
-    NAME_W     = COL_W - 12 - RIGHT_W - 4   # 12 = dot clearance
+    NAME_W     = COL_W - 12 - QTY_GAP - qty_max_w - GAP - RIGHT_W - 4  # 12 = dot
 
     total_h = BANNER_H + ROW_H + n_stock * ROW_H + ROW_H + FOOTER_H
 
@@ -121,10 +129,14 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     y = BANNER_H
     d.rectangle([0, y, IMG_W, y + ROW_H], fill=BG2)
     d.text((PAD + 12, y + 4), 'Item', font=f_small, fill=DIM)
-    d.text((IMG_W - PAD - 4, y + 4), 'Corp', font=f_small, fill=DIM, anchor='ra')
+    right = IMG_W - PAD - 4
+    d.text((right, y + 4), 'Corp', font=f_small, fill=DIM, anchor='ra')
     corp_hdr_w = tw(d, 'Corp', f_small)
-    d.text((IMG_W - PAD - 4 - corp_hdr_w - GAP, y + 4), 'Alliance',
-           font=f_small, fill=DIM, anchor='ra')
+    ally_x = right - corp_hdr_w - GAP
+    d.text((ally_x, y + 4), 'Alliance', font=f_small, fill=DIM, anchor='ra')
+    ally_hdr_w = tw(d, 'Alliance', f_small)
+    qty_hdr_x = ally_x - ally_hdr_w - GAP - QTY_GAP
+    d.text((qty_hdr_x, y + 4), 'Qty', font=f_small, fill=DIM, anchor='ra')
     y += ROW_H
 
     # ── Item rows ─────────────────────────────────────────────────────────────
@@ -141,6 +153,11 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
         # Name
         disp = truncate(d, name, f_item, NAME_W)
         d.text((cx + 12, y + 3), disp, font=f_item, fill=WHITE)
+
+        # Qty
+        qty_str = fmt_qty(qty)
+        qty_x   = right - (pct_max_w + GAP + pct_max_w + 4) - QTY_GAP
+        d.text((qty_x, y + 4), qty_str, font=f_price, fill=GREEN, anchor='ra')
 
         # Prices
         if price_pct is not None:
