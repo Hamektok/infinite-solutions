@@ -86,12 +86,12 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     # Pre-measure columns
     _d_tmp     = ImageDraw.Draw(Image.new('RGB', (1, 1)))
     pct_max_w  = tw(_d_tmp, '100%', f_price)
-    qty_max_w  = tw(_d_tmp, '999.9M', f_price)
     GAP        = 10
-    QTY_GAP    = 8
+    QTY_GAP    = 10
     RIGHT_W    = pct_max_w + GAP + pct_max_w + 4
     COL_W      = IMG_W - PAD * 2
-    NAME_W     = COL_W - 12 - QTY_GAP - qty_max_w - GAP - RIGHT_W - 4  # 12 = dot
+    # Name column sized to actual longest name in this category, not worst-case
+    NAME_W     = max((tw(_d_tmp, name, f_item) for name, *_ in items_stock), default=80) + 4
 
     total_h = BANNER_H + ROW_H + n_stock * ROW_H + ROW_H + FOOTER_H
 
@@ -134,9 +134,7 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     corp_hdr_w = tw(d, 'Corp', f_small)
     ally_x = right - corp_hdr_w - GAP
     d.text((ally_x, y + 4), 'Alliance', font=f_small, fill=DIM, anchor='ra')
-    ally_hdr_w = tw(d, 'Alliance', f_small)
-    qty_hdr_x = ally_x - ally_hdr_w - GAP - QTY_GAP
-    d.text((qty_hdr_x, y + 4), 'Qty', font=f_small, fill=DIM, anchor='ra')
+    d.text((PAD + 12 + NAME_W + QTY_GAP, y + 4), 'Qty', font=f_small, fill=DIM)
     y += ROW_H
 
     # ── Item rows ─────────────────────────────────────────────────────────────
@@ -154,10 +152,10 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
         disp = truncate(d, name, f_item, NAME_W)
         d.text((cx + 12, y + 3), disp, font=f_item, fill=WHITE)
 
-        # Qty
+        # Qty — left-anchored just after the name column
         qty_str = fmt_qty(qty)
-        qty_x   = right - (pct_max_w + GAP + pct_max_w + 4) - QTY_GAP
-        d.text((qty_x, y + 4), qty_str, font=f_price, fill=GREEN, anchor='ra')
+        qty_x   = PAD + 12 + NAME_W + QTY_GAP
+        d.text((qty_x, y + 4), qty_str, font=f_price, fill=GREEN)
 
         # Prices
         if price_pct is not None:
