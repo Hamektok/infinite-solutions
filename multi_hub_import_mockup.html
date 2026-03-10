@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Multi-Hub Import Analysis – Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a1520; font-family: 'Segoe UI', sans-serif; color: #c0e0f0; font-size: 13px; }
+
+  .mockup-banner { background: #1a1000; border-bottom: 1px solid #ffcc4440; color: #ffcc44;
+                   text-align: center; padding: 5px; font-size: 12px; letter-spacing: 1px; }
+  .header { display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px 5px; background: #0a1520; }
+  .header-title { color: #00ffff; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+  .header-status { color: #66d9ff; font-size: 12px; }
+  .tab-bar { display: flex; background: #0d1117; padding: 7px 15px 0; gap: 2px; flex-wrap: wrap; }
+  .tab { padding: 8px 16px; background: #1a2332; color: #66d9ff; font-size: 12px;
+         font-weight: bold; cursor: pointer; border-radius: 4px 4px 0 0; border: none; }
+  .tab.active { background: #0a3040; color: #00ffff; }
+  .tab-content { background: #0d1117; padding: 10px 14px; }
+  .section-desc { color: #66d9ff; font-size: 12px; margin-bottom: 7px; }
+
+  /* ── Flow bar ── */
+  .flow-bar { display: flex; align-items: center; gap: 0; margin-bottom: 3px; flex-wrap: wrap; }
+  .flow-node { background: #0a2030; border: 1px solid #1a5060; border-radius: 4px;
+               padding: 5px 10px; font-size: 10px; color: #00ffff; font-weight: bold; text-align: center; }
+  .flow-node .sub { color: #3a7090; font-size: 9px; font-weight: normal; margin-top: 1px; }
+  .flow-node.hub-other { border-color: #aa660044; color: #ffcc88; }
+  .flow-arrow { color: #1a5060; font-size: 14px; padding: 0 4px; }
+  .flow-cost { background: #0a1a10; border: 1px solid #1a4030; border-radius: 4px;
+               padding: 5px 10px; font-size: 10px; color: #ffcc44; text-align: center; }
+  .flow-cost .sub { color: #3a6030; font-size: 9px; margin-top: 1px; }
+  .flow-cost.hs { background: #1a1500; border-color: #4a3800; color: #ffa020; }
+  .hub-note { color: #3a6080; font-size: 10px; margin-bottom: 7px; font-style: italic; }
+
+  /* ── Param panel ── */
+  .param-panel { background: #0a2030; border: 1px solid #1a4060; border-radius: 4px;
+                 padding: 9px 12px; margin-bottom: 8px; }
+  .param-sections { display: flex; gap: 0; align-items: flex-start; flex-wrap: wrap; }
+  .param-group { display: flex; flex-direction: column; gap: 5px; padding: 0 11px; }
+  .param-group:first-child { padding-left: 0; }
+  .param-divider-v { width: 1px; background: #1a3040; margin: 0 2px; align-self: stretch; flex-shrink: 0; }
+  .param-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .param-col { display: flex; flex-direction: column; gap: 3px; min-width: 85px; }
+  .param-col label { color: #88d0e8; font-size: 11px; white-space: nowrap; }
+  .param-col input, .param-col select {
+    background: #061420; border: 1px solid #1a5070; color: #00ffff;
+    font-size: 12px; padding: 3px 6px; border-radius: 3px; width: 100%;
+  }
+  .param-col input:disabled { color: #2a5060; border-color: #0a2030; background: #040e18; cursor: not-allowed; }
+  .param-col .hint { color: #2a5060; font-size: 10px; font-style: italic; }
+  .param-col .hint.active { color: #2a5060; }
+  .param-col.wide { min-width: 155px; }
+  .section-badge { display: inline-block; padding: 1px 7px; border-radius: 2px;
+                   font-size: 10px; font-weight: bold; margin-bottom: 2px; }
+  .badge-buy  { background: #0a1a30; border: 1px solid #1a5070; color: #66d9ff; }
+  .badge-null { background: #1a1a00; border: 1px solid #4a4000; color: #ffcc44; }
+  .badge-hs   { background: #1a1200; border: 1px solid #4a3200; color: #ffa020; }
+  .badge-sell { background: #0a1a10; border: 1px solid #1a5030; color: #00ff88; }
+
+  /* Hub jump table */
+  .hub-tbl { border-collapse: collapse; font-size: 11px; }
+  .hub-tbl th { color: #3a6070; font-size: 9px; font-weight: normal; padding: 0 4px 2px; text-align: left; }
+  .hub-tbl td { padding: 2px 4px; vertical-align: middle; white-space: nowrap; }
+  .hub-tbl td:first-child { min-width: 58px; }
+  .hub-tbl input[type=number] {
+    background: #061420; border: 1px solid #1a5070; color: #00ffff;
+    font-size: 11px; padding: 2px 4px; border-radius: 2px; width: 40px; text-align: center;
+  }
+  .hub-tbl input[type=number]:disabled { color: #1a3040; border-color: #0a2030; background: #040e18; }
+  .hub-tbl input[type=checkbox] { accent-color: #00a8cc; cursor: pointer; width: 13px; height: 13px; }
+  .hub-tbl label { color: #3a6070; font-size: 10px; cursor: pointer; }
+  .multihop-note { color: #2a5040; font-size: 9px; font-style: italic; margin-top: 2px; }
+
+  .recalc-btn { background: #0a3040; border: 1px solid #00ffff44; color: #00ffff;
+                padding: 4px 12px; border-radius: 3px; font-size: 11px; font-weight: bold;
+                cursor: pointer; margin-top: 6px; }
+  .recalc-btn:hover { background: #0d4050; }
+
+  /* ── Summary cards ── */
+  .summary-row { display: flex; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+  .card { background: #0a2030; border: 1px solid #1a4060; border-radius: 4px;
+          padding: 6px 10px; flex: 1; min-width: 75px; }
+  .card-label { color: #66d9ff; font-size: 9px; letter-spacing: 0.5px; margin-bottom: 2px; text-transform: uppercase; }
+  .card-value { font-size: 14px; font-weight: bold; }
+  .green  { color: #00ff88; }  .yellow { color: #ffcc44; }  .red   { color: #ff6666; }
+  .cyan   { color: #00ffff; }  .blue   { color: #66d9ff; }
+  .c-amarr { color: #ffcc88; }  .c-dodixie { color: #88ffaa; }
+  .c-rens  { color: #ff88cc; }  .c-hek    { color: #88ccff; }
+
+  /* ── Filter row ── */
+  .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .filter-row label { color: #88d0e8; font-size: 12px; }
+  .filter-row input, .filter-row select {
+    background: #0a2030; border: 1px solid #1a4060; color: #00ffff;
+    font-size: 12px; padding: 3px 7px; border-radius: 3px;
+  }
+  .filter-row input { width: 130px; }
+  .filter-row select { width: 145px; }
+
+  /* ── Table ── */
+  .tree-wrap { border: 1px solid #1a4060; border-radius: 3px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+  thead th {
+    background: #0a3040; color: #00d9ff; font-size: 11px; font-weight: bold;
+    padding: 6px 7px; text-align: left; border-bottom: 1px solid #1a5060; white-space: nowrap;
+  }
+  thead th.num { text-align: right; }
+  thead th .sub { display: block; color: #3a7090; font-size: 9px; font-weight: normal; margin-top: 1px; }
+  thead th.h-jita    { color: #00aaff; border-top: 2px solid #00aaff33; }
+  thead th.h-amarr   { color: #ffcc88; border-top: 2px solid #ffcc4433; }
+  thead th.h-dodixie { color: #88ffaa; border-top: 2px solid #88ffaa33; }
+  thead th.h-rens    { color: #ff88cc; border-top: 2px solid #ff88cc33; }
+  thead th.h-hek     { color: #88ccff; border-top: 2px solid #88ccff33; }
+  tbody tr { background: #0d1a25; }
+  tbody tr:nth-child(even) { background: #0a1820; }
+  tbody tr:hover { background: #0a3050; }
+  tbody td { padding: 4px 7px; border-bottom: 1px solid #0f2535;
+             font-size: 12px; color: #c0e0f0; white-space: nowrap; }
+  tbody td.num { text-align: right; font-family: 'Courier New', monospace; font-size: 11px; }
+  td.hub-best { background: #003322 !important; }
+  td.hub-best .hv { color: #00ff88; font-weight: bold; }
+  td.hub-ok   .hv { color: #7ab8a0; }
+  td.hub-hi   .hv { color: #3a5848; }
+  td.hub-dis  .hv { color: #1a3040; }
+  .pct-above { color: #2a4a38; font-size: 9px; }
+  .best-badge { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+  .best-jita    { background: #001830; color: #00aaff; border: 1px solid #00aaff33; }
+  .best-amarr   { background: #1a1200; color: #ffcc88; border: 1px solid #ffcc4433; }
+  .best-dodixie { background: #001a10; color: #88ffaa; border: 1px solid #88ffaa33; }
+  .best-rens    { background: #1a0015; color: #ff88cc; border: 1px solid #ff88cc33; }
+  .best-hek     { background: #001525; color: #88ccff; border: 1px solid #88ccff33; }
+  .saving { font-size: 9px; color: #2a5040; display: block; margin-top: 1px; }
+  .margin-cell { font-weight: bold; text-align: right; font-family: 'Courier New', monospace; font-size: 12px; }
+  .mg-great { color: #00ff88; }  .mg-good { color: #88ff66; }  .mg-ok   { color: #ffcc44; }
+  .mg-thin  { color: #ff9944; }  .mg-neg  { color: #ff6666; }
+  .verdict { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: bold; }
+  .v-yes { background: #003320; color: #00ff88; border: 1px solid #00ff4420; }
+  .v-ok  { background: #332200; color: #ffcc44; border: 1px solid #ffcc4420; }
+  .v-no  { background: #330000; color: #ff6666; border: 1px solid #ff666620; }
+  .cat-tag { display: inline-block; padding: 1px 5px; border-radius: 2px; font-size: 10px;
+             background: #0a3040; color: #66d9ff; border: 1px solid #1a5060; }
+  .sub-tag { display: block; color: #3a7090; font-size: 10px; margin-top: 1px; }
+  .footer-note { margin-top: 8px; color: #3a6080; font-size: 11px; font-style: italic; line-height: 1.6; }
+  .db-note { margin-top: 5px; background: #0a1a30; border: 1px solid #1a3a50; border-radius: 3px;
+             padding: 5px 10px; color: #3a6a90; font-size: 10px; line-height: 1.5; }
+  #item-count { color: #3a7090; font-size: 11px; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">&#9670; MOCKUP PREVIEW &mdash; PRICES ARE ILLUSTRATIVE &#9670;</div>
+
+<div class="header">
+  <span class="header-title">INFINITE SOLUTIONS</span>
+  <span class="header-status">All saved</span>
+</div>
+
+<div class="tab-bar">
+  <button class="tab">Market Rates</button>
+  <button class="tab">Buyback Program</button>
+  <button class="tab">Blueprint Library</button>
+  <button class="tab">Inventory</button>
+  <button class="tab">Export Analysis</button>
+  <button class="tab active">Import Analysis</button>
+  <button class="tab">Quick Actions</button>
+</div>
+
+<div class="tab-content">
+
+  <div class="section-desc">Compare buy prices across all 5 major trade hubs with full multi-leg shipping to LX-ZOJ.
+    Landed cost = hub buy price + HS freight per leg (non-Jita) + null-sec freight.</div>
+
+  <!-- Flow bar -->
+  <div class="flow-bar">
+    <div class="flow-node hub-other">AMARR / DODIXIE / RENS / HEK<div class="sub">Buy at hub market</div></div>
+    <span class="flow-arrow">&#9658;</span>
+    <div class="flow-cost hs">HS LEG 1<div class="sub">Red Frog / PushX</div></div>
+    <span class="flow-arrow">&#9658;</span>
+    <div class="flow-cost hs">[HS LEG 2]<div class="sub">optional via waypoint</div></div>
+    <span class="flow-arrow">&#9658;</span>
+    <div class="flow-node">JITA / HS STAGING<div class="sub">null entry point</div></div>
+    <span class="flow-arrow">&#9658;</span>
+    <div class="flow-cost">NULL FREIGHT<div class="sub">Black Frog / JF</div></div>
+    <span class="flow-arrow">&#9658;</span>
+    <div class="flow-node">LX-ZOJ<div class="sub">Sell via contract</div></div>
+  </div>
+  <div class="hub-note">
+    &#9432;&nbsp; Jita = null staging in this model (skip HS legs entirely).
+    &nbsp;|&nbsp; Non-Jita: 1 or 2 HS courier contracts + null freight.
+    &nbsp;|&nbsp; 2nd HS leg: each leg charges ISK/m³ &amp; collateral separately — useful for Amarr&rarr;Rens&rarr;staging or similar long routes.
+  </div>
+
+  <!-- Parameter panel -->
+  <div class="param-panel">
+    <div class="param-sections">
+
+      <!-- BUY SIDE -->
+      <div class="param-group">
+        <span class="section-badge badge-buy">BUY SIDE &mdash; per hub</span>
+        <div class="param-row">
+          <div class="param-col wide">
+            <label>Order Type</label>
+            <select id="buy-type">
+              <option value="sell" selected>Market Sell Orders &mdash; instant</option>
+              <option value="buy">Market Buy Orders &mdash; limit order</option>
+            </select>
+            <span class="hint">Hub ask/bid price used per hub independently</span>
+          </div>
+          <div class="param-col">
+            <label>Buy % of Price</label>
+            <input type="number" value="100" min="50" max="200" step="0.5" id="buy-pct">
+            <span class="hint">100 = at market price</span>
+          </div>
+          <div class="param-col">
+            <label>Broker Fee %</label>
+            <input type="number" value="3.0" min="0" max="10" step="0.1" id="broker-fee" disabled>
+            <span class="hint" id="broker-hint" style="color:#1a4060;">N/A &mdash; sell orders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="param-divider-v"></div>
+
+      <!-- NULL FREIGHT -->
+      <div class="param-group">
+        <span class="section-badge badge-null">NULL FREIGHT &mdash; all hubs</span>
+        <div class="param-row">
+          <div class="param-col">
+            <label>ISK / m&#179;</label>
+            <input type="number" value="125" min="0" id="null-isk-m3">
+          </div>
+          <div class="param-col">
+            <label>ISK / jump</label>
+            <input type="number" value="0" min="0" id="null-isk-jump">
+            <span class="hint">optional</span>
+          </div>
+          <div class="param-col">
+            <label># Jumps</label>
+            <input type="number" value="5" min="1" id="null-jumps">
+          </div>
+          <div class="param-col">
+            <label>Collateral %</label>
+            <input type="number" value="1.0" min="0" step="0.1" id="null-coll">
+            <span class="hint">% of buy price</span>
+          </div>
+        </div>
+        <div style="color:#3a6080;font-size:10px;font-style:italic;">Single leg. Applied to all hubs.</div>
+      </div>
+
+      <div class="param-divider-v"></div>
+
+      <!-- HS INTER-HUB FREIGHT -->
+      <div class="param-group">
+        <span class="section-badge badge-hs">HS FREIGHT &mdash; non-Jita only</span>
+        <div class="param-row">
+          <div class="param-col">
+            <label>ISK / m&#179;</label>
+            <input type="number" value="300" min="0" id="hs-isk-m3">
+            <span class="hint">per leg</span>
+          </div>
+          <div class="param-col">
+            <label>ISK / jump</label>
+            <input type="number" value="0" min="0" id="hs-isk-jump">
+            <span class="hint">per leg, optional</span>
+          </div>
+          <div class="param-col">
+            <label>Collateral %</label>
+            <input type="number" value="0.5" min="0" step="0.1" id="hs-coll">
+            <span class="hint">% of buy price, per leg</span>
+          </div>
+        </div>
+        <table class="hub-tbl" style="margin-top:5px;">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Leg 1 (j)</th>
+              <th colspan="2" style="padding-left:6px;">+ 2nd leg (j)</th>
+              <th style="padding-left:4px;">On</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:#ffcc88;">Amarr</td>
+              <td><input type="number" value="9"  min="1" id="j1-amarr"></td>
+              <td style="padding-left:6px;"><input type="checkbox" id="l2-amarr"><label for="l2-amarr"> +</label></td>
+              <td><input type="number" value="0" min="0" id="j2-amarr" disabled></td>
+              <td style="padding-left:4px;"><input type="checkbox" id="en-amarr" checked></td>
+            </tr>
+            <tr>
+              <td style="color:#88ffaa;">Dodixie</td>
+              <td><input type="number" value="13" min="1" id="j1-dodixie"></td>
+              <td style="padding-left:6px;"><input type="checkbox" id="l2-dodixie"><label for="l2-dodixie"> +</label></td>
+              <td><input type="number" value="0" min="0" id="j2-dodixie" disabled></td>
+              <td style="padding-left:4px;"><input type="checkbox" id="en-dodixie" checked></td>
+            </tr>
+            <tr>
+              <td style="color:#ff88cc;">Rens</td>
+              <td><input type="number" value="14" min="1" id="j1-rens"></td>
+              <td style="padding-left:6px;"><input type="checkbox" id="l2-rens"><label for="l2-rens"> +</label></td>
+              <td><input type="number" value="0" min="0" id="j2-rens" disabled></td>
+              <td style="padding-left:4px;"><input type="checkbox" id="en-rens" checked></td>
+            </tr>
+            <tr>
+              <td style="color:#88ccff;">Hek</td>
+              <td><input type="number" value="12" min="1" id="j1-hek"></td>
+              <td style="padding-left:6px;"><input type="checkbox" id="l2-hek"><label for="l2-hek"> +</label></td>
+              <td><input type="number" value="0" min="0" id="j2-hek" disabled></td>
+              <td style="padding-left:4px;"><input type="checkbox" id="en-hek" checked></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="multihop-note">&#9733; 2nd leg: ISK/m³ &amp; collateral charged again per leg; jumps are additive<br>
+          e.g. Amarr&#8594;Rens (leg1=15j) &#8594; staging (leg2=3j) = 2&times; ISK/m³, 18 jump cost, 2&times; collat</div>
+      </div>
+
+      <div class="param-divider-v"></div>
+
+      <!-- SELL SIDE -->
+      <div class="param-group">
+        <span class="section-badge badge-sell">SELL SIDE</span>
+        <div class="param-row">
+          <div class="param-col wide">
+            <label>Price Reference</label>
+            <select id="sell-ref">
+              <option value="jsv" selected>Jita Sell (JSV)</option>
+              <option value="split">Jita Split</option>
+              <option value="jbv">Jita Buy (JBV)</option>
+            </select>
+            <span class="hint">Contract price always Jita-referenced</span>
+          </div>
+          <div class="param-col">
+            <label>Sell Markup %</label>
+            <input type="number" value="115" min="100" step="1" id="sell-markup">
+            <span class="hint">115 = 15% above ref</span>
+          </div>
+        </div>
+        <div style="color:#3a6080;font-size:10px;font-style:italic;margin-top:3px;">
+          Contracts: no tax or broker fee on sell side.
+        </div>
+        <button class="recalc-btn" onclick="renderTable()">&#10227; Recalculate</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-row">
+    <div class="card"><div class="card-label">Items Shown</div><div class="card-value cyan" id="sum-total">—</div></div>
+    <div class="card"><div class="card-label">&#9670; Jita Best</div><div class="card-value blue" id="sum-jita">—</div></div>
+    <div class="card"><div class="card-label">&#9670; Amarr Best</div><div class="card-value c-amarr" id="sum-amarr">—</div></div>
+    <div class="card"><div class="card-label">&#9670; Dodixie Best</div><div class="card-value c-dodixie" id="sum-dodixie">—</div></div>
+    <div class="card"><div class="card-label">&#9670; Rens Best</div><div class="card-value c-rens" id="sum-rens">—</div></div>
+    <div class="card"><div class="card-label">&#9670; Hek Best</div><div class="card-value c-hek" id="sum-hek">—</div></div>
+    <div class="card"><div class="card-label">Worth Importing</div><div class="card-value green" id="sum-worth">—</div></div>
+    <div class="card"><div class="card-label">Avg Best Margin</div><div class="card-value green" id="sum-margin">—</div></div>
+  </div>
+
+  <!-- Filter row -->
+  <div class="filter-row">
+    <label>Search:</label>
+    <input type="text" id="search-input" placeholder="Item name…">
+    <label>Category:</label>
+    <select id="cat-filter">
+      <option>All Categories</option>
+      <option>Minerals</option>
+      <option>Ice Products</option>
+      <option>PI Materials</option>
+      <option>Moon Materials</option>
+      <option>Standard Ore</option>
+      <option>Ice Ore</option>
+      <option>Moon Ore</option>
+      <option>Salvaged Materials</option>
+      <option>Gas</option>
+    </select>
+    <label>Subcategory:</label>
+    <select id="sub-filter">
+      <option>All Subcategories</option>
+    </select>
+    <label>Best Hub:</label>
+    <select id="hub-filter">
+      <option>Any Hub</option>
+      <option>Jita</option>
+      <option>Amarr</option>
+      <option>Dodixie</option>
+      <option>Rens</option>
+      <option>Hek</option>
+    </select>
+    <label>Show:</label>
+    <select id="show-filter">
+      <option>All</option>
+      <option selected>Profitable only</option>
+      <option>Marginal / Avoid</option>
+    </select>
+  </div>
+
+  <div id="item-count"></div>
+
+  <!-- Table -->
+  <div class="tree-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="min-width:145px;">Item</th>
+          <th style="min-width:95px;">Category</th>
+          <th class="num">Vol<span class="sub">m³/unit</span></th>
+          <th class="num h-jita">Jita<span class="sub">landed/unit</span></th>
+          <th class="num h-amarr">Amarr<span class="sub">landed/unit</span></th>
+          <th class="num h-dodixie">Dodixie<span class="sub">landed/unit</span></th>
+          <th class="num h-rens">Rens<span class="sub">landed/unit</span></th>
+          <th class="num h-hek">Hek<span class="sub">landed/unit</span></th>
+          <th style="text-align:center;min-width:82px;">Best Hub<span class="sub" style="color:#3a7090;">vs Jita</span></th>
+          <th class="num">Contract<span class="sub">sell price</span></th>
+          <th class="num" style="min-width:58px;">Margin</th>
+          <th style="min-width:80px;text-align:center;">Verdict</th>
+        </tr>
+      </thead>
+      <tbody id="item-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    <strong>Landed cost</strong> = buy price &times; buy% &times; (1 + broker fee if buy orders) + HS freight &times; legs + null freight.
+    &nbsp;|&nbsp; <strong>HS freight per leg</strong> = ISK/m³ &times; vol + ISK/jump &times; leg_jumps + collat% &times; buy price.
+    &nbsp;|&nbsp; <strong>Null freight</strong> = ISK/m³ &times; vol + ISK/jump &times; jumps + collat% &times; buy price.
+    &nbsp;|&nbsp; <strong>Contract price</strong> = Jita price &times; sell markup% &mdash; always Jita-referenced (JSV, Split, or JBV approximated as JSV &times; 0.975/0.95 in mockup).
+    &nbsp;|&nbsp; <strong>Margin</strong> = (Contract &minus; Best Landed) &divide; Contract.
+  </div>
+  <div class="db-note">
+    &#9432;&nbsp; <strong>Data requirement:</strong> Multi-hub analysis requires separate ESI snapshots per hub region.
+    A <code>region_id</code> column would be added to <code>market_price_snapshots</code> and a daily fetch added for each enabled hub:
+    Jita&nbsp;10000002 &middot; Amarr&nbsp;10000043 &middot; Dodixie&nbsp;10000032 &middot; Rens&nbsp;10000030 &middot; Hek&nbsp;10000042.
+    Prices shown here are illustrative only.
+  </div>
+
+</div>
+
+<script>
+// Items: [name, vol, category, subcategory, [pJita, pAmarr, pDodixie, pRens, pHek]]
+// Prices are illustrative ISK/unit (sell-order equivalent)
+const ITEMS = [
+  // Minerals
+  ['Tritanium',              0.01,  'Minerals',         '',              [5.52,   5.69,   5.87,   5.78,   5.72]],
+  ['Pyerite',                0.01,  'Minerals',         '',              [10.82,  11.15,  11.47,  11.28,  11.05]],
+  ['Isogen',                 0.01,  'Minerals',         '',              [73.4,   75.5,   77.3,   76.2,   74.9]],
+  ['Mexallon',               0.01,  'Minerals',         '',              [82.1,   84.5,   86.9,   85.6,   84.0]],
+  ['Nocxium',                0.01,  'Minerals',         '',              [582,    598,    615,    607,    594]],
+  ['Zydrine',                0.01,  'Minerals',         '',              [1124,   1157,   1189,   1172,   1148]],
+  ['Megacyte',               0.01,  'Minerals',         '',              [2340,   2406,   2472,   2438,   2390]],
+  ['Morphite',               0.01,  'Minerals',         '',              [8750,   8992,   9232,   9106,   8920]],
+  // Ice Products
+  ['Nitrogen Fuel Block',    5.0,   'Ice Products',     'Fuel Blocks',   [7820,   8044,   8267,   8152,   7995]],
+  ['Hydrogen Fuel Block',    5.0,   'Ice Products',     'Fuel Blocks',   [7640,   7856,   8074,   7968,   7808]],
+  ['Oxygen Isotopes',        0.03,  'Ice Products',     'Isotopes',      [412,    424,    436,    430,    420]],
+  ['Nitrogen Isotopes',      0.03,  'Ice Products',     'Isotopes',      [428,    441,    454,    447,    437]],
+  ['Heavy Water',            0.4,   'Ice Products',     'Refined Ice',   [312,    321,    330,    326,    319]],
+  ['Liquid Ozone',           0.4,   'Ice Products',     'Refined Ice',   [484,    498,    512,    505,    494]],
+  ['Strontium Clathrates',   3.0,   'Ice Products',     'Refined Ice',   [1240,   1276,   1312,   1294,   1266]],
+  // Moon Materials
+  ['Crystalline Carbonide',  0.01,  'Moon Materials',   'Advanced',      [12400,  12754,  13100,  12952,  12680]],
+  ['Nanotransistors',        0.25,  'Moon Materials',   'Advanced',      [8350,   8583,   8822,   8715,   8512]],
+  ['Ferrogel',               1.0,   'Moon Materials',   'Advanced',      [24800,  25512,  26224,  25872,  25318]],
+  ['Titanium Carbide',       0.01,  'Moon Materials',   'Advanced',      [9820,   10105,  10386,  10244,  10025]],
+  ['Titanium Chromide',      0.2,   'Moon Materials',   'Processed',     [4820,   4962,   5098,   5032,   4922]],
+  ['Silicon Diborite',       0.2,   'Moon Materials',   'Processed',     [3640,   3748,   3851,   3802,   3722]],
+  ['Atmospheric Gases',      0.05,  'Moon Materials',   'Raw',           [2180,   2244,   2306,   2276,   2228]],
+  ['Cobalt',                 0.05,  'Moon Materials',   'Raw',           [4320,   4448,   4572,   4512,   4415]],
+  // PI Materials
+  ['Bacteria',               0.19,  'PI Materials',     'P1',            [412,    424,    436,    430,    420]],
+  ['Biofuels',               0.19,  'PI Materials',     'P1',            [388,    399,    410,    405,    396]],
+  ['Miniature Electronics',  0.75,  'PI Materials',     'P2',            [8240,   8479,   8706,   8593,   8413]],
+  ['Coolant',                0.75,  'PI Materials',     'P2',            [7120,   7326,   7527,   7429,   7274]],
+  ['Enriched Uranium',       0.75,  'PI Materials',     'P2',            [6480,   6668,   6855,   6762,   6620]],
+  ['Robotics',               3.0,   'PI Materials',     'P3',            [95200,  97952,  100510, 99210,  97140]],
+  ['Guidance Systems',       3.0,   'PI Materials',     'P3',            [52400,  53896,  55348,  54620,  53502]],
+  ['Broadcast Node',         50.0,  'PI Materials',     'P4',            [5850000,6015750,6179100,6097500,5970375]],
+  ['Wetware Mainframe',      50.0,  'PI Materials',     'P4',            [6120000,6291360,6462720,6378000,6242400]],
+  // Standard Ore
+  ['Compressed Arkonor',     0.16,  'Standard Ore',     'Compressed',    [51800,  53350,  54860,  54100,  52940]],
+  ['Compressed Bistot',      0.16,  'Standard Ore',     'Compressed',    [73200,  75350,  77440,  76380,  74720]],
+  ['Compressed Crokite',     0.16,  'Standard Ore',     'Compressed',    [48500,  49910,  51310,  50610,  49560]],
+  ['Compressed Spodumain',   0.16,  'Standard Ore',     'Compressed',    [31400,  32340,  33230,  32790,  32090]],
+  ['Compressed Mercoxit',    0.4,   'Standard Ore',     'Compressed',    [62000,  63800,  65600,  64700,  63300]],
+  ['Compressed Veldspar',    0.001, 'Standard Ore',     'Compressed',    [520,    535,    550,    543,    531]],
+  ['Compressed Scordite',    0.0015,'Standard Ore',     'Compressed',    [420,    432,    444,    438,    429]],
+  ['Arkonor',                16.0,  'Standard Ore',     'Uncompressed',  [480,    494,    508,    501,    490]],
+  ['Bistot',                 16.0,  'Standard Ore',     'Uncompressed',  [680,    700,    720,    710,    695]],
+  // Ice Ore
+  ['Compressed Blue Ice',    100.0, 'Ice Ore',          'Compressed',    [72000,  74100,  76200,  75150,  73500]],
+  ['Compressed Clear Icicle',100.0, 'Ice Ore',          'Compressed',    [68500,  70550,  72550,  71550,  69930]],
+  ['Compressed Glacial Mass',100.0, 'Ice Ore',          'Compressed',    [65200,  67100,  68990,  68040,  66590]],
+  ['Compressed White Glaze', 100.0, 'Ice Ore',          'Compressed',    [63800,  65660,  67520,  66590,  65180]],
+  ['Blue Ice',               1000.0,'Ice Ore',          'Uncompressed',  [580,    597,    614,    606,    592]],
+  // Moon Ore
+  ['Compressed Zeolites',    0.1,   'Moon Ore',         'R4 Common',     [3200,   3294,   3386,   3341,   3269]],
+  ['Compressed Sylvite',     0.1,   'Moon Ore',         'R4 Common',     [3450,   3552,   3652,   3603,   3525]],
+  ['Compressed Cobaltite',   0.1,   'Moon Ore',         'R8 Uncommon',   [8800,   9055,   9305,   9182,   8993]],
+  ['Compressed Euxenite',    0.1,   'Moon Ore',         'R8 Uncommon',   [9200,   9467,   9729,   9600,   9394]],
+  ['Compressed Otavite',     0.1,   'Moon Ore',         'R16 Rare',      [28400,  29240,  30060,  29655,  29030]],
+  ['Compressed Sperrylite',  0.1,   'Moon Ore',         'R16 Rare',      [31200,  32118,  33026,  32575,  31886]],
+  ['Compressed Carnotite',   0.1,   'Moon Ore',         'R32 Exceptional',[82000, 84400,  86800,  85600,  83800]],
+  ['Compressed Zircon',      0.1,   'Moon Ore',         'R32 Exceptional',[87500, 90050,  92600,  91325,  89390]],
+  ['Compressed Xenotime',    0.1,   'Moon Ore',         'R64 Legendary', [142000, 146200, 150200, 148200, 145000]],
+  ['Compressed Monazite',    0.1,   'Moon Ore',         'R64 Legendary', [138000, 142100, 146100, 144100, 141000]],
+  // Salvaged Materials
+  ['Alloyed Tritanium Bar',  0.01,  'Salvaged Materials','Common',       [780,    803,    826,    815,    797]],
+  ['Charred Micro Circuit',  0.01,  'Salvaged Materials','Common',       [620,    638,    656,    647,    633]],
+  ['Contaminated Nanite Compound',0.01,'Salvaged Materials','Uncommon',  [2480,   2552,   2624,   2591,   2536]],
+  ['Melted Capacitor Console',0.01, 'Salvaged Materials','Uncommon',     [3120,   3212,   3302,   3258,   3189]],
+  ['Power Circuit',          0.01,  'Salvaged Materials','Rare',         [6800,   6996,   7189,   7095,   6944]],
+  ['Drone Transceiver',      0.01,  'Salvaged Materials','Rare',         [8400,   8644,   8884,   8766,   8580]],
+  ['Intact Shield Emitter',  0.01,  'Salvaged Materials','Very Rare',    [14500,  14920,  15340,  15130,  14790]],
+  ['Nanite Compound',        0.01,  'Salvaged Materials','Very Rare',    [18200,  18728,  19242,  18990,  18584]],
+  ['Drone Capillary Fluid',  0.02,  'Salvaged Materials','Rogue Drone',  [3900,   4014,   4126,   4072,   3981]],
+  ['Elite Drone AI',         0.01,  'Salvaged Materials','Rogue Drone',  [24500,  25210,  25910,  25565,  25010]],
+  // Gas
+  ['Fullerite-C28',          1.0,   'Gas',              'Fullerite',     [145000, 149200, 153400, 151300, 148000]],
+  ['Fullerite-C32',          1.0,   'Gas',              'Fullerite',     [215000, 221200, 227400, 224300, 219500]],
+  ['Fullerite-C50',          1.0,   'Gas',              'Fullerite',     [340000, 349800, 359600, 354700, 347000]],
+  ['Fullerite-C60',          1.0,   'Gas',              'Fullerite',     [520000, 535000, 550100, 542600, 531000]],
+  ['Azure Mykoserocin',      1.0,   'Gas',              'Mykoserocin',   [12500,  12850,  13200,  13025,  12740]],
+  ['Lime Mykoserocin',       1.0,   'Gas',              'Mykoserocin',   [15800,  16262,  16712,  16490,  16140]],
+];
+
+const SUB_MAP = {
+  'All Categories':      [],
+  'Minerals':            [],
+  'Ice Products':        ['Fuel Blocks', 'Refined Ice', 'Isotopes'],
+  'PI Materials':        ['P1', 'P2', 'P3', 'P4'],
+  'Moon Materials':      ['Advanced', 'Processed', 'Raw'],
+  'Standard Ore':        ['Compressed', 'Uncompressed'],
+  'Ice Ore':             ['Compressed', 'Uncompressed'],
+  'Moon Ore':            ['R4 Common', 'R8 Uncommon', 'R16 Rare', 'R32 Exceptional', 'R64 Legendary'],
+  'Salvaged Materials':  ['Common', 'Uncommon', 'Rare', 'Very Rare', 'Rogue Drone'],
+  'Gas':                 ['Fullerite', 'Mykoserocin'],
+};
+
+const HUBS = ['jita','amarr','dodixie','rens','hek'];
+const HUB_LABELS = {jita:'Jita', amarr:'Amarr', dodixie:'Dodixie', rens:'Rens', hek:'Hek'};
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+function fmtISK(v) {
+  if (v >= 1e9) return (v / 1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return (v / 1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K';
+  if (v >= 100) return v.toFixed(0);
+  return v.toFixed(2);
+}
+function fmtVol(v) {
+  if (v < 0.01) return v.toFixed(3);
+  if (v < 1)    return v.toFixed(2);
+  return v.toFixed(1);
+}
+function marginClass(m) {
+  if (m >= 0.20) return 'mg-great';
+  if (m >= 0.12) return 'mg-good';
+  if (m >= 0.05) return 'mg-ok';
+  if (m >= 0)    return 'mg-thin';
+  return 'mg-neg';
+}
+
+// ─── Params ────────────────────────────────────────────────────────────────
+function getParams() {
+  const isBuy = document.getElementById('buy-type').value === 'buy';
+  const sellRef = document.getElementById('sell-ref').value;
+  // Approximate sell ref multiplier (mockup only — real impl reads separate snapshot)
+  const refMult = sellRef === 'jbv' ? 0.95 : sellRef === 'split' ? 0.975 : 1.0;
+  return {
+    buyPct:      parseFloat(document.getElementById('buy-pct').value)      / 100,
+    brokerFee:   isBuy ? parseFloat(document.getElementById('broker-fee').value) / 100 : 0,
+    nullIskM3:   parseFloat(document.getElementById('null-isk-m3').value),
+    nullIskJump: parseFloat(document.getElementById('null-isk-jump').value),
+    nullJumps:   parseFloat(document.getElementById('null-jumps').value),
+    nullColl:    parseFloat(document.getElementById('null-coll').value)    / 100,
+    hsIskM3:     parseFloat(document.getElementById('hs-isk-m3').value),
+    hsIskJump:   parseFloat(document.getElementById('hs-isk-jump').value),
+    hsColl:      parseFloat(document.getElementById('hs-coll').value)      / 100,
+    hubs: {
+      jita:    { enabled: true,  isJita: true,  leg1j: 0,  leg2: false, leg2j: 0 },
+      amarr:   { enabled: !!document.getElementById('en-amarr').checked,   isJita: false,
+                 leg1j: +document.getElementById('j1-amarr').value,
+                 leg2:  !!document.getElementById('l2-amarr').checked,
+                 leg2j: +document.getElementById('j2-amarr').value },
+      dodixie: { enabled: !!document.getElementById('en-dodixie').checked, isJita: false,
+                 leg1j: +document.getElementById('j1-dodixie').value,
+                 leg2:  !!document.getElementById('l2-dodixie').checked,
+                 leg2j: +document.getElementById('j2-dodixie').value },
+      rens:    { enabled: !!document.getElementById('en-rens').checked,    isJita: false,
+                 leg1j: +document.getElementById('j1-rens').value,
+                 leg2:  !!document.getElementById('l2-rens').checked,
+                 leg2j: +document.getElementById('j2-rens').value },
+      hek:     { enabled: !!document.getElementById('en-hek').checked,     isJita: false,
+                 leg1j: +document.getElementById('j1-hek').value,
+                 leg2:  !!document.getElementById('l2-hek').checked,
+                 leg2j: +document.getElementById('j2-hek').value },
+    },
+    sellMarkup: parseFloat(document.getElementById('sell-markup').value) / 100,
+    refMult,
+  };
+}
+
+// ─── Cost calculation ───────────────────────────────────────────────────────
+// Jita:       landed = buyPrice + nullFreight
+// Non-Jita:   landed = buyPrice + (HS leg 1) + [HS leg 2 if enabled] + nullFreight
+//
+// HS per leg  = iskM3 × vol + iskJump × legJumps + hsColl × buyPrice
+// Null        = iskM3 × vol + iskJump × nullJumps + nullColl × buyPrice
+function calcLanded(hubPrice, vol, hc, p) {
+  const buyPrice    = hubPrice * p.buyPct * (1 + p.brokerFee);
+  const nullFreight = (p.nullIskM3 * vol) + (p.nullIskJump * p.nullJumps) + (p.nullColl * buyPrice);
+  if (hc.isJita) return buyPrice + nullFreight;
+
+  const legs       = hc.leg2 ? 2 : 1;
+  const totalJumps = hc.leg1j + (hc.leg2 ? hc.leg2j : 0);
+  const hsFreight  = legs * (p.hsIskM3 * vol) + (p.hsIskJump * totalJumps) + legs * (p.hsColl * buyPrice);
+  return buyPrice + hsFreight + nullFreight;
+}
+
+// ─── Render table ──────────────────────────────────────────────────────────
+function renderTable() {
+  const p          = getParams();
+  const search     = document.getElementById('search-input').value.toLowerCase();
+  const catFilter  = document.getElementById('cat-filter').value;
+  const subFilter  = document.getElementById('sub-filter').value;
+  const showFilter = document.getElementById('show-filter').value;
+  const hubFilter  = document.getElementById('hub-filter').value;
+  const tbody      = document.getElementById('item-tbody');
+  tbody.innerHTML  = '';
+
+  const hubCounts = {jita:0,amarr:0,dodixie:0,rens:0,hek:0};
+  let totalShown = 0, worthCount = 0, marginSum = 0;
+
+  for (const [name, vol, cat, sub, prices] of ITEMS) {
+    if (search    && !name.toLowerCase().includes(search)) continue;
+    if (catFilter !== 'All Categories'    && cat !== catFilter) continue;
+    if (subFilter !== 'All Subcategories' && sub !== subFilter) continue;
+
+    const [pJita, pAmarr, pDodixie, pRens, pHek] = prices;
+    const hubPrices = {jita: pJita, amarr: pAmarr, dodixie: pDodixie, rens: pRens, hek: pHek};
+
+    const landed = {};
+    let bestHub = null, bestCost = Infinity;
+    for (const h of HUBS) {
+      const hc = p.hubs[h];
+      if (!hc.enabled) { landed[h] = null; continue; }
+      landed[h] = calcLanded(hubPrices[h], vol, hc, p);
+      if (landed[h] < bestCost) { bestCost = landed[h]; bestHub = h; }
+    }
+
+    // Contract price always Jita-referenced
+    const contractPrice = pJita * p.sellMarkup * p.refMult;
+    const margin = bestHub != null ? (contractPrice - bestCost) / contractPrice : null;
+
+    if (showFilter === 'Profitable only'  && (margin == null || margin < 0.05)) continue;
+    if (showFilter === 'Marginal / Avoid' && (margin == null || margin >= 0.12)) continue;
+    if (hubFilter  !== 'Any Hub' && bestHub !== hubFilter.toLowerCase()) continue;
+
+    totalShown++;
+    if (margin != null && margin >= 0.05) worthCount++;
+    if (margin != null) marginSum += margin;
+    if (bestHub) hubCounts[bestHub]++;
+
+    const jitaLanded   = landed.jita;
+    const savingVsJita = (bestHub && bestHub !== 'jita' && jitaLanded != null)
+                         ? (jitaLanded - bestCost) / jitaLanded * 100 : 0;
+
+    const subTag = sub ? `<span class="sub-tag">${sub}</span>` : '';
+    let cells = `<td>${name}</td>
+      <td><span class="cat-tag">${cat}</span>${subTag}</td>
+      <td class="num">${fmtVol(vol)}</td>`;
+
+    for (const h of HUBS) {
+      const hc = p.hubs[h];
+      if (!hc.enabled) {
+        cells += `<td class="num hub-dis"><span class="hv">—</span></td>`;
+        continue;
+      }
+      const isBest   = (h === bestHub);
+      const pctAbove = (landed[h] - bestCost) / bestCost;
+      const cls      = isBest ? 'hub-best' : pctAbove < 0.05 ? 'hub-ok' : 'hub-hi';
+      const pctTag   = (!isBest && pctAbove > 0.002)
+        ? ` <span class="pct-above">+${(pctAbove*100).toFixed(1)}%</span>` : '';
+      cells += `<td class="num ${cls}"><span class="hv">${fmtISK(landed[h])}</span>${pctTag}</td>`;
+    }
+
+    let bestBadge = '—';
+    if (bestHub) {
+      const savingTag = savingVsJita > 0.1
+        ? `<span class="saving">&#9660;${savingVsJita.toFixed(1)}% vs Jita</span>` : '';
+      bestBadge = `<span class="best-badge best-${bestHub}">${HUB_LABELS[bestHub]}</span>${savingTag}`;
+    }
+    const mPct   = margin != null ? (margin * 100).toFixed(1) + '%' : '—';
+    const mClass = margin != null ? marginClass(margin) : '';
+    const vHtml  = margin == null ? '<span class="verdict v-no">NO DATA</span>'
+      : margin >= 0.12 ? '<span class="verdict v-yes">IMPORT</span>'
+      : margin >= 0.05 ? '<span class="verdict v-ok">MARGINAL</span>'
+      : '<span class="verdict v-no">AVOID</span>';
+
+    cells += `<td style="text-align:center;">${bestBadge}</td>
+      <td class="num">${fmtISK(contractPrice)}</td>
+      <td class="margin-cell ${mClass}">${mPct}</td>
+      <td style="text-align:center;">${vHtml}</td>`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById('item-count').textContent  = totalShown + ' items shown';
+  document.getElementById('sum-total').textContent   = totalShown;
+  document.getElementById('sum-jita').textContent    = hubCounts.jita;
+  document.getElementById('sum-amarr').textContent   = hubCounts.amarr;
+  document.getElementById('sum-dodixie').textContent = hubCounts.dodixie;
+  document.getElementById('sum-rens').textContent    = hubCounts.rens;
+  document.getElementById('sum-hek').textContent     = hubCounts.hek;
+  document.getElementById('sum-worth').textContent   = worthCount;
+  document.getElementById('sum-margin').textContent  = totalShown
+    ? (marginSum / totalShown * 100).toFixed(1) + '%' : '—';
+}
+
+function updateSubFilter() {
+  const cat = document.getElementById('cat-filter').value;
+  const sel = document.getElementById('sub-filter');
+  sel.innerHTML = '<option>All Subcategories</option>';
+  for (const s of (SUB_MAP[cat] || [])) {
+    const o = document.createElement('option');
+    o.textContent = s;
+    sel.appendChild(o);
+  }
+  renderTable();
+}
+
+// ─── Event wiring ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Broker fee: enable only for buy orders
+  document.getElementById('buy-type').addEventListener('change', () => {
+    const isBuy  = document.getElementById('buy-type').value === 'buy';
+    const input  = document.getElementById('broker-fee');
+    const hint   = document.getElementById('broker-hint');
+    input.disabled    = !isBuy;
+    hint.textContent  = isBuy ? 'applies when placing orders' : 'N/A — sell orders';
+    hint.style.color  = isBuy ? '#2a5060' : '#1a4060';
+    renderTable();
+  });
+
+  // 2nd leg toggles
+  for (const h of ['amarr','dodixie','rens','hek']) {
+    document.getElementById('l2-'+h).addEventListener('change', () => {
+      document.getElementById('j2-'+h).disabled = !document.getElementById('l2-'+h).checked;
+      renderTable();
+    });
+  }
+
+  // Filters
+  document.getElementById('search-input').addEventListener('input',  renderTable);
+  document.getElementById('cat-filter').addEventListener('change',   updateSubFilter);
+  document.getElementById('sub-filter').addEventListener('change',   renderTable);
+  document.getElementById('show-filter').addEventListener('change',  renderTable);
+  document.getElementById('hub-filter').addEventListener('change',   renderTable);
+
+  // Auto-recalc on any param panel change
+  document.querySelectorAll('.param-panel input:not([type=checkbox]), .param-panel select').forEach(el => {
+    el.addEventListener('change', renderTable);
+  });
+  document.querySelectorAll('.param-panel input[type=checkbox]').forEach(el => {
+    el.addEventListener('change', renderTable);
+  });
+
+  renderTable();
+});
+</script>
+</body>
+</html>
