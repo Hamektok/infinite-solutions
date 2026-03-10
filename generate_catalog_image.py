@@ -32,11 +32,24 @@ GREEN   = ( 50, 210, 120)
 ACCENT  = (  0, 175, 255)
 GOLD    = (255, 200,  50)
 
-# Flag badge colours
-FLAG_WTB_BG   = ( 60,  35,   0)   # dark amber bg for WTB badge
-FLAG_WTB_FG   = (255, 160,  40)   # bright amber text
-FLAG_QUOTA_BG = (  0,  22,  50)   # dark blue bg for quota badge
-FLAG_QUOTA_FG = ( 80, 170, 255)   # light blue text
+# Item flags — mirrors ITEM_FLAGS in admin_dashboard.py (out_of_stock excluded)
+_FLAGS_RAW = [
+    ('low_stock',    'Low Stock',      '#ff8844'),
+    ('hot_item',     'Hot Item',       '#ff4444'),
+    ('new_arrival',  'New Arrival',    '#44aaff'),
+    ('limited',      'Limited Supply', '#cc66ff'),
+    ('popular',      'Popular',        '#44cc88'),
+]
+
+def _hex_rgb(h):
+    h = h.lstrip('#')
+    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+
+# key -> (label, fg_rgb, bg_rgb)
+FLAG_DISPLAY = {
+    k: (lbl, _hex_rgb(col), tuple(int(c * 0.18) for c in _hex_rgb(col)))
+    for k, lbl, col in _FLAGS_RAW
+}
 
 CAT_COLOURS = {
     'minerals':      (  0, 175, 255),
@@ -152,19 +165,15 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     y += ROW_H
 
     # ── Item rows ─────────────────────────────────────────────────────────────
-    for i, (name, qty, price_pct, alliance_disc, buyback, quota) in enumerate(items_stock):
+    for i, (name, qty, price_pct, alliance_disc, flags) in enumerate(items_stock):
         row_bg = BG if i % 2 == 0 else BG2
         d.rectangle([0, y, IMG_W, y + ROW_H], fill=row_bg)
 
         # Dot
         d.ellipse([PAD, y + 6, PAD + 8, y + 14], fill=GREEN)
 
-        # Measure flag badge widths so the name can be truncated correctly
-        flag_w = 0
-        if buyback:
-            flag_w += tw(d, 'WTB', f_small) + 6 + 3
-        if quota > 0:
-            flag_w += tw(d, fmt_qty(quota), f_small) + 6 + 3
+        # Measure total flag badge width so name can be truncated correctly
+        flag_w = sum(tw(d, lbl, f_small) + 6 + 3 for lbl, _, _ in flags)
 
         # Name — truncated to leave room for flags
         name_avail = NAME_W - flag_w
@@ -173,10 +182,8 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
 
         # Flags — drawn immediately after the (possibly truncated) name
         fx = PAD + 12 + tw(d, disp, f_item) + 5
-        if buyback:
-            fx = _draw_flag(d, fx, y, 'WTB', FLAG_WTB_FG, FLAG_WTB_BG, f_small)
-        if quota > 0:
-            fx = _draw_flag(d, fx, y, fmt_qty(quota), FLAG_QUOTA_FG, FLAG_QUOTA_BG, f_small)
+        for lbl, fg, bg in flags:
+            fx = _draw_flag(d, fx, y, lbl, fg, bg, f_small)
 
         # Qty — right-aligned at qty column anchor
         d.text((qty_right, y + 4), fmt_qty(qty), font=f_price, fill=GREEN, anchor='ra')
@@ -238,12 +245,10 @@ def main():
 
     # ── Query items ───────────────────────────────────────────────────────────
     rows = c.execute('''
-        SELECT t.category, t.type_name, t.display_order,
+        SELECT t.type_id, t.category, t.type_name, t.display_order,
                COALESCE(MAX(i.quantity), 0) AS qty,
                t.price_percentage,
-               COALESCE(t.alliance_discount, 0) AS alliance_discount,
-               COALESCE(t.buyback_accepted, 0) AS buyback_accepted,
-               COALESCE(t.buyback_quota,    0) AS buyback_quota
+               COALESCE(t.alliance_discount, 0) AS alliance_discount
         FROM tracked_market_items t
         LEFT JOIN lx_zoj_inventory i
                ON i.type_id = t.type_id
@@ -251,6 +256,13 @@ def main():
         GROUP BY t.type_id
         ORDER BY t.category, t.display_order, t.type_name
     ''').fetchall()
+
+    # Build flags lookup: type_id -> [(label, fg, bg), ...]
+    flags_lookup: dict = {}
+    for tid, fk in c.execute(
+            "SELECT type_id, flag_key FROM item_flags WHERE flag_key != 'out_of_stock'"):
+        if fk in FLAG_DISPLAY:
+            flags_lookup.setdefault(tid, []).append(FLAG_DISPLAY[fk])
 
     snap_ts = c.execute(
         'SELECT MAX(snapshot_timestamp) FROM lx_zoj_inventory'
@@ -267,14 +279,14 @@ def main():
     cat_all   = defaultdict(list)
     cat_stock = defaultdict(list)
 
-    for cat, name, disp_ord, qty, price_pct, alliance_disc, buyback, quota in rows:
+    for type_id, cat, name, disp_ord, qty, price_pct, alliance_disc in rows:
         if cat not in SHOW_CATS or not cat_visible.get(cat, True):
             continue
         if cat == 'ice_products'   and not ice_sub_visible(disp_ord):
             continue
         if cat == 'moon_materials' and not moon_sub_visible(disp_ord):
             continue
-        entry = (name, qty, price_pct, alliance_disc, buyback, quota)
+        entry = (name, qty, price_pct, alliance_disc, flags_lookup.get(type_id, []))
         cat_all[cat].append(entry)
         if qty > 0:
             cat_stock[cat].append(entry)
