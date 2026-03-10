@@ -547,8 +547,22 @@ def snapshot_test_comp(conn):
         ('PI',                   '684077699'),
     ]
 
-    snapshot_time = datetime.now(timezone.utc).isoformat()
+    INTERVAL_HOURS = 12
     cursor = conn.cursor()
+    last_snap = cursor.execute(
+        'SELECT MAX(snapshot_timestamp) FROM test_comp_snapshots'
+    ).fetchone()[0]
+    if last_snap:
+        from datetime import timedelta
+        last_dt = datetime.fromisoformat(last_snap)
+        if last_dt.tzinfo is None:
+            last_dt = last_dt.replace(tzinfo=timezone.utc)
+        age_hours = (datetime.now(timezone.utc) - last_dt).total_seconds() / 3600
+        if age_hours < INTERVAL_HOURS:
+            print(f'\n>>> Skipping TEST Buyback snapshot (last was {age_hours:.1f}h ago, interval={INTERVAL_HOURS}h)')
+            return None
+
+    snapshot_time = datetime.now(timezone.utc).isoformat()
     rows_inserted = 0
 
     print('\n>>> Snapshotting TEST Buyback competitor stock...')
