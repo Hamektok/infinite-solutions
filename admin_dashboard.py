@@ -2966,196 +2966,289 @@ class AdminDashboard:
     # ===== IMPORT ANALYSIS =====
 
     def build_import_tab(self):
-        """Build the Import Analysis tab (Jita -> null-sec staging, sold via contract)."""
+        """Build the Multi-Hub Import Analysis tab."""
+        import threading as _threading
+        self._hub_import_threading = _threading
+
         outer = ttk.Frame(self.import_frame)
         outer.pack(fill='both', expand=True, padx=15, pady=(15, 10))
 
         ttk.Label(outer,
-                  text="Model profitability of importing items from Jita to null-sec staging, purchased via market and sold via contract.",
+                  text="Compare landed costs across all 5 EVE trade hubs \u2014 buy at cheapest hub, ship to null-sec staging, sell via contract.",
                   style='SubHeader.TLabel').pack(anchor='w', pady=(0, 8))
 
-        # ── Flow indicator ───────────────────────────────────────────────────
-        flow_frame = ttk.Frame(outer)
-        flow_frame.pack(fill='x', pady=(0, 10))
-        for widget_type, text, fg, bg in [
-            ('node',  'JITA\nBuy from market',                  '#00ffff', '#0a2030'),
-            ('arrow', '  >  ',                                   '#1a5060', '#0d1117'),
-            ('cost',  'SHIPPING + COLLATERAL\nHauler contract',  '#ffcc44', '#0d1a00'),
-            ('arrow', '  >  ',                                   '#1a5060', '#0d1117'),
-            ('node',  'NULL-SEC STAGING\nSell via contract',     '#00ff88', '#0a2030'),
-        ]:
-            tk.Label(flow_frame, text=text, background=bg, foreground=fg,
-                     font=('Segoe UI', 10, 'bold' if widget_type != 'arrow' else 'normal'),
-                     relief=('solid' if widget_type != 'arrow' else 'flat'),
-                     borderwidth=(1 if widget_type != 'arrow' else 0),
-                     padx=(10 if widget_type != 'arrow' else 0),
-                     pady=(5 if widget_type != 'arrow' else 0)).pack(side='left')
+        # \u2500\u2500 Fetch card \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        fetch_card = ttk.Frame(outer, style='Card.TFrame')
+        fetch_card.pack(fill='x', pady=(0, 8))
+        fetch_inner = ttk.Frame(fetch_card, style='Card.TFrame')
+        fetch_inner.pack(fill='x', padx=12, pady=8)
 
-        # ── Parameter panel ──────────────────────────────────────────────────
+        tk.Label(fetch_inner, text='Fetch Hub Prices:', background='#0a2030',
+                 foreground='#88d0e8', font=('Segoe UI', 9)).pack(side='left', padx=(0, 8))
+        self._hub_fetch_btns = {}
+        for label, cat in [('All', 'all'), ('Tracked', 'tracked'),
+                            ('Std Ore', 'standard'), ('Ice Ore', 'ice'),
+                            ('Moon Ore', 'moon'), ('Gas', 'gas')]:
+            btn = ttk.Button(fetch_inner, text=f'\u27f3 {label}', style='Action.TButton',
+                             command=lambda c=cat: self._run_hub_fetch(c))
+            btn.pack(side='left', padx=(0, 4))
+            self._hub_fetch_btns[cat] = btn
+
+        self._hub_price_age_lbl = tk.Label(fetch_inner,
+            text='\u26a0 Not loaded \u2014 click Fetch to begin',
+            background='#0a2030', foreground='#ffcc44', font=('Segoe UI', 8))
+        self._hub_price_age_lbl.pack(side='right')
+
+        # \u2500\u2500 Parameter card \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         param_card = ttk.Frame(outer, style='Card.TFrame')
-        param_card.pack(fill='x', pady=(0, 10))
-        param_inner = ttk.Frame(param_card, style='Card.TFrame')
-        param_inner.pack(fill='x', padx=12, pady=10)
+        param_card.pack(fill='x', pady=(0, 6))
+
+        param_top = ttk.Frame(param_card, style='Card.TFrame')
+        param_top.pack(fill='x', padx=12, pady=(10, 6))
 
         lbl_cfg = dict(background='#0a2030', foreground='#88d0e8', font=('Segoe UI', 10))
         hdr_cfg = dict(background='#0a2030', font=('Segoe UI', 9, 'bold'))
 
-        tk.Label(param_inner, text="BUY SIDE  (Jita market, fees may apply)",
-                 foreground='#66d9ff', **hdr_cfg).grid(
-                 row=0, column=0, columnspan=3, sticky='w', padx=(0, 20), pady=(0, 6))
-        tk.Label(param_inner, text="LOGISTICS",
+        # BUY SIDE
+        tk.Label(param_top, text="BUY SIDE", foreground='#66d9ff', **hdr_cfg).grid(
+                 row=0, column=0, columnspan=3, sticky='w', pady=(0, 4))
+        tk.Label(param_top, text="Order Type", **lbl_cfg).grid(row=1, column=0, sticky='w', padx=(0, 4))
+        self.hub_buy_type_var = tk.StringVar(
+            value=self._get_config('hub_import_buy_type', 'Sell Orders'))
+        self.hub_buy_type_var.trace_add('write',
+            lambda *_: self._set_config('hub_import_buy_type', self.hub_buy_type_var.get()))
+        self.hub_buy_type_var.trace_add('write', lambda *_: self._hub_import_broker_toggle())
+        ttk.Combobox(param_top, textvariable=self.hub_buy_type_var, width=14,
+                     values=['Sell Orders', 'Buy Orders'],
+                     state='readonly').grid(row=2, column=0, sticky='w', padx=(0, 10))
+
+        tk.Label(param_top, text="Buy %", **lbl_cfg).grid(row=1, column=1, sticky='w', padx=(0, 4))
+        self.hub_buy_pct_var = tk.StringVar(value=self._get_config('hub_import_buy_pct', '100'))
+        self.hub_buy_pct_var.trace_add('write',
+            lambda *_: self._set_config('hub_import_buy_pct', self.hub_buy_pct_var.get()))
+        ttk.Entry(param_top, textvariable=self.hub_buy_pct_var, width=7).grid(
+            row=2, column=1, sticky='w', padx=(0, 10))
+
+        tk.Label(param_top, text="Broker Fee %", **lbl_cfg).grid(row=1, column=2, sticky='w', padx=(0, 4))
+        self.hub_broker_var = tk.StringVar(value=self._get_config('hub_import_broker_pct', '0.0'))
+        self.hub_broker_var.trace_add('write',
+            lambda *_: self._set_config('hub_import_broker_pct', self.hub_broker_var.get()))
+        self._hub_broker_entry = ttk.Entry(
+            param_top, textvariable=self.hub_broker_var, width=7, state='disabled')
+        self._hub_broker_entry.grid(row=2, column=2, sticky='w', padx=(0, 20))
+
+        # Divider
+        tk.Frame(param_top, background='#1a3040', width=1).grid(
+            row=0, column=3, rowspan=3, sticky='ns', padx=(0, 16))
+
+        # NULL FREIGHT
+        tk.Label(param_top, text="NULL FREIGHT  (Null-Sec leg)",
                  foreground='#ffcc44', **hdr_cfg).grid(
-                 row=0, column=3, columnspan=3, sticky='w', padx=(16, 20), pady=(0, 6))
-        tk.Label(param_inner, text="SELL SIDE  (contract, no tax/broker)",
-                 foreground='#00ff88', **hdr_cfg).grid(
-                 row=0, column=6, columnspan=3, sticky='w', padx=(16, 0), pady=(0, 6))
-
-        tk.Frame(param_inner, background='#1a3040', height=1).grid(
-            row=1, column=0, columnspan=9, sticky='ew', pady=(0, 8))
-
-        # Buy side
-        tk.Label(param_inner, text="Buy From", **lbl_cfg).grid(
-            row=2, column=0, sticky='w', padx=(0, 4))
-        self.import_buy_var = tk.StringVar(value=self._get_config('import_param_buy_basis', 'JSV  (instant, from sell orders)'))
-        self.import_buy_var.trace_add('write', lambda *_: self._set_config('import_param_buy_basis', self.import_buy_var.get()))
-        ttk.Combobox(param_inner, textvariable=self.import_buy_var, width=22,
-                     values=['JSV  (instant, from sell orders)', 'JBV  (place buy order)'],
-                     state='readonly').grid(row=3, column=0, sticky='w', padx=(0, 12))
-
-        tk.Label(param_inner, text="Buy % of Basis", **lbl_cfg).grid(
-            row=2, column=1, sticky='w', padx=(0, 4))
-        self.import_buy_pct_var = tk.StringVar(value=self._get_config('import_param_buy_pct', '100'))
-        self.import_buy_pct_var.trace_add('write', lambda *_: self._set_config('import_param_buy_pct', self.import_buy_pct_var.get()))
-        ttk.Entry(param_inner, textvariable=self.import_buy_pct_var, width=8).grid(
-            row=3, column=1, sticky='w', padx=(0, 12))
-
-        tk.Label(param_inner, text="Broker Fee %", **lbl_cfg).grid(
-            row=2, column=2, sticky='w', padx=(0, 4))
-        self.import_broker_var = tk.StringVar(value=self._get_config('import_param_broker_pct', '0.0'))
-        self.import_broker_var.trace_add('write', lambda *_: self._set_config('import_param_broker_pct', self.import_broker_var.get()))
-        ttk.Entry(param_inner, textvariable=self.import_broker_var, width=8).grid(
-            row=3, column=2, sticky='w', padx=(0, 20))
-
-        # Logistics
-        tk.Frame(param_inner, background='#1a3040', width=1).grid(
-            row=2, column=3, rowspan=2, sticky='ns', padx=(0, 12))
-        tk.Label(param_inner, text="Shipping (ISK/m\u00b3)", **lbl_cfg).grid(
-            row=2, column=4, sticky='w', padx=(0, 4))
-        self.import_ship_var = tk.StringVar(value=self._get_config('import_param_ship_rate', '125'))
-        self.import_ship_var.trace_add('write', lambda *_: self._set_config('import_param_ship_rate', self.import_ship_var.get()))
-        ttk.Entry(param_inner, textvariable=self.import_ship_var, width=10).grid(
-            row=3, column=4, sticky='w', padx=(0, 12))
-
-        tk.Label(param_inner, text="Collateral %", **lbl_cfg).grid(
-            row=2, column=5, sticky='w', padx=(0, 4))
-        self.import_collat_var = tk.StringVar(value=self._get_config('import_param_collat_pct', '1.0'))
-        self.import_collat_var.trace_add('write', lambda *_: self._set_config('import_param_collat_pct', self.import_collat_var.get()))
-        ttk.Entry(param_inner, textvariable=self.import_collat_var, width=8).grid(
-            row=3, column=5, sticky='w', padx=(0, 20))
-
-        # Sell side
-        tk.Frame(param_inner, background='#1a3040', width=1).grid(
-            row=2, column=6, rowspan=2, sticky='ns', padx=(0, 12))
-        tk.Label(param_inner, text="Price Reference", **lbl_cfg).grid(
-            row=2, column=7, sticky='w', padx=(0, 4))
-        self.import_sell_ref_var = tk.StringVar(value=self._get_config('import_param_sell_ref', 'JSV'))
-        self.import_sell_ref_var.trace_add('write', lambda *_: self._set_config('import_param_sell_ref', self.import_sell_ref_var.get()))
-        ttk.Combobox(param_inner, textvariable=self.import_sell_ref_var,
-                     width=14, values=['JSV', 'Jita Split', 'JBV'],
-                     state='readonly').grid(row=3, column=7, sticky='w', padx=(0, 12))
-
-        tk.Label(param_inner, text="Sell Markup %", **lbl_cfg).grid(
-            row=2, column=8, sticky='w', padx=(0, 4))
-        self.import_markup_var = tk.StringVar(value=self._get_config('import_param_markup_pct', '115'))
-        self.import_markup_var.trace_add('write', lambda *_: self._set_config('import_param_markup_pct', self.import_markup_var.get()))
-        ttk.Entry(param_inner, textvariable=self.import_markup_var, width=8).grid(
-            row=3, column=8, sticky='w', padx=(0, 12))
-
-        ttk.Button(param_inner, text='\u27f3  Recalculate', style='Action.TButton',
-                   command=self.load_import_data).grid(
-                   row=3, column=9, sticky='w', padx=(4, 0))
-
-        # Quick scenarios
-        scenario_frame = ttk.Frame(param_card, style='Card.TFrame')
-        scenario_frame.pack(fill='x', padx=12, pady=(0, 10))
-        tk.Label(scenario_frame, text="Quick:", **lbl_cfg).pack(side='left', padx=(0, 8))
-        for label, buy, pct, broker, ref, markup in [
-            ('JSV + 15%  (baseline)',    'JSV  (instant, from sell orders)', '100', '0.0', 'JSV', '115'),
-            ('JSV + 20%  (premium)',     'JSV  (instant, from sell orders)', '100', '0.0', 'JSV', '120'),
-            ('JSV + 10%  (competitive)', 'JSV  (instant, from sell orders)', '100', '0.0', 'JSV', '110'),
-            ('JBV order + 15%',          'JBV  (place buy order)',           '100', '3.0', 'JSV', '115'),
+                 row=0, column=4, columnspan=4, sticky='w', pady=(0, 4))
+        for col, key, label, default, w in [
+            (4, 'null_ism3', 'ISK/m\u00b3',   '125', 8),
+            (5, 'null_isj',  'ISK/jump', '0',   7),
+            (6, 'null_j',    '# Jumps',  '65',  7),
+            (7, 'null_coll', 'Collat %', '1.0', 7),
         ]:
-            ttk.Button(scenario_frame, text=label, style='Action.TButton',
-                       command=lambda b=buy, p=pct, br=broker, r=ref, m=markup:
-                           self._apply_import_scenario(b, p, br, r, m)
-                       ).pack(side='left', padx=3)
+            tk.Label(param_top, text=label, **lbl_cfg).grid(
+                row=1, column=col, sticky='w', padx=(0, 4))
+            var = tk.StringVar(value=self._get_config(f'hub_import_{key}', default))
+            var.trace_add('write', lambda *_, k=f'hub_import_{key}', v=var:
+                          self._set_config(k, v.get()))
+            setattr(self, f'hub_{key}_var', var)
+            ttk.Entry(param_top, textvariable=var, width=w).grid(
+                row=2, column=col, sticky='w', padx=(0, 8))
 
-        # Summary cards
-        self.import_summary_frame = ttk.Frame(outer)
-        self.import_summary_frame.pack(fill='x', pady=(0, 8))
-        self._import_summary_labels = {}
-        for key, title in [('scenario', 'SCENARIO'), ('total', 'ITEMS ANALYSED'),
-                            ('worth', 'WORTH IMPORTING'), ('marginal', 'MARGINAL'),
-                            ('avoid', 'AVOID'), ('avg_margin', 'AVG MARGIN')]:
-            card = ttk.Frame(self.import_summary_frame, style='Card.TFrame')
+        # Divider
+        tk.Frame(param_top, background='#1a3040', width=1).grid(
+            row=0, column=8, rowspan=3, sticky='ns', padx=(0, 16))
+
+        # SELL SIDE
+        tk.Label(param_top, text="SELL SIDE  (Contract, Jita-based)",
+                 foreground='#00ff88', **hdr_cfg).grid(
+                 row=0, column=9, columnspan=3, sticky='w', pady=(0, 4))
+
+        tk.Label(param_top, text="Price Ref", **lbl_cfg).grid(row=1, column=9, sticky='w', padx=(0, 4))
+        self.hub_sell_ref_var = tk.StringVar(value=self._get_config('hub_import_sell_ref', 'JSV'))
+        self.hub_sell_ref_var.trace_add('write',
+            lambda *_: self._set_config('hub_import_sell_ref', self.hub_sell_ref_var.get()))
+        ttk.Combobox(param_top, textvariable=self.hub_sell_ref_var, width=12,
+                     values=['JSV', 'Jita Split', 'JBV'],
+                     state='readonly').grid(row=2, column=9, sticky='w', padx=(0, 10))
+
+        tk.Label(param_top, text="Markup %", **lbl_cfg).grid(row=1, column=10, sticky='w', padx=(0, 4))
+        self.hub_markup_var = tk.StringVar(value=self._get_config('hub_import_markup_pct', '115'))
+        self.hub_markup_var.trace_add('write',
+            lambda *_: self._set_config('hub_import_markup_pct', self.hub_markup_var.get()))
+        ttk.Entry(param_top, textvariable=self.hub_markup_var, width=7).grid(
+            row=2, column=10, sticky='w', padx=(0, 10))
+
+        ttk.Button(param_top, text='\u27f3  Recalculate', style='Action.TButton',
+                   command=self.load_import_data).grid(row=2, column=11, sticky='w', padx=(4, 0))
+
+        # HS FREIGHT section
+        hs_frame = ttk.Frame(param_card, style='Card.TFrame')
+        hs_frame.pack(fill='x', padx=12, pady=(0, 10))
+        tk.Frame(hs_frame, background='#1a3040', height=1).pack(fill='x', pady=(0, 8))
+
+        hs_top = ttk.Frame(hs_frame, style='Card.TFrame')
+        hs_top.pack(fill='x')
+        tk.Label(hs_top, text="HS FREIGHT  (High-Sec legs)",
+                 foreground='#ff9944', **hdr_cfg).pack(side='left', padx=(0, 16))
+        for key, label, default, w in [
+            ('hs_ism3', 'ISK/m\u00b3',   '150', 7),
+            ('hs_isj',  'ISK/jump', '50',  6),
+            ('hs_coll', 'Collat %', '1.0', 6),
+        ]:
+            tk.Label(hs_top, text=label, **lbl_cfg).pack(side='left', padx=(0, 4))
+            var = tk.StringVar(value=self._get_config(f'hub_import_{key}', default))
+            var.trace_add('write', lambda *_, k=f'hub_import_{key}', v=var:
+                          self._set_config(k, v.get()))
+            setattr(self, f'hub_{key}_var', var)
+            ttk.Entry(hs_top, textvariable=var, width=w).pack(side='left', padx=(0, 14))
+
+        # Hub-specific jump config table
+        hub_grid = ttk.Frame(hs_frame, style='Card.TFrame')
+        hub_grid.pack(fill='x', pady=(6, 0))
+        for c, text in enumerate(['Hub', 'Leg 1 Jumps', '2nd Leg', 'Leg 2 Jumps', 'Enabled']):
+            tk.Label(hub_grid, text=text, background='#0a2030', foreground='#88d0e8',
+                     font=('Segoe UI', 8, 'bold')).grid(
+                     row=0, column=c, sticky='w', padx=(0, 14), pady=(0, 4))
+
+        self._hub_vars = {}
+        HUB_DEFAULTS = {
+            'jita':    {'j1': '0',  'j2': '0',  'leg2': False, 'en': True},
+            'amarr':   {'j1': '9',  'j2': '4',  'leg2': True,  'en': True},
+            'dodixie': {'j1': '6',  'j2': '0',  'leg2': False, 'en': True},
+            'rens':    {'j1': '13', 'j2': '4',  'leg2': True,  'en': True},
+            'hek':     {'j1': '16', 'j2': '4',  'leg2': True,  'en': True},
+        }
+        HUB_COLORS = {
+            'jita': '#00ffff', 'amarr': '#ffaa44', 'dodixie': '#ffcc88',
+            'rens': '#88ffcc', 'hek': '#88ccff',
+        }
+        for row_i, (hub, defs) in enumerate(HUB_DEFAULTS.items(), start=1):
+            tk.Label(hub_grid, text=hub.title(), background='#0a2030',
+                     foreground=HUB_COLORS[hub],
+                     font=('Segoe UI', 9, 'bold')).grid(
+                     row=row_i, column=0, sticky='w', padx=(0, 14))
+            if hub == 'jita':
+                tk.Label(hub_grid, text='\u2014 null only \u2014', background='#0a2030',
+                         foreground='#1a4060', font=('Segoe UI', 9)).grid(
+                         row=row_i, column=1, columnspan=3, sticky='w')
+                en_var = tk.BooleanVar(value=bool(int(
+                    self._get_config('hub_import_en_jita', '1'))))
+                en_var.trace_add('write', lambda *_, v=en_var:
+                    self._set_config('hub_import_en_jita', '1' if v.get() else '0'))
+                ttk.Checkbutton(hub_grid, variable=en_var).grid(
+                    row=row_i, column=4, sticky='w')
+                self._hub_vars['jita'] = {'en': en_var}
+            else:
+                j1_var = tk.StringVar(value=self._get_config(
+                    f'hub_import_j1_{hub}', defs['j1']))
+                j1_var.trace_add('write', lambda *_, k=f'hub_import_j1_{hub}', v=j1_var:
+                    self._set_config(k, v.get()))
+                ttk.Entry(hub_grid, textvariable=j1_var, width=5).grid(
+                    row=row_i, column=1, sticky='w', padx=(0, 14))
+
+                leg2_var = tk.BooleanVar(value=bool(int(self._get_config(
+                    f'hub_import_leg2_{hub}', '1' if defs['leg2'] else '0'))))
+                leg2_var.trace_add('write', lambda *_, k=f'hub_import_leg2_{hub}', v=leg2_var:
+                    self._set_config(k, '1' if v.get() else '0'))
+                ttk.Checkbutton(hub_grid, text='+', variable=leg2_var).grid(
+                    row=row_i, column=2, sticky='w', padx=(0, 14))
+
+                j2_var = tk.StringVar(value=self._get_config(
+                    f'hub_import_j2_{hub}', defs['j2']))
+                j2_var.trace_add('write', lambda *_, k=f'hub_import_j2_{hub}', v=j2_var:
+                    self._set_config(k, v.get()))
+                ttk.Entry(hub_grid, textvariable=j2_var, width=5).grid(
+                    row=row_i, column=3, sticky='w', padx=(0, 14))
+
+                en_var = tk.BooleanVar(value=bool(int(self._get_config(
+                    f'hub_import_en_{hub}', '1'))))
+                en_var.trace_add('write', lambda *_, k=f'hub_import_en_{hub}', v=en_var:
+                    self._set_config(k, '1' if v.get() else '0'))
+                ttk.Checkbutton(hub_grid, variable=en_var).grid(
+                    row=row_i, column=4, sticky='w')
+
+                self._hub_vars[hub] = {
+                    'j1': j1_var, 'j2': j2_var, 'leg2': leg2_var, 'en': en_var,
+                }
+
+        self._hub_import_broker_toggle()
+
+        # \u2500\u2500 Summary cards \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        self.hub_import_summary_frame = ttk.Frame(outer)
+        self.hub_import_summary_frame.pack(fill='x', pady=(0, 8))
+        self._hub_import_summary_labels = {}
+        for key, title in [
+            ('total',      'ITEMS ANALYSED'), ('worth',    'WORTH IMPORTING'),
+            ('marginal',   'MARGINAL'),        ('avoid',    'AVOID'),
+            ('avg_margin', 'AVG MARGIN'),       ('best_hub', 'BEST HUB'),
+        ]:
+            card = ttk.Frame(self.hub_import_summary_frame, style='Card.TFrame')
             card.pack(side='left', fill='both', expand=True, padx=3)
             tk.Label(card, text=title, background='#0a2030', foreground='#66d9ff',
                      font=('Segoe UI', 9)).pack(anchor='w', padx=8, pady=(6, 0))
             val_lbl = tk.Label(card, text='\u2014', background='#0a2030',
                                foreground='#00ffff', font=('Segoe UI', 12, 'bold'))
             val_lbl.pack(anchor='w', padx=8, pady=(0, 6))
-            self._import_summary_labels[key] = val_lbl
+            self._hub_import_summary_labels[key] = val_lbl
 
-        # Filter row
+        # \u2500\u2500 Filter row \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         filter_frame = ttk.Frame(outer)
         filter_frame.pack(fill='x', pady=(0, 6))
         ttk.Label(filter_frame, text="Search:").pack(side='left', padx=(0, 4))
-        self.import_search_var = tk.StringVar()
-        self.import_search_var.trace_add('write', lambda *_: self._filter_import_tree())
-        ttk.Entry(filter_frame, textvariable=self.import_search_var, width=18).pack(
+        self.hub_import_search_var = tk.StringVar()
+        self.hub_import_search_var.trace_add('write', lambda *_: self._filter_import_tree())
+        ttk.Entry(filter_frame, textvariable=self.hub_import_search_var, width=18).pack(
             side='left', padx=(0, 12))
         ttk.Label(filter_frame, text="Category:").pack(side='left', padx=(0, 4))
         self.import_cat_var = tk.StringVar(value='All')
-        import_cat_menu = ttk.Combobox(filter_frame, textvariable=self.import_cat_var,
-                                       width=20, state='readonly',
-                                       values=['All', 'Minerals', 'Ice Products',
-                                               'PI Materials', 'Moon Materials',
-                                               'Salvaged Materials'])
+        import_cat_menu = ttk.Combobox(
+            filter_frame, textvariable=self.import_cat_var, width=18, state='readonly',
+            values=['All', 'Minerals', 'Ice Products', 'PI Materials',
+                    'Moon Materials', 'Salvaged Materials'])
         import_cat_menu.pack(side='left', padx=(0, 12))
         import_cat_menu.bind('<<ComboboxSelected>>', lambda _: self._import_cat_changed())
         ttk.Label(filter_frame, text="Subcategory:").pack(side='left', padx=(0, 4))
         self.import_sub_var = tk.StringVar(value='All Subcategories')
-        self.import_sub_menu = ttk.Combobox(filter_frame, textvariable=self.import_sub_var,
-                                            width=18, state='readonly',
-                                            values=['All Subcategories'])
+        self.import_sub_menu = ttk.Combobox(
+            filter_frame, textvariable=self.import_sub_var, width=18, state='readonly',
+            values=['All Subcategories'])
         self.import_sub_menu.pack(side='left', padx=(0, 12))
         self.import_sub_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_import_tree())
         ttk.Label(filter_frame, text="Show:").pack(side='left', padx=(0, 4))
         self.import_show_var = tk.StringVar(value='Profitable')
-        show_menu = ttk.Combobox(filter_frame, textvariable=self.import_show_var,
-                                 width=16, state='readonly',
-                                 values=['All', 'Profitable', 'Marginal', 'Avoid'])
+        show_menu = ttk.Combobox(
+            filter_frame, textvariable=self.import_show_var, width=16, state='readonly',
+            values=['All', 'Profitable', 'Marginal', 'Avoid'])
         show_menu.pack(side='left', padx=(0, 4))
         show_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_import_tree())
 
-        # Treeview
+        # \u2500\u2500 Treeview \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         tree_frame = ttk.Frame(outer)
         tree_frame.pack(fill='both', expand=True)
-        cols = ('category', 'item', 'volume', 'buy_cost', 'ship_collat',
-                'total_cost', 'contract_price', 'profit', 'margin', 'verdict')
+        cols = ('category', 'item', 'volume',
+                'jita_lc', 'amarr_lc', 'dodixie_lc', 'rens_lc', 'hek_lc',
+                'best_hub', 'contract', 'margin', 'verdict')
         self.import_tree = ttk.Treeview(tree_frame, columns=cols,
                                         show='headings', selectmode='browse')
         for col, heading, width, anchor in [
-            ('category',       'Category',       120, 'w'),
-            ('item',           'Item',            195, 'w'),
-            ('volume',         'Vol (m\u00b3)',    70, 'e'),
-            ('buy_cost',       'Buy Cost',        110, 'e'),
-            ('ship_collat',    'Ship+Collat',     105, 'e'),
-            ('total_cost',     'Total Landed',    110, 'e'),
-            ('contract_price', 'Contract Price',  115, 'e'),
-            ('profit',         'Profit / unit',   105, 'e'),
-            ('margin',         'Margin',           75, 'e'),
-            ('verdict',        'Verdict',          90, 'center'),
+            ('category',   'Category',     110, 'w'),
+            ('item',       'Item',          180, 'w'),
+            ('volume',     'Vol m\u00b3',         65, 'e'),
+            ('jita_lc',    'Jita',           95, 'e'),
+            ('amarr_lc',   'Amarr',          95, 'e'),
+            ('dodixie_lc', 'Dodixie',        95, 'e'),
+            ('rens_lc',    'Rens',           95, 'e'),
+            ('hek_lc',     'Hek',            95, 'e'),
+            ('best_hub',   'Best Hub',       80, 'center'),
+            ('contract',   'Contract',      100, 'e'),
+            ('margin',     'Margin',          70, 'e'),
+            ('verdict',    'Verdict',         80, 'center'),
         ]:
             self.import_tree.heading(col, text=heading,
                                      command=lambda c=col: self._sort_import_tree(c))
@@ -3171,10 +3264,10 @@ class AdminDashboard:
         vsb.pack(side='right', fill='y')
 
         ttk.Label(outer,
-                  text="Buy cost = Jita price x buy %.  Broker fee only if placing buy orders.  "
-                       "No buyer-side sales tax (paid by seller).  "
-                       "Contract price = reference x markup %.  No tax/broker on contract sales.  "
-                       "Margin = (Contract - Landed) / Contract.",
+                  text="Landed cost = hub price \u00d7 buy% \u00d7 (1+broker) + null freight + HS freight (per leg).  "
+                       "Best Hub = lowest landed cost among enabled hubs.  "
+                       "Contract price = Jita reference \u00d7 markup%.  "
+                       "Margin = (Contract \u2212 Best Landed) / Contract.",
                   foreground='#2a5070', background='#0d1117',
                   font=('Segoe UI', 9)).pack(anchor='w', pady=(4, 0))
 
@@ -3182,54 +3275,119 @@ class AdminDashboard:
         self._import_sort_col = 'margin'
         self._import_sort_asc = False
 
-    def _apply_import_scenario(self, buy, pct, broker, ref, markup):
-        self.import_buy_var.set(buy)
-        self.import_buy_pct_var.set(pct)
-        self.import_broker_var.set(broker)
-        self.import_sell_ref_var.set(ref)
-        self.import_markup_var.set(markup)
-        self.load_import_data()
+    def _hub_import_broker_toggle(self):
+        """Enable/disable broker fee entry based on order type selection."""
+        is_buy = self.hub_buy_type_var.get() == 'Buy Orders'
+        self._hub_broker_entry.configure(state='normal' if is_buy else 'disabled')
 
-    def _import_price_for_basis(self, basis, best_buy, best_sell):
-        key = basis.split()[0]
-        if key == 'JSV':
-            return best_sell
-        elif key == 'JBV':
-            return best_buy or best_sell   # fall back to sell when no buy orders exist
-        return ((best_buy or best_sell) + best_sell) / 2
+    def _run_hub_fetch(self, category='all'):
+        """Run fetch_hub_prices.py for the given category in a background thread."""
+        import threading
+        import subprocess
+        for btn in self._hub_fetch_btns.values():
+            btn.configure(state='disabled')
+        self._hub_price_age_lbl.configure(
+            text=f'Fetching {category} prices from all hubs...',
+            foreground='#ffcc44')
+        self.root.update()
+
+        python_exe = r'C:\Users\lsant\AppData\Local\Python\pythoncore-3.14-64\python.exe'
+        fetch_script = os.path.join(PROJECT_DIR, 'scripts', 'fetch_hub_prices.py')
+        fetch_error = [None]
+
+        def _worker():
+            try:
+                result = subprocess.run(
+                    [python_exe, fetch_script, category, 'all'],
+                    cwd=PROJECT_DIR, capture_output=True, timeout=600, text=True)
+                if result.returncode != 0:
+                    fetch_error[0] = (result.stderr or result.stdout or 'unknown').strip()[-200:]
+            except Exception as e:
+                fetch_error[0] = str(e)
+            self.root.after(0, _done)
+
+        def _done():
+            for btn in self._hub_fetch_btns.values():
+                btn.configure(state='normal')
+            if fetch_error[0]:
+                self._hub_price_age_lbl.configure(
+                    text=f'\u26a0 Fetch failed: {fetch_error[0]}', foreground='#ff4444')
+            else:
+                self.load_import_data()
+
+        threading.Thread(target=_worker, daemon=True).start()
 
     def load_import_data(self):
-        """Query DB and populate the import analysis treeview."""
+        """Query market_snapshots and populate the multi-hub import analysis treeview."""
         try:
-            ship_rate  = float(self.import_ship_var.get())
-            collat_pct = float(self.import_collat_var.get()) / 100.0
-            buy_pct    = float(self.import_buy_pct_var.get()) / 100.0
-            broker_pct = float(self.import_broker_var.get()) / 100.0
-            markup_pct = float(self.import_markup_var.get()) / 100.0
+            buy_pct    = float(self.hub_buy_pct_var.get()) / 100.0
+            broker_pct = (float(self.hub_broker_var.get()) / 100.0
+                          if self.hub_buy_type_var.get() == 'Buy Orders' else 0.0)
+            null_ism3  = float(self.hub_null_ism3_var.get())
+            null_isj   = float(self.hub_null_isj_var.get())
+            null_j     = int(float(self.hub_null_j_var.get()))
+            null_coll  = float(self.hub_null_coll_var.get()) / 100.0
+            hs_ism3    = float(self.hub_hs_ism3_var.get())
+            hs_isj     = float(self.hub_hs_isj_var.get())
+            hs_coll    = float(self.hub_hs_coll_var.get()) / 100.0
+            markup_pct = float(self.hub_markup_var.get()) / 100.0
         except ValueError:
             messagebox.showerror("Invalid Input", "All parameters must be numeric.")
             return
 
-        buy_basis        = self.import_buy_var.get()
-        sell_ref         = self.import_sell_ref_var.get()
-        effective_broker = broker_pct if 'JBV' in buy_basis else 0.0
+        sell_ref = self.hub_sell_ref_var.get()
+
+        # Build per-hub config
+        HUB_STATION = {
+            'jita': 60003760, 'amarr': 60008494, 'dodixie': 60011866,
+            'rens': 60004588, 'hek':   60005686,
+        }
+        hubs_cfg = {}
+        for hub in HUB_STATION:
+            hv = self._hub_vars.get(hub, {})
+            try:
+                j1 = int(float(hv['j1'].get())) if 'j1' in hv else 0
+                j2 = int(float(hv['j2'].get())) if 'j2' in hv else 0
+            except (ValueError, AttributeError):
+                j1, j2 = 0, 0
+            hubs_cfg[hub] = {
+                'j1':   j1,
+                'j2':   j2,
+                'leg2': hv['leg2'].get() if 'leg2' in hv else False,
+                'en':   hv['en'].get()   if 'en'   in hv else True,
+            }
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT it.type_name, tmi.category, it.volume, mps.best_buy, mps.best_sell,
-                   tmi.display_order, it.market_group_id
-            FROM tracked_market_items tmi
-            JOIN inv_types it               ON tmi.type_id = it.type_id
-            JOIN market_price_snapshots mps ON tmi.type_id = mps.type_id
-            WHERE mps.timestamp = (
-                SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id = tmi.type_id
+            WITH latest AS (
+                SELECT station_id, type_id, best_buy, best_sell,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY station_id, type_id
+                           ORDER BY fetched_at DESC) AS rn
+                FROM market_snapshots
             )
-              AND mps.best_sell > 0
+            SELECT tmi.type_id, it.type_name, tmi.category, it.volume,
+                   tmi.display_order, it.market_group_id,
+                   j.best_buy,  j.best_sell,
+                   a.best_buy,  a.best_sell,
+                   d.best_buy,  d.best_sell,
+                   r.best_buy,  r.best_sell,
+                   h.best_buy,  h.best_sell
+            FROM tracked_market_items tmi
+            JOIN inv_types it ON tmi.type_id = it.type_id
+            LEFT JOIN latest j ON j.type_id=tmi.type_id AND j.station_id=60003760 AND j.rn=1
+            LEFT JOIN latest a ON a.type_id=tmi.type_id AND a.station_id=60008494 AND a.rn=1
+            LEFT JOIN latest d ON d.type_id=tmi.type_id AND d.station_id=60011866 AND d.rn=1
+            LEFT JOIN latest r ON r.type_id=tmi.type_id AND r.station_id=60004588 AND r.rn=1
+            LEFT JOIN latest h ON h.type_id=tmi.type_id AND h.station_id=60005686 AND h.rn=1
+            WHERE (j.best_sell IS NOT NULL OR a.best_sell IS NOT NULL
+                   OR d.best_sell IS NOT NULL OR r.best_sell IS NOT NULL
+                   OR h.best_sell IS NOT NULL)
             ORDER BY tmi.category, it.type_name
         """)
         rows = cursor.fetchall()
-        cursor.execute("SELECT MAX(timestamp) FROM market_price_snapshots")
+        cursor.execute("SELECT MAX(fetched_at) FROM market_snapshots")
         snap_ts = cursor.fetchone()[0] or '\u2014'
         conn.close()
 
@@ -3238,15 +3396,16 @@ class AdminDashboard:
             'moon_materials': 'Moon Materials', 'pi_materials': 'PI Materials',
             'salvaged_materials': 'Salvaged Materials',
         }
-        _pi_sub  = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+        _pi_sub = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+
         def _sub(cat, disp, mg):
             if cat == 'ice_products':
                 if disp <= 8:  return 'Fuel Blocks'
                 if disp <= 11: return 'Refined Ice'
                 return 'Isotopes'
             if cat == 'moon_materials':
-                if disp < 100:  return 'Raw'
-                if disp < 200:  return 'Processed'
+                if disp < 100: return 'Raw'
+                if disp < 200: return 'Processed'
                 return 'Advanced'
             if cat == 'pi_materials':
                 return _pi_sub.get(mg, '')
@@ -3258,21 +3417,66 @@ class AdminDashboard:
                 return 'Rogue Drone'
             return ''
 
-        self._import_all_rows = []
-        counts = {'great': 0, 'good': 0, 'marginal': 0, 'avoid': 0}
-        margin_sum, margin_n = 0.0, 0
+        def _calc_landed(hub_buy, hub_sell, vol, j1, j2, leg2, is_jita):
+            raw = hub_buy if self.hub_buy_type_var.get() == 'Buy Orders' else None
+            raw = raw or hub_sell
+            if raw is None:
+                return None
+            buy_cost     = raw * buy_pct * (1.0 + broker_pct)
+            null_freight = null_ism3 * vol + null_isj * null_j + null_coll * buy_cost
+            if is_jita:
+                return buy_cost + null_freight
+            legs       = 2 if leg2 else 1
+            total_hs_j = j1 + (j2 if leg2 else 0)
+            hs_freight  = (legs * hs_ism3 * vol + hs_isj * total_hs_j
+                           + legs * hs_coll * buy_cost)
+            return buy_cost + hs_freight + null_freight
 
-        for name, category, volume, best_buy, best_sell, disp_ord, mgroup in rows:
+        HUB_NAMES = ['jita', 'amarr', 'dodixie', 'rens', 'hek']
+        self._import_all_rows = []
+        counts        = {'great': 0, 'good': 0, 'marginal': 0, 'avoid': 0}
+        margin_sum, margin_n = 0.0, 0
+        hub_win_count = {h: 0 for h in HUB_NAMES}
+
+        for row in rows:
+            tid, name, category, volume, disp_ord, mgroup = row[:6]
+            hub_prices = {HUB_NAMES[i]: (row[6 + i * 2], row[7 + i * 2])
+                          for i in range(5)}
             subcategory = _sub(category, disp_ord or 0, mgroup or 0)
-            raw_buy        = self._import_price_for_basis(buy_basis, best_buy, best_sell)
-            buy_cost       = raw_buy * buy_pct + raw_buy * effective_broker
-            ship_cost      = volume * ship_rate
-            collat         = buy_cost * collat_pct
-            total_cost     = buy_cost + ship_cost + collat
-            ref_price      = self._import_price_for_basis(sell_ref, best_buy, best_sell)
-            contract_price = ref_price * markup_pct
-            profit         = contract_price - total_cost
-            margin         = (profit / contract_price * 100) if contract_price > 0 else 0
+
+            landed = {}
+            for hub in HUB_NAMES:
+                cfg = hubs_cfg[hub]
+                if not cfg['en']:
+                    continue
+                hb, hs = hub_prices[hub]
+                lc = _calc_landed(hb, hs, volume,
+                                  cfg['j1'], cfg['j2'], cfg['leg2'],
+                                  hub == 'jita')
+                if lc is not None:
+                    landed[hub] = lc
+
+            if not landed:
+                continue
+
+            best_hub = min(landed, key=lambda h: landed[h])
+            best_lc  = landed[best_hub]
+            hub_win_count[best_hub] += 1
+
+            # Contract price always Jita-based
+            jb, js = hub_prices['jita']
+            if sell_ref == 'JSV':
+                ref = js
+            elif sell_ref == 'JBV':
+                ref = jb or js
+            else:  # Jita Split
+                ref = ((jb or js) + js) / 2.0 if js else None
+            if not ref:
+                continue
+            contract_price = ref * markup_pct
+
+            profit = contract_price - best_lc
+            margin = (profit / contract_price * 100) if contract_price > 0 else 0
 
             if margin >= 5:
                 tag, verdict = 'great',    '\u2713 Import'
@@ -3291,42 +3495,49 @@ class AdminDashboard:
             margin_n   += 1
 
             self._import_all_rows.append({
-                'category':       cat_map.get(category, category.replace('_', ' ').title()),
-                'subcategory':    subcategory,
-                'item':           name,
-                'volume':         volume,
-                'buy_cost':       buy_cost,
-                'ship_collat':    ship_cost + collat,
-                'total_cost':     total_cost,
-                'contract_price': contract_price,
-                'profit':         profit,
-                'margin':         margin,
-                'verdict':        verdict,
-                'tag':            tag,
+                'category':    cat_map.get(category, category.replace('_', ' ').title()),
+                'subcategory': subcategory,
+                'item':        name,
+                'volume':      volume,
+                'jita_lc':     landed.get('jita'),
+                'amarr_lc':    landed.get('amarr'),
+                'dodixie_lc':  landed.get('dodixie'),
+                'rens_lc':     landed.get('rens'),
+                'hek_lc':      landed.get('hek'),
+                'best_hub':    best_hub.title(),
+                'contract':    contract_price,
+                'margin':      margin,
+                'verdict':     verdict,
+                'tag':         tag,
             })
 
         total = len(self._import_all_rows)
         worth = counts['great'] + counts['good']
         avg   = (margin_sum / margin_n) if margin_n else 0
-        buy_label = 'JSV' if 'JSV' in buy_basis else 'JBV'
-        self._import_summary_labels['scenario'].configure(
-            text=f"Buy {buy_label} \u2192 Sell {markup_pct*100:.0f}% {sell_ref}",
-            foreground='#66d9ff')
-        self._import_summary_labels['total'].configure(
+        best_hub_name = (max(hub_win_count, key=hub_win_count.get).title()
+                         if total else '\u2014')
+
+        self._hub_import_summary_labels['total'].configure(
             text=str(total), foreground='#00ffff')
-        self._import_summary_labels['worth'].configure(
+        self._hub_import_summary_labels['worth'].configure(
             text=str(worth), foreground='#00ff88')
-        self._import_summary_labels['marginal'].configure(
+        self._hub_import_summary_labels['marginal'].configure(
             text=str(counts['marginal']), foreground='#ffcc44')
-        self._import_summary_labels['avoid'].configure(
+        self._hub_import_summary_labels['avoid'].configure(
             text=str(counts['avoid']), foreground='#ff6666')
-        self._import_summary_labels['avg_margin'].configure(
+        self._hub_import_summary_labels['avg_margin'].configure(
             text=f"{avg:.1f}%",
             foreground='#00ff88' if avg >= 5 else '#ffcc44')
+        self._hub_import_summary_labels['best_hub'].configure(
+            text=best_hub_name, foreground='#ffcc44')
 
+        self._hub_price_age_lbl.configure(
+            text=f'Prices: {snap_ts[:16] if len(snap_ts) > 16 else snap_ts}',
+            foreground='#00ff88' if snap_ts != '\u2014' else '#ffcc44')
         self._filter_import_tree()
         self.update_status(
-            f"Import analysis updated \u2014 {snap_ts[:16] if len(snap_ts) > 16 else snap_ts}")
+            f"Multi-hub import analysis updated \u2014 "
+            f"{snap_ts[:16] if len(snap_ts) > 16 else snap_ts}")
 
     def _import_cat_changed(self):
         cat = self.import_cat_var.get()
@@ -3336,41 +3547,58 @@ class AdminDashboard:
             'Ice Products':       ['All Subcategories', 'Fuel Blocks', 'Refined Ice', 'Isotopes'],
             'PI Materials':       ['All Subcategories', 'P1', 'P2', 'P3', 'P4'],
             'Moon Materials':     ['All Subcategories', 'Raw', 'Processed', 'Advanced'],
-            'Salvaged Materials': ['All Subcategories', 'Common', 'Uncommon', 'Rare', 'Very Rare', 'Rogue Drone'],
+            'Salvaged Materials': ['All Subcategories', 'Common', 'Uncommon',
+                                   'Rare', 'Very Rare', 'Rogue Drone'],
         }.get(cat, ['All Subcategories'])
         self.import_sub_menu['values'] = sub_opts
         self.import_sub_var.set('All Subcategories')
         self._filter_import_tree()
 
     def _filter_import_tree(self):
-        search     = self.import_search_var.get().lower()
+        search     = self.hub_import_search_var.get().lower()
         cat_filter = self.import_cat_var.get()
         sub_filter = self.import_sub_var.get()
         show       = self.import_show_var.get()
-        filtered   = [r for r in self._import_all_rows
-                      if (not search or search in r['item'].lower())
-                      and (cat_filter == 'All' or r['category'] == cat_filter)
-                      and (sub_filter == 'All Subcategories' or r['subcategory'] == sub_filter)
-                      and (show == 'All'
-                           or (show == 'Profitable' and r['tag'] in ('great', 'good'))
-                           or (show == 'Marginal'   and r['tag'] == 'marginal')
-                           or (show == 'Avoid'      and r['tag'] == 'avoid'))]
+        filtered   = [
+            r for r in self._import_all_rows
+            if (not search or search in r['item'].lower())
+            and (cat_filter == 'All' or r['category'] == cat_filter)
+            and (sub_filter == 'All Subcategories' or r['subcategory'] == sub_filter)
+            and (show == 'All'
+                 or (show == 'Profitable' and r['tag'] in ('great', 'good'))
+                 or (show == 'Marginal'   and r['tag'] == 'marginal')
+                 or (show == 'Avoid'      and r['tag'] == 'avoid'))
+        ]
 
         col     = self._import_sort_col
         reverse = not self._import_sort_asc
-        filtered.sort(key=lambda r: r[col] if isinstance(r[col], (int, float))
-                      else r[col].lower(), reverse=reverse)
+        lc_cols = {'jita_lc', 'amarr_lc', 'dodixie_lc', 'rens_lc', 'hek_lc'}
+
+        def _key(r):
+            v = r.get(col)
+            if col in lc_cols:
+                return v if v is not None else 1e18
+            if isinstance(v, (int, float)):
+                return v
+            return (v or '').lower()
+
+        filtered.sort(key=_key, reverse=reverse)
+
+        def _fmt(v):
+            return f"{v:,.0f}" if v is not None else '\u2014'
 
         self.import_tree.delete(*self.import_tree.get_children())
         for row in filtered:
             self.import_tree.insert('', 'end', tags=(row['tag'],), values=(
                 row['category'], row['item'],
                 f"{row['volume']:.2f}",
-                f"{row['buy_cost']:,.0f}",
-                f"{row['ship_collat']:,.0f}",
-                f"{row['total_cost']:,.0f}",
-                f"{row['contract_price']:,.0f}",
-                f"{row['profit']:,.0f}",
+                _fmt(row['jita_lc']),
+                _fmt(row['amarr_lc']),
+                _fmt(row['dodixie_lc']),
+                _fmt(row['rens_lc']),
+                _fmt(row['hek_lc']),
+                row['best_hub'],
+                f"{row['contract']:,.0f}",
                 f"{row['margin']:.1f}%",
                 row['verdict'],
             ))
@@ -3380,8 +3608,10 @@ class AdminDashboard:
             self._import_sort_asc = not self._import_sort_asc
         else:
             self._import_sort_col = col
-            self._import_sort_asc = col in ('category', 'item')
+            self._import_sort_asc = col in ('category', 'item', 'best_hub')
         self._filter_import_tree()
+
+
 
     # ===== ORE IMPORT ANALYSIS =====
 
