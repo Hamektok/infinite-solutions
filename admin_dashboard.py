@@ -3178,6 +3178,9 @@ class AdminDashboard:
                 }
 
         self._hub_import_broker_toggle()
+        self._hub_sell_basis = {}   # type_id -> StringVar  (JSV / Jita Split / JBV)
+        self._hub_sell_pct   = {}   # type_id -> StringVar  (markup %)
+        self._build_hub_sell_overrides(outer)
 
         # \u2500\u2500 Summary cards \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
         self.hub_import_summary_frame = ttk.Frame(outer)
@@ -3279,6 +3282,140 @@ class AdminDashboard:
         """Enable/disable broker fee entry based on order type selection."""
         is_buy = self.hub_buy_type_var.get() == 'Buy Orders'
         self._hub_broker_entry.configure(state='normal' if is_buy else 'disabled')
+
+    def _build_hub_sell_overrides(self, parent):
+        from collections import OrderedDict as _OD
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute(
+            'SELECT tmi.type_id, it.type_name, tmi.category,'
+            '       tmi.display_order, it.market_group_id'
+            ' FROM tracked_market_items tmi'
+            ' JOIN inv_types it ON tmi.type_id = it.type_id'
+            ' ORDER BY tmi.category, tmi.display_order, it.type_name'
+        ).fetchall()
+        conn.close()
+
+        cat_items = _OD()
+        for tid, name, cat, disp, mg in rows:
+            cat_items.setdefault(cat, []).append((tid, name, disp, mg or 0))
+
+        _pi_sub   = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+        CAT_ORDER = ['minerals', 'ice_products', 'moon_materials',
+                     'pi_materials', 'salvaged_materials']
+        CAT_META  = {
+            'minerals':          ('Minerals',           '#00d9ff'),
+            'ice_products':      ('Ice Products',       '#28c8c8'),
+            'moon_materials':    ('Moon Materials',     '#c850dc'),
+            'pi_materials':      ('PI Materials',       '#ffa01e'),
+            'salvaged_materials':('Salvaged Materials', '#88aa88'),
+        }
+        ITEMS_PER_ROW = 10
+        lbl_cfg = dict(background='#0a2030', foreground='#aaccdd',
+                       font=('Segoe UI', 8))
+
+        card = ttk.Frame(parent, style='Card.TFrame')
+        card.pack(fill='x', pady=(0, 6))
+
+        hdr_row = ttk.Frame(card, style='Card.TFrame')
+        hdr_row.pack(fill='x', padx=12, pady=(8, 4))
+        tk.Label(hdr_row,
+                 text='SELL PRICE OVERRIDES  '
+                      '(per-item basis & markup % \u2014 overrides global Sell Side above)',
+                 background='#0a2030', foreground='#00ff88',
+                 font=('Segoe UI', 9, 'bold')).pack(side='left')
+        ttk.Button(hdr_row, text='Reset All to Global',
+                   command=self._hub_sell_reset_all).pack(side='right')
+
+        for cat in CAT_ORDER:
+            if cat not in cat_items:
+                continue
+            items    = cat_items[cat]
+            clabel, ccolor = CAT_META.get(cat, (cat.title(), '#aaaaaa'))
+            expanded = cat in ('minerals', 'ice_products')
+            content  = self._make_collapsible_section(card, clabel, ccolor,
+                                                      expanded=expanded)
+            inner    = ttk.Frame(content, style='Card.TFrame')
+            inner.pack(padx=16, pady=(4, 6), fill='x')
+
+            if cat == 'pi_materials':
+                tier_groups = _OD()
+                for tid, name, disp, mg in items:
+                    tier = _pi_sub.get(mg, 'Other')
+                    tier_groups.setdefault(tier, []).append((tid, name))
+                for tier in ['P1', 'P2', 'P3', 'P4', 'Other']:
+                    if tier not in tier_groups:
+                        continue
+                    tk.Label(inner, text=f'{tier}:', background='#0a2030',
+                             foreground='#ffa01e',
+                             font=('Segoe UI', 8, 'bold')).pack(anchor='w',
+                                                                pady=(4, 0))
+                    tframe = ttk.Frame(inner, style='Card.TFrame')
+                    tframe.pack(fill='x')
+                    for ci, (tid2, name2) in enumerate(tier_groups[tier]):
+                        self._hub_sell_item_widget(
+                            tframe, ci % ITEMS_PER_ROW,
+                            (ci // ITEMS_PER_ROW) * 3, tid2, name2, lbl_cfg)
+
+            elif cat == 'moon_materials':
+                tier_groups = _OD()
+                for tid, name, disp, mg in items:
+                    tier = ('Raw' if disp < 100 else
+                            'Processed' if disp < 200 else 'Advanced')
+                    tier_groups.setdefault(tier, []).append((tid, name))
+                for tier in ['Raw', 'Processed', 'Advanced']:
+                    if tier not in tier_groups:
+                        continue
+                    tk.Label(inner, text=f'{tier}:', background='#0a2030',
+                             foreground='#c850dc',
+                             font=('Segoe UI', 8, 'bold')).pack(anchor='w',
+                                                                pady=(4, 0))
+                    tframe = ttk.Frame(inner, style='Card.TFrame')
+                    tframe.pack(fill='x')
+                    for ci, (tid2, name2) in enumerate(tier_groups[tier]):
+                        self._hub_sell_item_widget(
+                            tframe, ci % ITEMS_PER_ROW,
+                            (ci // ITEMS_PER_ROW) * 3, tid2, name2, lbl_cfg)
+            else:
+                for ci, (tid, name, disp, mg) in enumerate(items):
+                    self._hub_sell_item_widget(
+                        inner, ci % ITEMS_PER_ROW,
+                        (ci // ITEMS_PER_ROW) * 3, tid, name, lbl_cfg)
+
+    def _hub_sell_item_widget(self, parent, col, row_base, tid, name, lbl_cfg):
+        disp = name[:14] + '\u2026' if len(name) > 15 else name
+        tk.Label(parent, text=disp, **lbl_cfg).grid(
+            row=row_base, column=col, sticky='w', padx=(0, 8), pady=(0, 1))
+
+        basis_key = f'hub_imp_basis_{tid}'
+        pct_key   = f'hub_imp_pct_{tid}'
+        default_basis = (self.hub_sell_ref_var.get()
+                         if hasattr(self, 'hub_sell_ref_var') else 'JSV')
+        default_pct   = (self.hub_markup_var.get()
+                         if hasattr(self, 'hub_markup_var') else '115')
+
+        basis_var = tk.StringVar(value=self._get_config(basis_key, default_basis))
+        basis_var.trace_add('write',
+            lambda *_, k=basis_key, v=basis_var: self._set_config(k, v.get()))
+        self._hub_sell_basis[tid] = basis_var
+        ttk.Combobox(parent, textvariable=basis_var, width=7,
+                     values=['JSV', 'Jita Split', 'JBV'],
+                     state='readonly').grid(
+            row=row_base + 1, column=col, sticky='w', padx=(0, 8), pady=(0, 1))
+
+        pct_var = tk.StringVar(value=self._get_config(pct_key, default_pct))
+        pct_var.trace_add('write',
+            lambda *_, k=pct_key, v=pct_var: self._set_config(k, v.get()))
+        self._hub_sell_pct[tid] = pct_var
+        ttk.Entry(parent, textvariable=pct_var, width=6).grid(
+            row=row_base + 2, column=col, sticky='w', padx=(0, 8), pady=(0, 4))
+
+    def _hub_sell_reset_all(self):
+        basis = self.hub_sell_ref_var.get()
+        pct   = self.hub_markup_var.get()
+        for var in self._hub_sell_basis.values():
+            var.set(basis)
+        for var in self._hub_sell_pct.values():
+            var.set(pct)
 
     def _run_hub_fetch(self, category='all'):
         """Run fetch_hub_prices.py for the given category in a background thread."""
@@ -3463,17 +3600,24 @@ class AdminDashboard:
             best_lc  = landed[best_hub]
             hub_win_count[best_hub] += 1
 
-            # Contract price always Jita-based
+            # Contract price always Jita-based (per-item basis/pct overrides)
             jb, js = hub_prices['jita']
-            if sell_ref == 'JSV':
+            i_basis = (self._hub_sell_basis[tid].get()
+                       if tid in self._hub_sell_basis else sell_ref)
+            try:
+                i_pct = (float(self._hub_sell_pct[tid].get()) / 100.0
+                         if tid in self._hub_sell_pct else markup_pct)
+            except ValueError:
+                i_pct = markup_pct
+            if i_basis == 'JSV':
                 ref = js
-            elif sell_ref == 'JBV':
+            elif i_basis == 'JBV':
                 ref = jb or js
             else:  # Jita Split
                 ref = ((jb or js) + js) / 2.0 if js else None
             if not ref:
                 continue
-            contract_price = ref * markup_pct
+            contract_price = ref * i_pct
 
             profit = contract_price - best_lc
             margin = (profit / contract_price * 100) if contract_price > 0 else 0
