@@ -53,6 +53,13 @@ def tw(draw, text, font):
     bb = draw.textbbox((0, 0), text, font=font)
     return bb[2] - bb[0]
 
+def truncate(draw, text, font, max_px):
+    if tw(draw, text, font) <= max_px:
+        return text
+    while text and tw(draw, text + '…', font) > max_px:
+        text = text[:-1]
+    return text + '…'
+
 # ── Fonts ────────────────────────────────────────────────────────────────────
 F_TITLE = load_font('segoeuib.ttf', 24)
 F_HDR   = load_font('segoeuib.ttf', 13)
@@ -62,9 +69,13 @@ F_SUB   = load_font('segoeui.ttf',  12)
 F_TAG   = load_font('segoeuib.ttf', 10)
 
 
-def draw_item_row(draw, x, y, col_w, name, qty, buyback, row_bg):
-    """Draw a single item row. Items have (name, qty, buyback_accepted)."""
-    in_stock = qty > 0
+def draw_item_row(draw, x, y, col_w, name, qty, buyback, row_bg,
+                  price_pct=None, alliance_disc=0):
+    """Draw a single item row."""
+    in_stock   = qty > 0
+    GAP        = 14
+    pct_col_w  = tw(draw, '100%',   F_QTY)
+    qty_col_w  = tw(draw, '999.9M', F_QTY)
 
     draw.rectangle([(x, y), (x + col_w, y + ROW_H - 1)], fill=row_bg)
 
@@ -72,31 +83,43 @@ def draw_item_row(draw, x, y, col_w, name, qty, buyback, row_bg):
     if buyback:
         draw.rectangle([(x, y), (x + BB_BAR, y + ROW_H - 1)], fill=GOLD)
 
-    name_x = x + BB_BAR + 5
+    # Right-to-left column anchors
+    right      = x + col_w
+    corp_right = right
+    ally_right = corp_right - pct_col_w - GAP
+    qty_right  = ally_right - pct_col_w - GAP
+
+    # Qty / OUT
+    qty_str   = fmt_qty(qty) if in_stock else 'OUT'
+    qty_color = GREEN        if in_stock else RED
+    draw.text((qty_right, y + 4), qty_str, font=F_QTY, fill=qty_color, anchor='ra')
+
+    # Price columns
+    if price_pct is not None:
+        draw.text((ally_right, y + 4), f'{price_pct:.0f}%',
+                  font=F_QTY, fill=ACCENT, anchor='ra')
+        draw.text((corp_right, y + 4), f'{price_pct - alliance_disc:.0f}%',
+                  font=F_QTY, fill=GOLD,   anchor='ra')
+
+    # Name — truncated to fit remaining space
     name_color = WHITE if in_stock else GRAY
-
-    if in_stock:
-        qty_str   = fmt_qty(qty)
-        qty_color = GREEN
-    else:
-        qty_str   = 'OUT'
-        qty_color = RED
-
-    qw = tw(draw, qty_str, F_QTY)
-    draw.text((name_x,             y + 4), name,    font=F_ITEM, fill=name_color)
-    draw.text((x + col_w - qw,     y + 4), qty_str, font=F_QTY,  fill=qty_color)
+    name_x     = x + BB_BAR + 5
+    name_w     = qty_right - qty_col_w - GAP - name_x
+    draw.text((name_x, y + 4), truncate(draw, name, F_ITEM, name_w),
+              font=F_ITEM, fill=name_color)
 
 
 def draw_section(draw, label, items, x, y, col_w):
-    """Draw a labelled two-column section. items = [(name, qty, buyback), ...]"""
+    """Draw a labelled section. items = [(name, qty, buyback, price_pct, alliance_disc), ...]"""
     draw.text((x, y), label, font=F_HDR, fill=ACCENT)
     line_y = y + 18
     draw.line([(x, line_y), (x + col_w, line_y)], fill=DIM, width=1)
     y = line_y + 5
 
-    for i, (name, qty, buyback) in enumerate(items):
+    for i, (name, qty, buyback, price_pct, alliance_disc) in enumerate(items):
         row_bg = BG_ROW_B if i % 2 == 1 else BG_ROW_A
-        draw_item_row(draw, x, y, col_w, name, qty, buyback, row_bg)
+        draw_item_row(draw, x, y, col_w, name, qty, buyback, row_bg,
+                      price_pct, alliance_disc)
         y += ROW_H
 
     return y
@@ -135,7 +158,9 @@ def main():
 
     placeholders = ','.join('?' * len(visible_cats))
     c.execute(f'''
-        SELECT tm.category, t.type_name, i.quantity, tm.buyback_accepted, tm.display_order
+        SELECT tm.category, t.type_name, i.quantity, tm.buyback_accepted,
+               tm.display_order, tm.price_percentage,
+               COALESCE(tm.alliance_discount, 0)
         FROM lx_zoj_current_inventory i
         JOIN tracked_market_items tm ON i.type_id = tm.type_id
         JOIN inv_types t             ON i.type_id = t.type_id
@@ -159,12 +184,12 @@ def main():
         return show_moon_adv
 
     by_cat = {}
-    for cat, name, qty, buyback, disp_ord in rows:
+    for cat, name, qty, buyback, disp_ord, price_pct, alliance_disc in rows:
         if cat == 'ice_products'   and not ice_sub_visible(disp_ord):
             continue
         if cat == 'moon_materials' and not moon_sub_visible(disp_ord):
             continue
-        by_cat.setdefault(cat, []).append((name, qty, buyback))
+        by_cat.setdefault(cat, []).append((name, qty, buyback, price_pct, alliance_disc))
 
     minerals  = by_cat.get('minerals',       []) if show_minerals else []
     ice       = by_cat.get('ice_products',   []) if show_ice      else []
@@ -243,11 +268,13 @@ def main():
             row_bg = BG_ROW_B if i % 2 == 1 else BG_ROW_A
             draw.rectangle([(x_l, yr), (x_l + full_w, yr + ROW_H - 1)], fill=row_bg)
             if i < len(left_moon):
-                name, qty, buyback = left_moon[i]
-                draw_item_row(draw, x_l, yr, col_w, name, qty, buyback, row_bg)
+                name, qty, buyback, price_pct, alliance_disc = left_moon[i]
+                draw_item_row(draw, x_l, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
             if i < len(right_moon):
-                name, qty, buyback = right_moon[i]
-                draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg)
+                name, qty, buyback, price_pct, alliance_disc = right_moon[i]
+                draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
             yr += ROW_H
 
     # Footer with legend
@@ -264,6 +291,21 @@ def main():
     draw.rectangle([(dot_x, ly + 1), (dot_x + out_w + 6, ly + 13)], fill=(40, 15, 15))
     draw.text((dot_x + 3, ly), 'OUT', font=F_TAG, fill=RED)
     draw.text((dot_x + out_w + 10, ly), '= Out of stock', font=F_SUB, fill=SUBTEXT)
+
+    # Price legend (right side of footer)
+    sw, gap = 8, 4
+    rx = W - PAD
+    draw.text((rx, ly), '% of Jita Buy', font=F_SUB, fill=DIM, anchor='ra')
+    rx -= tw(draw, '% of Jita Buy', F_SUB) + 16
+    corp_lbl = 'Corp'
+    draw.text((rx, ly), corp_lbl, font=F_SUB, fill=GOLD, anchor='ra')
+    rx -= tw(draw, corp_lbl, F_SUB) + gap
+    draw.rectangle([rx - sw, ly + 2, rx, ly + 2 + sw], fill=GOLD)
+    rx -= sw + 12
+    ally_lbl = 'Alliance'
+    draw.text((rx, ly), ally_lbl, font=F_SUB, fill=ACCENT, anchor='ra')
+    rx -= tw(draw, ally_lbl, F_SUB) + gap
+    draw.rectangle([rx - sw, ly + 2, rx, ly + 2 + sw], fill=ACCENT)
 
     note = '@ or DM Hamektok Hakaari on Discord to purchase  ·  corp members only'
     nw   = tw(draw, note, F_SUB)
