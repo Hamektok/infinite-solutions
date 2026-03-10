@@ -1025,6 +1025,8 @@ class AdminDashboard:
              self.action_generate_stock_image),
             ("Generate Fuel Image", "Create a Discord-ready PNG of fuel/ice products (fuel_image.png)",
              self.action_generate_fuel_image),
+            ("Generate Catalog Images", "Create per-category Discord PNGs showing prices (catalog_*.png)",
+             self.action_generate_catalog_images),
             ("Update Blueprints", "Refresh blueprint data, BPC pricing, and research jobs",
              self.action_update_blueprints),
             ("Deploy to Live", "Push current changes to GitHub (makes them live)",
@@ -2519,6 +2521,41 @@ class AdminDashboard:
             else:
                 self.update_status('Fuel image saved to fuel_image.png')
                 messagebox.showinfo("Done", "fuel_image.png has been saved.\nReady to drag into Discord.")
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def action_generate_catalog_images(self):
+        """Generate per-category Discord catalog images in a background thread."""
+        import threading, sys as _sys
+        script_path = os.path.join(PROJECT_DIR, 'generate_catalog_image.py')
+        if not os.path.exists(script_path):
+            messagebox.showerror("Not Found", f"Script not found:\n{script_path}")
+            return
+        self.update_status('Generating catalog images...')
+        error_holder = [None]
+
+        def _worker():
+            try:
+                result = subprocess.run(
+                    [_sys.executable, script_path],
+                    cwd=PROJECT_DIR,
+                    capture_output=True, text=True, timeout=30
+                )
+                if result.returncode != 0:
+                    error_holder[0] = (result.stderr or result.stdout or 'Unknown error').strip()[-300:]
+            except Exception as e:
+                error_holder[0] = str(e)
+            self.root.after(0, _done)
+
+        def _done():
+            if error_holder[0]:
+                self.update_status('Catalog image generation failed')
+                messagebox.showerror("Failed", f"Image generation failed:\n\n{error_holder[0]}")
+            else:
+                self.update_status('Catalog images saved (catalog_*.png)')
+                messagebox.showinfo("Done", "catalog_minerals.png\ncatalog_ice_products.png\n"
+                                            "catalog_moon_materials.png\ncatalog_pi_materials.png\n\n"
+                                            "Ready to drag into Discord.")
 
         threading.Thread(target=_worker, daemon=True).start()
 
