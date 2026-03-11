@@ -3485,7 +3485,7 @@ class AdminDashboard:
             foreground='#ffcc44')
         self.root.update()
 
-        python_exe = r'C:\Users\lsant\AppData\Local\Python\pythoncore-3.14-64\python.exe'
+        python_exe = sys.executable
         fetch_script = os.path.join(PROJECT_DIR, 'scripts', 'fetch_hub_prices.py')
         fetch_error = [None]
 
@@ -3604,13 +3604,15 @@ class AdminDashboard:
                             for m in ylds})
             if mat_ids:
                 mat_ph = ','.join('?' * len(mat_ids))
+                # Use market_snapshots at Jita — same source as ore buy prices,
+                # updated by the Fetch buttons so everything is consistently fresh
                 cursor.execute("""
                     SELECT type_id, best_buy
-                    FROM market_price_snapshots mps
-                    WHERE type_id IN (%s)
-                      AND timestamp = (
-                          SELECT MAX(timestamp) FROM market_price_snapshots
-                          WHERE type_id = mps.type_id)
+                    FROM market_snapshots ms
+                    WHERE station_id=60003760 AND type_id IN (%s)
+                      AND fetched_at = (
+                          SELECT MAX(fetched_at) FROM market_snapshots
+                          WHERE station_id=60003760 AND type_id=ms.type_id)
                 """ % mat_ph, mat_ids)
                 mineral_jbv = {r[0]: r[1] for r in cursor.fetchall()
                                if r[1] and r[1] > 0}
