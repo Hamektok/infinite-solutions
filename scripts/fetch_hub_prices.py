@@ -160,6 +160,17 @@ GAS_IDS = [
     25272, 25273, 25274, 25275, 25276, 25277, 25278, 25279,
 ]
 
+# Refine products — needed so per-ore-type fetch buttons also update product prices
+MINERAL_IDS = [34, 35, 36, 37, 38, 39, 40, 11399]  # Tritanium → Morphite
+
+ICE_PRODUCT_IDS = [
+    16272, 16273, 16274, 16275,   # Heavy Water, Liquid Ozone, Helium Iso., Stront. Clath.
+    17887, 17888, 17889,           # Oxygen, Nitrogen, Hydrogen Isotopes
+]
+
+# R4 raw moon materials (direct refine products of moon ore)
+MOON_MATERIAL_IDS = [16633, 16634, 16635, 16636]  # Hydrocarbons, Atmo. Gases, Evap. Dep., Silicates
+
 ALL_ORE_IDS = list(set(
     STD_ORE_IDS + COMPRESSED_STD_ORE_IDS +
     ANOMALY_ORE_IDS + COMPRESSED_ANOMALY_ORE_IDS +
@@ -292,15 +303,16 @@ def main():
         type_ids = list(set(
             STD_ORE_IDS + COMPRESSED_STD_ORE_IDS +
             ANOMALY_ORE_IDS + COMPRESSED_ANOMALY_ORE_IDS +
-            A0_RARE_ORE_IDS + COMPRESSED_A0_RARE_ORE_IDS
+            A0_RARE_ORE_IDS + COMPRESSED_A0_RARE_ORE_IDS +
+            MINERAL_IDS
         ))
-        label = f'standard ores ({len(type_ids)} type IDs)'
+        label = f'standard ores + minerals ({len(type_ids)} type IDs)'
     elif category == 'ice':
-        type_ids = list(set(ICE_IDS + COMPRESSED_ICE_IDS))
-        label    = f'ice ore ({len(type_ids)} type IDs)'
+        type_ids = list(set(ICE_IDS + COMPRESSED_ICE_IDS + ICE_PRODUCT_IDS))
+        label    = f'ice ore + products ({len(type_ids)} type IDs)'
     elif category == 'moon':
-        type_ids = list(set(MOON_ORE_IDS + COMPRESSED_MOON_ORE_IDS))
-        label    = f'moon ore ({len(type_ids)} type IDs)'
+        type_ids = list(set(MOON_ORE_IDS + COMPRESSED_MOON_ORE_IDS + MOON_MATERIAL_IDS))
+        label    = f'moon ore + R4 materials ({len(type_ids)} type IDs)'
     elif category == 'gas':
         type_ids = list(set(GAS_IDS))
         label    = f'gas ({len(type_ids)} type IDs)'

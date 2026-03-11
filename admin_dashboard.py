@@ -3766,6 +3766,22 @@ class AdminDashboard:
                             sell_pct = 1.0
                         ref_val += mat['quantity'] * refine_eff * mat_jbv * sell_pct
                 if ref_val <= 0:
+                    # Ore prices fetched but mineral prices not yet available
+                    self._import_all_rows.append({
+                        'category':    cat_map.get(category, category.replace('_',' ').title()),
+                        'subcategory': subcategory,
+                        'item':        name,
+                        'volume':      volume,
+                        'jita_lc':     landed.get('jita'),   'amarr_lc':   landed.get('amarr'),
+                        'dodixie_lc':  landed.get('dodixie'), 'rens_lc':   landed.get('rens'),
+                        'hek_lc':      landed.get('hek'),
+                        'best_hub':    best_hub.title(),
+                        'contract':    None,
+                        'dev':         None,
+                        'margin':      None,
+                        'verdict':     'No Data',
+                        'tag':         'nodata',
+                    })
                     continue
                 contract_price = ref_val / portion  # per-unit refine value
             else:
