@@ -3731,13 +3731,38 @@ class AdminDashboard:
             # Contract price: refine value for ore, otherwise Jita-based with overrides
             jb, js = hub_prices['jita']
             if category in ORE_CATS:
+                # Recalculate landed cost using Ore Import formula:
+                # collateral on pre-broker cost, no per-jump cost (matches Ore Import tab)
+                _raw = (hub_prices[best_hub][0]
+                        if buy_type == 'Buy Orders' else None)
+                _raw = _raw or hub_prices[best_hub][1] or hub_prices[best_hub][0]
+                if _raw:
+                    _ore_cost = _raw * buy_pct
+                    _broker   = _ore_cost * (broker_pct
+                                             if buy_type == 'Buy Orders' else 0.0)
+                    _is_jita  = best_hub == 'jita'
+                    _cfg      = hubs_cfg[best_hub]
+                    _legs     = 2 if _cfg['leg2'] else 1
+                    _hs_j     = _cfg['j1'] + (_cfg['j2'] if _cfg['leg2'] else 0)
+                    _ship     = (null_ism3 * volume
+                                 if _is_jita else
+                                 _legs * hs_ism3 * volume + null_ism3 * volume)
+                    _collat   = _ore_cost * (null_coll if _is_jita
+                                             else hs_coll)
+                    best_lc   = _ore_cost + _broker + _ship + _collat
                 ylds    = ore_yields.get(tid, [])
                 portion = ore_portion.get(tid, 1) or 1
                 ref_val = 0.0
                 for mat in ylds:
-                    mat_jbv = mineral_jbv.get(mat['materialTypeID'])
+                    mat_id  = mat['materialTypeID']
+                    mat_jbv = mineral_jbv.get(mat_id)
                     if mat_jbv:
-                        ref_val += mat['quantity'] * refine_eff * mat_jbv
+                        try:
+                            sell_pct = (float(self.ore_product_pct[mat_id].get()) / 100.0
+                                        if mat_id in self.ore_product_pct else 1.0)
+                        except (ValueError, AttributeError):
+                            sell_pct = 1.0
+                        ref_val += mat['quantity'] * refine_eff * mat_jbv * sell_pct
                 if ref_val <= 0:
                     continue
                 contract_price = ref_val / portion  # per-unit refine value
@@ -3768,7 +3793,10 @@ class AdminDashboard:
                         if jita_raw and avg_jita and avg_jita > 0 else None)
 
             profit = contract_price - best_lc
-            margin = (profit / contract_price * 100) if contract_price > 0 else 0
+            if category in ORE_CATS:
+                margin = (profit / best_lc * 100) if best_lc > 0 else 0
+            else:
+                margin = (profit / contract_price * 100) if contract_price > 0 else 0
 
             if margin >= 5:
                 tag, verdict = 'great',    '\u2713 Import'
