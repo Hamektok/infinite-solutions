@@ -3573,7 +3573,6 @@ class AdminDashboard:
             dev_days = int(float(self.hub_dev_days_var.get()))
         except (ValueError, AttributeError):
             dev_days = 7
-        buy_type = self.hub_buy_type_var.get()
         if buy_type == 'Buy Orders':
             avg_col = 'AVG(best_buy)'
         else:
@@ -3683,7 +3682,7 @@ class AdminDashboard:
             # Contract price always Jita-based (per-item basis/pct overrides)
             jb, js = hub_prices['jita']
             i_basis = (self._hub_sell_basis[tid].get()
-                       if tid in self._hub_sell_basis else sell_ref)
+                       if tid in self._hub_sell_basis else self.hub_sell_ref_var.get())
             try:
                 i_pct = (float(self._hub_sell_pct[tid].get()) / 100.0
                          if tid in self._hub_sell_pct else markup_pct)
