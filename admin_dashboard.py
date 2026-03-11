@@ -3606,12 +3606,11 @@ class AdminDashboard:
                 mat_ph = ','.join('?' * len(mat_ids))
                 cursor.execute("""
                     SELECT type_id, best_buy
-                    FROM market_snapshots
-                    WHERE station_id=60003760 AND type_id IN (%s)
-                      AND fetched_at = (
-                          SELECT MAX(fetched_at) FROM market_snapshots ms2
-                          WHERE ms2.station_id=60003760
-                            AND ms2.type_id=market_snapshots.type_id)
+                    FROM market_price_snapshots mps
+                    WHERE type_id IN (%s)
+                      AND timestamp = (
+                          SELECT MAX(timestamp) FROM market_price_snapshots
+                          WHERE type_id = mps.type_id)
                 """ % mat_ph, mat_ids)
                 mineral_jbv = {r[0]: r[1] for r in cursor.fetchall()
                                if r[1] and r[1] > 0}
