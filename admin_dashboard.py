@@ -3235,7 +3235,8 @@ class AdminDashboard:
         import_cat_menu = ttk.Combobox(
             filter_frame, textvariable=self.import_cat_var, width=18, state='readonly',
             values=['All', 'Minerals', 'Ice Products', 'PI Materials',
-                    'Moon Materials', 'Salvaged Materials'])
+                    'Moon Materials', 'Salvaged Materials',
+                    'Standard Ore', 'Ice Ore', 'Moon Ore'])
         import_cat_menu.pack(side='left', padx=(0, 12))
         import_cat_menu.bind('<<ComboboxSelected>>', lambda _: self._import_cat_changed())
         ttk.Label(filter_frame, text="Subcategory:").pack(side='left', padx=(0, 4))
@@ -3842,6 +3843,9 @@ class AdminDashboard:
             'Moon Materials':     ['All Subcategories', 'Raw', 'Processed', 'Advanced'],
             'Salvaged Materials': ['All Subcategories', 'Common', 'Uncommon',
                                    'Rare', 'Very Rare', 'Rogue Drone'],
+            'Standard Ore':       ['All Subcategories'],
+            'Ice Ore':            ['All Subcategories'],
+            'Moon Ore':           ['All Subcategories'],
         }.get(cat, ['All Subcategories'])
         self.import_sub_menu['values'] = sub_opts
         self.import_sub_var.set('All Subcategories')
