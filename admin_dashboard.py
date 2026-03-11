@@ -2966,7 +2966,7 @@ class AdminDashboard:
     # ===== IMPORT ANALYSIS =====
 
     def build_import_tab(self):
-        """Build the Multi-Hub Import Analysis tab."""
+        """Build the Multi-Hub Import Analysis tab (Phase 1: ore items)."""
         import threading as _threading
         self._hub_import_threading = _threading
 
@@ -2975,10 +2975,10 @@ class AdminDashboard:
 
         ttk.Label(outer,
                   text="Compare landed costs across all 5 EVE trade hubs — "
-                       "buy at cheapest hub, ship to null-sec, sell via contract.",
+                       "buy at cheapest hub, ship to null-sec, refine and sell via contract.",
                   style='SubHeader.TLabel').pack(anchor='w', pady=(0, 8))
 
-        # ── Fetch card ───────────────────────────────────────────────────────────────
+        # ── Fetch card ──────────────────────────────────────────────────────────────────────────────────
         fetch_card = ttk.Frame(outer, style='Card.TFrame')
         fetch_card.pack(fill='x', pady=(0, 8))
         fi = ttk.Frame(fetch_card, style='Card.TFrame')
@@ -2998,7 +2998,7 @@ class AdminDashboard:
             background='#0a2030', foreground='#ffcc44', font=('Segoe UI', 8))
         self._hub_price_age_lbl.pack(side='right')
 
-        # ── Parameter card (BUY SIDE + NULL FREIGHT + Dev Window + Recalculate) ──
+        # ── Parameter card ────────────────────────────────────────────────────────────────────────────────
         param_card = ttk.Frame(outer, style='Card.TFrame')
         param_card.pack(fill='x', pady=(0, 4))
         pi = ttk.Frame(param_card, style='Card.TFrame')
@@ -3048,7 +3048,7 @@ class AdminDashboard:
                  foreground='#ffcc44', **hdr_cfg).grid(
                  row=0, column=col, columnspan=4, sticky='w', pady=(0, 4))
         for key, label, default, w in [
-            ('null_ism3', 'ISK/m³',   '125', 7),
+            ('null_ism3', 'ISK/m³',  '125', 7),
             ('null_isj',  'ISK/jump', '0',   6),
             ('null_j',    '# Jumps',  '65',  6),
             ('null_coll', 'Collat %', '1.0', 6),
@@ -3066,7 +3066,7 @@ class AdminDashboard:
             row=0, column=col, rowspan=3, sticky='ns', padx=(0, 16))
         col += 1
 
-        # DEV WINDOW
+        # ANALYSIS
         tk.Label(pi, text="ANALYSIS", foreground='#aaddff', **hdr_cfg).grid(
                  row=0, column=col, columnspan=2, sticky='w', pady=(0, 4))
         tk.Label(pi, text="Dev Window", **lbl_cfg).grid(
@@ -3098,7 +3098,7 @@ class AdminDashboard:
 
         self._hub_import_broker_toggle()
 
-        # ── HS FREIGHT (collapsible) ──────────────────────────────────────────────────────
+        # ── HS FREIGHT (collapsible) ──────────────────────────────────────────────────────────────────────────────────
         hs_card = ttk.Frame(outer, style='Card.TFrame')
         hs_card.pack(fill='x', pady=(0, 4))
         hs_body = ttk.Frame(hs_card, style='Card.TFrame')
@@ -3126,7 +3126,7 @@ class AdminDashboard:
         hs_rates = ttk.Frame(hs_body, style='Card.TFrame')
         hs_rates.pack(fill='x', pady=(0, 8))
         for key, label, default, w in [
-            ('hs_ism3', 'ISK/m³',   '150', 7),
+            ('hs_ism3', 'ISK/m³',  '150', 7),
             ('hs_isj',  'ISK/jump', '50',  6),
             ('hs_coll', 'Collat %', '1.0', 6),
         ]:
@@ -3199,19 +3199,20 @@ class AdminDashboard:
                 self._hub_vars[hub] = {
                     'j1': j1_v, 'j2': j2_v, 'leg2': l2_v, 'en': en_v}
 
-        # ── Sell Price Overrides (collapsible) ────────────────────────────────────────────
+        # ── Sell Price Overrides (collapsible) ──────────────────────────────────────────────────────────────────────────────
         self._hub_sell_basis = {}
         self._hub_sell_pct   = {}
         self._build_hub_sell_overrides(outer)
 
-        # ── Summary cards ───────────────────────────────────────────────────────────────
+        # ── Summary cards ─────────────────────────────────────────────────────────────────────────────────────
         self.hub_import_summary_frame = ttk.Frame(outer)
         self.hub_import_summary_frame.pack(fill='x', pady=(0, 8))
         self._hub_import_summary_labels = {}
         for key, title in [
-            ('total',      'ITEMS ANALYSED'), ('worth',    'WORTH IMPORTING'),
-            ('marginal',   'MARGINAL'),        ('avoid',    'AVOID'),
-            ('avg_margin', 'AVG MARGIN'),       ('best_hub', 'BEST HUB'),
+            ('total',        'ITEMS ANALYSED'),
+            ('profitable',   'PROFITABLE'),
+            ('best_margin',  'BEST MARGIN'),
+            ('worst_margin', 'WORST MARGIN'),
         ]:
             card = ttk.Frame(self.hub_import_summary_frame, style='Card.TFrame')
             card.pack(side='left', fill='both', expand=True, padx=3)
@@ -3222,7 +3223,7 @@ class AdminDashboard:
             val_lbl.pack(anchor='w', padx=8, pady=(0, 6))
             self._hub_import_summary_labels[key] = val_lbl
 
-        # ── Filter row ──────────────────────────────────────────────────────────────────
+        # ── Filter row ────────────────────────────────────────────────────────────────────────────────────────
         filter_frame = ttk.Frame(outer)
         filter_frame.pack(fill='x', pady=(0, 6))
         ttk.Label(filter_frame, text="Search:").pack(side='left', padx=(0, 4))
@@ -3233,68 +3234,56 @@ class AdminDashboard:
         ttk.Label(filter_frame, text="Category:").pack(side='left', padx=(0, 4))
         self.import_cat_var = tk.StringVar(value='All')
         import_cat_menu = ttk.Combobox(
-            filter_frame, textvariable=self.import_cat_var, width=18, state='readonly',
-            values=['All', 'Minerals', 'Ice Products', 'PI Materials',
-                    'Moon Materials', 'Salvaged Materials',
-                    'Standard Ore', 'Ice Ore', 'Moon Ore'])
+            filter_frame, textvariable=self.import_cat_var, width=14, state='readonly',
+            values=['All', 'Standard Ore', 'Ice Ore', 'Moon Ore'])
         import_cat_menu.pack(side='left', padx=(0, 12))
         import_cat_menu.bind('<<ComboboxSelected>>', lambda _: self._import_cat_changed())
-        ttk.Label(filter_frame, text="Subcategory:").pack(side='left', padx=(0, 4))
-        self.import_sub_var = tk.StringVar(value='All Subcategories')
-        self.import_sub_menu = ttk.Combobox(
-            filter_frame, textvariable=self.import_sub_var, width=18, state='readonly',
-            values=['All Subcategories'])
-        self.import_sub_menu.pack(side='left', padx=(0, 12))
-        self.import_sub_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_import_tree())
         ttk.Label(filter_frame, text="Show:").pack(side='left', padx=(0, 4))
-        self.import_show_var = tk.StringVar(value='Profitable')
+        self.import_show_var = tk.StringVar(value='All')
         show_menu = ttk.Combobox(
-            filter_frame, textvariable=self.import_show_var, width=16, state='readonly',
-            values=['All', 'Profitable', 'Marginal', 'Avoid', 'No Data'])
+            filter_frame, textvariable=self.import_show_var, width=14, state='readonly',
+            values=['All', 'Profitable', 'Marginal', 'Loss', 'No Data'])
         show_menu.pack(side='left', padx=(0, 4))
         show_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_import_tree())
 
-        # ── Treeview ────────────────────────────────────────────────────────────────────
+        # ── Treeview ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
         tree_frame = ttk.Frame(outer)
         tree_frame.pack(fill='both', expand=True)
-        cols = ('category', 'item', 'volume',
+        cols = ('category', 'item',
                 'jita_lc', 'amarr_lc', 'dodixie_lc', 'rens_lc', 'hek_lc',
-                'best_hub', 'contract', 'dev', 'margin', 'verdict')
+                'best_hub', 'contract', 'margin', 'dev')
         self.import_tree = ttk.Treeview(tree_frame, columns=cols,
                                         show='headings', selectmode='browse')
         for col_id, heading, width, anchor in [
-            ('category',   'Category',       110, 'w'),
-            ('item',       'Item',            180, 'w'),
-            ('volume',     'Vol m³',          65, 'e'),
-            ('jita_lc',    'Jita',             95, 'e'),
-            ('amarr_lc',   'Amarr',            95, 'e'),
-            ('dodixie_lc', 'Dodixie',          95, 'e'),
-            ('rens_lc',    'Rens',             95, 'e'),
-            ('hek_lc',     'Hek',              95, 'e'),
-            ('best_hub',   'Best Hub',         80, 'center'),
-            ('contract',   'Contract',        100, 'e'),
-            ('dev',        'vs N-Day Avg %',   90, 'e'),
-            ('margin',     'Margin',           70, 'e'),
-            ('verdict',    'Verdict',          80, 'center'),
+            ('category',   'Category',    110, 'w'),
+            ('item',       'Item',         200, 'w'),
+            ('jita_lc',    'Jita LC',      110, 'e'),
+            ('amarr_lc',   'Amarr LC',     110, 'e'),
+            ('dodixie_lc', 'Dodixie LC',   110, 'e'),
+            ('rens_lc',    'Rens LC',      110, 'e'),
+            ('hek_lc',     'Hek LC',       110, 'e'),
+            ('best_hub',   'Best Hub',      80, 'center'),
+            ('contract',   'Contract',     110, 'e'),
+            ('margin',     'Margin %',      75, 'e'),
+            ('dev',        'vs 7d Avg %',   90, 'e'),
         ]:
             self.import_tree.heading(col_id, text=heading,
                                      command=lambda c=col_id: self._sort_import_tree(c))
             self.import_tree.column(col_id, width=width, anchor=anchor,
                                     stretch=(col_id == 'item'))
-        self.import_tree.tag_configure('great',    foreground='#00ff88')
-        self.import_tree.tag_configure('good',     foreground='#88ff66')
-        self.import_tree.tag_configure('marginal', foreground='#ffcc44')
-        self.import_tree.tag_configure('avoid',    foreground='#ff6666')
-        self.import_tree.tag_configure('nodata',   foreground='#446688')
+        self.import_tree.tag_configure('profitable', foreground='#00ff88')
+        self.import_tree.tag_configure('marginal',   foreground='#ffcc44')
+        self.import_tree.tag_configure('loss',       foreground='#ff4444')
+        self.import_tree.tag_configure('nodata',     foreground='#446688')
         vsb = ttk.Scrollbar(tree_frame, orient='vertical', command=self.import_tree.yview)
         self.import_tree.configure(yscrollcommand=vsb.set)
         self.import_tree.pack(side='left', fill='both', expand=True)
         vsb.pack(side='right', fill='y')
 
         ttk.Label(outer,
-                  text="Landed = hub price × buy% × (1+broker) + null freight + HS freight.  "
-                       "Contract = Jita ref × item markup%.  "
-                       "vs N-Day Avg = current Jita price vs last N-day average.",
+                  text="Landed = hub price × buy% + broker + HS freight + null freight.  "
+                       "Contract = refine value per unit at JBV × sell%.  "
+                       "Margin = (Contract − Landed) / Landed × 100.",
                   foreground='#2a5070', background='#0d1117',
                   font=('Segoe UI', 9)).pack(anchor='w', pady=(4, 0))
 
@@ -3512,7 +3501,7 @@ class AdminDashboard:
         threading.Thread(target=_worker, daemon=True).start()
 
     def load_import_data(self):
-        """Query market_snapshots and populate the multi-hub import analysis treeview."""
+        """Query market_snapshots for ore items and compute multi-hub landed costs."""
         try:
             buy_pct    = float(self.hub_buy_pct_var.get()) / 100.0
             broker_pct = (float(self.hub_broker_var.get()) / 100.0
@@ -3524,15 +3513,13 @@ class AdminDashboard:
             hs_ism3    = float(self.hub_hs_ism3_var.get())
             hs_isj     = float(self.hub_hs_isj_var.get())
             hs_coll    = float(self.hub_hs_coll_var.get()) / 100.0
-            markup_pct  = float(self.hub_markup_var.get()) / 100.0
-            refine_eff  = float(self.hub_refine_var.get()) / 100.0
+            refine_eff = float(self.hub_refine_var.get()) / 100.0
         except ValueError:
             messagebox.showerror("Invalid Input", "All parameters must be numeric.")
             return
 
         buy_type = self.hub_buy_type_var.get()
 
-        # Build per-hub config
         HUB_STATION = {
             'jita': 60003760, 'amarr': 60008494, 'dodixie': 60011866,
             'rens': 60004588, 'hek':   60005686,
@@ -3554,6 +3541,8 @@ class AdminDashboard:
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
+
+        # Phase 1: ore/ice/moon ore items only
         cursor.execute("""
             WITH latest AS (
                 SELECT station_id, type_id, best_buy, best_sell,
@@ -3563,12 +3552,12 @@ class AdminDashboard:
                 FROM market_snapshots
             )
             SELECT tmi.type_id, it.type_name, tmi.category, it.volume,
-                   tmi.display_order, it.market_group_id,
-                   j.best_buy,  j.best_sell,
-                   a.best_buy,  a.best_sell,
-                   d.best_buy,  d.best_sell,
-                   r.best_buy,  r.best_sell,
-                   h.best_buy,  h.best_sell
+                   tmi.display_order,
+                   j.best_buy, j.best_sell,
+                   a.best_sell,
+                   d.best_sell,
+                   r.best_sell,
+                   h.best_sell
             FROM tracked_market_items tmi
             JOIN inv_types it ON tmi.type_id = it.type_id
             LEFT JOIN latest j ON j.type_id=tmi.type_id AND j.station_id=60003760 AND j.rn=1
@@ -3576,36 +3565,35 @@ class AdminDashboard:
             LEFT JOIN latest d ON d.type_id=tmi.type_id AND d.station_id=60011866 AND d.rn=1
             LEFT JOIN latest r ON r.type_id=tmi.type_id AND r.station_id=60004588 AND r.rn=1
             LEFT JOIN latest h ON h.type_id=tmi.type_id AND h.station_id=60005686 AND h.rn=1
+            WHERE tmi.category IN ('standard_ore', 'ice_ore', 'moon_ore')
             ORDER BY tmi.category, tmi.display_order, it.type_name
         """)
         rows = cursor.fetchall()
-        cursor.execute("SELECT MAX(fetched_at) FROM market_snapshots")
-        snap_ts = cursor.fetchone()[0] or '\u2014'
 
-        # Ore/ice/moon refine data: yields + portion size + mineral JBV at Jita
-        ORE_CATS = {'standard_ore', 'ice_ore', 'moon_ore'}
-        ore_type_ids = [r[0] for r in rows if r[2] in ORE_CATS]
+        cursor.execute("SELECT MAX(fetched_at) FROM market_snapshots")
+        snap_ts = cursor.fetchone()[0] or '—'
+
+        # Refine data: yields + portion size
+        ore_type_ids = [r[0] for r in rows]
         ore_yields   = {}
         ore_portion  = {}
         mineral_jbv  = {}
         if ore_type_ids:
-            import json as _json_ore
-            ore_ph = ','.join('?' * len(ore_type_ids))
+            import json as _json
+            ph = ','.join('?' * len(ore_type_ids))
             cursor.execute(
-                f'SELECT type_id, materials_json FROM type_materials'
-                f' WHERE type_id IN ({ore_ph})', ore_type_ids)
-            ore_yields = {r[0]: _json_ore.loads(r[1]) for r in cursor.fetchall()}
+                f'SELECT type_id, materials_json FROM type_materials WHERE type_id IN ({ph})',
+                ore_type_ids)
+            ore_yields = {r[0]: _json.loads(r[1]) for r in cursor.fetchall()}
             cursor.execute(
-                f'SELECT type_id, portion_size FROM inv_types'
-                f' WHERE type_id IN ({ore_ph})', ore_type_ids)
+                f'SELECT type_id, portion_size FROM inv_types WHERE type_id IN ({ph})',
+                ore_type_ids)
             ore_portion = {r[0]: r[1] for r in cursor.fetchall()}
-            # Collect all mineral type_ids needed
-            mat_ids = list({m['materialTypeID'] for ylds in ore_yields.values()
-                            for m in ylds})
+            # Mineral / ice product / moon material JBV at Jita (from market_snapshots)
+            mat_ids = list({m['materialTypeID']
+                            for ylds in ore_yields.values() for m in ylds})
             if mat_ids:
                 mat_ph = ','.join('?' * len(mat_ids))
-                # Use market_snapshots at Jita — same source as ore buy prices,
-                # updated by the Fetch buttons so everything is consistently fresh
                 cursor.execute("""
                     SELECT type_id, best_buy
                     FROM market_snapshots ms
@@ -3617,337 +3605,257 @@ class AdminDashboard:
                 mineral_jbv = {r[0]: r[1] for r in cursor.fetchall()
                                if r[1] and r[1] > 0}
 
-        # N-day avg for vs-avg deviation column (Jita best_sell)
+        # N-day avg per hub for vs-avg dev column
         try:
             dev_days = int(float(self.hub_dev_days_var.get()))
         except (ValueError, AttributeError):
             dev_days = 7
-        if buy_type == 'Buy Orders':
-            avg_col = 'AVG(best_buy)'
-        else:
-            avg_col = 'AVG(best_sell)'
         cursor.execute(f"""
-            SELECT type_id, {avg_col}
+            SELECT type_id, station_id, AVG(best_sell)
             FROM market_snapshots
-            WHERE station_id = 60003760
-              AND fetched_at >= datetime('now', '-{dev_days} days')
-            GROUP BY type_id
+            WHERE fetched_at >= datetime('now', '-{dev_days} days')
+              AND station_id IN (60003760,60008494,60011866,60004588,60005686)
+              AND best_sell IS NOT NULL
+            GROUP BY type_id, station_id
         """)
-        avg_prices = {r[0]: r[1] for r in cursor.fetchall()}
+        avg_prices = {}
+        for tid2, sid2, avg2 in cursor.fetchall():
+            avg_prices[(tid2, sid2)] = avg2
+
         conn.close()
 
         cat_map = {
-            'minerals': 'Minerals', 'ice_products': 'Ice Products',
-            'moon_materials': 'Moon Materials', 'pi_materials': 'PI Materials',
-            'salvaged_materials': 'Salvaged Materials',
-            'standard_ore': 'Standard Ore', 'ice_ore': 'Ice Ore',
-            'moon_ore': 'Moon Ore',
+            'standard_ore': 'Standard Ore',
+            'ice_ore':      'Ice Ore',
+            'moon_ore':     'Moon Ore',
         }
-        _pi_sub = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
+        # Column positions in query result:
+        #  0=tid, 1=name, 2=cat, 3=vol, 4=disp_ord
+        #  5=jita_buy, 6=jita_sell, 7=amarr_sell, 8=dodixie_sell, 9=rens_sell, 10=hek_sell
+        HUB_NAMES    = ['jita', 'amarr', 'dodixie', 'rens', 'hek']
+        HUB_SELL_COL = {'jita': 6, 'amarr': 7, 'dodixie': 8, 'rens': 9, 'hek': 10}
 
-        def _sub(cat, disp, mg):
-            if cat == 'ice_products':
-                if disp <= 8:  return 'Fuel Blocks'
-                if disp <= 11: return 'Refined Ice'
-                return 'Isotopes'
-            if cat == 'moon_materials':
-                if disp < 100: return 'Raw'
-                if disp < 200: return 'Processed'
-                return 'Advanced'
-            if cat == 'pi_materials':
-                return _pi_sub.get(mg, '')
-            if cat == 'salvaged_materials':
-                if disp <= 9:  return 'Common'
-                if disp <= 21: return 'Uncommon'
-                if disp <= 32: return 'Rare'
-                if disp <= 42: return 'Very Rare'
-                return 'Rogue Drone'
-            return ''
-
-        def _calc_landed(hub_buy, hub_sell, vol, j1, j2, leg2, is_jita):
-            raw = hub_buy if self.hub_buy_type_var.get() == 'Buy Orders' else None
-            raw = raw or hub_sell
-            if raw is None:
-                return None
-            buy_cost     = raw * buy_pct * (1.0 + broker_pct)
-            null_freight = null_ism3 * vol + null_isj * null_j + null_coll * buy_cost
-            if is_jita:
-                return buy_cost + null_freight
-            legs       = 2 if leg2 else 1
-            total_hs_j = j1 + (j2 if leg2 else 0)
-            hs_freight  = (legs * hs_ism3 * vol + hs_isj * total_hs_j
-                           + legs * hs_coll * buy_cost)
-            return buy_cost + hs_freight + null_freight
-
-        HUB_NAMES = ['jita', 'amarr', 'dodixie', 'rens', 'hek']
         self._import_all_rows = []
-        counts        = {'great': 0, 'good': 0, 'marginal': 0, 'avoid': 0}
-        margin_sum, margin_n = 0.0, 0
-        hub_win_count = {h: 0 for h in HUB_NAMES}
+        best_margin  = None
+        worst_margin = None
+        profitable_n = 0
 
         for row in rows:
-            tid, name, category, volume, disp_ord, mgroup = row[:6]
-            hub_prices = {HUB_NAMES[i]: (row[6 + i * 2], row[7 + i * 2])
-                          for i in range(5)}
-            subcategory = _sub(category, disp_ord or 0, mgroup or 0)
+            tid      = row[0]
+            name     = row[1]
+            category = row[2]
+            volume   = row[3]
+            cat_label = cat_map.get(category, category.replace('_', ' ').title())
 
+            # Raw price at each hub (buy order price for Jita if buy-order mode)
+            hub_raw = {}
+            for hub in HUB_NAMES:
+                sell = row[HUB_SELL_COL[hub]]
+                if hub == 'jita' and buy_type == 'Buy Orders':
+                    jbuy = row[5]  # jita best_buy
+                    hub_raw[hub] = jbuy if jbuy else sell
+                else:
+                    hub_raw[hub] = sell
+
+            # Landed cost per enabled hub
             landed = {}
             for hub in HUB_NAMES:
                 cfg = hubs_cfg[hub]
                 if not cfg['en']:
                     continue
-                hb, hs = hub_prices[hub]
-                lc = _calc_landed(hb, hs, volume,
-                                  cfg['j1'], cfg['j2'], cfg['leg2'],
-                                  hub == 'jita')
-                if lc is not None:
-                    landed[hub] = lc
+                raw = hub_raw[hub]
+                if raw is None:
+                    continue
+                buy_price = raw * buy_pct
+                broker    = buy_price * broker_pct
+                null_cost = null_ism3 * volume + null_isj * null_j + null_coll * buy_price
+                if hub == 'jita':
+                    lc = buy_price + broker + null_cost
+                else:
+                    hub_jumps = cfg['j1'] + (cfg['j2'] if cfg['leg2'] else 0)
+                    hs_cost   = hs_ism3 * volume + hs_isj * hub_jumps + hs_coll * buy_price
+                    lc = buy_price + broker + hs_cost + null_cost
+                landed[hub] = lc
+
+            jita_lc    = landed.get('jita')
+            amarr_lc   = landed.get('amarr')
+            dodixie_lc = landed.get('dodixie')
+            rens_lc    = landed.get('rens')
+            hek_lc     = landed.get('hek')
 
             if not landed:
-                # Include no-price items as 'nodata'
-                jb0, js0 = hub_prices['jita']
-                avg0 = avg_prices.get(tid)
-                raw0 = (jb0 if buy_type == 'Buy Orders' else js0) or jb0 or js0
-                dev0 = ((raw0 - avg0) / avg0 * 100
-                        if raw0 and avg0 and avg0 > 0 else None)
                 self._import_all_rows.append({
-                    'category':    cat_map.get(category, category.replace('_',' ').title()),
-                    'subcategory': subcategory,
-                    'item':        name,
-                    'volume':      volume,
-                    'jita_lc':     None, 'amarr_lc': None,
-                    'dodixie_lc':  None, 'rens_lc':  None, 'hek_lc': None,
-                    'best_hub':    '—',
-                    'contract':    None,
-                    'dev':         dev0,
-                    'margin':      None,
-                    'verdict':     'No Data',
-                    'tag':         'nodata',
+                    'type_id':    tid,
+                    'category':   cat_label,
+                    'item':       name,
+                    'jita_lc':    None, 'amarr_lc':   None, 'dodixie_lc': None,
+                    'rens_lc':    None, 'hek_lc':     None,
+                    'best_hub':   '—',
+                    'best_lc':    None,
+                    'contract':   None,
+                    'margin':     None,
+                    'dev':        None,
+                    'tag':        'nodata',
                 })
                 continue
 
             best_hub = min(landed, key=lambda h: landed[h])
             best_lc  = landed[best_hub]
-            hub_win_count[best_hub] += 1
 
-            # Contract price: refine value for ore, otherwise Jita-based with overrides
-            jb, js = hub_prices['jita']
-            if category in ORE_CATS:
-                # Recalculate landed cost using Ore Import formula:
-                # collateral on pre-broker cost, no per-jump cost (matches Ore Import tab)
-                _raw = (hub_prices[best_hub][0]
-                        if buy_type == 'Buy Orders' else None)
-                _raw = _raw or hub_prices[best_hub][1] or hub_prices[best_hub][0]
-                if _raw:
-                    _ore_cost = _raw * buy_pct
-                    _broker   = _ore_cost * (broker_pct
-                                             if buy_type == 'Buy Orders' else 0.0)
-                    _is_jita  = best_hub == 'jita'
-                    _cfg      = hubs_cfg[best_hub]
-                    _legs     = 2 if _cfg['leg2'] else 1
-                    _hs_j     = _cfg['j1'] + (_cfg['j2'] if _cfg['leg2'] else 0)
-                    _ship     = (null_ism3 * volume
-                                 if _is_jita else
-                                 _legs * hs_ism3 * volume + null_ism3 * volume)
-                    _collat   = _ore_cost * (null_coll if _is_jita
-                                             else hs_coll)
-                    best_lc   = _ore_cost + _broker + _ship + _collat
-                ylds    = ore_yields.get(tid, [])
-                portion = ore_portion.get(tid, 1) or 1
-                ref_val = 0.0
-                for mat in ylds:
-                    mat_id  = mat['materialTypeID']
-                    mat_jbv = mineral_jbv.get(mat_id)
-                    if mat_jbv:
-                        try:
-                            sell_pct = (float(self.ore_product_pct[mat_id].get()) / 100.0
-                                        if mat_id in self.ore_product_pct else 1.0)
-                        except (ValueError, AttributeError):
-                            sell_pct = 1.0
-                        ref_val += mat['quantity'] * refine_eff * mat_jbv * sell_pct
-                if ref_val <= 0:
-                    # Ore prices fetched but mineral prices not yet available
-                    self._import_all_rows.append({
-                        'category':    cat_map.get(category, category.replace('_',' ').title()),
-                        'subcategory': subcategory,
-                        'item':        name,
-                        'volume':      volume,
-                        'jita_lc':     landed.get('jita'),   'amarr_lc':   landed.get('amarr'),
-                        'dodixie_lc':  landed.get('dodixie'), 'rens_lc':   landed.get('rens'),
-                        'hek_lc':      landed.get('hek'),
-                        'best_hub':    best_hub.title(),
-                        'contract':    None,
-                        'dev':         None,
-                        'margin':      None,
-                        'verdict':     'No Data',
-                        'tag':         'nodata',
-                    })
-                    continue
-                contract_price = ref_val / portion  # per-unit refine value
-            else:
-                i_basis = (self._hub_sell_basis[tid].get()
-                           if tid in self._hub_sell_basis else self.hub_sell_ref_var.get())
-                try:
-                    i_pct = (float(self._hub_sell_pct[tid].get()) / 100.0
-                             if tid in self._hub_sell_pct else markup_pct)
-                except ValueError:
-                    i_pct = markup_pct
-                if i_basis == 'JSV':
-                    ref = js
-                elif i_basis == 'JBV':
-                    ref = jb or js
-                else:  # Jita Split
-                    ref = ((jb or js) + js) / 2.0 if js else None
-                if not ref:
-                    continue
-                contract_price = ref * i_pct
+            # Refine value: sum of (yield_qty × refine_eff × mineral_jbv × sell_pct)
+            ylds    = ore_yields.get(tid, [])
+            portion = ore_portion.get(tid, 1) or 1
+            ref_val = 0.0
+            for mat in ylds:
+                mat_id  = mat['materialTypeID']
+                mat_jbv = mineral_jbv.get(mat_id)
+                if mat_jbv:
+                    try:
+                        sell_pct = (
+                            float(self.ore_product_pct[mat_id].get()) / 100.0
+                            if hasattr(self, 'ore_product_pct')
+                            and mat_id in self.ore_product_pct
+                            else 1.0)
+                    except (ValueError, AttributeError):
+                        sell_pct = 1.0
+                    ref_val += mat['quantity'] * refine_eff * mat_jbv * sell_pct
 
-            # vs N-day avg deviation
-            avg_jita = avg_prices.get(tid)
-            jita_raw = (hub_prices['jita'][0]
-                        if buy_type == 'Buy Orders' else hub_prices['jita'][1])
-            jita_raw = jita_raw or hub_prices['jita'][0] or hub_prices['jita'][1]
-            dev_pct  = ((jita_raw - avg_jita) / avg_jita * 100
-                        if jita_raw and avg_jita and avg_jita > 0 else None)
+            if ref_val <= 0:
+                # Mineral prices not yet fetched — show as nodata with landed costs
+                self._import_all_rows.append({
+                    'type_id':    tid,
+                    'category':   cat_label,
+                    'item':       name,
+                    'jita_lc':    jita_lc,   'amarr_lc':   amarr_lc,
+                    'dodixie_lc': dodixie_lc, 'rens_lc':   rens_lc,
+                    'hek_lc':     hek_lc,
+                    'best_hub':   best_hub.title(),
+                    'best_lc':    best_lc,
+                    'contract':   None,
+                    'margin':     None,
+                    'dev':        None,
+                    'tag':        'nodata',
+                })
+                continue
 
-            profit = contract_price - best_lc
-            if category in ORE_CATS:
-                margin = (profit / best_lc * 100) if best_lc > 0 else 0
-            else:
-                margin = (profit / contract_price * 100) if contract_price > 0 else 0
+            contract = ref_val / portion  # per-unit refine value
 
+            # Margin: ROI = (contract − landed) / landed × 100
+            margin = ((contract - best_lc) / best_lc * 100) if best_lc > 0 else 0.0
+
+            # Dev vs N-day avg at best hub
+            best_station = HUB_STATION[best_hub]
+            best_sell    = row[HUB_SELL_COL[best_hub]]
+            avg_at_best  = avg_prices.get((tid, best_station))
+            dev_pct      = ((best_sell - avg_at_best) / avg_at_best * 100
+                            if best_sell and avg_at_best and avg_at_best > 0 else None)
+
+            # Tag
             if margin >= 5:
-                tag, verdict = 'great',    '\u2713 Import'
-                counts['great'] += 1
-            elif margin >= 1:
-                tag, verdict = 'good',     '\u2713 Import'
-                counts['good'] += 1
+                tag = 'profitable'
+                profitable_n += 1
             elif margin >= 0:
-                tag, verdict = 'marginal', '~ Marginal'
-                counts['marginal'] += 1
+                tag = 'marginal'
             else:
-                tag, verdict = 'avoid',    '\u2717 Avoid'
-                counts['avoid'] += 1
+                tag = 'loss'
 
-            margin_sum += margin
-            margin_n   += 1
+            if best_margin is None or margin > best_margin:
+                best_margin = margin
+            if worst_margin is None or margin < worst_margin:
+                worst_margin = margin
 
             self._import_all_rows.append({
-                'category':    cat_map.get(category, category.replace('_', ' ').title()),
-                'subcategory': subcategory,
-                'item':        name,
-                'volume':      volume,
-                'jita_lc':     landed.get('jita'),
-                'amarr_lc':    landed.get('amarr'),
-                'dodixie_lc':  landed.get('dodixie'),
-                'rens_lc':     landed.get('rens'),
-                'hek_lc':      landed.get('hek'),
-                'best_hub':    best_hub.title(),
-                'contract':    contract_price,
-                'dev':         dev_pct,
-                'margin':      margin,
-                'verdict':     verdict,
-                'tag':         tag,
+                'type_id':    tid,
+                'category':   cat_label,
+                'item':       name,
+                'jita_lc':    jita_lc,    'amarr_lc':   amarr_lc,
+                'dodixie_lc': dodixie_lc, 'rens_lc':    rens_lc,
+                'hek_lc':     hek_lc,
+                'best_hub':   best_hub.title(),
+                'best_lc':    best_lc,
+                'contract':   contract,
+                'margin':     margin,
+                'dev':        dev_pct,
+                'tag':        tag,
             })
 
         total = len(self._import_all_rows)
-        worth = counts['great'] + counts['good']
-        avg   = (margin_sum / margin_n) if margin_n else 0
-        best_hub_name = (max(hub_win_count, key=hub_win_count.get).title()
-                         if total else '\u2014')
-
         self._hub_import_summary_labels['total'].configure(
             text=str(total), foreground='#00ffff')
-        self._hub_import_summary_labels['worth'].configure(
-            text=str(worth), foreground='#00ff88')
-        self._hub_import_summary_labels['marginal'].configure(
-            text=str(counts['marginal']), foreground='#ffcc44')
-        self._hub_import_summary_labels['avoid'].configure(
-            text=str(counts['avoid']), foreground='#ff6666')
-        self._hub_import_summary_labels['avg_margin'].configure(
-            text=f"{avg:.1f}%",
-            foreground='#00ff88' if avg >= 5 else '#ffcc44')
-        self._hub_import_summary_labels['best_hub'].configure(
-            text=best_hub_name, foreground='#ffcc44')
+        self._hub_import_summary_labels['profitable'].configure(
+            text=str(profitable_n),
+            foreground='#00ff88' if profitable_n > 0 else '#ffcc44')
+        self._hub_import_summary_labels['best_margin'].configure(
+            text=(f'{best_margin:+.1f}%' if best_margin is not None else '—'),
+            foreground='#00ff88' if (best_margin or 0) >= 5 else '#ffcc44')
+        self._hub_import_summary_labels['worst_margin'].configure(
+            text=(f'{worst_margin:+.1f}%' if worst_margin is not None else '—'),
+            foreground='#ff4444' if (worst_margin or 0) < 0 else '#ffcc44')
 
         self._hub_price_age_lbl.configure(
             text=f'Prices: {snap_ts[:16] if len(snap_ts) > 16 else snap_ts}',
-            foreground='#00ff88' if snap_ts != '\u2014' else '#ffcc44')
+            foreground='#00ff88' if snap_ts != '—' else '#ffcc44')
         self._filter_import_tree()
         self.update_status(
-            f"Multi-hub import analysis updated \u2014 "
+            f"Multi-hub import analysis updated — "
             f"{snap_ts[:16] if len(snap_ts) > 16 else snap_ts}")
 
     def _import_cat_changed(self):
-        cat = self.import_cat_var.get()
-        sub_opts = {
-            'All':                ['All Subcategories'],
-            'Minerals':           ['All Subcategories'],
-            'Ice Products':       ['All Subcategories', 'Fuel Blocks', 'Refined Ice', 'Isotopes'],
-            'PI Materials':       ['All Subcategories', 'P1', 'P2', 'P3', 'P4'],
-            'Moon Materials':     ['All Subcategories', 'Raw', 'Processed', 'Advanced'],
-            'Salvaged Materials': ['All Subcategories', 'Common', 'Uncommon',
-                                   'Rare', 'Very Rare', 'Rogue Drone'],
-            'Standard Ore':       ['All Subcategories'],
-            'Ice Ore':            ['All Subcategories'],
-            'Moon Ore':           ['All Subcategories'],
-        }.get(cat, ['All Subcategories'])
-        self.import_sub_menu['values'] = sub_opts
-        self.import_sub_var.set('All Subcategories')
         self._filter_import_tree()
 
     def _filter_import_tree(self):
         search     = self.hub_import_search_var.get().lower()
         cat_filter = self.import_cat_var.get()
-        sub_filter = self.import_sub_var.get()
         show       = self.import_show_var.get()
-        filtered   = [
+
+        show_map = {
+            'Profitable': {'profitable'},
+            'Marginal':   {'marginal'},
+            'Loss':       {'loss'},
+            'No Data':    {'nodata'},
+        }
+        show_tags = show_map.get(show)  # None means show All
+
+        filtered = [
             r for r in self._import_all_rows
             if (not search or search in r['item'].lower())
             and (cat_filter == 'All' or r['category'] == cat_filter)
-            and (sub_filter == 'All Subcategories' or r['subcategory'] == sub_filter)
-            and (show == 'All'
-                 or (show == 'Profitable' and r['tag'] in ('great', 'good'))
-                 or (show == 'Marginal'   and r['tag'] == 'marginal')
-                 or (show == 'Avoid'      and r['tag'] == 'avoid')
-                 or (show == 'No Data'    and r['tag'] == 'nodata'))
+            and (show_tags is None or r['tag'] in show_tags)
         ]
 
         col     = self._import_sort_col
         reverse = not self._import_sort_asc
-        lc_cols = {'jita_lc', 'amarr_lc', 'dodixie_lc', 'rens_lc', 'hek_lc', 'dev'}
 
         def _key(r):
             v = r.get(col)
-            if col in lc_cols:
-                return v if v is not None else 1e18
+            if v is None:
+                return (1e18 if not reverse else -1e18)
             if isinstance(v, (int, float)):
                 return v
             return (v or '').lower()
 
         filtered.sort(key=_key, reverse=reverse)
 
-        def _fmt(v):
-            return f"{v:,.0f}" if v is not None else '\u2014'
+        def _isk(v):
+            return f'{v:,.0f}' if v is not None else '—'
 
         self.import_tree.delete(*self.import_tree.get_children())
-        for row in filtered:
-            ct  = row.get('contract')
-            mg  = row.get('margin')
-            dev = row.get('dev')
-            self.import_tree.insert('', 'end', tags=(row['tag'],), values=(
-                row['category'], row['item'],
-                f"{row['volume']:.2f}",
-                _fmt(row['jita_lc']),
-                _fmt(row['amarr_lc']),
-                _fmt(row['dodixie_lc']),
-                _fmt(row['rens_lc']),
-                _fmt(row['hek_lc']),
-                row['best_hub'],
+        for r in filtered:
+            ct  = r.get('contract')
+            mg  = r.get('margin')
+            dev = r.get('dev')
+            self.import_tree.insert('', 'end', tags=(r['tag'],), values=(
+                r['category'],
+                r['item'],
+                _isk(r.get('jita_lc')),
+                _isk(r.get('amarr_lc')),
+                _isk(r.get('dodixie_lc')),
+                _isk(r.get('rens_lc')),
+                _isk(r.get('hek_lc')),
+                r['best_hub'],
                 f'{ct:,.0f}' if ct is not None else '—',
-                (f'{dev:+.1f}%' if dev is not None else '—'),
-                f'{mg:.1f}%' if mg is not None else '—',
-                row['verdict'],
+                f'{mg:+.1f}%' if mg is not None else '—',
+                f'{dev:+.1f}%' if dev is not None else '—',
             ))
 
     def _sort_import_tree(self, col):
@@ -3957,8 +3865,6 @@ class AdminDashboard:
             self._import_sort_col = col
             self._import_sort_asc = col in ('category', 'item', 'best_hub')
         self._filter_import_tree()
-
-
 
     # ===== ORE IMPORT ANALYSIS =====
 
