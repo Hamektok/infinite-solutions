@@ -4840,7 +4840,7 @@ class AdminDashboard:
             foreground='#ffcc44')
         self.root.update()
 
-        python_exe = r'C:\Users\lsant\AppData\Local\Python\pythoncore-3.14-64\python.exe'
+        python_exe = sys.executable
         fetch_script = os.path.join(PROJECT_DIR, 'scripts', 'fetch_ore_prices.py')
 
         fetch_error = [None]
