@@ -3250,22 +3250,21 @@ class AdminDashboard:
         tree_frame = ttk.Frame(outer)
         tree_frame.pack(fill='both', expand=True)
         cols = ('category', 'item',
-                'jita_lc', 'amarr_lc', 'dodixie_lc', 'rens_lc', 'hek_lc',
-                'best_hub', 'contract', 'margin', 'dev')
+                'jita', 'amarr', 'dodixie', 'rens', 'hek',
+                'best_hub', 'margin', 'dev')
         self.import_tree = ttk.Treeview(tree_frame, columns=cols,
                                         show='headings', selectmode='browse')
         for col_id, heading, width, anchor in [
-            ('category',   'Category',    110, 'w'),
-            ('item',       'Item',         200, 'w'),
-            ('jita_lc',    'Jita LC',      110, 'e'),
-            ('amarr_lc',   'Amarr LC',     110, 'e'),
-            ('dodixie_lc', 'Dodixie LC',   110, 'e'),
-            ('rens_lc',    'Rens LC',      110, 'e'),
-            ('hek_lc',     'Hek LC',       110, 'e'),
-            ('best_hub',   'Best Hub',      80, 'center'),
-            ('contract',   'Contract',     110, 'e'),
-            ('margin',     'Margin %',      75, 'e'),
-            ('dev',        'vs 7d Avg %',   90, 'e'),
+            ('category', 'Category',    110, 'w'),
+            ('item',     'Item',         200, 'w'),
+            ('jita',     'Jita',         100, 'e'),
+            ('amarr',    'Amarr',        100, 'e'),
+            ('dodixie',  'Dodixie',      100, 'e'),
+            ('rens',     'Rens',         100, 'e'),
+            ('hek',      'Hek',          100, 'e'),
+            ('best_hub', 'Best Hub',      80, 'center'),
+            ('margin',   'Margin %',      75, 'e'),
+            ('dev',      'vs 7d Avg %',   90, 'e'),
         ]:
             self.import_tree.heading(col_id, text=heading,
                                      command=lambda c=col_id: self._sort_import_tree(c))
@@ -3281,9 +3280,8 @@ class AdminDashboard:
         vsb.pack(side='right', fill='y')
 
         ttk.Label(outer,
-                  text="Landed = hub price × buy% + broker + HS freight + null freight.  "
-                       "Contract = refine value per unit at JBV × sell%.  "
-                       "Margin = (Contract − Landed) / Landed × 100.",
+                  text="Hub price = best sell (or buy order) at each hub.  "
+                       "Margin = (Refine value \u2212 Landed cost) / Landed cost \u00d7 100.",
                   foreground='#2a5070', background='#0d1117',
                   font=('Segoe UI', 9)).pack(anchor='w', pady=(4, 0))
 
@@ -3657,6 +3655,13 @@ class AdminDashboard:
                 else:
                     hub_raw[hub] = sell
 
+            # Raw hub prices for display
+            jita_price    = hub_raw.get('jita')
+            amarr_price   = hub_raw.get('amarr')
+            dodixie_price = hub_raw.get('dodixie')
+            rens_price    = hub_raw.get('rens')
+            hek_price     = hub_raw.get('hek')
+
             # Landed cost per enabled hub
             landed = {}
             for hub in HUB_NAMES:
@@ -3677,22 +3682,16 @@ class AdminDashboard:
                     lc = buy_price + broker + hs_cost + null_cost
                 landed[hub] = lc
 
-            jita_lc    = landed.get('jita')
-            amarr_lc   = landed.get('amarr')
-            dodixie_lc = landed.get('dodixie')
-            rens_lc    = landed.get('rens')
-            hek_lc     = landed.get('hek')
-
             if not landed:
                 self._import_all_rows.append({
                     'type_id':    tid,
                     'category':   cat_label,
                     'item':       name,
-                    'jita_lc':    None, 'amarr_lc':   None, 'dodixie_lc': None,
-                    'rens_lc':    None, 'hek_lc':     None,
+                    'jita':    jita_price,    'amarr':   amarr_price,
+                    'dodixie': dodixie_price, 'rens':    rens_price,
+                    'hek':     hek_price,
                     'best_hub':   '—',
                     'best_lc':    None,
-                    'contract':   None,
                     'margin':     None,
                     'dev':        None,
                     'tag':        'nodata',
@@ -3721,17 +3720,16 @@ class AdminDashboard:
                     ref_val += mat['quantity'] * refine_eff * mat_jbv * sell_pct
 
             if ref_val <= 0:
-                # Mineral prices not yet fetched — show as nodata with landed costs
+                # Mineral prices not yet fetched — show as nodata with hub prices
                 self._import_all_rows.append({
                     'type_id':    tid,
                     'category':   cat_label,
                     'item':       name,
-                    'jita_lc':    jita_lc,   'amarr_lc':   amarr_lc,
-                    'dodixie_lc': dodixie_lc, 'rens_lc':   rens_lc,
-                    'hek_lc':     hek_lc,
+                    'jita':    jita_price,    'amarr':   amarr_price,
+                    'dodixie': dodixie_price, 'rens':    rens_price,
+                    'hek':     hek_price,
                     'best_hub':   best_hub.title(),
                     'best_lc':    best_lc,
-                    'contract':   None,
                     'margin':     None,
                     'dev':        None,
                     'tag':        'nodata',
@@ -3768,12 +3766,11 @@ class AdminDashboard:
                 'type_id':    tid,
                 'category':   cat_label,
                 'item':       name,
-                'jita_lc':    jita_lc,    'amarr_lc':   amarr_lc,
-                'dodixie_lc': dodixie_lc, 'rens_lc':    rens_lc,
-                'hek_lc':     hek_lc,
+                'jita':    jita_price,    'amarr':   amarr_price,
+                'dodixie': dodixie_price, 'rens':    rens_price,
+                'hek':     hek_price,
                 'best_hub':   best_hub.title(),
                 'best_lc':    best_lc,
-                'contract':   contract,
                 'margin':     margin,
                 'dev':        dev_pct,
                 'tag':        tag,
@@ -3841,19 +3838,17 @@ class AdminDashboard:
 
         self.import_tree.delete(*self.import_tree.get_children())
         for r in filtered:
-            ct  = r.get('contract')
             mg  = r.get('margin')
             dev = r.get('dev')
             self.import_tree.insert('', 'end', tags=(r['tag'],), values=(
                 r['category'],
                 r['item'],
-                _isk(r.get('jita_lc')),
-                _isk(r.get('amarr_lc')),
-                _isk(r.get('dodixie_lc')),
-                _isk(r.get('rens_lc')),
-                _isk(r.get('hek_lc')),
+                _isk(r.get('jita')),
+                _isk(r.get('amarr')),
+                _isk(r.get('dodixie')),
+                _isk(r.get('rens')),
+                _isk(r.get('hek')),
                 r['best_hub'],
-                f'{ct:,.0f}' if ct is not None else '—',
                 f'{mg:+.1f}%' if mg is not None else '—',
                 f'{dev:+.1f}%' if dev is not None else '—',
             ))
