@@ -3081,6 +3081,18 @@ class AdminDashboard:
         tk.Label(pi, text="days", **lbl_cfg).grid(row=2, column=col, sticky='w', padx=(0, 16))
         col += 1
 
+        tk.Label(pi, text="Refine Eff %", **lbl_cfg).grid(
+            row=1, column=col, sticky='w', padx=(0, 4))
+        self.hub_refine_var = tk.StringVar(
+            value=self._get_config('hub_import_refine_eff', '87.5'))
+        self.hub_refine_var.trace_add('write',
+            lambda *_: self._set_config('hub_import_refine_eff', self.hub_refine_var.get()))
+        ttk.Entry(pi, textvariable=self.hub_refine_var, width=6).grid(
+            row=2, column=col, sticky='w', padx=(0, 4))
+        col += 1
+        tk.Label(pi, text="%", **lbl_cfg).grid(row=2, column=col, sticky='w', padx=(0, 16))
+        col += 1
+
         ttk.Button(pi, text='⟳  Recalculate', style='Action.TButton',
                    command=self.load_import_data).grid(row=2, column=col, sticky='w')
 
@@ -3511,7 +3523,8 @@ class AdminDashboard:
             hs_ism3    = float(self.hub_hs_ism3_var.get())
             hs_isj     = float(self.hub_hs_isj_var.get())
             hs_coll    = float(self.hub_hs_coll_var.get()) / 100.0
-            markup_pct = float(self.hub_markup_var.get()) / 100.0
+            markup_pct  = float(self.hub_markup_var.get()) / 100.0
+            refine_eff  = float(self.hub_refine_var.get()) / 100.0
         except ValueError:
             messagebox.showerror("Invalid Input", "All parameters must be numeric.")
             return
@@ -3568,6 +3581,40 @@ class AdminDashboard:
         cursor.execute("SELECT MAX(fetched_at) FROM market_snapshots")
         snap_ts = cursor.fetchone()[0] or '\u2014'
 
+        # Ore/ice/moon refine data: yields + portion size + mineral JBV at Jita
+        ORE_CATS = {'standard_ore', 'ice_ore', 'moon_ore'}
+        ore_type_ids = [r[0] for r in rows if r[2] in ORE_CATS]
+        ore_yields   = {}
+        ore_portion  = {}
+        mineral_jbv  = {}
+        if ore_type_ids:
+            import json as _json_ore
+            ore_ph = ','.join('?' * len(ore_type_ids))
+            cursor.execute(
+                f'SELECT type_id, materials_json FROM type_materials'
+                f' WHERE type_id IN ({ore_ph})', ore_type_ids)
+            ore_yields = {r[0]: _json_ore.loads(r[1]) for r in cursor.fetchall()}
+            cursor.execute(
+                f'SELECT type_id, portion_size FROM inv_types'
+                f' WHERE type_id IN ({ore_ph})', ore_type_ids)
+            ore_portion = {r[0]: r[1] for r in cursor.fetchall()}
+            # Collect all mineral type_ids needed
+            mat_ids = list({m['materialTypeID'] for ylds in ore_yields.values()
+                            for m in ylds})
+            if mat_ids:
+                mat_ph = ','.join('?' * len(mat_ids))
+                cursor.execute("""
+                    SELECT type_id, best_buy
+                    FROM market_snapshots
+                    WHERE station_id=60003760 AND type_id IN (%s)
+                      AND fetched_at = (
+                          SELECT MAX(fetched_at) FROM market_snapshots ms2
+                          WHERE ms2.station_id=60003760
+                            AND ms2.type_id=market_snapshots.type_id)
+                """ % mat_ph, mat_ids)
+                mineral_jbv = {r[0]: r[1] for r in cursor.fetchall()
+                               if r[1] and r[1] > 0}
+
         # N-day avg for vs-avg deviation column (Jita best_sell)
         try:
             dev_days = int(float(self.hub_dev_days_var.get()))
@@ -3591,6 +3638,8 @@ class AdminDashboard:
             'minerals': 'Minerals', 'ice_products': 'Ice Products',
             'moon_materials': 'Moon Materials', 'pi_materials': 'PI Materials',
             'salvaged_materials': 'Salvaged Materials',
+            'standard_ore': 'Standard Ore', 'ice_ore': 'Ice Ore',
+            'moon_ore': 'Moon Ore',
         }
         _pi_sub = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
 
@@ -3679,24 +3728,36 @@ class AdminDashboard:
             best_lc  = landed[best_hub]
             hub_win_count[best_hub] += 1
 
-            # Contract price always Jita-based (per-item basis/pct overrides)
+            # Contract price: refine value for ore, otherwise Jita-based with overrides
             jb, js = hub_prices['jita']
-            i_basis = (self._hub_sell_basis[tid].get()
-                       if tid in self._hub_sell_basis else self.hub_sell_ref_var.get())
-            try:
-                i_pct = (float(self._hub_sell_pct[tid].get()) / 100.0
-                         if tid in self._hub_sell_pct else markup_pct)
-            except ValueError:
-                i_pct = markup_pct
-            if i_basis == 'JSV':
-                ref = js
-            elif i_basis == 'JBV':
-                ref = jb or js
-            else:  # Jita Split
-                ref = ((jb or js) + js) / 2.0 if js else None
-            if not ref:
-                continue
-            contract_price = ref * i_pct
+            if category in ORE_CATS:
+                ylds    = ore_yields.get(tid, [])
+                portion = ore_portion.get(tid, 1) or 1
+                ref_val = 0.0
+                for mat in ylds:
+                    mat_jbv = mineral_jbv.get(mat['materialTypeID'])
+                    if mat_jbv:
+                        ref_val += mat['quantity'] * refine_eff * mat_jbv
+                if ref_val <= 0:
+                    continue
+                contract_price = ref_val / portion  # per-unit refine value
+            else:
+                i_basis = (self._hub_sell_basis[tid].get()
+                           if tid in self._hub_sell_basis else self.hub_sell_ref_var.get())
+                try:
+                    i_pct = (float(self._hub_sell_pct[tid].get()) / 100.0
+                             if tid in self._hub_sell_pct else markup_pct)
+                except ValueError:
+                    i_pct = markup_pct
+                if i_basis == 'JSV':
+                    ref = js
+                elif i_basis == 'JBV':
+                    ref = jb or js
+                else:  # Jita Split
+                    ref = ((jb or js) + js) / 2.0 if js else None
+                if not ref:
+                    continue
+                contract_price = ref * i_pct
 
             # vs N-day avg deviation
             avg_jita = avg_prices.get(tid)
