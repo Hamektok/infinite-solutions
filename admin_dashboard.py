@@ -9,6 +9,7 @@ import subprocess
 import os
 import sys
 import json
+import math
 from datetime import datetime, timezone
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mydatabase.db')
@@ -2986,9 +2987,18 @@ class AdminDashboard:
         tk.Label(fi, text='Fetch Hub Prices:', background='#0a2030',
                  foreground='#88d0e8', font=('Segoe UI', 9)).pack(side='left', padx=(0, 8))
         self._hub_fetch_btns = {}
-        for label, cat in [('All', 'all'), ('Tracked', 'tracked'),
-                            ('Std Ore', 'standard'), ('Ice Ore', 'ice'),
-                            ('Moon Ore', 'moon'), ('Gas', 'gas')]:
+        for label, cat in [
+            ('Std Ore',   'standard'),
+            ('Ice Ore',   'ice'),
+            ('Moon Ore',  'moon'),
+            ('Minerals',  'minerals'),
+            ('Ice Prods', 'ice_products'),
+            ('Moon Mats', 'moon_materials'),
+            ('PI Mats',   'pi_materials'),
+            ('Salvaged',  'salvaged_materials'),
+            ('Gas',       'gas'),
+            ('Tracked',   'tracked'),
+        ]:
             btn = ttk.Button(fi, text=f'⟳ {label}', style='Action.TButton',
                              command=lambda c=cat: self._run_hub_fetch(c))
             btn.pack(side='left', padx=(0, 4))
@@ -3122,35 +3132,86 @@ class AdminDashboard:
         hs_btn.pack(fill='x', padx=12, pady=(8, 2))
         hs_body.pack(fill='x', padx=12, pady=(0, 10))
 
-        # Freight rates
-        hs_rates = ttk.Frame(hs_body, style='Card.TFrame')
-        hs_rates.pack(fill='x', pady=(0, 8))
-        for key, label, default, w in [
-            ('hs_ism3', 'ISK/m³',  '150', 7),
-            ('hs_isj',  'ISK/jump', '50',  6),
-            ('hs_coll', 'Collat %', '1.0', 6),
-        ]:
-            tk.Label(hs_rates, text=label, **lbl_cfg).pack(side='left', padx=(0, 4))
-            var = tk.StringVar(value=self._get_config(f'hub_import_{key}', default))
-            var.trace_add('write', lambda *_, k=f'hub_import_{key}', v=var:
-                          self._set_config(k, v.get()))
-            setattr(self, f'hub_{key}_var', var)
-            ttk.Entry(hs_rates, textvariable=var, width=w).pack(side='left', padx=(0, 20))
+        # ── HS Mode toggle (Freighter / Contract) ────────────────────────────
+        mode_row = ttk.Frame(hs_body, style='Card.TFrame')
+        mode_row.pack(fill='x', pady=(0, 6))
+        tk.Label(mode_row, text='HS Mode:', background='#0a2030', foreground='#ff9944',
+                 font=('Segoe UI', 9, 'bold')).pack(side='left', padx=(0, 8))
+        self.hub_hs_mode_var = tk.StringVar(
+            value=self._get_config('hub_hs_mode', 'freighter'))
+        self.hub_hs_mode_var.trace_add('write', lambda *_: (
+            self._set_config('hub_hs_mode', self.hub_hs_mode_var.get()),
+            self._toggle_hs_mode()))
 
-        # Hub table
-        hg = ttk.Frame(hs_body, style='Card.TFrame')
-        hg.pack(fill='x')
-        for ci, txt in enumerate(['Hub', 'Leg 1 Jumps', '+2nd Leg', 'Leg 2 Jumps', 'Enabled']):
+        # Sub-frames that swap in/out
+        self._hs_freighter_frame = ttk.Frame(hs_body, style='Card.TFrame')
+        self._hs_contract_frame  = ttk.Frame(hs_body, style='Card.TFrame')
+
+        for val, lbl in [('freighter', 'Freighter (DIY)'), ('contract', 'Contract Hauler')]:
+            tk.Radiobutton(mode_row, text=lbl,
+                           variable=self.hub_hs_mode_var, value=val,
+                           background='#0a2030', foreground='#aaccdd',
+                           activebackground='#0a2030', activeforeground='#ff9944',
+                           selectcolor='#0a2030', font=('Segoe UI', 9),
+                           relief='flat').pack(side='left', padx=(0, 12))
+
+        # ── FREIGHTER sub-frame ───────────────────────────────────────────────
+        ff = self._hs_freighter_frame
+
+        # Leg rate cards (3 legs)
+        self._leg_vars = {}
+        LEG_DEFAULTS = {
+            1: {'en': '1',  'ism3': '150', 'isj': '50000', 'coll': '1.0', 'dep': '900000'},
+            2: {'en': '1',  'ism3': '150', 'isj': '50000', 'coll': '1.0', 'dep': '900000'},
+            3: {'en': '0',  'ism3': '150', 'isj': '50000', 'coll': '1.0', 'dep': '900000'},
+        }
+        for n, defs in LEG_DEFAULTS.items():
+            leg_outer = ttk.Frame(ff, style='Card.TFrame')
+            leg_outer.pack(fill='x', pady=(0, 4))
+            hdr = ttk.Frame(leg_outer, style='Card.TFrame')
+            hdr.pack(fill='x', padx=4, pady=(2, 0))
+            en_v = tk.BooleanVar(value=bool(int(
+                self._get_config(f'hub_import_leg{n}_en', defs['en']))))
+            _n, _v = n, en_v
+            en_v.trace_add('write', lambda *_, k=f'hub_import_leg{n}_en', v=en_v:
+                           self._set_config(k, '1' if v.get() else '0'))
+            ttk.Checkbutton(hdr, variable=en_v).pack(side='left')
+            tk.Label(hdr, text=f'Leg {n}', background='#0a2030', foreground='#ff9944',
+                     font=('Segoe UI', 9, 'bold')).pack(side='left', padx=(4, 0))
+            rates_row = ttk.Frame(leg_outer, style='Card.TFrame')
+            rates_row.pack(fill='x', padx=4, pady=(0, 4))
+            leg_vd = {'en': en_v}
+            for key, label, w in [
+                ('ism3', 'ISK/m³',       7),
+                ('isj',  'ISK/jump',     8),
+                ('coll', 'Collat %',     6),
+                ('dep',  'Departing m³', 9),
+            ]:
+                tk.Label(rates_row, text=label, background='#0a2030', foreground='#aaaaaa',
+                         font=('Segoe UI', 8)).pack(side='left', padx=(0, 3))
+                var = tk.StringVar(value=self._get_config(
+                    f'hub_import_leg{n}_{key}', defs[key]))
+                var.trace_add('write', lambda *_, k=f'hub_import_leg{n}_{key}', v=var:
+                              self._set_config(k, v.get()))
+                ttk.Entry(rates_row, textvariable=var, width=w).pack(
+                    side='left', padx=(0, 14))
+                leg_vd[key] = var
+            self._leg_vars[n] = leg_vd
+
+        # Hub assignment table
+        hg = ttk.Frame(ff, style='Card.TFrame')
+        hg.pack(fill='x', pady=(4, 0))
+        for ci, txt in enumerate(['Hub', 'Leg 1 j', 'Leg 2 j', 'Leg 3 j', 'Enabled']):
             tk.Label(hg, text=txt, background='#0a2030', foreground='#88d0e8',
                      font=('Segoe UI', 8, 'bold')).grid(
-                     row=0, column=ci, sticky='w', padx=(0, 22), pady=(0, 4))
+                     row=0, column=ci, sticky='w', padx=(0, 16), pady=(0, 4))
         self._hub_vars = {}
         HUB_DEFAULTS = {
-            'jita':    {'j1': '0',  'j2': '0',  'leg2': False, 'en': True},
-            'amarr':   {'j1': '9',  'j2': '4',  'leg2': True,  'en': True},
-            'dodixie': {'j1': '6',  'j2': '0',  'leg2': False, 'en': True},
-            'rens':    {'j1': '13', 'j2': '4',  'leg2': True,  'en': True},
-            'hek':     {'j1': '16', 'j2': '4',  'leg2': True,  'en': True},
+            'jita':    {'j1': '0',  'j2': '0',  'j3': '0',  'en': True},
+            'amarr':   {'j1': '20', 'j2': '6',  'j3': '19', 'en': True},
+            'dodixie': {'j1': '15', 'j2': '0',  'j3': '0',  'en': True},
+            'rens':    {'j1': '0',  'j2': '6',  'j3': '19', 'en': True},
+            'hek':     {'j1': '0',  'j2': '0',  'j3': '19', 'en': True},
         }
         HUB_COLORS = {
             'jita': '#00ffff', 'amarr': '#ffaa44', 'dodixie': '#ffcc88',
@@ -3160,11 +3221,11 @@ class AdminDashboard:
             tk.Label(hg, text=hub.title(), background='#0a2030',
                      foreground=HUB_COLORS[hub],
                      font=('Segoe UI', 9, 'bold')).grid(
-                     row=ri, column=0, sticky='w', padx=(0, 22))
+                     row=ri, column=0, sticky='w', padx=(0, 16))
             if hub == 'jita':
                 tk.Label(hg, text='── null only ──',
-                         background='#0a2030',
-                         foreground='#1a4060', font=('Segoe UI', 9)).grid(
+                         background='#0a2030', foreground='#1a4060',
+                         font=('Segoe UI', 9)).grid(
                          row=ri, column=1, columnspan=3, sticky='w')
                 en_v = tk.BooleanVar(value=bool(int(
                     self._get_config('hub_import_en_jita', '1'))))
@@ -3173,31 +3234,94 @@ class AdminDashboard:
                 ttk.Checkbutton(hg, variable=en_v).grid(row=ri, column=4, sticky='w')
                 self._hub_vars['jita'] = {'en': en_v}
             else:
-                j1_v = tk.StringVar(value=self._get_config(
-                    f'hub_import_j1_{hub}', defs['j1']))
-                j1_v.trace_add('write', lambda *_, k=f'hub_import_j1_{hub}', v=j1_v:
-                    self._set_config(k, v.get()))
-                ttk.Entry(hg, textvariable=j1_v, width=5).grid(
-                    row=ri, column=1, sticky='w', padx=(0, 22))
-                l2_v = tk.BooleanVar(value=bool(int(self._get_config(
-                    f'hub_import_leg2_{hub}', '1' if defs['leg2'] else '0'))))
-                l2_v.trace_add('write', lambda *_, k=f'hub_import_leg2_{hub}', v=l2_v:
-                    self._set_config(k, '1' if v.get() else '0'))
-                ttk.Checkbutton(hg, variable=l2_v).grid(
-                    row=ri, column=2, sticky='w', padx=(4, 22))
-                j2_v = tk.StringVar(value=self._get_config(
-                    f'hub_import_j2_{hub}', defs['j2']))
-                j2_v.trace_add('write', lambda *_, k=f'hub_import_j2_{hub}', v=j2_v:
-                    self._set_config(k, v.get()))
-                ttk.Entry(hg, textvariable=j2_v, width=5).grid(
-                    row=ri, column=3, sticky='w', padx=(0, 22))
+                hub_vd = {}
+                for ci2, jk in enumerate(('j1', 'j2', 'j3'), start=1):
+                    jv = tk.StringVar(value=self._get_config(
+                        f'hub_import_{jk}_{hub}', defs[jk]))
+                    jv.trace_add('write', lambda *_, k=f'hub_import_{jk}_{hub}', v=jv:
+                        self._set_config(k, v.get()))
+                    ttk.Entry(hg, textvariable=jv, width=5).grid(
+                        row=ri, column=ci2, sticky='w', padx=(0, 16))
+                    hub_vd[jk] = jv
                 en_v = tk.BooleanVar(value=bool(int(self._get_config(
                     f'hub_import_en_{hub}', '1'))))
                 en_v.trace_add('write', lambda *_, k=f'hub_import_en_{hub}', v=en_v:
                     self._set_config(k, '1' if v.get() else '0'))
                 ttk.Checkbutton(hg, variable=en_v).grid(row=ri, column=4, sticky='w')
-                self._hub_vars[hub] = {
-                    'j1': j1_v, 'j2': j2_v, 'leg2': l2_v, 'en': en_v}
+                hub_vd['en'] = en_v
+                self._hub_vars[hub] = hub_vd
+
+        # Jump Reference (editable, informational)
+        jr_sep = ttk.Frame(ff, style='Card.TFrame')
+        jr_sep.pack(fill='x', pady=(6, 0))
+        tk.Label(jr_sep, text='Jump Reference:', background='#0a2030',
+                 foreground='#88d0e8',
+                 font=('Segoe UI', 8, 'bold')).pack(side='left', padx=(0, 8))
+        JUMP_REF_PAIRS = [
+            ('jita',  'amarr',   '45'), ('jita',  'rens',    '25'),
+            ('jita',  'hek',     '19'), ('jita',  'dodixie', '15'),
+            ('amarr', 'rens',    '20'), ('amarr', 'hek',     '26'),
+            ('rens',  'hek',     '6'),
+        ]
+        self._jump_ref = {}
+        for h1, h2, default in JUMP_REF_PAIRS:
+            cfg_key = f'hub_import_ref_{h1}_{h2}'
+            tk.Label(jr_sep, text=f'{h1.title()}↔{h2.title()}',
+                     background='#0a2030', foreground='#556677',
+                     font=('Segoe UI', 8)).pack(side='left', padx=(0, 2))
+            rvar = tk.StringVar(value=self._get_config(cfg_key, default))
+            rvar.trace_add('write', lambda *_, k=cfg_key, v=rvar:
+                           self._set_config(k, v.get()))
+            ttk.Entry(jr_sep, textvariable=rvar, width=4).pack(side='left', padx=(0, 8))
+            self._jump_ref[(h1, h2)] = rvar
+
+        # ── CONTRACT sub-frame ────────────────────────────────────────────────
+        cf = self._hs_contract_frame
+        tk.Label(cf, text='Per-hub contract rates  (offer to freelance haulers)',
+                 background='#0a2030', foreground='#88d0e8',
+                 font=('Segoe UI', 8)).pack(anchor='w', pady=(0, 4))
+
+        cg = ttk.Frame(cf, style='Card.TFrame')
+        cg.pack(fill='x')
+        for ci, hdr_txt in enumerate(['Hub', 'ISK/m³', 'Coll %', 'Min Reward (ISK)']):
+            tk.Label(cg, text=hdr_txt, background='#0a2030', foreground='#88d0e8',
+                     font=('Segoe UI', 8, 'bold')).grid(
+                     row=0, column=ci, sticky='w', padx=(0, 20), pady=(0, 4))
+
+        CONTRACT_DEFAULTS = {
+            'amarr':   {'ism3': '500', 'coll': '0.5', 'min_reward': '2000000'},
+            'dodixie': {'ism3': '400', 'coll': '0.5', 'min_reward': '1500000'},
+            'rens':    {'ism3': '450', 'coll': '0.5', 'min_reward': '1800000'},
+            'hek':     {'ism3': '350', 'coll': '0.5', 'min_reward': '1200000'},
+        }
+        HUB_COLORS2 = {
+            'amarr': '#ffaa44', 'dodixie': '#ffcc88',
+            'rens': '#88ffcc', 'hek':   '#88ccff',
+        }
+        self._hub_contract_vars = {}
+        for ri, (hub, defs) in enumerate(CONTRACT_DEFAULTS.items(), start=1):
+            tk.Label(cg, text=hub.title(), background='#0a2030',
+                     foreground=HUB_COLORS2[hub],
+                     font=('Segoe UI', 9, 'bold')).grid(
+                     row=ri, column=0, sticky='w', padx=(0, 20))
+            cvd = {}
+            for ci2, (key, w) in enumerate([('ism3', 7), ('coll', 6), ('min_reward', 12)],
+                                            start=1):
+                cfg_key = f'hub_import_contract_{key}_{hub}'
+                v = tk.StringVar(value=self._get_config(cfg_key, defs[key]))
+                v.trace_add('write', lambda *_, k=cfg_key, vv=v:
+                            self._set_config(k, vv.get()))
+                ttk.Entry(cg, textvariable=v, width=w).grid(
+                    row=ri, column=ci2, sticky='w', padx=(0, 20))
+                cvd[key] = v
+            self._hub_contract_vars[hub] = cvd
+
+        tk.Label(cf, text='Jita: no HS leg (null-sec direct)',
+                 background='#0a2030', foreground='#1a4060',
+                 font=('Segoe UI', 8)).pack(anchor='w', pady=(6, 0))
+
+        # Pack whichever frame is active at startup
+        self._toggle_hs_mode()
 
         # ── Sell Price Overrides (collapsible) ──────────────────────────────────────────────────────────────────────────────
         self._hub_sell_basis = {}
@@ -3235,7 +3359,9 @@ class AdminDashboard:
         self.import_cat_var = tk.StringVar(value='All')
         import_cat_menu = ttk.Combobox(
             filter_frame, textvariable=self.import_cat_var, width=14, state='readonly',
-            values=['All', 'Standard Ore', 'Ice Ore', 'Moon Ore'])
+            values=['All', 'Standard Ore', 'Ice Ore', 'Moon Ore',
+                    'Minerals', 'Ice Products', 'Moon Materials',
+                    'PI Materials', 'Salvaged Materials'])
         import_cat_menu.pack(side='left', padx=(0, 12))
         import_cat_menu.bind('<<ComboboxSelected>>', lambda _: self._import_cat_changed())
         ttk.Label(filter_frame, text="Show:").pack(side='left', padx=(0, 4))
@@ -3245,13 +3371,24 @@ class AdminDashboard:
             values=['All', 'Profitable', 'Marginal', 'Loss', 'No Data'])
         show_menu.pack(side='left', padx=(0, 4))
         show_menu.bind('<<ComboboxSelected>>', lambda _: self._filter_import_tree())
+        tk.Label(filter_frame, text='Target %',
+                 background='#0d1117', foreground='#88d0e8',
+                 font=('Segoe UI', 9)).pack(side='left', padx=(16, 4))
+        self.hub_target_mg_var = tk.StringVar(
+            value=self._get_config('hub_import_target_mg', '10'))
+        self.hub_target_mg_var.trace_add('write', lambda *_: (
+            self._set_config('hub_import_target_mg',
+                             self.hub_target_mg_var.get()),
+            self._filter_import_tree()))
+        ttk.Entry(filter_frame, textvariable=self.hub_target_mg_var,
+                  width=5).pack(side='left')
 
         # ── Treeview ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
         tree_frame = ttk.Frame(outer)
         tree_frame.pack(fill='both', expand=True)
         cols = ('category', 'item',
                 'jita', 'amarr', 'dodixie', 'rens', 'hek',
-                'best_hub', 'margin', 'dev')
+                'best_hub', 'margin', 'dev', 'min_units')
         self.import_tree = ttk.Treeview(tree_frame, columns=cols,
                                         show='headings', selectmode='browse')
         for col_id, heading, width, anchor in [
@@ -3265,6 +3402,7 @@ class AdminDashboard:
             ('best_hub', 'Best Hub',      80, 'center'),
             ('margin',   'Margin %',      75, 'e'),
             ('dev',      'vs 7d Avg %',   90, 'e'),
+            ('min_units','Min Units',      90, 'e'),
         ]:
             self.import_tree.heading(col_id, text=heading,
                                      command=lambda c=col_id: self._sort_import_tree(c))
@@ -3392,11 +3530,10 @@ class AdminDashboard:
                 for tier in ['P1', 'P2', 'P3', 'P4', 'Other']:
                     if tier not in tg:
                         continue
-                    tk.Label(inner, text=f'{tier}:', background='#0a2030',
-                             foreground='#ffa01e',
-                             font=('Segoe UI', 8, 'bold')).pack(anchor='w', pady=(4, 0))
-                    tf = ttk.Frame(inner, style='Card.TFrame')
-                    tf.pack(fill='x')
+                    sub_content = self._make_collapsible_section(
+                        inner, tier, '#ffa01e', expanded=False)
+                    tf = ttk.Frame(sub_content, style='Card.TFrame')
+                    tf.pack(fill='x', pady=(2, 4))
                     for ci, (t2, n2) in enumerate(tg[tier]):
                         self._hub_sell_item_widget(
                             tf, ci % ITEMS_PER_ROW,
@@ -3410,11 +3547,10 @@ class AdminDashboard:
                 for tier in ['Raw', 'Processed', 'Advanced']:
                     if tier not in tg:
                         continue
-                    tk.Label(inner, text=f'{tier}:', background='#0a2030',
-                             foreground='#c850dc',
-                             font=('Segoe UI', 8, 'bold')).pack(anchor='w', pady=(4, 0))
-                    tf = ttk.Frame(inner, style='Card.TFrame')
-                    tf.pack(fill='x')
+                    sub_content = self._make_collapsible_section(
+                        inner, tier, '#c850dc', expanded=False)
+                    tf = ttk.Frame(sub_content, style='Card.TFrame')
+                    tf.pack(fill='x', pady=(2, 4))
                     for ci, (t2, n2) in enumerate(tg[tier]):
                         self._hub_sell_item_widget(
                             tf, ci % ITEMS_PER_ROW,
@@ -3498,6 +3634,16 @@ class AdminDashboard:
 
         threading.Thread(target=_worker, daemon=True).start()
 
+    def _toggle_hs_mode(self):
+        """Show/hide freighter vs contract rate card inside HS FREIGHT section."""
+        mode = self.hub_hs_mode_var.get()
+        if mode == 'contract':
+            self._hs_freighter_frame.pack_forget()
+            self._hs_contract_frame.pack(fill='x')
+        else:
+            self._hs_contract_frame.pack_forget()
+            self._hs_freighter_frame.pack(fill='x')
+
     def load_import_data(self):
         """Query market_snapshots for ore items and compute multi-hub landed costs."""
         try:
@@ -3508,9 +3654,6 @@ class AdminDashboard:
             null_isj   = float(self.hub_null_isj_var.get())
             null_j     = int(float(self.hub_null_j_var.get()))
             null_coll  = float(self.hub_null_coll_var.get()) / 100.0
-            hs_ism3    = float(self.hub_hs_ism3_var.get())
-            hs_isj     = float(self.hub_hs_isj_var.get())
-            hs_coll    = float(self.hub_hs_coll_var.get()) / 100.0
             refine_eff = float(self.hub_refine_var.get()) / 100.0
         except ValueError:
             messagebox.showerror("Invalid Input", "All parameters must be numeric.")
@@ -3522,25 +3665,46 @@ class AdminDashboard:
             'jita': 60003760, 'amarr': 60008494, 'dodixie': 60011866,
             'rens': 60004588, 'hek':   60005686,
         }
+        hs_mode = self.hub_hs_mode_var.get()   # 'freighter' or 'contract'
+
+        legs_cfg = {}
+        for _n in (1, 2, 3):
+            lv = self._leg_vars[_n]
+            try:
+                legs_cfg[_n] = {
+                    'en':   lv['en'].get(),
+                    'ism3': float(lv['ism3'].get()),
+                    'isj':  float(lv['isj'].get()),
+                    'coll': float(lv['coll'].get()) / 100,
+                    'dep':  max(float(lv['dep'].get()), 1.0),
+                }
+            except (ValueError, AttributeError):
+                legs_cfg[_n] = {'en': False, 'ism3': 0, 'isj': 0, 'coll': 0, 'dep': 1}
         hubs_cfg = {}
         for hub in HUB_STATION:
             hv = self._hub_vars.get(hub, {})
+            jumps = {}
+            for jk in ('j1', 'j2', 'j3'):
+                try:    jumps[jk] = int(float(hv[jk].get())) if jk in hv else 0
+                except: jumps[jk] = 0
+            hubs_cfg[hub] = {**jumps, 'en': hv['en'].get() if 'en' in hv else True}
+
+        # Contract mode: build per-hub rate lookup
+        contract_rates = {}
+        for hub, cvd in self._hub_contract_vars.items():
             try:
-                j1 = int(float(hv['j1'].get())) if 'j1' in hv else 0
-                j2 = int(float(hv['j2'].get())) if 'j2' in hv else 0
+                contract_rates[hub] = {
+                    'ism3':       float(cvd['ism3'].get()),
+                    'coll':       float(cvd['coll'].get()) / 100.0,
+                    'min_reward': float(cvd['min_reward'].get()),
+                }
             except (ValueError, AttributeError):
-                j1, j2 = 0, 0
-            hubs_cfg[hub] = {
-                'j1':   j1,
-                'j2':   j2,
-                'leg2': hv['leg2'].get() if 'leg2' in hv else False,
-                'en':   hv['en'].get()   if 'en'   in hv else True,
-            }
+                contract_rates[hub] = {'ism3': 0, 'coll': 0, 'min_reward': 0}
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
-        # Phase 1: ore/ice/moon ore items only
+        # Ore + finished products (minerals, ice products, moon materials)
         cursor.execute("""
             WITH latest AS (
                 SELECT station_id, type_id, best_buy, best_sell,
@@ -3563,7 +3727,11 @@ class AdminDashboard:
             LEFT JOIN latest d ON d.type_id=tmi.type_id AND d.station_id=60011866 AND d.rn=1
             LEFT JOIN latest r ON r.type_id=tmi.type_id AND r.station_id=60004588 AND r.rn=1
             LEFT JOIN latest h ON h.type_id=tmi.type_id AND h.station_id=60005686 AND h.rn=1
-            WHERE tmi.category IN ('standard_ore', 'ice_ore', 'moon_ore')
+            WHERE tmi.category IN (
+                'standard_ore', 'ice_ore', 'moon_ore',
+                'minerals', 'ice_products', 'moon_materials',
+                'pi_materials', 'salvaged_materials'
+            )
             ORDER BY tmi.category, tmi.display_order, it.type_name
         """)
         rows = cursor.fetchall()
@@ -3623,10 +3791,17 @@ class AdminDashboard:
         conn.close()
 
         cat_map = {
-            'standard_ore': 'Standard Ore',
-            'ice_ore':      'Ice Ore',
-            'moon_ore':     'Moon Ore',
+            'standard_ore':      'Standard Ore',
+            'ice_ore':           'Ice Ore',
+            'moon_ore':          'Moon Ore',
+            'minerals':          'Minerals',
+            'ice_products':      'Ice Products',
+            'moon_materials':    'Moon Materials',
+            'pi_materials':      'PI Materials',
+            'salvaged_materials':'Salvaged Materials',
         }
+        PRODUCT_CATS = {'minerals', 'ice_products', 'moon_materials',
+                        'pi_materials', 'salvaged_materials'}
         # Column positions in query result:
         #  0=tid, 1=name, 2=cat, 3=vol, 4=disp_ord
         #  5=jita_buy, 6=jita_sell, 7=amarr_sell, 8=dodixie_sell, 9=rens_sell, 10=hek_sell
@@ -3663,7 +3838,8 @@ class AdminDashboard:
             hek_price     = hub_raw.get('hek')
 
             # Landed cost per enabled hub
-            landed = {}
+            landed       = {}
+            landed_comps = {}
             for hub in HUB_NAMES:
                 cfg = hubs_cfg[hub]
                 if not cfg['en']:
@@ -3671,15 +3847,52 @@ class AdminDashboard:
                 raw = hub_raw[hub]
                 if raw is None:
                     continue
-                buy_price = raw * buy_pct
-                broker    = buy_price * broker_pct
-                null_cost = null_ism3 * volume + null_isj * null_j + null_coll * buy_price
+                buy_price  = raw * buy_pct
+                broker     = buy_price * broker_pct
+                null_fixed = null_isj * null_j
+                null_var   = null_ism3 * volume + null_coll * buy_price
+                null_cost  = null_fixed + null_var
                 if hub == 'jita':
                     lc = buy_price + broker + null_cost
+                    landed_comps[hub] = {
+                        'fixed': null_fixed,
+                        'var':   buy_price + broker + null_var,
+                        'dep':   1e12,
+                    }
+                elif hs_mode == 'contract':
+                    cr         = contract_rates.get(hub, {'ism3': 0, 'coll': 0, 'min_reward': 0})
+                    hs_var_h   = cr['ism3'] * volume + cr['coll'] * buy_price
+                    hs_fixed_h = cr['min_reward']
+                    lc = buy_price + broker + hs_var_h + null_cost
+                    landed_comps[hub] = {
+                        'fixed': hs_fixed_h + null_fixed,
+                        'var':   buy_price + broker + hs_var_h + null_var,
+                        'dep':   860000.0,
+                    }
                 else:
-                    hub_jumps = cfg['j1'] + (cfg['j2'] if cfg['leg2'] else 0)
-                    hs_cost   = hs_ism3 * volume + hs_isj * hub_jumps + hs_coll * buy_price
+                    hs_cost    = 0.0
+                    hs_fixed_h = 0.0
+                    hs_var_h   = 0.0
+                    dep_list   = []
+                    for _n, jkey in ((1, 'j1'), (2, 'j2'), (3, 'j3')):
+                        leg   = legs_cfg[_n]
+                        jumps = hubs_cfg[hub][jkey]
+                        if not leg['en'] or jumps <= 0:
+                            continue
+                        hs_fixed_h += leg['isj'] * jumps
+                        hs_var_h   += leg['ism3'] * volume + leg['coll'] * buy_price
+                        dep_list.append(leg['dep'])
+                        hs_cost    += (
+                            leg['ism3'] * volume
+                            + leg['isj'] * jumps * (volume / leg['dep'])
+                            + leg['coll'] * buy_price
+                        )
                     lc = buy_price + broker + hs_cost + null_cost
+                    landed_comps[hub] = {
+                        'fixed': hs_fixed_h + null_fixed,
+                        'var':   buy_price + broker + hs_var_h + null_var,
+                        'dep':   min(dep_list) if dep_list else 900000.0,
+                    }
                 landed[hub] = lc
 
             if not landed:
@@ -3695,48 +3908,88 @@ class AdminDashboard:
                     'margin':     None,
                     'dev':        None,
                     'tag':        'nodata',
+                    'ref_val':    None,
+                    'vol':        volume,
+                    'best_fixed': None,
+                    'best_var':   None,
+                    'best_dep':   None,
                 })
                 continue
 
             best_hub = min(landed, key=lambda h: landed[h])
             best_lc  = landed[best_hub]
+            bc       = landed_comps.get(best_hub, {})
 
-            # Refine value: sum of (yield_qty × refine_eff × mineral_jbv × sell_pct)
-            ylds    = ore_yields.get(tid, [])
-            portion = ore_portion.get(tid, 1) or 1
-            ref_val = 0.0
-            for mat in ylds:
-                mat_id  = mat['materialTypeID']
-                mat_jbv = mineral_jbv.get(mat_id)
-                if mat_jbv:
-                    try:
-                        sell_pct = (
-                            float(self.ore_product_pct[mat_id].get()) / 100.0
-                            if hasattr(self, 'ore_product_pct')
-                            and mat_id in self.ore_product_pct
-                            else 1.0)
-                    except (ValueError, AttributeError):
-                        sell_pct = 1.0
-                    ref_val += mat['quantity'] * refine_eff * mat_jbv * sell_pct
+            if category in PRODUCT_CATS:
+                # Finished product — sell value = price_basis(tid) × sell_pct(tid)
+                basis_var = self._hub_sell_basis.get(tid)
+                pct_var   = self._hub_sell_pct.get(tid)
+                basis_str = (basis_var.get() if basis_var
+                             else self._get_config('hub_import_sell_ref', 'JSV'))
+                try:
+                    pct_val = float(pct_var.get() if pct_var
+                                    else self._get_config('hub_import_markup_pct', '115')) / 100.0
+                except (ValueError, AttributeError):
+                    pct_val = 1.15
+                jita_buy_p  = row[5]
+                jita_sell_p = row[6]
+                if basis_str == 'JBV':
+                    base_price = jita_buy_p
+                elif basis_str == 'Jita Split':
+                    base_price = ((jita_buy_p + jita_sell_p) / 2
+                                  if jita_buy_p and jita_sell_p
+                                  else (jita_buy_p or jita_sell_p))
+                else:  # JSV
+                    base_price = jita_sell_p
+                if not base_price:
+                    self._import_all_rows.append({
+                        'type_id':    tid,   'category':   cat_label,
+                        'item':       name,
+                        'jita':    jita_price,    'amarr':   amarr_price,
+                        'dodixie': dodixie_price, 'rens':    rens_price,
+                        'hek':     hek_price,
+                        'best_hub':   best_hub.title(), 'best_lc': best_lc,
+                        'margin':     None,  'dev':   None,  'tag': 'nodata',
+                        'ref_val':    None,  'vol':   volume,
+                        'best_fixed': bc.get('fixed'), 'best_var': bc.get('var'),
+                        'best_dep':   bc.get('dep'),
+                    })
+                    continue
+                contract = base_price * pct_val
+            else:
+                # Ore — refine value: sum of (yield_qty × refine_eff × mineral_jbv × sell_pct)
+                ylds    = ore_yields.get(tid, [])
+                portion = ore_portion.get(tid, 1) or 1
+                ref_val = 0.0
+                for mat in ylds:
+                    mat_id  = mat['materialTypeID']
+                    mat_jbv = mineral_jbv.get(mat_id)
+                    if mat_jbv:
+                        try:
+                            sell_pct = (
+                                float(self.ore_product_pct[mat_id].get()) / 100.0
+                                if hasattr(self, 'ore_product_pct')
+                                and mat_id in self.ore_product_pct
+                                else 1.0)
+                        except (ValueError, AttributeError):
+                            sell_pct = 1.0
+                        ref_val += mat['quantity'] * refine_eff * mat_jbv * sell_pct
 
-            if ref_val <= 0:
-                # Mineral prices not yet fetched — show as nodata with hub prices
-                self._import_all_rows.append({
-                    'type_id':    tid,
-                    'category':   cat_label,
-                    'item':       name,
-                    'jita':    jita_price,    'amarr':   amarr_price,
-                    'dodixie': dodixie_price, 'rens':    rens_price,
-                    'hek':     hek_price,
-                    'best_hub':   best_hub.title(),
-                    'best_lc':    best_lc,
-                    'margin':     None,
-                    'dev':        None,
-                    'tag':        'nodata',
-                })
-                continue
-
-            contract = ref_val / portion  # per-unit refine value
+                if ref_val <= 0:
+                    self._import_all_rows.append({
+                        'type_id':    tid,   'category':   cat_label,
+                        'item':       name,
+                        'jita':    jita_price,    'amarr':   amarr_price,
+                        'dodixie': dodixie_price, 'rens':    rens_price,
+                        'hek':     hek_price,
+                        'best_hub':   best_hub.title(), 'best_lc': best_lc,
+                        'margin':     None,  'dev':   None,  'tag': 'nodata',
+                        'ref_val':    None,  'vol':   volume,
+                        'best_fixed': bc.get('fixed'), 'best_var': bc.get('var'),
+                        'best_dep':   bc.get('dep'),
+                    })
+                    continue
+                contract = ref_val / portion  # per-unit refine value
 
             # Margin: ROI = (contract − landed) / landed × 100
             margin = ((contract - best_lc) / best_lc * 100) if best_lc > 0 else 0.0
@@ -3774,6 +4027,11 @@ class AdminDashboard:
                 'margin':     margin,
                 'dev':        dev_pct,
                 'tag':        tag,
+                'ref_val':    contract,
+                'vol':        volume,
+                'best_fixed': bc.get('fixed'),
+                'best_var':   bc.get('var'),
+                'best_dep':   bc.get('dep'),
             })
 
         total = len(self._import_all_rows)
@@ -3805,6 +4063,11 @@ class AdminDashboard:
         cat_filter = self.import_cat_var.get()
         show       = self.import_show_var.get()
 
+        try:
+            tgt = float(self.hub_target_mg_var.get()) / 100
+        except (ValueError, AttributeError):
+            tgt = 0.10
+
         show_map = {
             'Profitable': {'profitable'},
             'Marginal':   {'marginal'},
@@ -3823,7 +4086,25 @@ class AdminDashboard:
         col     = self._import_sort_col
         reverse = not self._import_sort_asc
 
+        def _min_n(r):
+            ref_v  = r.get('ref_val')
+            bfixed = r.get('best_fixed') or 0
+            bvar   = r.get('best_var')
+            if ref_v is None or bvar is None:
+                return None
+            if bfixed <= 0:
+                return 1 if ref_v > bvar * (1 + tgt) else None
+            denom = ref_v / (1 + tgt) - bvar
+            if denom <= 0:
+                return None
+            return bfixed / denom
+
         def _key(r):
+            if col == 'min_units':
+                mn = _min_n(r)
+                if mn is None:
+                    return 1e18 if not reverse else -1e18
+                return mn
             v = r.get(col)
             if v is None:
                 return (1e18 if not reverse else -1e18)
@@ -3840,6 +4121,16 @@ class AdminDashboard:
         for r in filtered:
             mg  = r.get('margin')
             dev = r.get('dev')
+            mn  = _min_n(r)
+            bvol = r.get('vol') or 1
+            bdep = r.get('best_dep') or 900000
+            if mn is None:
+                min_u = '—'
+            else:
+                min_n_int = math.ceil(mn)
+                cap = int(bdep / bvol)
+                min_u = (f'{min_n_int:,}' if min_n_int <= cap
+                         else f'⚠ >{cap:,}')
             self.import_tree.insert('', 'end', tags=(r['tag'],), values=(
                 r['category'],
                 r['item'],
@@ -3851,6 +4142,7 @@ class AdminDashboard:
                 r['best_hub'],
                 f'{mg:+.1f}%' if mg is not None else '—',
                 f'{dev:+.1f}%' if dev is not None else '—',
+                min_u,
             ))
 
     def _sort_import_tree(self, col):
@@ -3858,7 +4150,7 @@ class AdminDashboard:
             self._import_sort_asc = not self._import_sort_asc
         else:
             self._import_sort_col = col
-            self._import_sort_asc = col in ('category', 'item', 'best_hub')
+            self._import_sort_asc = col in ('category', 'item', 'best_hub', 'min_units')
         self._filter_import_tree()
 
     # ===== ORE IMPORT ANALYSIS =====
@@ -4688,11 +4980,9 @@ class AdminDashboard:
             ttk.Entry(inner, textvariable=var, width=7).grid(row=1, column=col, padx=6)
 
     def _build_moon_material_price_section(self, parent, expanded=False):
-        """Collapsible: Moon Materials (20 inputs, R4-R64 tiers)."""
+        """Collapsible: Moon Materials (20 inputs, R4-R64 tiers, each tier collapsible)."""
         content = self._make_collapsible_section(
             parent, 'Moon Materials', '#cc88ff', expanded)
-        inner = ttk.Frame(content, style='Card.TFrame')
-        inner.pack(padx=16, pady=(4, 6))
 
         tier_colors = {'R4': '#888888', 'R8': '#00ff88', 'R16': '#44aaff',
                        'R32': '#cc88ff', 'R64': '#ffcc44'}
@@ -4700,37 +4990,33 @@ class AdminDashboard:
                        'R16': 'R16 \u2014 Uncommon', 'R32': 'R32 \u2014 Rare',
                        'R64': 'R64 \u2014 Exceptional'}
 
-        grid_row = 0
-        current_tier = None
-        items_in_row = 0
+        # Group items by tier (preserving R4/R8/R16/R32/R64 order)
+        tier_groups = {}
+        tier_order = []
         for tid, name, default, tier in self._ORE_MOON_MATERIALS:
-            if tier != current_tier:
-                current_tier = tier
-                if items_in_row > 0:
-                    grid_row += 1
-                    items_in_row = 0
-                tk.Label(inner, text=tier_labels[tier],
-                         background='#0a2030', foreground=tier_colors[tier],
-                         font=('Segoe UI', 8, 'bold')).grid(
-                         row=grid_row, column=0, columnspan=8, sticky='w', pady=(6, 2))
-                grid_row += 1
+            if tier not in tier_groups:
+                tier_groups[tier] = []
+                tier_order.append(tier)
+            tier_groups[tier].append((tid, name, default))
 
-            key = f'ore_pct_{tid}'
-            var = tk.StringVar(value=self._get_config(key, default))
-            var.trace_add('write', lambda *_, k=key, v=var: self._set_config(k, v.get()))
-            self.ore_product_pct[tid] = var
-
-            gc = items_in_row * 2
-            tk.Label(inner, text=name,
-                     background='#0a2030', foreground='#88d0e8',
-                     font=('Segoe UI', 9)).grid(row=grid_row, column=gc, padx=(6, 2), sticky='e')
-            ttk.Entry(inner, textvariable=var, width=6).grid(
-                      row=grid_row, column=gc + 1, padx=(0, 10), sticky='w')
-
-            items_in_row += 1
-            if items_in_row >= 4:
-                items_in_row = 0
-                grid_row += 1
+        for tier in tier_order:
+            tier_items = tier_groups[tier]
+            sub_content = self._make_collapsible_section(
+                content, tier_labels[tier], tier_colors[tier], expanded=False)
+            inner = ttk.Frame(sub_content, style='Card.TFrame')
+            inner.pack(padx=8, pady=(2, 4))
+            lbl_cfg = dict(background='#0a2030', foreground='#88d0e8',
+                           font=('Segoe UI', 9))
+            for col_i, (tid, name, default) in enumerate(tier_items):
+                key = f'ore_pct_{tid}'
+                var = tk.StringVar(value=self._get_config(key, default))
+                var.trace_add('write', lambda *_, k=key, v=var: self._set_config(k, v.get()))
+                self.ore_product_pct[tid] = var
+                gc = col_i * 2
+                tk.Label(inner, text=name, **lbl_cfg).grid(
+                    row=0, column=gc, padx=(6, 2), sticky='e')
+                ttk.Entry(inner, textvariable=var, width=6).grid(
+                    row=0, column=gc + 1, padx=(0, 10), sticky='w')
 
     def _set_ore_type_filter(self, val):
         """Switch the ore type filter and refresh the active view."""

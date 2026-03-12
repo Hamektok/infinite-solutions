@@ -169,7 +169,18 @@ ICE_PRODUCT_IDS = [
 ]
 
 # R4 raw moon materials (direct refine products of moon ore)
-MOON_MATERIAL_IDS = [16633, 16634, 16635, 16636]  # Hydrocarbons, Atmo. Gases, Evap. Dep., Silicates
+MOON_MATERIAL_IDS = [
+    # R4
+    16633, 16634, 16635, 16636,   # Hydrocarbons, Atmospheric Gases, Evaporite Deposits, Silicates
+    # R8
+    16637, 16638, 16639, 16640,   # Tungsten, Titanium, Scandium, Cobalt
+    # R16
+    16641, 16642, 16643, 16644,   # Chromium, Vanadium, Cadmium, Platinum
+    # R32
+    16646, 16647, 16648, 16649,   # Mercury, Caesium, Hafnium, Technetium
+    # R64
+    16650, 16651, 16652, 16653,   # Dysprosium, Neodymium, Promethium, Thulium
+]
 
 ALL_ORE_IDS = list(set(
     STD_ORE_IDS + COMPRESSED_STD_ORE_IDS +
@@ -316,13 +327,29 @@ def main():
     elif category == 'gas':
         type_ids = list(set(GAS_IDS))
         label    = f'gas ({len(type_ids)} type IDs)'
+    elif category == 'minerals':
+        type_ids = MINERAL_IDS
+        label    = f'minerals only ({len(type_ids)} type IDs)'
+    elif category == 'ice_products':
+        type_ids = ICE_PRODUCT_IDS
+        label    = f'ice products only ({len(type_ids)} type IDs)'
+    elif category == 'moon_materials':
+        type_ids = MOON_MATERIAL_IDS
+        label    = f'moon materials only ({len(type_ids)} type IDs)'
+    elif category in ('pi_materials', 'salvaged_materials'):
+        cur = conn.cursor()
+        cur.execute("SELECT DISTINCT type_id FROM tracked_market_items WHERE category = ?",
+                    (category,))
+        type_ids = [r[0] for r in cur.fetchall()]
+        label    = f'{category.replace("_", " ")} ({len(type_ids)} type IDs)'
     elif category == 'all':
         tracked  = get_tracked_type_ids(conn)
         type_ids = list(set(ALL_ORE_IDS + GAS_IDS + tracked))
         label    = f'all ({len(type_ids)} type IDs)'
     else:
         print(f'Unknown category "{category}". '
-              f'Use: standard | ice | moon | gas | tracked | all')
+              f'Use: standard | ice | moon | minerals | ice_products | moon_materials'
+              f' | pi_materials | salvaged_materials | gas | tracked | all')
         conn.close()
         sys.exit(1)
 
