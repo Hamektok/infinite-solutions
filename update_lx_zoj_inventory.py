@@ -428,10 +428,17 @@ def commit_and_push_to_github(snapshot_time):
 # MAIN SCRIPT
 # ============================================
 
+# Tracks whether ensure_main_branch stashed changes; used by restore_branch.
+_stash_was_created = False
+
+
 def ensure_main_branch():
     """Switch to main branch before making any changes (GitHub Pages builds from main).
+    Stashes tracked changes first so checkout succeeds on a dirty dev branch.
     Returns the original branch name so the caller can restore it afterward."""
     import subprocess
+    global _stash_was_created
+    _stash_was_created = False
     try:
         current_branch = subprocess.run(
             ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
@@ -442,6 +449,25 @@ def ensure_main_branch():
         branch_name = current_branch.stdout.strip()
 
         if branch_name != 'main':
+            # Count stashes before so we know if we created a new one
+            before = subprocess.run(
+                ['git', 'stash', 'list'],
+                cwd=PROJECT_DIR, capture_output=True, text=True
+            ).stdout.strip()
+            before_count = len(before.splitlines()) if before else 0
+
+            subprocess.run(
+                ['git', 'stash', '--quiet'],
+                cwd=PROJECT_DIR, capture_output=True, text=True
+            )
+
+            after = subprocess.run(
+                ['git', 'stash', 'list'],
+                cwd=PROJECT_DIR, capture_output=True, text=True
+            ).stdout.strip()
+            after_count = len(after.splitlines()) if after else 0
+            _stash_was_created = after_count > before_count
+
             print(f"[!] Currently on '{branch_name}' branch, switching to main...")
             subprocess.run(
                 ['git', 'checkout', 'main'],
@@ -459,8 +485,10 @@ def ensure_main_branch():
 
 
 def restore_branch(original_branch):
-    """Switch back to the branch that was active before ensure_main_branch()."""
+    """Switch back to the branch that was active before ensure_main_branch()
+    and pop the stash if one was created."""
     import subprocess
+    global _stash_was_created
     if original_branch and original_branch != 'main':
         try:
             subprocess.run(
@@ -472,6 +500,19 @@ def restore_branch(original_branch):
             print(f"[OK] Restored to '{original_branch}' branch")
         except Exception as e:
             print(f"[WARN] Could not restore branch '{original_branch}': {e}")
+
+    if _stash_was_created:
+        try:
+            subprocess.run(
+                ['git', 'stash', 'pop'],
+                cwd=PROJECT_DIR,
+                check=True,
+                capture_output=True
+            )
+            print("[OK] Stash popped (dev changes restored)")
+            _stash_was_created = False
+        except Exception as e:
+            print(f"[WARN] Could not pop stash: {e}")
 
 def _update_container_names_in_db(conn, esi_names):
     """
