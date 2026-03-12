@@ -428,12 +428,17 @@ def commit_and_push_to_github(snapshot_time):
 # MAIN SCRIPT
 # ============================================
 
+# Tracks whether ensure_main_branch stashed changes; used by restore_branch.
+_stash_was_created = False
+
+
 def ensure_main_branch():
     """Switch to main branch before making any changes (GitHub Pages builds from main).
-    Stashes any uncommitted changes first so the checkout succeeds even on a dirty dev branch.
-    Returns (original_branch, stashed) so the caller can restore afterward."""
+    Stashes tracked changes first so checkout succeeds on a dirty dev branch.
+    Returns the original branch name so the caller can restore it afterward."""
     import subprocess
-    stashed = False
+    global _stash_was_created
+    _stash_was_created = False
     try:
         current_branch = subprocess.run(
             ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
@@ -444,18 +449,24 @@ def ensure_main_branch():
         branch_name = current_branch.stdout.strip()
 
         if branch_name != 'main':
-            # Stash tracked changes so checkout to main doesn't fail.
-            # Don't include untracked files — they don't block checkout and
-            # stash-pop would conflict with files already on disk.
-            stash_result = subprocess.run(
+            # Count stashes before so we know if we created a new one
+            before = subprocess.run(
+                ['git', 'stash', 'list'],
+                cwd=PROJECT_DIR, capture_output=True, text=True
+            ).stdout.strip()
+            before_count = len(before.splitlines()) if before else 0
+
+            subprocess.run(
                 ['git', 'stash', '--quiet'],
-                cwd=PROJECT_DIR,
-                capture_output=True,
-                text=True
+                cwd=PROJECT_DIR, capture_output=True, text=True
             )
-            # git stash exits 0 whether or not anything was stashed;
-            # "No local changes to save" means nothing was stashed
-            stashed = 'No local changes' not in stash_result.stdout
+
+            after = subprocess.run(
+                ['git', 'stash', 'list'],
+                cwd=PROJECT_DIR, capture_output=True, text=True
+            ).stdout.strip()
+            after_count = len(after.splitlines()) if after else 0
+            _stash_was_created = after_count > before_count
 
             print(f"[!] Currently on '{branch_name}' branch, switching to main...")
             subprocess.run(
@@ -467,16 +478,17 @@ def ensure_main_branch():
             print("[OK] Switched to main branch")
         else:
             print("[OK] Already on main branch")
-        return branch_name, stashed
+        return branch_name
     except Exception as e:
         print(f"[ERROR] Could not switch to main branch: {e}")
-        return 'main', stashed
+        return 'main'
 
 
-def restore_branch(original_branch, stashed=False):
+def restore_branch(original_branch):
     """Switch back to the branch that was active before ensure_main_branch()
-    and pop any stash that was saved."""
+    and pop the stash if one was created."""
     import subprocess
+    global _stash_was_created
     if original_branch and original_branch != 'main':
         try:
             subprocess.run(
@@ -489,7 +501,7 @@ def restore_branch(original_branch, stashed=False):
         except Exception as e:
             print(f"[WARN] Could not restore branch '{original_branch}': {e}")
 
-    if stashed:
+    if _stash_was_created:
         try:
             subprocess.run(
                 ['git', 'stash', 'pop'],
@@ -497,7 +509,8 @@ def restore_branch(original_branch, stashed=False):
                 check=True,
                 capture_output=True
             )
-            print("[OK] Stash popped")
+            print("[OK] Stash popped (dev changes restored)")
+            _stash_was_created = False
         except Exception as e:
             print(f"[WARN] Could not pop stash: {e}")
 
@@ -640,7 +653,7 @@ def main():
     print("=" * 60)
 
     # Switch to main branch FIRST (before modifying any files)
-    original_branch, _stashed = ensure_main_branch()
+    original_branch = ensure_main_branch()
 
     print(f"\nCharacter ID: {CHARACTER_ID}")
     print(f"Structure: LX-ZOJ ({LX_ZOJ_STRUCTURE_ID})")
@@ -733,14 +746,14 @@ def main():
 
         print(f"\n[OK] Inventory update completed!")
         print(f"Finished: {datetime.now().strftime('%I:%M:%S %p')}")
-        restore_branch(original_branch, _stashed)
+        restore_branch(original_branch)
 
     except Exception as e:
         print(f"\n[ERROR] FATAL ERROR: {e}")
         import traceback
         traceback.print_exc()
         conn.close()
-        restore_branch(original_branch, _stashed)
+        restore_branch(original_branch)
         raise
 
 if __name__ == '__main__':
