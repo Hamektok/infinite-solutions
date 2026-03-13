@@ -101,6 +101,49 @@ class AdminDashboard:
         self.root.configure(bg='#0a1520')
         self.root.minsize(900, 600)
 
+        # Ore Import tab — mineral/product sell% reference data
+        self._ORE_MINERALS = [
+            (34,    'Tritanium',  '95'),
+            (35,    'Pyerite',   '95'),
+            (36,    'Mexallon',  '98'),
+            (37,    'Isogen',   '100'),
+            (38,    'Nocxium',  '105'),
+            (39,    'Zydrine',  '110'),
+            (40,    'Megacyte', '115'),
+            (11399, 'Morphite', '120'),
+        ]
+        self._ORE_ICE_PRODUCTS = [
+            (16272, 'Heavy Water',        '90'),
+            (16273, 'Liquid Ozone',       '95'),
+            (16274, 'Helium Isotopes',   '100'),
+            (16275, 'Strontium Clath.', '100'),
+            (17887, 'Oxygen Isotopes',   '100'),
+            (17888, 'Nitrogen Isotopes', '100'),
+            (17889, 'Hydrogen Isotopes', '100'),
+        ]
+        self._ORE_MOON_MATERIALS = [
+            (16633, 'Hydrocarbons',   '95',  'R4'),
+            (16634, 'Atmo. Gases',    '95',  'R4'),
+            (16635, 'Evaporite Dep.', '95',  'R4'),
+            (16636, 'Silicates',      '95',  'R4'),
+            (16637, 'Tungsten',      '100',  'R8'),
+            (16638, 'Titanium',      '100',  'R8'),
+            (16639, 'Scandium',      '100',  'R8'),
+            (16640, 'Cobalt',        '100',  'R8'),
+            (16641, 'Chromium',      '105', 'R16'),
+            (16642, 'Vanadium',      '105', 'R16'),
+            (16643, 'Cadmium',       '105', 'R16'),
+            (16644, 'Platinum',      '105', 'R16'),
+            (16646, 'Mercury',       '110', 'R32'),
+            (16647, 'Caesium',       '110', 'R32'),
+            (16648, 'Hafnium',       '110', 'R32'),
+            (16649, 'Technetium',    '115', 'R32'),
+            (16650, 'Dysprosium',    '120', 'R64'),
+            (16651, 'Neodymium',     '120', 'R64'),
+            (16652, 'Promethium',    '125', 'R64'),
+            (16653, 'Thulium',       '125', 'R64'),
+        ]
+
         # Track unsaved changes
         self.unsaved_changes = {}
 
