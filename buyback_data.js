@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-13 00:47 UTC
+// Generated: 2026-03-13 00:51 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -576,7 +576,7 @@ const BUYBACK_DATA = {
       "corpRate": 98,
       "allianceDiscount": 1,
       "accepted": true,
-      "quota": 45000,
+      "quota": 100000,
       "avgJitaBuy": 928.36,
       "flags": []
     },
@@ -590,7 +590,7 @@ const BUYBACK_DATA = {
       "corpRate": 98,
       "allianceDiscount": 1,
       "accepted": true,
-      "quota": 50000,
+      "quota": 45000,
       "avgJitaBuy": 2358.71,
       "flags": []
     },
@@ -7859,5 +7859,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-13 00:47 UTC"
+  "generated": "2026-03-13 00:51 UTC"
 };
