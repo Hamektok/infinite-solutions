@@ -1138,7 +1138,7 @@ BLUEPRINT_DATA = [
   {
     "name": "Mobile Tractor Unit Blueprint",
     "me": 10,
-    "te": 0,
+    "te": 20,
     "category": "Structures",
     "subcategory": "Deployable Structures"
   },
