@@ -515,8 +515,8 @@
     "type_id": 2317,
     "category": "pi_materials",
     "name": "Oxides",
-    "status": "open",
-    "lessee": null,
+    "status": "closed",
+    "lessee": "Cural Azaph",
     "price": "0"
   }
 ]
