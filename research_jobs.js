@@ -26,14 +26,6 @@ RESEARCH_JOBS = [
     "job_id": 642907983
   },
   {
-    "name": "Mobile Tractor Unit Blueprint",
-    "research_type": "TE",
-    "current_level": 0,
-    "target_level": 2,
-    "end_date": "2026-03-05T23:23:16+00:00",
-    "job_id": 642561140
-  },
-  {
     "name": "Einherji I Blueprint",
     "research_type": "TE",
     "current_level": 14,
