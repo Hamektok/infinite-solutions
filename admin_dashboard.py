@@ -118,26 +118,31 @@ class AdminDashboard:
             (17889, 'Hydrogen Isotopes',  '100'),
         ]
         self._ORE_MOON_MATERIALS = [
-            (16633, 'Hydrocarbons',    '95', 'R4'),
-            (16634, 'Atmo. Gases',     '95', 'R4'),
-            (16635, 'Evaporate Dep.',  '95', 'R4'),
-            (16636, 'Silicates',       '95', 'R4'),
-            (45490, 'Cobaltite',       '95', 'R8'),
-            (45491, 'Euxenite',        '95', 'R8'),
-            (45492, 'Scheelite',       '95', 'R8'),
-            (45493, 'Titanite',        '95', 'R8'),
-            (45494, 'Chromite',        '95', 'R16'),
-            (45495, 'Otavite',         '95', 'R16'),
-            (45496, 'Sperrylite',      '95', 'R16'),
-            (45497, 'Vanadinite',      '95', 'R16'),
-            (45498, 'Carnotite',       '95', 'R32'),
-            (45499, 'Cinnabar',        '95', 'R32'),
-            (45500, 'Pollucite',       '95', 'R32'),
-            (45501, 'Zircon',          '95', 'R32'),
-            (45502, 'Loparite',        '95', 'R64'),
-            (45503, 'Monazite',        '95', 'R64'),
-            (45504, 'Xenotime',        '95', 'R64'),
-            (45506, 'Ytterbite',       '95', 'R64'),
+            # R4 processed moon materials
+            (16633, 'Hydrocarbons',  '95', 'R4'),
+            (16634, 'Atmo. Gases',   '95', 'R4'),
+            (16635, 'Evaporate Dep.','95', 'R4'),
+            (16636, 'Silicates',     '95', 'R4'),
+            # R8 processed moon materials
+            (16637, 'Tungsten',      '95', 'R8'),
+            (16638, 'Titanium',      '95', 'R8'),
+            (16639, 'Scandium',      '95', 'R8'),
+            (16640, 'Cobalt',        '95', 'R8'),
+            # R16 processed moon materials
+            (16641, 'Chromium',      '95', 'R16'),
+            (16642, 'Vanadium',      '95', 'R16'),
+            (16643, 'Cadmium',       '95', 'R16'),
+            (16644, 'Platinum',      '95', 'R16'),
+            # R32 processed moon materials
+            (16646, 'Mercury',       '95', 'R32'),
+            (16647, 'Caesium',       '95', 'R32'),
+            (16648, 'Hafnium',       '95', 'R32'),
+            (16649, 'Technetium',    '95', 'R32'),
+            # R64 processed moon materials
+            (16650, 'Dysprosium',    '95', 'R64'),
+            (16651, 'Neodymium',     '95', 'R64'),
+            (16652, 'Promethium',    '95', 'R64'),
+            (16653, 'Thulium',       '95', 'R64'),
         ]
 
         # Track unsaved changes
