@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-19 13:19 UTC
+// Generated: 2026-03-19 13:41 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -7837,27 +7837,27 @@ const BUYBACK_DATA = {
       }
     },
     "pi_materials": {
-      "visible": true,
+      "visible": false,
       "subs": {
         "p1": {
-          "visible": true,
+          "visible": false,
           "displayName": "P1"
         },
         "p2": {
-          "visible": true,
+          "visible": false,
           "displayName": "P2"
         },
         "p3": {
-          "visible": true,
+          "visible": false,
           "displayName": "P3"
         },
         "p4": {
-          "visible": true,
+          "visible": false,
           "displayName": "P4"
         }
       }
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-19 13:19 UTC"
+  "generated": "2026-03-19 13:41 UTC"
 };
