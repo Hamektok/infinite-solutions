@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-19 13:14 UTC
+// Generated: 2026-03-19 13:19 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -475,7 +475,7 @@ const BUYBACK_DATA = {
       "sellRate": 101,
       "corpRate": 98,
       "allianceDiscount": 3,
-      "accepted": true,
+      "accepted": false,
       "quota": 200000,
       "avgJitaBuy": 736.91,
       "flags": []
@@ -573,7 +573,7 @@ const BUYBACK_DATA = {
       "sellRate": 99,
       "corpRate": 98,
       "allianceDiscount": 1,
-      "accepted": true,
+      "accepted": false,
       "quota": 100000,
       "avgJitaBuy": 956.12,
       "flags": []
@@ -713,7 +713,7 @@ const BUYBACK_DATA = {
       "sellRate": 101,
       "corpRate": 98,
       "allianceDiscount": 3,
-      "accepted": true,
+      "accepted": false,
       "quota": 50000,
       "avgJitaBuy": 677.35,
       "flags": []
@@ -1965,7 +1965,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 4108.6612,
       "flags": []
@@ -1979,7 +1979,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 2356.0003,
       "flags": []
@@ -1993,7 +1993,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 1532.8284,
       "flags": []
@@ -2021,7 +2021,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 4767.2203,
       "flags": []
@@ -2035,7 +2035,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 2732.7263,
       "flags": []
@@ -2049,7 +2049,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 1781.9784,
       "flags": []
@@ -2077,7 +2077,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 8217.3224,
       "flags": []
@@ -2091,7 +2091,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 4712.0005,
       "flags": []
@@ -2105,7 +2105,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 3065.6567,
       "flags": []
@@ -2805,7 +2805,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 4108.6612,
       "flags": []
@@ -2819,7 +2819,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 2356.0003,
       "flags": []
@@ -2833,7 +2833,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 1532.8284,
       "flags": []
@@ -2861,7 +2861,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 4767.2203,
       "flags": []
@@ -2875,7 +2875,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 2732.7263,
       "flags": []
@@ -2889,7 +2889,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 1781.9784,
       "flags": []
@@ -2917,7 +2917,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 8217.3224,
       "flags": []
@@ -2931,7 +2931,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 4712.0005,
       "flags": []
@@ -2945,7 +2945,7 @@ const BUYBACK_DATA = {
       "sellRate": 95,
       "corpRate": 93,
       "allianceDiscount": 2,
-      "accepted": true,
+      "accepted": false,
       "quota": 25000,
       "avgJitaBuy": 3065.6567,
       "flags": []
@@ -7758,7 +7758,7 @@ const BUYBACK_DATA = {
   "categories": {
     "minerals": {
       "displayName": "Minerals",
-      "visible": true,
+      "visible": false,
       "pricingMethod": "Jita Buy"
     },
     "ice_products": {
@@ -7793,7 +7793,7 @@ const BUYBACK_DATA = {
     },
     "moon_ore": {
       "displayName": "Moon Ore",
-      "visible": true,
+      "visible": false,
       "pricingMethod": "Jita Buy"
     }
   },
@@ -7859,5 +7859,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-19 13:14 UTC"
+  "generated": "2026-03-19 13:19 UTC"
 };
