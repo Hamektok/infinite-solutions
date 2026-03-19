@@ -39,7 +39,7 @@ BLUEPRINT_DATA = [
   {
     "name": "Algos Blueprint",
     "me": 0,
-    "te": 0,
+    "te": 20,
     "category": "Ships",
     "subcategory": "Destroyer"
   },
@@ -179,14 +179,14 @@ BLUEPRINT_DATA = [
   {
     "name": "Catalyst Blueprint",
     "me": 10,
-    "te": 0,
+    "te": 20,
     "category": "Ships",
     "subcategory": "Destroyer"
   },
   {
     "name": "Coercer Blueprint",
     "me": 0,
-    "te": 0,
+    "te": 20,
     "category": "Ships",
     "subcategory": "Destroyer"
   },
@@ -1873,7 +1873,7 @@ BLUEPRINT_DATA = [
   {
     "name": "Vexor Blueprint",
     "me": 10,
-    "te": 14,
+    "te": 20,
     "category": "Ships",
     "subcategory": "Cruiser"
   },

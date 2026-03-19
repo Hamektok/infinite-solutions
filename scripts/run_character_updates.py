@@ -1,5 +1,6 @@
 import subprocess
 import os
+import time
 from datetime import datetime
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +29,9 @@ def main():
                 print(f"ERROR: {result.stderr}")
         except Exception as e:
             print(f"ERROR: {e}")
-    
+
+        time.sleep(10)  # pause between scripts to avoid sustained network bursts
+
     print(f"\nCharacter updates complete - {datetime.now()}")
 
 if __name__ == '__main__':
