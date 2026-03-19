@@ -29,6 +29,8 @@ CATEGORY_DISPLAY = {
     'minerals': 'Minerals',
     'ice_products': 'Ice Products',
     'moon_materials': 'Reaction Materials',
+    'gas_cloud_materials': 'Gas Cloud Materials',
+    'research_equipment': 'Research Equipment',
     'pi_materials': 'Planetary Materials',
     'salvaged_materials': 'Salvaged Materials',
     'standard_ore': 'Standard Ore',
@@ -48,31 +50,39 @@ COMP_TABS = [
 ]
 # DB categories covered by the competitor sheet (for tree tag colouring)
 COMP_INTEL_CATEGORIES = {
-    'minerals', 'ice_products', 'moon_materials', 'pi_materials',
+    'minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials',
     'standard_ore', 'ice_ore', 'moon_ore',
 }
 
 # Market tab visibility
-MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials']
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials']
 MARKET_TAB_LABELS = {
-    'minerals':       'Minerals',
-    'ice_products':   'Ice Products',
-    'moon_materials': 'Moon Materials',
-    'pi_materials':   'Planetary Materials',
+    'minerals':            'Minerals',
+    'ice_products':        'Ice Products',
+    'moon_materials':      'Moon Materials',
+    'gas_cloud_materials': 'Gas Cloud Materials',
+    'research_equipment':  'Research Equipment',
+    'pi_materials':        'Planetary Materials',
 }
 
 # Market subcategory definitions: (tab_key, sub_key, display_label)
 MARKET_SUBTAB_DEFS = [
-    ('ice_products',   'fuel_blocks',  'Fuel Blocks'),
-    ('ice_products',   'refined_ice',  'Refined Ice'),
-    ('ice_products',   'isotopes',     'Isotopes'),
-    ('moon_materials', 'raw',          'Raw'),
-    ('moon_materials', 'processed',    'Processed'),
-    ('moon_materials', 'advanced',     'Advanced'),
-    ('pi_materials',   'p1',           'P1'),
-    ('pi_materials',   'p2',           'P2'),
-    ('pi_materials',   'p3',           'P3'),
-    ('pi_materials',   'p4',           'P4'),
+    ('ice_products',        'fuel_blocks',           'Fuel Blocks'),
+    ('ice_products',        'refined_ice',           'Refined Ice'),
+    ('ice_products',        'isotopes',              'Isotopes'),
+    ('moon_materials',      'raw',                   'Raw'),
+    ('moon_materials',      'processed',             'Processed'),
+    ('moon_materials',      'advanced',              'Advanced'),
+    ('gas_cloud_materials', 'compressed_fullerene',  'Compressed Fullerenes'),
+    ('gas_cloud_materials', 'compressed_booster',    'Compressed Booster Gas'),
+    ('gas_cloud_materials', 'uncompressed_fullerene','Uncompressed Fullerenes'),
+    ('gas_cloud_materials', 'uncompressed_booster',  'Uncompressed Booster Gas'),
+    ('research_equipment',  'datacores',             'Datacores'),
+    ('research_equipment',  'decryptors',            'Decryptors'),
+    ('pi_materials',        'p1',                    'P1'),
+    ('pi_materials',        'p2',                    'P2'),
+    ('pi_materials',        'p3',                    'P3'),
+    ('pi_materials',        'p4',                    'P4'),
 ]
 
 
@@ -88,6 +98,20 @@ def _get_moon_subcat(display_order):
     if display_order <= 35:  return 'Raw'
     if display_order <= 124: return 'Processed'
     return 'Advanced'
+
+
+def _get_gas_subcat(display_order):
+    if display_order is None: return ''
+    if display_order < 100:  return 'compressed_fullerene'
+    if display_order < 200:  return 'compressed_booster'
+    if display_order < 300:  return 'uncompressed_fullerene'
+    return 'uncompressed_booster'
+
+
+def _get_research_subcat(display_order):
+    if display_order is None: return ''
+    if display_order < 100:  return 'datacores'
+    return 'decryptors'
 
 
 PI_GROUP_MAP = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
@@ -582,7 +606,7 @@ class AdminDashboard:
         # Buyback category names (must match what the website uses)
         self.buyback_categories = [
             'Minerals', 'Ice Products', 'Reaction Materials',
-            'Salvaged Materials', 'Gas Clouds Materials', 'Planetary Materials',
+            'Salvaged Materials', 'Gas Cloud Materials', 'Research Equipment', 'Planetary Materials',
             'Standard Ore', 'Ice Ore', 'Moon Ore',
         ]
         self._ore_categories = {'Standard Ore', 'Ice Ore', 'Moon Ore'}
@@ -1184,6 +1208,10 @@ class AdminDashboard:
                 subcat = _get_ice_subcat(display_order)
             elif category == 'moon_materials':
                 subcat = _get_moon_subcat(display_order)
+            elif category == 'gas_cloud_materials':
+                subcat = _get_gas_subcat(display_order)
+            elif category == 'research_equipment':
+                subcat = _get_research_subcat(display_order)
             elif category == 'pi_materials':
                 subcat = PI_GROUP_MAP.get(mkt_group_id, '')
             else:

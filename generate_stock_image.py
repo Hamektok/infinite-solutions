@@ -134,21 +134,31 @@ def main():
         "SELECT key, value FROM site_config WHERE key LIKE 'market_tab_%' OR key LIKE 'market_sub_%'"
     ).fetchall()
     vis = {k: (str(v) == '1') for k, v in vis_rows}
-    show_minerals      = vis.get('market_tab_minerals',                    True)
-    show_ice           = vis.get('market_tab_ice_products',                True)
-    show_moon          = vis.get('market_tab_moon_materials',              True)
-    show_ice_fuel      = vis.get('market_sub_ice_products_fuel_blocks',    True)
-    show_ice_refined   = vis.get('market_sub_ice_products_refined_ice',    True)
-    show_ice_isotopes  = vis.get('market_sub_ice_products_isotopes',       True)
-    show_moon_raw      = vis.get('market_sub_moon_materials_raw',          True)
-    show_moon_proc     = vis.get('market_sub_moon_materials_processed',    True)
-    show_moon_adv      = vis.get('market_sub_moon_materials_advanced',     True)
+    show_minerals      = vis.get('market_tab_minerals',                                  True)
+    show_ice           = vis.get('market_tab_ice_products',                              True)
+    show_moon          = vis.get('market_tab_moon_materials',                            True)
+    show_gas           = vis.get('market_tab_gas_cloud_materials',                       True)
+    show_ice_fuel      = vis.get('market_sub_ice_products_fuel_blocks',                  True)
+    show_ice_refined   = vis.get('market_sub_ice_products_refined_ice',                  True)
+    show_ice_isotopes  = vis.get('market_sub_ice_products_isotopes',                     True)
+    show_moon_raw      = vis.get('market_sub_moon_materials_raw',                        True)
+    show_moon_proc     = vis.get('market_sub_moon_materials_processed',                  True)
+    show_moon_adv      = vis.get('market_sub_moon_materials_advanced',                   True)
+    show_gas_cf        = vis.get('market_sub_gas_cloud_materials_compressed_fullerene',  True)
+    show_gas_cb        = vis.get('market_sub_gas_cloud_materials_compressed_booster',    True)
+    show_gas_uf        = vis.get('market_sub_gas_cloud_materials_uncompressed_fullerene',True)
+    show_gas_ub        = vis.get('market_sub_gas_cloud_materials_uncompressed_booster',  True)
+    show_research      = vis.get('market_tab_research_equipment',                        True)
+    show_res_dc        = vis.get('market_sub_research_equipment_datacores',              True)
+    show_res_dec       = vis.get('market_sub_research_equipment_decryptors',             True)
 
     # Fetch items only for visible categories
     visible_cats = [c_name for c_name, flag in [
-        ('minerals',       show_minerals),
-        ('ice_products',   show_ice),
-        ('moon_materials', show_moon),
+        ('minerals',            show_minerals),
+        ('ice_products',        show_ice),
+        ('moon_materials',      show_moon),
+        ('gas_cloud_materials', show_gas),
+        ('research_equipment',  show_research),
     ] if flag]
 
     if not visible_cats:
@@ -183,17 +193,33 @@ def main():
         if display_order < 200:  return show_moon_proc
         return show_moon_adv
 
+    def gas_sub_visible(display_order):
+        if display_order < 100:  return show_gas_cf
+        if display_order < 200:  return show_gas_cb
+        if display_order < 300:  return show_gas_uf
+        return show_gas_ub
+
+    def research_sub_visible(display_order):
+        if display_order < 100:  return show_res_dc
+        return show_res_dec
+
     by_cat = {}
     for cat, name, qty, buyback, disp_ord, price_pct, alliance_disc in rows:
-        if cat == 'ice_products'   and not ice_sub_visible(disp_ord):
+        if cat == 'ice_products'        and not ice_sub_visible(disp_ord):
             continue
-        if cat == 'moon_materials' and not moon_sub_visible(disp_ord):
+        if cat == 'moon_materials'      and not moon_sub_visible(disp_ord):
+            continue
+        if cat == 'gas_cloud_materials' and not gas_sub_visible(disp_ord):
+            continue
+        if cat == 'research_equipment'  and not research_sub_visible(disp_ord):
             continue
         by_cat.setdefault(cat, []).append((name, qty, buyback, price_pct, alliance_disc))
 
-    minerals  = by_cat.get('minerals',       []) if show_minerals else []
-    ice       = by_cat.get('ice_products',   []) if show_ice      else []
-    moon_mats = by_cat.get('moon_materials', []) if show_moon     else []
+    minerals  = by_cat.get('minerals',            []) if show_minerals else []
+    ice       = by_cat.get('ice_products',        []) if show_ice      else []
+    moon_mats = by_cat.get('moon_materials',      []) if show_moon     else []
+    gas_mats      = by_cat.get('gas_cloud_materials', []) if show_gas      else []
+    research_items = by_cat.get('research_equipment',  []) if show_research else []
 
     try:
         dt     = datetime.fromisoformat(snap_ts)
@@ -209,7 +235,9 @@ def main():
 
     col_w     = (W - PAD * 2 - COL_GAP) // 2
     full_w    = W - PAD * 2
-    half_moon = (len(moon_mats) + 1) // 2
+    half_moon     = (len(moon_mats)      + 1) // 2
+    half_gas      = (len(gas_mats)       + 1) // 2
+    half_research = (len(research_items) + 1) // 2
 
     # Top pair: minerals and/or ice
     show_top = show_minerals or show_ice
@@ -227,6 +255,10 @@ def main():
         total_h += SEC_HDR + top_rows * ROW_H + GAP
     if show_moon:
         total_h += SEC_HDR + half_moon * ROW_H + GAP
+    if show_gas and gas_mats:
+        total_h += SEC_HDR + half_gas * ROW_H + GAP
+    if show_research and research_items:
+        total_h += SEC_HDR + half_research * ROW_H + GAP
     total_h += FOOTER
 
     # ── Render ───────────────────────────────────────────────────────────
@@ -276,6 +308,55 @@ def main():
                 draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg,
                               price_pct, alliance_disc)
             yr += ROW_H
+        y = yr + GAP
+
+    # Gas cloud materials — full-width, two columns
+    if show_gas and gas_mats:
+        draw.text((x_l, y), 'GAS CLOUD MATERIALS', font=F_HDR, fill=ACCENT)
+        line_y = y + 18
+        draw.line([(x_l, line_y), (x_l + full_w, line_y)], fill=DIM, width=1)
+        yr = line_y + 5
+
+        left_gas  = gas_mats[:half_gas]
+        right_gas = gas_mats[half_gas:]
+
+        for i in range(half_gas):
+            row_bg = BG_ROW_B if i % 2 == 1 else BG_ROW_A
+            draw.rectangle([(x_l, yr), (x_l + full_w, yr + ROW_H - 1)], fill=row_bg)
+            if i < len(left_gas):
+                name, qty, buyback, price_pct, alliance_disc = left_gas[i]
+                draw_item_row(draw, x_l, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
+            if i < len(right_gas):
+                name, qty, buyback, price_pct, alliance_disc = right_gas[i]
+                draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
+            yr += ROW_H
+        y = yr + GAP
+
+    # Research equipment — full-width, two columns
+    if show_research and research_items:
+        draw.text((x_l, y), 'RESEARCH EQUIPMENT', font=F_HDR, fill=ACCENT)
+        line_y = y + 18
+        draw.line([(x_l, line_y), (x_l + full_w, line_y)], fill=DIM, width=1)
+        yr = line_y + 5
+
+        left_res  = research_items[:half_research]
+        right_res = research_items[half_research:]
+
+        for i in range(half_research):
+            row_bg = BG_ROW_B if i % 2 == 1 else BG_ROW_A
+            draw.rectangle([(x_l, yr), (x_l + full_w, yr + ROW_H - 1)], fill=row_bg)
+            if i < len(left_res):
+                name, qty, buyback, price_pct, alliance_disc = left_res[i]
+                draw_item_row(draw, x_l, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
+            if i < len(right_res):
+                name, qty, buyback, price_pct, alliance_disc = right_res[i]
+                draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
+            yr += ROW_H
+        y = yr + GAP
 
     # Footer with legend
     footer_y = total_h - FOOTER
