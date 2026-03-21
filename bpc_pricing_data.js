@@ -19,9 +19,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 12630750.0,
-        "price10Runs": 315768.75,
-        "pricePerRun": 31576.88
+        "jitaSellPrice": 12386923.08,
+        "price10Runs": 309673.08,
+        "pricePerRun": 30967.31
     },
     {
         "blueprintTypeId": 28263,
@@ -31,9 +31,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 147512.5,
-        "price10Runs": 3687.81,
-        "pricePerRun": 368.78
+        "jitaSellPrice": 143687.18,
+        "price10Runs": 3592.18,
+        "pricePerRun": 359.22
     },
     {
         "blueprintTypeId": 28283,
@@ -43,9 +43,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 640365.0,
-        "price10Runs": 16009.13,
-        "pricePerRun": 1600.91
+        "jitaSellPrice": 671092.31,
+        "price10Runs": 16777.31,
+        "pricePerRun": 1677.73
     },
     {
         "blueprintTypeId": 28291,
@@ -55,9 +55,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 901862.5,
-        "price10Runs": 22546.56,
-        "pricePerRun": 2254.66
+        "jitaSellPrice": 896756.41,
+        "price10Runs": 22418.91,
+        "pricePerRun": 2241.89
     },
     {
         "blueprintTypeId": 28295,
@@ -67,9 +67,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 551945.0,
-        "price10Runs": 13798.62,
-        "pricePerRun": 1379.86
+        "jitaSellPrice": 558241.03,
+        "price10Runs": 13956.03,
+        "pricePerRun": 1395.6
     },
     {
         "blueprintTypeId": 23814,
@@ -79,9 +79,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 35299000.0,
-        "price10Runs": 882475.0,
-        "pricePerRun": 88247.5
+        "jitaSellPrice": 35365641.03,
+        "price10Runs": 884141.03,
+        "pricePerRun": 88414.1
     },
     {
         "blueprintTypeId": 12059,
@@ -91,9 +91,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 2127275.0,
-        "price10Runs": 94663.74,
-        "pricePerRun": 9466.37
+        "jitaSellPrice": 2157410.26,
+        "price10Runs": 96004.76,
+        "pricePerRun": 9600.48
     },
     {
         "blueprintTypeId": 11280,
@@ -103,9 +103,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1710850.0,
-        "price10Runs": 171085.0,
-        "pricePerRun": 17108.5
+        "jitaSellPrice": 1713025.64,
+        "price10Runs": 171302.56,
+        "pricePerRun": 17130.26
     },
     {
         "blueprintTypeId": 12357,
@@ -115,9 +115,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.775,
         "qualityPercent": 77.5,
-        "jitaSellPrice": 2531350.0,
-        "price10Runs": 196179.62,
-        "pricePerRun": 19617.96
+        "jitaSellPrice": 2575435.9,
+        "price10Runs": 199596.28,
+        "pricePerRun": 19959.63
     },
     {
         "blueprintTypeId": 1073,
@@ -127,9 +127,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 2893200.0,
-        "price10Runs": 128747.4,
-        "pricePerRun": 12874.74
+        "jitaSellPrice": 2891435.9,
+        "price10Runs": 128668.9,
+        "pricePerRun": 12866.89
     },
     {
         "blueprintTypeId": 828,
@@ -139,9 +139,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 389205.0,
-        "price10Runs": 38920.5,
-        "pricePerRun": 3892.05
+        "jitaSellPrice": 389458.97,
+        "price10Runs": 38945.9,
+        "pricePerRun": 3894.59
     },
     {
         "blueprintTypeId": 24693,
@@ -151,9 +151,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 174645000.0,
-        "price10Runs": 17464500.0,
-        "pricePerRun": 1746450.0
+        "jitaSellPrice": 172269230.77,
+        "price10Runs": 17226923.08,
+        "pricePerRun": 1722692.31
     },
     {
         "blueprintTypeId": 23660,
@@ -163,9 +163,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 3297.35,
-        "price10Runs": 280.27,
-        "pricePerRun": 28.03
+        "jitaSellPrice": 3317.0,
+        "price10Runs": 281.94,
+        "pricePerRun": 28.19
     },
     {
         "blueprintTypeId": 2204,
@@ -175,9 +175,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 3434.2,
-        "price10Runs": 343.42,
-        "pricePerRun": 34.34
+        "jitaSellPrice": 3421.64,
+        "price10Runs": 342.16,
+        "pricePerRun": 34.22
     },
     {
         "blueprintTypeId": 23728,
@@ -187,9 +187,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 3271.93,
-        "price10Runs": 278.11,
-        "pricePerRun": 27.81
+        "jitaSellPrice": 3251.15,
+        "price10Runs": 276.35,
+        "pricePerRun": 27.63
     },
     {
         "blueprintTypeId": 42883,
@@ -199,8 +199,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 486.68,
-        "price10Runs": 48.67,
+        "jitaSellPrice": 486.94,
+        "price10Runs": 48.69,
         "pricePerRun": 4.87
     },
     {
@@ -211,9 +211,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 0.4,
         "qualityPercent": 40.0,
-        "jitaSellPrice": 1379950.0,
-        "price10Runs": 55198.0,
-        "pricePerRun": 5519.8
+        "jitaSellPrice": 1371948.72,
+        "price10Runs": 54877.95,
+        "pricePerRun": 5487.79
     },
     {
         "blueprintTypeId": 32873,
@@ -223,9 +223,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1379950.0,
-        "price10Runs": 137995.0,
-        "pricePerRun": 13799.5
+        "jitaSellPrice": 1371948.72,
+        "price10Runs": 137194.87,
+        "pricePerRun": 13719.49
     },
     {
         "blueprintTypeId": 1153,
@@ -235,9 +235,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 267.29,
-        "price10Runs": 26.73,
-        "pricePerRun": 2.67
+        "jitaSellPrice": 259.14,
+        "price10Runs": 25.91,
+        "pricePerRun": 2.59
     },
     {
         "blueprintTypeId": 1137,
@@ -247,8 +247,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 27.37,
-        "price10Runs": 2.74,
+        "jitaSellPrice": 26.98,
+        "price10Runs": 2.7,
         "pricePerRun": 0.27
     },
     {
@@ -259,9 +259,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 2444.57,
-        "price10Runs": 244.46,
-        "pricePerRun": 24.45
+        "jitaSellPrice": 2471.15,
+        "price10Runs": 247.12,
+        "pricePerRun": 24.71
     },
     {
         "blueprintTypeId": 17338,
@@ -271,9 +271,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 136920.0,
-        "price10Runs": 13692.0,
-        "pricePerRun": 1369.2
+        "jitaSellPrice": 136684.62,
+        "price10Runs": 13668.46,
+        "pricePerRun": 1366.85
     },
     {
         "blueprintTypeId": 996,
@@ -283,9 +283,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 175382500.0,
-        "price10Runs": 17538250.0,
-        "pricePerRun": 1753825.0
+        "jitaSellPrice": 175407692.31,
+        "price10Runs": 17540769.23,
+        "pricePerRun": 1754076.92
     },
     {
         "blueprintTypeId": 973,
@@ -295,9 +295,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 9725600.0,
-        "price10Runs": 972560.0,
-        "pricePerRun": 97256.0
+        "jitaSellPrice": 9815948.72,
+        "price10Runs": 981594.87,
+        "pricePerRun": 98159.49
     },
     {
         "blueprintTypeId": 42874,
@@ -307,9 +307,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 695.91,
-        "price10Runs": 69.59,
-        "pricePerRun": 6.96
+        "jitaSellPrice": 691.32,
+        "price10Runs": 69.13,
+        "pricePerRun": 6.91
     },
     {
         "blueprintTypeId": 42875,
@@ -319,9 +319,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 521.39,
-        "price10Runs": 52.14,
-        "pricePerRun": 5.21
+        "jitaSellPrice": 520.03,
+        "price10Runs": 52.0,
+        "pricePerRun": 5.2
     },
     {
         "blueprintTypeId": 955,
@@ -331,9 +331,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 624385.0,
-        "price10Runs": 62438.5,
-        "pricePerRun": 6243.85
+        "jitaSellPrice": 617184.62,
+        "price10Runs": 61718.46,
+        "pricePerRun": 6171.85
     },
     {
         "blueprintTypeId": 970,
@@ -343,9 +343,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 9639700.0,
-        "price10Runs": 963970.0,
-        "pricePerRun": 96397.0
+        "jitaSellPrice": 9635641.03,
+        "price10Runs": 963564.1,
+        "pricePerRun": 96356.41
     },
     {
         "blueprintTypeId": 11986,
@@ -355,9 +355,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 154392500.0,
-        "price10Runs": 6870466.25,
-        "pricePerRun": 687046.62
+        "jitaSellPrice": 151948717.95,
+        "price10Runs": 6761717.95,
+        "pricePerRun": 676171.79
     },
     {
         "blueprintTypeId": 23537,
@@ -367,9 +367,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 126362.5,
-        "price10Runs": 10740.81,
-        "pricePerRun": 1074.08
+        "jitaSellPrice": 126074.36,
+        "price10Runs": 10716.32,
+        "pricePerRun": 1071.63
     },
     {
         "blueprintTypeId": 23513,
@@ -379,9 +379,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 54323.0,
-        "price10Runs": 4617.45,
-        "pricePerRun": 461.75
+        "jitaSellPrice": 54217.69,
+        "price10Runs": 4608.5,
+        "pricePerRun": 460.85
     },
     {
         "blueprintTypeId": 977,
@@ -391,9 +391,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 9414925.0,
-        "price10Runs": 941492.5,
-        "pricePerRun": 94149.25
+        "jitaSellPrice": 9409615.38,
+        "price10Runs": 940961.54,
+        "pricePerRun": 94096.15
     },
     {
         "blueprintTypeId": 27915,
@@ -403,9 +403,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 2147825.0,
-        "price10Runs": 214782.5,
-        "pricePerRun": 21478.25
+        "jitaSellPrice": 2142897.44,
+        "price10Runs": 214289.74,
+        "pricePerRun": 21428.97
     },
     {
         "blueprintTypeId": 34329,
@@ -415,9 +415,9 @@ const BPC_PRICING_DATA = [
         "te": 8,
         "quality": 0.67,
         "qualityPercent": 67.0,
-        "jitaSellPrice": 1420475000.0,
-        "price10Runs": 95171825.0,
-        "pricePerRun": 9517182.5
+        "jitaSellPrice": 1417461538.46,
+        "price10Runs": 94969923.08,
+        "pricePerRun": 9496992.31
     },
     {
         "blueprintTypeId": 34329,
@@ -427,9 +427,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.685,
         "qualityPercent": 68.5,
-        "jitaSellPrice": 1420475000.0,
-        "price10Runs": 97302537.5,
-        "pricePerRun": 9730253.75
+        "jitaSellPrice": 1417461538.46,
+        "price10Runs": 97096115.38,
+        "pricePerRun": 9709611.54
     },
     {
         "blueprintTypeId": 945,
@@ -439,9 +439,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1008507.5,
-        "price10Runs": 100850.75,
-        "pricePerRun": 10085.08
+        "jitaSellPrice": 972266.67,
+        "price10Runs": 97226.67,
+        "pricePerRun": 9722.67
     },
     {
         "blueprintTypeId": 16230,
@@ -451,9 +451,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 55681000.0,
-        "price10Runs": 5568100.0,
-        "pricePerRun": 556810.0
+        "jitaSellPrice": 55720512.82,
+        "price10Runs": 5572051.28,
+        "pricePerRun": 557205.13
     },
     {
         "blueprintTypeId": 11193,
@@ -463,9 +463,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 20112000.0,
-        "price10Runs": 1257000.0,
-        "pricePerRun": 125700.0
+        "jitaSellPrice": 20177692.31,
+        "price10Runs": 1261105.77,
+        "pricePerRun": 126110.58
     },
     {
         "blueprintTypeId": 3537,
@@ -475,9 +475,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 361295000.0,
-        "price10Runs": 9032375.0,
-        "pricePerRun": 903237.5
+        "jitaSellPrice": 360464102.56,
+        "price10Runs": 9011602.56,
+        "pricePerRun": 901160.26
     },
     {
         "blueprintTypeId": 3545,
@@ -487,9 +487,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 356435000.0,
-        "price10Runs": 8910875.0,
-        "pricePerRun": 891087.5
+        "jitaSellPrice": 357333333.33,
+        "price10Runs": 8933333.33,
+        "pricePerRun": 893333.33
     },
     {
         "blueprintTypeId": 41603,
@@ -499,9 +499,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 342222500.0,
-        "price10Runs": 8555562.5,
-        "pricePerRun": 855556.25
+        "jitaSellPrice": 342253846.15,
+        "price10Runs": 8556346.15,
+        "pricePerRun": 855634.62
     },
     {
         "blueprintTypeId": 967,
@@ -511,9 +511,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 16699.25,
-        "price10Runs": 417.48,
-        "pricePerRun": 41.75
+        "jitaSellPrice": 16689.74,
+        "price10Runs": 417.24,
+        "pricePerRun": 41.72
     },
     {
         "blueprintTypeId": 11284,
@@ -523,9 +523,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 3708.57,
-        "price10Runs": 370.86,
-        "pricePerRun": 37.09
+        "jitaSellPrice": 3684.18,
+        "price10Runs": 368.42,
+        "pricePerRun": 36.84
     },
     {
         "blueprintTypeId": 31363,
@@ -535,9 +535,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 75756500.0,
-        "price10Runs": 7575650.0,
-        "pricePerRun": 757565.0
+        "jitaSellPrice": 75715384.62,
+        "price10Runs": 7571538.46,
+        "pricePerRun": 757153.85
     },
     {
         "blueprintTypeId": 21018,
@@ -547,9 +547,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 17253500.0,
-        "price10Runs": 1725350.0,
-        "pricePerRun": 172535.0
+        "jitaSellPrice": 17322051.28,
+        "price10Runs": 1732205.13,
+        "pricePerRun": 173220.51
     },
     {
         "blueprintTypeId": 20702,
@@ -559,9 +559,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 82293500.0,
-        "price10Runs": 8229350.0,
-        "pricePerRun": 822935.0
+        "jitaSellPrice": 81543076.92,
+        "price10Runs": 8154307.69,
+        "pricePerRun": 815430.77
     },
     {
         "blueprintTypeId": 41641,
@@ -571,9 +571,9 @@ const BPC_PRICING_DATA = [
         "te": 12,
         "quality": 0.52,
         "qualityPercent": 52.0,
-        "jitaSellPrice": 20259500.0,
-        "price10Runs": 1053494.0,
-        "pricePerRun": 105349.4
+        "jitaSellPrice": 20154358.97,
+        "price10Runs": 1048026.67,
+        "pricePerRun": 104802.67
     },
     {
         "blueprintTypeId": 21020,
@@ -583,9 +583,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 11715250.0,
-        "price10Runs": 1171525.0,
-        "pricePerRun": 117152.5
+        "jitaSellPrice": 11733589.74,
+        "price10Runs": 1173358.97,
+        "pricePerRun": 117335.9
     },
     {
         "blueprintTypeId": 41646,
@@ -595,9 +595,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 136857500.0,
-        "price10Runs": 8553593.75,
-        "pricePerRun": 855359.38
+        "jitaSellPrice": 137146153.85,
+        "price10Runs": 8571634.62,
+        "pricePerRun": 857163.46
     },
     {
         "blueprintTypeId": 21028,
@@ -607,9 +607,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 15563750.0,
-        "price10Runs": 1556375.0,
-        "pricePerRun": 155637.5
+        "jitaSellPrice": 15351282.05,
+        "price10Runs": 1535128.21,
+        "pricePerRun": 153512.82
     },
     {
         "blueprintTypeId": 21028,
@@ -619,9 +619,9 @@ const BPC_PRICING_DATA = [
         "te": 16,
         "quality": 0.97,
         "qualityPercent": 97.0,
-        "jitaSellPrice": 15563750.0,
-        "price10Runs": 1509683.75,
-        "pricePerRun": 150968.38
+        "jitaSellPrice": 15351282.05,
+        "price10Runs": 1489074.36,
+        "pricePerRun": 148907.44
     },
     {
         "blueprintTypeId": 24548,
@@ -631,9 +631,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 33050750.0,
-        "price10Runs": 3305075.0,
-        "pricePerRun": 330507.5
+        "jitaSellPrice": 32286153.85,
+        "price10Runs": 3228615.38,
+        "pricePerRun": 322861.54
     },
     {
         "blueprintTypeId": 24548,
@@ -643,9 +643,9 @@ const BPC_PRICING_DATA = [
         "te": 18,
         "quality": 0.985,
         "qualityPercent": 98.5,
-        "jitaSellPrice": 33050750.0,
-        "price10Runs": 3255498.88,
-        "pricePerRun": 325549.89
+        "jitaSellPrice": 32286153.85,
+        "price10Runs": 3180186.15,
+        "pricePerRun": 318018.62
     },
     {
         "blueprintTypeId": 21036,
@@ -655,9 +655,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 13349250.0,
-        "price10Runs": 1334925.0,
-        "pricePerRun": 133492.5
+        "jitaSellPrice": 13317692.31,
+        "price10Runs": 1331769.23,
+        "pricePerRun": 133176.92
     },
     {
         "blueprintTypeId": 21038,
@@ -667,9 +667,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 8226700.0,
-        "price10Runs": 822670.0,
-        "pricePerRun": 82267.0
+        "jitaSellPrice": 8216179.49,
+        "price10Runs": 821617.95,
+        "pricePerRun": 82161.79
     },
     {
         "blueprintTypeId": 24561,
@@ -679,9 +679,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 14288500.0,
-        "price10Runs": 1428850.0,
-        "pricePerRun": 142885.0
+        "jitaSellPrice": 14236666.67,
+        "price10Runs": 1423666.67,
+        "pricePerRun": 142366.67
     },
     {
         "blueprintTypeId": 24561,
@@ -691,9 +691,9 @@ const BPC_PRICING_DATA = [
         "te": 8,
         "quality": 0.79,
         "qualityPercent": 79.0,
-        "jitaSellPrice": 14288500.0,
-        "price10Runs": 1128791.5,
-        "pricePerRun": 112879.15
+        "jitaSellPrice": 14236666.67,
+        "price10Runs": 1124696.67,
+        "pricePerRun": 112469.67
     },
     {
         "blueprintTypeId": 21030,
@@ -703,9 +703,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 7755900.0,
-        "price10Runs": 775590.0,
-        "pricePerRun": 77559.0
+        "jitaSellPrice": 7651820.51,
+        "price10Runs": 765182.05,
+        "pricePerRun": 76518.21
     },
     {
         "blueprintTypeId": 31477,
@@ -715,9 +715,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 2457500.0,
-        "price10Runs": 61437.5,
-        "pricePerRun": 6143.75
+        "jitaSellPrice": 2442564.1,
+        "price10Runs": 61064.1,
+        "pricePerRun": 6106.41
     },
     {
         "blueprintTypeId": 21026,
@@ -727,9 +727,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 16863000.0,
-        "price10Runs": 1686300.0,
-        "pricePerRun": 168630.0
+        "jitaSellPrice": 16794358.97,
+        "price10Runs": 1679435.9,
+        "pricePerRun": 167943.59
     },
     {
         "blueprintTypeId": 21022,
@@ -739,9 +739,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 12867750.0,
-        "price10Runs": 1286775.0,
-        "pricePerRun": 128677.5
+        "jitaSellPrice": 12863333.33,
+        "price10Runs": 1286333.33,
+        "pricePerRun": 128633.33
     },
     {
         "blueprintTypeId": 33304,
@@ -751,9 +751,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 9907400.0,
-        "price10Runs": 990740.0,
-        "pricePerRun": 99074.0
+        "jitaSellPrice": 9906589.74,
+        "price10Runs": 990658.97,
+        "pricePerRun": 99065.9
     },
     {
         "blueprintTypeId": 33306,
@@ -763,9 +763,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 172390750.0,
-        "price10Runs": 7671388.38,
-        "pricePerRun": 767138.84
+        "jitaSellPrice": 204343333.33,
+        "price10Runs": 9093278.33,
+        "pricePerRun": 909327.83
     },
     {
         "blueprintTypeId": 21010,
@@ -775,9 +775,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 15279500.0,
-        "price10Runs": 1527950.0,
-        "pricePerRun": 152795.0
+        "jitaSellPrice": 15284102.56,
+        "price10Runs": 1528410.26,
+        "pricePerRun": 152841.03
     },
     {
         "blueprintTypeId": 21014,
@@ -787,9 +787,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 15814000.0,
-        "price10Runs": 1581400.0,
-        "pricePerRun": 158140.0
+        "jitaSellPrice": 15800512.82,
+        "price10Runs": 1580051.28,
+        "pricePerRun": 158005.13
     },
     {
         "blueprintTypeId": 20704,
@@ -799,9 +799,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 104562000.0,
-        "price10Runs": 10456200.0,
-        "pricePerRun": 1045620.0
+        "jitaSellPrice": 105951282.05,
+        "price10Runs": 10595128.21,
+        "pricePerRun": 1059512.82
     },
     {
         "blueprintTypeId": 41634,
@@ -811,9 +811,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 139135000.0,
-        "price10Runs": 6191507.5,
-        "pricePerRun": 619150.75
+        "jitaSellPrice": 137951282.05,
+        "price10Runs": 6138832.05,
+        "pricePerRun": 613883.21
     },
     {
         "blueprintTypeId": 21024,
@@ -823,9 +823,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 10731750.0,
-        "price10Runs": 1073175.0,
-        "pricePerRun": 107317.5
+        "jitaSellPrice": 10727692.31,
+        "price10Runs": 1072769.23,
+        "pricePerRun": 107276.92
     },
     {
         "blueprintTypeId": 21024,
@@ -835,9 +835,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.895,
         "qualityPercent": 89.5,
-        "jitaSellPrice": 10731750.0,
-        "price10Runs": 960491.62,
-        "pricePerRun": 96049.16
+        "jitaSellPrice": 10727692.31,
+        "price10Runs": 960128.46,
+        "pricePerRun": 96012.85
     },
     {
         "blueprintTypeId": 41602,
@@ -847,9 +847,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 150035000.0,
-        "price10Runs": 9377187.5,
-        "pricePerRun": 937718.75
+        "jitaSellPrice": 151210256.41,
+        "price10Runs": 9450641.03,
+        "pricePerRun": 945064.1
     },
     {
         "blueprintTypeId": 24559,
@@ -859,9 +859,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 21733000.0,
-        "price10Runs": 2173300.0,
-        "pricePerRun": 217330.0
+        "jitaSellPrice": 21170769.23,
+        "price10Runs": 2117076.92,
+        "pricePerRun": 211707.69
     },
     {
         "blueprintTypeId": 21040,
@@ -871,9 +871,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 14413500.0,
-        "price10Runs": 1441350.0,
-        "pricePerRun": 144135.0
+        "jitaSellPrice": 13664871.79,
+        "price10Runs": 1366487.18,
+        "pricePerRun": 136648.72
     },
     {
         "blueprintTypeId": 21012,
@@ -883,9 +883,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 15180250.0,
-        "price10Runs": 1518025.0,
-        "pricePerRun": 151802.5
+        "jitaSellPrice": 14775384.62,
+        "price10Runs": 1477538.46,
+        "pricePerRun": 147753.85
     },
     {
         "blueprintTypeId": 687,
@@ -895,9 +895,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 11394250.0,
-        "price10Runs": 1139425.0,
-        "pricePerRun": 113942.5
+        "jitaSellPrice": 11383333.33,
+        "price10Runs": 1138333.33,
+        "pricePerRun": 113833.33
     },
     {
         "blueprintTypeId": 895,
@@ -907,8 +907,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 34.41,
-        "price10Runs": 3.44,
+        "jitaSellPrice": 33.96,
+        "price10Runs": 3.4,
         "pricePerRun": 0.34
     },
     {
@@ -919,7 +919,7 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 10.57,
+        "jitaSellPrice": 10.58,
         "price10Runs": 1.06,
         "pricePerRun": 0.11
     },
@@ -931,9 +931,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 943070.0,
-        "price10Runs": 94307.0,
-        "pricePerRun": 9430.7
+        "jitaSellPrice": 943787.18,
+        "price10Runs": 94378.72,
+        "pricePerRun": 9437.87
     },
     {
         "blueprintTypeId": 11994,
@@ -943,9 +943,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 155737500.0,
-        "price10Runs": 9733593.75,
-        "pricePerRun": 973359.38
+        "jitaSellPrice": 154676923.08,
+        "price10Runs": 9667307.69,
+        "pricePerRun": 966730.77
     },
     {
         "blueprintTypeId": 11994,
@@ -955,9 +955,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 155737500.0,
-        "price10Runs": 6930318.75,
-        "pricePerRun": 693031.88
+        "jitaSellPrice": 154676923.08,
+        "price10Runs": 6883123.08,
+        "pricePerRun": 688312.31
     },
     {
         "blueprintTypeId": 20186,
@@ -967,9 +967,9 @@ const BPC_PRICING_DATA = [
         "te": 18,
         "quality": 0.985,
         "qualityPercent": 98.5,
-        "jitaSellPrice": 1481000000.0,
-        "price10Runs": 145878500.0,
-        "pricePerRun": 14587850.0
+        "jitaSellPrice": 1468846153.85,
+        "price10Runs": 144681346.15,
+        "pricePerRun": 14468134.62
     },
     {
         "blueprintTypeId": 20186,
@@ -979,9 +979,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.805,
         "qualityPercent": 80.5,
-        "jitaSellPrice": 1481000000.0,
-        "price10Runs": 119220500.0,
-        "pricePerRun": 11922050.0
+        "jitaSellPrice": 1468846153.85,
+        "price10Runs": 118242115.38,
+        "pricePerRun": 11824211.54
     },
     {
         "blueprintTypeId": 16237,
@@ -991,9 +991,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 0.4,
         "qualityPercent": 40.0,
-        "jitaSellPrice": 1321165.0,
-        "price10Runs": 52846.6,
-        "pricePerRun": 5284.66
+        "jitaSellPrice": 1332648.72,
+        "price10Runs": 53305.95,
+        "pricePerRun": 5330.59
     },
     {
         "blueprintTypeId": 60343,
@@ -1003,9 +1003,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 196130.0,
-        "price10Runs": 19613.0,
-        "pricePerRun": 1961.3
+        "jitaSellPrice": 196971.79,
+        "price10Runs": 19697.18,
+        "pricePerRun": 1969.72
     },
     {
         "blueprintTypeId": 30029,
@@ -1015,9 +1015,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 36328.75,
-        "price10Runs": 3087.94,
-        "pricePerRun": 308.79
+        "jitaSellPrice": 35956.15,
+        "price10Runs": 3056.27,
+        "pricePerRun": 305.63
     },
     {
         "blueprintTypeId": 30029,
@@ -1027,9 +1027,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 36328.75,
-        "price10Runs": 3632.88,
-        "pricePerRun": 363.29
+        "jitaSellPrice": 35956.15,
+        "price10Runs": 3595.62,
+        "pricePerRun": 359.56
     },
     {
         "blueprintTypeId": 60347,
@@ -1039,9 +1039,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 158565.0,
-        "price10Runs": 15856.5,
-        "pricePerRun": 1585.65
+        "jitaSellPrice": 161715.38,
+        "price10Runs": 16171.54,
+        "pricePerRun": 1617.15
     },
     {
         "blueprintTypeId": 60347,
@@ -1051,9 +1051,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 158565.0,
-        "price10Runs": 3964.12,
-        "pricePerRun": 396.41
+        "jitaSellPrice": 161715.38,
+        "price10Runs": 4042.88,
+        "pricePerRun": 404.29
     },
     {
         "blueprintTypeId": 684,
@@ -1063,9 +1063,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 574512.5,
-        "price10Runs": 57451.25,
-        "pricePerRun": 5745.12
+        "jitaSellPrice": 571556.41,
+        "price10Runs": 57155.64,
+        "pricePerRun": 5715.56
     },
     {
         "blueprintTypeId": 12815,
@@ -1075,9 +1075,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.775,
         "qualityPercent": 77.5,
-        "jitaSellPrice": 142117.5,
-        "price10Runs": 11014.11,
-        "pricePerRun": 1101.41
+        "jitaSellPrice": 141900.0,
+        "price10Runs": 10997.25,
+        "pricePerRun": 1099.72
     },
     {
         "blueprintTypeId": 32877,
@@ -1087,9 +1087,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1072437.5,
-        "price10Runs": 107243.75,
-        "pricePerRun": 10724.38
+        "jitaSellPrice": 1069474.36,
+        "price10Runs": 106947.44,
+        "pricePerRun": 10694.74
     },
     {
         "blueprintTypeId": 17939,
@@ -1099,9 +1099,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 25814.0,
-        "price10Runs": 2194.19,
-        "pricePerRun": 219.42
+        "jitaSellPrice": 25410.26,
+        "price10Runs": 2159.87,
+        "pricePerRun": 215.99
     },
     {
         "blueprintTypeId": 30014,
@@ -1111,9 +1111,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 8419.7,
-        "price10Runs": 841.97,
-        "pricePerRun": 84.2
+        "jitaSellPrice": 8406.69,
+        "price10Runs": 840.67,
+        "pricePerRun": 84.07
     },
     {
         "blueprintTypeId": 16239,
@@ -1123,9 +1123,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 557305.0,
-        "price10Runs": 55730.5,
-        "pricePerRun": 5573.05
+        "jitaSellPrice": 567333.33,
+        "price10Runs": 56733.33,
+        "pricePerRun": 5673.33
     },
     {
         "blueprintTypeId": 17477,
@@ -1135,9 +1135,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 39385000.0,
-        "price10Runs": 3938500.0,
-        "pricePerRun": 393850.0
+        "jitaSellPrice": 39386410.26,
+        "price10Runs": 3938641.03,
+        "pricePerRun": 393864.1
     },
     {
         "blueprintTypeId": 2162,
@@ -1147,9 +1147,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 464967.5,
-        "price10Runs": 46496.75,
-        "pricePerRun": 4649.68
+        "jitaSellPrice": 462641.03,
+        "price10Runs": 46264.1,
+        "pricePerRun": 4626.41
     },
     {
         "blueprintTypeId": 16232,
@@ -1159,9 +1159,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 54527250.0,
-        "price10Runs": 5452725.0,
-        "pricePerRun": 545272.5
+        "jitaSellPrice": 53943076.92,
+        "price10Runs": 5394307.69,
+        "pricePerRun": 539430.77
     },
     {
         "blueprintTypeId": 2047,
@@ -1171,9 +1171,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 9001.33,
-        "price10Runs": 900.13,
-        "pricePerRun": 90.01
+        "jitaSellPrice": 9027.41,
+        "price10Runs": 902.74,
+        "pricePerRun": 90.27
     },
     {
         "blueprintTypeId": 22475,
@@ -1183,9 +1183,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 358535000.0,
-        "price10Runs": 15954807.5,
-        "pricePerRun": 1595480.75
+        "jitaSellPrice": 361179487.18,
+        "price10Runs": 16072487.18,
+        "pricePerRun": 1607248.72
     },
     {
         "blueprintTypeId": 22176,
@@ -1195,9 +1195,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 59762.75,
-        "price10Runs": 5976.28,
-        "pricePerRun": 597.63
+        "jitaSellPrice": 59833.59,
+        "price10Runs": 5983.36,
+        "pricePerRun": 598.34
     },
     {
         "blueprintTypeId": 898,
@@ -1207,9 +1207,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 102.3,
-        "price10Runs": 10.23,
-        "pricePerRun": 1.02
+        "jitaSellPrice": 104.73,
+        "price10Runs": 10.47,
+        "pricePerRun": 1.05
     },
     {
         "blueprintTypeId": 890,
@@ -1219,9 +1219,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 65.98,
-        "price10Runs": 6.6,
-        "pricePerRun": 0.66
+        "jitaSellPrice": 64.48,
+        "price10Runs": 6.45,
+        "pricePerRun": 0.64
     },
     {
         "blueprintTypeId": 999,
@@ -1231,9 +1231,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 164147500.0,
-        "price10Runs": 16414750.0,
-        "pricePerRun": 1641475.0
+        "jitaSellPrice": 161661538.46,
+        "price10Runs": 16166153.85,
+        "pricePerRun": 1616615.38
     },
     {
         "blueprintTypeId": 23058,
@@ -1243,9 +1243,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 6417750.0,
-        "price10Runs": 641775.0,
-        "pricePerRun": 64177.5
+        "jitaSellPrice": 6422820.51,
+        "price10Runs": 642282.05,
+        "pricePerRun": 64228.21
     },
     {
         "blueprintTypeId": 32875,
@@ -1255,9 +1255,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1068475.0,
-        "price10Runs": 106847.5,
-        "pricePerRun": 10684.75
+        "jitaSellPrice": 1078756.41,
+        "price10Runs": 107875.64,
+        "pricePerRun": 10787.56
     },
     {
         "blueprintTypeId": 24699,
@@ -1267,9 +1267,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 50515250.0,
-        "price10Runs": 5051525.0,
-        "pricePerRun": 505152.5
+        "jitaSellPrice": 50449743.59,
+        "price10Runs": 5044974.36,
+        "pricePerRun": 504497.44
     },
     {
         "blueprintTypeId": 27948,
@@ -1279,9 +1279,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 17965000.0,
-        "price10Runs": 449125.0,
-        "pricePerRun": 44912.5
+        "jitaSellPrice": 17820512.82,
+        "price10Runs": 445512.82,
+        "pricePerRun": 44551.28
     },
     {
         "blueprintTypeId": 4394,
@@ -1291,9 +1291,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 70609.5,
-        "price10Runs": 6001.81,
-        "pricePerRun": 600.18
+        "jitaSellPrice": 70021.54,
+        "price10Runs": 5951.83,
+        "pricePerRun": 595.18
     },
     {
         "blueprintTypeId": 41230,
@@ -1303,9 +1303,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 11722.67,
-        "price10Runs": 996.43,
-        "pricePerRun": 99.64
+        "jitaSellPrice": 11669.67,
+        "price10Runs": 991.92,
+        "pricePerRun": 99.19
     },
     {
         "blueprintTypeId": 17335,
@@ -1315,9 +1315,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 23503.25,
-        "price10Runs": 2350.32,
-        "pricePerRun": 235.03
+        "jitaSellPrice": 23578.97,
+        "price10Runs": 2357.9,
+        "pricePerRun": 235.79
     },
     {
         "blueprintTypeId": 902,
@@ -1327,8 +1327,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 199.75,
-        "price10Runs": 19.97,
+        "jitaSellPrice": 199.63,
+        "price10Runs": 19.96,
         "pricePerRun": 2.0
     },
     {
@@ -1339,8 +1339,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 93.35,
-        "price10Runs": 9.34,
+        "jitaSellPrice": 92.93,
+        "price10Runs": 9.29,
         "pricePerRun": 0.93
     },
     {
@@ -1351,9 +1351,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.955,
         "qualityPercent": 95.5,
-        "jitaSellPrice": 5261700.0,
-        "price10Runs": 502492.35,
-        "pricePerRun": 50249.24
+        "jitaSellPrice": 5363051.28,
+        "price10Runs": 512171.4,
+        "pricePerRun": 51217.14
     },
     {
         "blueprintTypeId": 23062,
@@ -1363,9 +1363,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 5261700.0,
-        "price10Runs": 526170.0,
-        "pricePerRun": 52617.0
+        "jitaSellPrice": 5363051.28,
+        "price10Runs": 536305.13,
+        "pricePerRun": 53630.51
     },
     {
         "blueprintTypeId": 41384,
@@ -1375,9 +1375,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 12512000.0,
-        "price10Runs": 782000.0,
-        "pricePerRun": 78200.0
+        "jitaSellPrice": 12444358.97,
+        "price10Runs": 777772.44,
+        "pricePerRun": 77777.24
     },
     {
         "blueprintTypeId": 42877,
@@ -1387,8 +1387,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 478.27,
-        "price10Runs": 47.83,
+        "jitaSellPrice": 478.04,
+        "price10Runs": 47.8,
         "pricePerRun": 4.78
     },
     {
@@ -1399,8 +1399,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 478.17,
-        "price10Runs": 47.82,
+        "jitaSellPrice": 477.82,
+        "price10Runs": 47.78,
         "pricePerRun": 4.78
     },
     {
@@ -1411,9 +1411,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 12500500.0,
-        "price10Runs": 556272.25,
-        "pricePerRun": 55627.22
+        "jitaSellPrice": 12408974.36,
+        "price10Runs": 552199.36,
+        "pricePerRun": 55219.94
     },
     {
         "blueprintTypeId": 12045,
@@ -1423,9 +1423,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 19323250.0,
-        "price10Runs": 1207703.12,
-        "pricePerRun": 120770.31
+        "jitaSellPrice": 19348974.36,
+        "price10Runs": 1209310.9,
+        "pricePerRun": 120931.09
     },
     {
         "blueprintTypeId": 990,
@@ -1435,9 +1435,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.79,
         "qualityPercent": 79.0,
-        "jitaSellPrice": 2647975.0,
-        "price10Runs": 209190.03,
-        "pricePerRun": 20919.0
+        "jitaSellPrice": 2642307.69,
+        "price10Runs": 208742.31,
+        "pricePerRun": 20874.23
     },
     {
         "blueprintTypeId": 41376,
@@ -1447,9 +1447,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 5883300.0,
-        "price10Runs": 588330.0,
-        "pricePerRun": 58833.0
+        "jitaSellPrice": 5830897.44,
+        "price10Runs": 583089.74,
+        "pricePerRun": 58308.97
     },
     {
         "blueprintTypeId": 42886,
@@ -1459,9 +1459,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 537.31,
-        "price10Runs": 53.73,
-        "pricePerRun": 5.37
+        "jitaSellPrice": 536.16,
+        "price10Runs": 53.62,
+        "pricePerRun": 5.36
     },
     {
         "blueprintTypeId": 979,
@@ -1471,9 +1471,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 10518700.0,
-        "price10Runs": 1051870.0,
-        "pricePerRun": 105187.0
+        "jitaSellPrice": 10658974.36,
+        "price10Runs": 1065897.44,
+        "pricePerRun": 106589.74
     },
     {
         "blueprintTypeId": 18640,
@@ -1483,9 +1483,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 21119.92,
-        "price10Runs": 1795.19,
-        "pricePerRun": 179.52
+        "jitaSellPrice": 21154.28,
+        "price10Runs": 1798.11,
+        "pricePerRun": 179.81
     },
     {
         "blueprintTypeId": 16228,
@@ -1495,9 +1495,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 43031000.0,
-        "price10Runs": 4303100.0,
-        "pricePerRun": 430310.0
+        "jitaSellPrice": 43347435.9,
+        "price10Runs": 4334743.59,
+        "pricePerRun": 433474.36
     },
     {
         "blueprintTypeId": 24284,
@@ -1507,9 +1507,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 70290750.0,
-        "price10Runs": 7029075.0,
-        "pricePerRun": 702907.5
+        "jitaSellPrice": 69967435.9,
+        "price10Runs": 6996743.59,
+        "pricePerRun": 699674.36
     },
     {
         "blueprintTypeId": 41416,
@@ -1519,9 +1519,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 128417500.0,
-        "price10Runs": 8026093.75,
-        "pricePerRun": 802609.38
+        "jitaSellPrice": 128135897.44,
+        "price10Runs": 8008493.59,
+        "pricePerRun": 800849.36
     },
     {
         "blueprintTypeId": 23060,
@@ -1531,9 +1531,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 5781475.0,
-        "price10Runs": 578147.5,
-        "pricePerRun": 57814.75
+        "jitaSellPrice": 5922179.49,
+        "price10Runs": 592217.95,
+        "pricePerRun": 59221.79
     },
     {
         "blueprintTypeId": 900,
@@ -1543,9 +1543,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 156.2,
-        "price10Runs": 15.62,
-        "pricePerRun": 1.56
+        "jitaSellPrice": 166.87,
+        "price10Runs": 16.69,
+        "pricePerRun": 1.67
     },
     {
         "blueprintTypeId": 892,
@@ -1555,9 +1555,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 115.32,
-        "price10Runs": 11.53,
-        "pricePerRun": 1.15
+        "jitaSellPrice": 116.09,
+        "price10Runs": 11.61,
+        "pricePerRun": 1.16
     },
     {
         "blueprintTypeId": 17331,
@@ -1567,9 +1567,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 127675.0,
-        "price10Runs": 12767.5,
-        "pricePerRun": 1276.75
+        "jitaSellPrice": 128428.21,
+        "price10Runs": 12842.82,
+        "pricePerRun": 1284.28
     },
     {
         "blueprintTypeId": 884,
@@ -1579,7 +1579,7 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 17.32,
+        "jitaSellPrice": 17.28,
         "price10Runs": 0.43,
         "pricePerRun": 0.04
     },
@@ -1591,9 +1591,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 33234.5,
-        "price10Runs": 3323.45,
-        "pricePerRun": 332.35
+        "jitaSellPrice": 32376.41,
+        "price10Runs": 3237.64,
+        "pricePerRun": 323.76
     },
     {
         "blueprintTypeId": 11130,
@@ -1603,9 +1603,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 15379.75,
-        "price10Runs": 1307.28,
-        "pricePerRun": 130.73
+        "jitaSellPrice": 15849.74,
+        "price10Runs": 1347.23,
+        "pricePerRun": 134.72
     },
     {
         "blueprintTypeId": 17340,
@@ -1615,9 +1615,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 24037.25,
-        "price10Runs": 2403.72,
-        "pricePerRun": 240.37
+        "jitaSellPrice": 23987.95,
+        "price10Runs": 2398.79,
+        "pricePerRun": 239.88
     },
     {
         "blueprintTypeId": 17340,
@@ -1627,9 +1627,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 24037.25,
-        "price10Runs": 600.93,
-        "pricePerRun": 60.09
+        "jitaSellPrice": 23987.95,
+        "price10Runs": 599.7,
+        "pricePerRun": 59.97
     },
     {
         "blueprintTypeId": 17353,
@@ -1639,9 +1639,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 142050.0,
-        "price10Runs": 14205.0,
-        "pricePerRun": 1420.5
+        "jitaSellPrice": 142912.82,
+        "price10Runs": 14291.28,
+        "pricePerRun": 1429.13
     },
     {
         "blueprintTypeId": 685,
@@ -1651,9 +1651,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 356475.0,
-        "price10Runs": 8911.88,
-        "pricePerRun": 891.19
+        "jitaSellPrice": 344605.13,
+        "price10Runs": 8615.13,
+        "pricePerRun": 861.51
     },
     {
         "blueprintTypeId": 2184,
@@ -1663,9 +1663,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 27185.25,
-        "price10Runs": 2718.53,
-        "pricePerRun": 271.85
+        "jitaSellPrice": 26924.62,
+        "price10Runs": 2692.46,
+        "pricePerRun": 269.25
     },
     {
         "blueprintTypeId": 23714,
@@ -1675,9 +1675,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 19086.5,
-        "price10Runs": 1622.35,
-        "pricePerRun": 162.24
+        "jitaSellPrice": 19074.87,
+        "price10Runs": 1621.36,
+        "pricePerRun": 162.14
     },
     {
         "blueprintTypeId": 24697,
@@ -1687,9 +1687,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 52508000.0,
-        "price10Runs": 5250800.0,
-        "pricePerRun": 525080.0
+        "jitaSellPrice": 52415641.03,
+        "price10Runs": 5241564.1,
+        "pricePerRun": 524156.41
     },
     {
         "blueprintTypeId": 23524,
@@ -1699,9 +1699,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 232990.0,
-        "price10Runs": 23299.0,
-        "pricePerRun": 2329.9
+        "jitaSellPrice": 233430.77,
+        "price10Runs": 23343.08,
+        "pricePerRun": 2334.31
     },
     {
         "blueprintTypeId": 33672,
@@ -1711,9 +1711,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 229875.0,
-        "price10Runs": 22987.5,
-        "pricePerRun": 2298.75
+        "jitaSellPrice": 227076.92,
+        "price10Runs": 22707.69,
+        "pricePerRun": 2270.77
     },
     {
         "blueprintTypeId": 48472,
@@ -1723,9 +1723,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 20421000.0,
-        "price10Runs": 510525.0,
-        "pricePerRun": 51052.5
+        "jitaSellPrice": 20171282.05,
+        "price10Runs": 504282.05,
+        "pricePerRun": 50428.21
     },
     {
         "blueprintTypeId": 22766,
@@ -1735,9 +1735,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 190395.0,
-        "price10Runs": 19039.5,
-        "pricePerRun": 1903.95
+        "jitaSellPrice": 194212.82,
+        "price10Runs": 19421.28,
+        "pricePerRun": 1942.13
     },
     {
         "blueprintTypeId": 4315,
@@ -1747,9 +1747,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 18924.0,
-        "price10Runs": 1892.4,
-        "pricePerRun": 189.24
+        "jitaSellPrice": 18952.46,
+        "price10Runs": 1895.25,
+        "pricePerRun": 189.52
     },
     {
         "blueprintTypeId": 952,
@@ -1759,9 +1759,9 @@ const BPC_PRICING_DATA = [
         "te": 16,
         "quality": 0.97,
         "qualityPercent": 97.0,
-        "jitaSellPrice": 815572.5,
-        "price10Runs": 79110.53,
-        "pricePerRun": 7911.05
+        "jitaSellPrice": 788787.18,
+        "price10Runs": 76512.36,
+        "pricePerRun": 7651.24
     },
     {
         "blueprintTypeId": 952,
@@ -1771,9 +1771,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 815572.5,
-        "price10Runs": 20389.31,
-        "pricePerRun": 2038.93
+        "jitaSellPrice": 788787.18,
+        "price10Runs": 19719.68,
+        "pricePerRun": 1971.97
     },
     {
         "blueprintTypeId": 2455,
@@ -1783,9 +1783,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 3974.82,
-        "price10Runs": 397.48,
-        "pricePerRun": 39.75
+        "jitaSellPrice": 3941.1,
+        "price10Runs": 394.11,
+        "pricePerRun": 39.41
     },
     {
         "blueprintTypeId": 2457,
@@ -1795,9 +1795,9 @@ const BPC_PRICING_DATA = [
         "te": 4,
         "quality": 0.4,
         "qualityPercent": 40.0,
-        "jitaSellPrice": 287942.5,
-        "price10Runs": 11517.7,
-        "pricePerRun": 1151.77
+        "jitaSellPrice": 286538.46,
+        "price10Runs": 11461.54,
+        "pricePerRun": 1146.15
     },
     {
         "blueprintTypeId": 23716,
@@ -1807,9 +1807,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 4795.95,
-        "price10Runs": 407.66,
-        "pricePerRun": 40.77
+        "jitaSellPrice": 4795.77,
+        "price10Runs": 407.64,
+        "pricePerRun": 40.76
     },
     {
         "blueprintTypeId": 23708,
@@ -1819,9 +1819,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 7373.52,
-        "price10Runs": 737.35,
-        "pricePerRun": 73.74
+        "jitaSellPrice": 7227.33,
+        "price10Runs": 722.73,
+        "pricePerRun": 72.27
     },
     {
         "blueprintTypeId": 2465,
@@ -1831,9 +1831,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 6426.93,
-        "price10Runs": 642.69,
-        "pricePerRun": 64.27
+        "jitaSellPrice": 6641.97,
+        "price10Runs": 664.2,
+        "pricePerRun": 66.42
     },
     {
         "blueprintTypeId": 22545,
@@ -1843,9 +1843,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 194217500.0,
-        "price10Runs": 12138593.75,
-        "pricePerRun": 1213859.38
+        "jitaSellPrice": 193861538.46,
+        "price10Runs": 12116346.15,
+        "pricePerRun": 1211634.62
     },
     {
         "blueprintTypeId": 24703,
@@ -1855,9 +1855,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 51341750.0,
-        "price10Runs": 5134175.0,
-        "pricePerRun": 513417.5
+        "jitaSellPrice": 51103333.33,
+        "price10Runs": 5110333.33,
+        "pricePerRun": 511033.33
     },
     {
         "blueprintTypeId": 4316,
@@ -1867,9 +1867,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 17265.38,
-        "price10Runs": 1726.54,
-        "pricePerRun": 172.65
+        "jitaSellPrice": 17229.18,
+        "price10Runs": 1722.92,
+        "pricePerRun": 172.29
     },
     {
         "blueprintTypeId": 24691,
@@ -1879,9 +1879,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 160502500.0,
-        "price10Runs": 16050250.0,
-        "pricePerRun": 1605025.0
+        "jitaSellPrice": 159702564.1,
+        "price10Runs": 15970256.41,
+        "pricePerRun": 1597025.64
     },
     {
         "blueprintTypeId": 43912,
@@ -1891,9 +1891,9 @@ const BPC_PRICING_DATA = [
         "te": 12,
         "quality": 0.52,
         "qualityPercent": 52.0,
-        "jitaSellPrice": 2986375.0,
-        "price10Runs": 155291.5,
-        "pricePerRun": 15529.15
+        "jitaSellPrice": 2980000.0,
+        "price10Runs": 154960.0,
+        "pricePerRun": 15496.0
     },
     {
         "blueprintTypeId": 954,
@@ -1903,9 +1903,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 652617.5,
-        "price10Runs": 55472.49,
-        "pricePerRun": 5547.25
+        "jitaSellPrice": 653220.51,
+        "price10Runs": 55523.74,
+        "pricePerRun": 5552.37
     },
     {
         "blueprintTypeId": 941,
@@ -1915,9 +1915,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 167557.5,
-        "price10Runs": 16755.75,
-        "pricePerRun": 1675.58
+        "jitaSellPrice": 164706.92,
+        "price10Runs": 16470.69,
+        "pricePerRun": 1647.07
     },
     {
         "blueprintTypeId": 805,
@@ -1927,9 +1927,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 270.57,
-        "price10Runs": 27.06,
-        "pricePerRun": 2.71
+        "jitaSellPrice": 281.67,
+        "price10Runs": 28.17,
+        "pricePerRun": 2.82
     },
     {
         "blueprintTypeId": 805,
@@ -1939,9 +1939,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 270.57,
-        "price10Runs": 23.0,
-        "pricePerRun": 2.3
+        "jitaSellPrice": 281.67,
+        "price10Runs": 23.94,
+        "pricePerRun": 2.39
     },
     {
         "blueprintTypeId": 26761,
@@ -1951,9 +1951,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 58.4,
-        "price10Runs": 4.96,
-        "pricePerRun": 0.5
+        "jitaSellPrice": 59.94,
+        "price10Runs": 5.1,
+        "pricePerRun": 0.51
     },
     {
         "blueprintTypeId": 809,
@@ -1963,9 +1963,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 90.79,
-        "price10Runs": 2.27,
-        "pricePerRun": 0.23
+        "jitaSellPrice": 88.09,
+        "price10Runs": 2.2,
+        "pricePerRun": 0.22
     },
     {
         "blueprintTypeId": 809,
@@ -1975,9 +1975,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 90.79,
-        "price10Runs": 7.72,
-        "pricePerRun": 0.77
+        "jitaSellPrice": 88.09,
+        "price10Runs": 7.49,
+        "pricePerRun": 0.75
     },
     {
         "blueprintTypeId": 812,
@@ -1987,8 +1987,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 19.25,
-        "price10Runs": 1.92,
+        "jitaSellPrice": 19.4,
+        "price10Runs": 1.94,
         "pricePerRun": 0.19
     },
     {
@@ -1999,9 +1999,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 15.84,
-        "price10Runs": 1.58,
-        "pricePerRun": 0.16
+        "jitaSellPrice": 15.23,
+        "price10Runs": 1.52,
+        "pricePerRun": 0.15
     },
     {
         "blueprintTypeId": 2515,
@@ -2011,8 +2011,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 15.84,
-        "price10Runs": 0.4,
+        "jitaSellPrice": 15.23,
+        "price10Runs": 0.38,
         "pricePerRun": 0.04
     },
     {
@@ -2023,9 +2023,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 339.77,
-        "price10Runs": 33.98,
-        "pricePerRun": 3.4
+        "jitaSellPrice": 337.73,
+        "price10Runs": 33.77,
+        "pricePerRun": 3.38
     },
     {
         "blueprintTypeId": 23703,
@@ -2035,9 +2035,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 47378.75,
-        "price10Runs": 4027.19,
-        "pricePerRun": 402.72
+        "jitaSellPrice": 49542.31,
+        "price10Runs": 4211.1,
+        "pricePerRun": 421.11
     },
     {
         "blueprintTypeId": 2174,
@@ -2047,9 +2047,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 41752.5,
-        "price10Runs": 4175.25,
-        "pricePerRun": 417.53
+        "jitaSellPrice": 41122.82,
+        "price10Runs": 4112.28,
+        "pricePerRun": 411.23
     },
     {
         "blueprintTypeId": 23726,
@@ -2059,9 +2059,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 18862.5,
-        "price10Runs": 1603.31,
-        "pricePerRun": 160.33
+        "jitaSellPrice": 18854.1,
+        "price10Runs": 1602.6,
+        "pricePerRun": 160.26
     },
     {
         "blueprintTypeId": 42887,
@@ -2071,9 +2071,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 486.87,
-        "price10Runs": 48.69,
-        "pricePerRun": 4.87
+        "jitaSellPrice": 479.1,
+        "price10Runs": 47.91,
+        "pricePerRun": 4.79
     },
     {
         "blueprintTypeId": 1148,
@@ -2083,9 +2083,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 67.89,
-        "price10Runs": 1.7,
-        "pricePerRun": 0.17
+        "jitaSellPrice": 70.71,
+        "price10Runs": 1.77,
+        "pricePerRun": 0.18
     },
     {
         "blueprintTypeId": 1148,
@@ -2095,9 +2095,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 67.89,
-        "price10Runs": 6.79,
-        "pricePerRun": 0.68
+        "jitaSellPrice": 70.71,
+        "price10Runs": 7.07,
+        "pricePerRun": 0.71
     },
     {
         "blueprintTypeId": 17651,
@@ -2107,9 +2107,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1435.1,
-        "price10Runs": 143.51,
-        "pricePerRun": 14.35
+        "jitaSellPrice": 1448.36,
+        "price10Runs": 144.84,
+        "pricePerRun": 14.48
     },
     {
         "blueprintTypeId": 1130,
@@ -2119,7 +2119,7 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5.1,
+        "jitaSellPrice": 5.09,
         "price10Runs": 0.13,
         "pricePerRun": 0.01
     },
@@ -2131,9 +2131,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.595,
         "qualityPercent": 59.5,
-        "jitaSellPrice": 151882500.0,
-        "price10Runs": 9037008.75,
-        "pricePerRun": 903700.88
+        "jitaSellPrice": 151115384.62,
+        "price10Runs": 8991365.38,
+        "pricePerRun": 899136.54
     },
     {
         "blueprintTypeId": 949,
@@ -2143,9 +2143,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 508762.5,
-        "price10Runs": 43244.81,
-        "pricePerRun": 4324.48
+        "jitaSellPrice": 506612.82,
+        "price10Runs": 43062.09,
+        "pricePerRun": 4306.21
     },
     {
         "blueprintTypeId": 949,
@@ -2155,9 +2155,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 508762.5,
-        "price10Runs": 50876.25,
-        "pricePerRun": 5087.62
+        "jitaSellPrice": 506612.82,
+        "price10Runs": 50661.28,
+        "pricePerRun": 5066.13
     },
     {
         "blueprintTypeId": 25977,
@@ -2167,9 +2167,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1208925.0,
-        "price10Runs": 30223.12,
-        "pricePerRun": 3022.31
+        "jitaSellPrice": 1201205.13,
+        "price10Runs": 30030.13,
+        "pricePerRun": 3003.01
     },
     {
         "blueprintTypeId": 26005,
@@ -2179,9 +2179,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 8396900.0,
-        "price10Runs": 209922.5,
-        "pricePerRun": 20992.25
+        "jitaSellPrice": 8396358.97,
+        "price10Runs": 209908.97,
+        "pricePerRun": 20990.9
     },
     {
         "blueprintTypeId": 25957,
@@ -2191,9 +2191,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 14076250.0,
-        "price10Runs": 351906.25,
-        "pricePerRun": 35190.62
+        "jitaSellPrice": 13746923.08,
+        "price10Runs": 343673.08,
+        "pricePerRun": 34367.31
     },
     {
         "blueprintTypeId": 25897,
@@ -2203,9 +2203,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 7750775.0,
-        "price10Runs": 193769.38,
-        "pricePerRun": 19376.94
+        "jitaSellPrice": 7730589.74,
+        "price10Runs": 193264.74,
+        "pricePerRun": 19326.47
     },
     {
         "blueprintTypeId": 26061,
@@ -2215,9 +2215,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 2867675.0,
-        "price10Runs": 71691.88,
-        "pricePerRun": 7169.19
+        "jitaSellPrice": 2867025.64,
+        "price10Runs": 71675.64,
+        "pricePerRun": 7167.56
     },
     {
         "blueprintTypeId": 26027,
@@ -2227,9 +2227,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5002550.0,
-        "price10Runs": 125063.75,
-        "pricePerRun": 12506.38
+        "jitaSellPrice": 4965358.97,
+        "price10Runs": 124133.97,
+        "pricePerRun": 12413.4
     },
     {
         "blueprintTypeId": 25949,
@@ -2239,9 +2239,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 2808375.0,
-        "price10Runs": 238711.88,
-        "pricePerRun": 23871.19
+        "jitaSellPrice": 2737025.64,
+        "price10Runs": 232647.18,
+        "pricePerRun": 23264.72
     },
     {
         "blueprintTypeId": 25949,
@@ -2251,9 +2251,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 2808375.0,
-        "price10Runs": 70209.38,
-        "pricePerRun": 7020.94
+        "jitaSellPrice": 2737025.64,
+        "price10Runs": 68425.64,
+        "pricePerRun": 6842.56
     },
     {
         "blueprintTypeId": 26073,
@@ -2263,9 +2263,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 738185.0,
-        "price10Runs": 18454.62,
-        "pricePerRun": 1845.46
+        "jitaSellPrice": 737915.38,
+        "price10Runs": 18447.88,
+        "pricePerRun": 1844.79
     },
     {
         "blueprintTypeId": 25907,
@@ -2275,9 +2275,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 199290.0,
-        "price10Runs": 4982.25,
-        "pricePerRun": 498.23
+        "jitaSellPrice": 199205.13,
+        "price10Runs": 4980.13,
+        "pricePerRun": 498.01
     },
     {
         "blueprintTypeId": 26091,
@@ -2299,9 +2299,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 4899325.0,
-        "price10Runs": 122483.12,
-        "pricePerRun": 12248.31
+        "jitaSellPrice": 4855871.79,
+        "price10Runs": 121396.79,
+        "pricePerRun": 12139.68
     },
     {
         "blueprintTypeId": 26085,
@@ -2311,9 +2311,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 3927200.0,
-        "price10Runs": 98180.0,
-        "pricePerRun": 9818.0
+        "jitaSellPrice": 3935538.46,
+        "price10Runs": 98388.46,
+        "pricePerRun": 9838.85
     },
     {
         "blueprintTypeId": 26087,
@@ -2323,9 +2323,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 4063475.0,
-        "price10Runs": 101586.88,
-        "pricePerRun": 10158.69
+        "jitaSellPrice": 4059282.05,
+        "price10Runs": 101482.05,
+        "pricePerRun": 10148.21
     },
     {
         "blueprintTypeId": 25909,
@@ -2335,9 +2335,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 4236350.0,
-        "price10Runs": 105908.75,
-        "pricePerRun": 10590.88
+        "jitaSellPrice": 4233230.77,
+        "price10Runs": 105830.77,
+        "pricePerRun": 10583.08
     },
     {
         "blueprintTypeId": 25917,
@@ -2359,9 +2359,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 4976500.0,
-        "price10Runs": 423002.5,
-        "pricePerRun": 42300.25
+        "jitaSellPrice": 4972333.33,
+        "price10Runs": 422648.33,
+        "pricePerRun": 42264.83
     },
     {
         "blueprintTypeId": 25911,
@@ -2383,9 +2383,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 2461150.0,
-        "price10Runs": 61528.75,
-        "pricePerRun": 6152.88
+        "jitaSellPrice": 2455051.28,
+        "price10Runs": 61376.28,
+        "pricePerRun": 6137.63
     },
     {
         "blueprintTypeId": 25915,
@@ -2407,9 +2407,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 997757.5,
-        "price10Runs": 24943.94,
-        "pricePerRun": 2494.39
+        "jitaSellPrice": 997684.62,
+        "price10Runs": 24942.12,
+        "pricePerRun": 2494.21
     },
     {
         "blueprintTypeId": 25737,
@@ -2419,9 +2419,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5945650.0,
-        "price10Runs": 148641.25,
-        "pricePerRun": 14864.12
+        "jitaSellPrice": 5962897.44,
+        "price10Runs": 149072.44,
+        "pricePerRun": 14907.24
     },
     {
         "blueprintTypeId": 26077,
@@ -2431,9 +2431,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 295805.0,
-        "price10Runs": 7395.12,
-        "pricePerRun": 739.51
+        "jitaSellPrice": 295807.69,
+        "price10Runs": 7395.19,
+        "pricePerRun": 739.52
     },
     {
         "blueprintTypeId": 25951,
@@ -2443,9 +2443,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 6204625.0,
-        "price10Runs": 155115.62,
-        "pricePerRun": 15511.56
+        "jitaSellPrice": 6168897.44,
+        "price10Runs": 154222.44,
+        "pricePerRun": 15422.24
     },
     {
         "blueprintTypeId": 25931,
@@ -2455,9 +2455,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1871200.0,
-        "price10Runs": 46780.0,
-        "pricePerRun": 4678.0
+        "jitaSellPrice": 1870384.62,
+        "price10Runs": 46759.62,
+        "pricePerRun": 4675.96
     },
     {
         "blueprintTypeId": 26343,
@@ -2467,9 +2467,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 4588000.0,
-        "price10Runs": 114700.0,
-        "pricePerRun": 11470.0
+        "jitaSellPrice": 4563051.28,
+        "price10Runs": 114076.28,
+        "pricePerRun": 11407.63
     },
     {
         "blueprintTypeId": 25971,
@@ -2479,9 +2479,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1279875.0,
-        "price10Runs": 31996.88,
-        "pricePerRun": 3199.69
+        "jitaSellPrice": 1276615.38,
+        "price10Runs": 31915.38,
+        "pricePerRun": 3191.54
     },
     {
         "blueprintTypeId": 26387,
@@ -2491,9 +2491,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 2283025.0,
-        "price10Runs": 57075.62,
-        "pricePerRun": 5707.56
+        "jitaSellPrice": 2274641.03,
+        "price10Runs": 56866.03,
+        "pricePerRun": 5686.6
     },
     {
         "blueprintTypeId": 25979,
@@ -2503,9 +2503,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 975715.0,
-        "price10Runs": 24392.88,
-        "pricePerRun": 2439.29
+        "jitaSellPrice": 976982.05,
+        "price10Runs": 24424.55,
+        "pricePerRun": 2442.46
     },
     {
         "blueprintTypeId": 25981,
@@ -2515,9 +2515,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1844025.0,
-        "price10Runs": 46100.62,
-        "pricePerRun": 4610.06
+        "jitaSellPrice": 1842128.21,
+        "price10Runs": 46053.21,
+        "pricePerRun": 4605.32
     },
     {
         "blueprintTypeId": 25969,
@@ -2527,9 +2527,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1813950.0,
-        "price10Runs": 45348.75,
-        "pricePerRun": 4534.88
+        "jitaSellPrice": 1811358.97,
+        "price10Runs": 45283.97,
+        "pricePerRun": 4528.4
     },
     {
         "blueprintTypeId": 25973,
@@ -2539,9 +2539,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1084375.0,
-        "price10Runs": 27109.38,
-        "pricePerRun": 2710.94
+        "jitaSellPrice": 1084641.03,
+        "price10Runs": 27116.03,
+        "pricePerRun": 2711.6
     },
     {
         "blueprintTypeId": 25975,
@@ -2551,9 +2551,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1032775.0,
-        "price10Runs": 25819.38,
-        "pricePerRun": 2581.94
+        "jitaSellPrice": 1032615.38,
+        "price10Runs": 25815.38,
+        "pricePerRun": 2581.54
     },
     {
         "blueprintTypeId": 26063,
@@ -2563,9 +2563,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1469125.0,
-        "price10Runs": 36728.12,
-        "pricePerRun": 3672.81
+        "jitaSellPrice": 1465282.05,
+        "price10Runs": 36632.05,
+        "pricePerRun": 3663.21
     },
     {
         "blueprintTypeId": 25889,
@@ -2575,9 +2575,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5484150.0,
-        "price10Runs": 137103.75,
-        "pricePerRun": 13710.38
+        "jitaSellPrice": 5484717.95,
+        "price10Runs": 137117.95,
+        "pricePerRun": 13711.79
     },
     {
         "blueprintTypeId": 26079,
@@ -2587,9 +2587,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 204497.5,
-        "price10Runs": 5112.44,
-        "pricePerRun": 511.24
+        "jitaSellPrice": 204500.0,
+        "price10Runs": 5112.5,
+        "pricePerRun": 511.25
     },
     {
         "blueprintTypeId": 25937,
@@ -2599,9 +2599,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 379247.5,
-        "price10Runs": 9481.19,
-        "pricePerRun": 948.12
+        "jitaSellPrice": 363838.46,
+        "price10Runs": 9095.96,
+        "pricePerRun": 909.6
     },
     {
         "blueprintTypeId": 34307,
@@ -2611,9 +2611,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 3363325.0,
-        "price10Runs": 84083.12,
-        "pricePerRun": 8408.31
+        "jitaSellPrice": 3295820.51,
+        "price10Runs": 82395.51,
+        "pricePerRun": 8239.55
     },
     {
         "blueprintTypeId": 25999,
@@ -2623,9 +2623,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 6882450.0,
-        "price10Runs": 172061.25,
-        "pricePerRun": 17206.12
+        "jitaSellPrice": 6881871.79,
+        "price10Runs": 172046.79,
+        "pricePerRun": 17204.68
     },
     {
         "blueprintTypeId": 26007,
@@ -2635,9 +2635,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 11256500.0,
-        "price10Runs": 281412.5,
-        "pricePerRun": 28141.25
+        "jitaSellPrice": 11232051.28,
+        "price10Runs": 280801.28,
+        "pricePerRun": 28080.13
     },
     {
         "blueprintTypeId": 26009,
@@ -2647,9 +2647,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 10062725.0,
-        "price10Runs": 251568.12,
-        "pricePerRun": 25156.81
+        "jitaSellPrice": 9997871.79,
+        "price10Runs": 249946.79,
+        "pricePerRun": 24994.68
     },
     {
         "blueprintTypeId": 25997,
@@ -2659,9 +2659,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 3163200.0,
-        "price10Runs": 79080.0,
-        "pricePerRun": 7908.0
+        "jitaSellPrice": 3155794.87,
+        "price10Runs": 78894.87,
+        "pricePerRun": 7889.49
     },
     {
         "blueprintTypeId": 26001,
@@ -2671,9 +2671,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5929325.0,
-        "price10Runs": 148233.12,
-        "pricePerRun": 14823.31
+        "jitaSellPrice": 5925846.15,
+        "price10Runs": 148146.15,
+        "pricePerRun": 14814.62
     },
     {
         "blueprintTypeId": 25891,
@@ -2683,9 +2683,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 4318150.0,
-        "price10Runs": 107953.75,
-        "pricePerRun": 10795.38
+        "jitaSellPrice": 4210897.44,
+        "price10Runs": 105272.44,
+        "pricePerRun": 10527.24
     },
     {
         "blueprintTypeId": 26081,
@@ -2695,9 +2695,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 149282.5,
-        "price10Runs": 3732.06,
-        "pricePerRun": 373.21
+        "jitaSellPrice": 149328.21,
+        "price10Runs": 3733.21,
+        "pricePerRun": 373.32
     },
     {
         "blueprintTypeId": 26349,
@@ -2707,9 +2707,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 4883150.0,
-        "price10Runs": 122078.75,
-        "pricePerRun": 12207.88
+        "jitaSellPrice": 4882846.15,
+        "price10Runs": 122071.15,
+        "pricePerRun": 12207.12
     },
     {
         "blueprintTypeId": 26419,
@@ -2719,9 +2719,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 70368250.0,
-        "price10Runs": 1759206.25,
-        "pricePerRun": 175920.62
+        "jitaSellPrice": 70057435.9,
+        "price10Runs": 1751435.9,
+        "pricePerRun": 175143.59
     },
     {
         "blueprintTypeId": 25903,
@@ -2731,9 +2731,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5900950.0,
-        "price10Runs": 147523.75,
-        "pricePerRun": 14752.38
+        "jitaSellPrice": 5900948.72,
+        "price10Runs": 147523.72,
+        "pricePerRun": 14752.37
     },
     {
         "blueprintTypeId": 10839,
@@ -2743,9 +2743,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 217420.0,
-        "price10Runs": 5435.5,
-        "pricePerRun": 543.55
+        "jitaSellPrice": 217058.97,
+        "price10Runs": 5426.47,
+        "pricePerRun": 542.65
     },
     {
         "blueprintTypeId": 3840,
@@ -2755,9 +2755,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 105403.25,
-        "price10Runs": 10540.33,
-        "pricePerRun": 1054.03
+        "jitaSellPrice": 103840.77,
+        "price10Runs": 10384.08,
+        "pricePerRun": 1038.41
     },
     {
         "blueprintTypeId": 26345,
@@ -2767,9 +2767,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5996450.0,
-        "price10Runs": 149911.25,
-        "pricePerRun": 14991.12
+        "jitaSellPrice": 5995666.67,
+        "price10Runs": 149891.67,
+        "pricePerRun": 14989.17
     },
     {
         "blueprintTypeId": 25893,
@@ -2779,9 +2779,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5791375.0,
-        "price10Runs": 144784.38,
-        "pricePerRun": 14478.44
+        "jitaSellPrice": 5784205.13,
+        "price10Runs": 144605.13,
+        "pricePerRun": 14460.51
     },
     {
         "blueprintTypeId": 26083,
@@ -2791,9 +2791,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 454175.0,
-        "price10Runs": 11354.38,
-        "pricePerRun": 1135.44
+        "jitaSellPrice": 456923.08,
+        "price10Runs": 11423.08,
+        "pricePerRun": 1142.31
     },
     {
         "blueprintTypeId": 17348,
@@ -2803,9 +2803,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 20898.0,
-        "price10Runs": 2089.8,
-        "pricePerRun": 208.98
+        "jitaSellPrice": 20736.41,
+        "price10Runs": 2073.64,
+        "pricePerRun": 207.36
     },
     {
         "blueprintTypeId": 1133,
@@ -2815,8 +2815,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 8.98,
-        "price10Runs": 0.9,
+        "jitaSellPrice": 9.1,
+        "price10Runs": 0.91,
         "pricePerRun": 0.09
     },
     {
@@ -2827,9 +2827,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 247865000.0,
-        "price10Runs": 6196625.0,
-        "pricePerRun": 619662.5
+        "jitaSellPrice": 248243589.74,
+        "price10Runs": 6206089.74,
+        "pricePerRun": 620608.97
     },
     {
         "blueprintTypeId": 23712,
@@ -2839,9 +2839,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 12587.6,
-        "price10Runs": 1258.76,
-        "pricePerRun": 125.88
+        "jitaSellPrice": 12576.77,
+        "price10Runs": 1257.68,
+        "pricePerRun": 125.77
     },
     {
         "blueprintTypeId": 33707,
@@ -2851,9 +2851,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 15084.63,
-        "price10Runs": 1508.46,
-        "pricePerRun": 150.85
+        "jitaSellPrice": 15067.31,
+        "price10Runs": 1506.73,
+        "pricePerRun": 150.67
     },
     {
         "blueprintTypeId": 786,
@@ -2863,9 +2863,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 18246.15,
-        "price10Runs": 456.15,
-        "pricePerRun": 45.62
+        "jitaSellPrice": 18176.05,
+        "price10Runs": 454.4,
+        "pricePerRun": 45.44
     },
     {
         "blueprintTypeId": 23720,
@@ -2875,9 +2875,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 11691.02,
-        "price10Runs": 1169.1,
-        "pricePerRun": 116.91
+        "jitaSellPrice": 11318.85,
+        "price10Runs": 1131.88,
+        "pricePerRun": 113.19
     },
     {
         "blueprintTypeId": 17359,
@@ -2887,9 +2887,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 37518.5,
-        "price10Runs": 3751.85,
-        "pricePerRun": 375.19
+        "jitaSellPrice": 37268.46,
+        "price10Runs": 3726.85,
+        "pricePerRun": 372.68
     },
     {
         "blueprintTypeId": 24695,
@@ -2899,9 +2899,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 169407500.0,
-        "price10Runs": 16940750.0,
-        "pricePerRun": 1694075.0
+        "jitaSellPrice": 169043589.74,
+        "price10Runs": 16904358.97,
+        "pricePerRun": 1690435.9
     },
     {
         "blueprintTypeId": 29249,
@@ -2911,9 +2911,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 417867.5,
-        "price10Runs": 41786.75,
-        "pricePerRun": 4178.68
+        "jitaSellPrice": 417766.67,
+        "price10Runs": 41776.67,
+        "pricePerRun": 4177.67
     },
     {
         "blueprintTypeId": 17356,
@@ -2923,9 +2923,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 35698.0,
-        "price10Runs": 892.45,
-        "pricePerRun": 89.25
+        "jitaSellPrice": 35621.54,
+        "price10Runs": 890.54,
+        "pricePerRun": 89.05
     },
     {
         "blueprintTypeId": 969,
@@ -2935,9 +2935,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 12708000.0,
-        "price10Runs": 1270800.0,
-        "pricePerRun": 127080.0
+        "jitaSellPrice": 12773076.92,
+        "price10Runs": 1277307.69,
+        "pricePerRun": 127730.77
     },
     {
         "blueprintTypeId": 31361,
@@ -2947,9 +2947,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 2871700.0,
-        "price10Runs": 287170.0,
-        "pricePerRun": 28717.0
+        "jitaSellPrice": 2963333.33,
+        "price10Runs": 296333.33,
+        "pricePerRun": 29633.33
     },
     {
         "blueprintTypeId": 23710,
@@ -2959,9 +2959,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 88066.0,
-        "price10Runs": 8806.6,
-        "pricePerRun": 880.66
+        "jitaSellPrice": 87926.15,
+        "price10Runs": 8792.62,
+        "pricePerRun": 879.26
     },
     {
         "blueprintTypeId": 31379,
@@ -2971,9 +2971,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 13065000.0,
-        "price10Runs": 326625.0,
-        "pricePerRun": 32662.5
+        "jitaSellPrice": 13124358.97,
+        "price10Runs": 328108.97,
+        "pricePerRun": 32810.9
     },
     {
         "blueprintTypeId": 33705,
@@ -2983,9 +2983,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 68306.0,
-        "price10Runs": 6830.6,
-        "pricePerRun": 683.06
+        "jitaSellPrice": 68360.0,
+        "price10Runs": 6836.0,
+        "pricePerRun": 683.6
     },
     {
         "blueprintTypeId": 4396,
@@ -2995,9 +2995,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 291787.5,
-        "price10Runs": 24801.94,
-        "pricePerRun": 2480.19
+        "jitaSellPrice": 292969.23,
+        "price10Runs": 24902.38,
+        "pricePerRun": 2490.24
     },
     {
         "blueprintTypeId": 31415,
@@ -3007,9 +3007,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 25765000.0,
-        "price10Runs": 644125.0,
-        "pricePerRun": 64412.5
+        "jitaSellPrice": 25543589.74,
+        "price10Runs": 638589.74,
+        "pricePerRun": 63858.97
     },
     {
         "blueprintTypeId": 10837,
@@ -3019,9 +3019,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 46548.75,
-        "price10Runs": 3956.64,
-        "pricePerRun": 395.66
+        "jitaSellPrice": 45324.62,
+        "price10Runs": 3852.59,
+        "pricePerRun": 385.26
     },
     {
         "blueprintTypeId": 3830,
@@ -3031,9 +3031,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 34905.25,
-        "price10Runs": 3490.53,
-        "pricePerRun": 349.05
+        "jitaSellPrice": 35341.79,
+        "price10Runs": 3534.18,
+        "pricePerRun": 353.42
     },
     {
         "blueprintTypeId": 23718,
@@ -3043,9 +3043,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 70362.75,
-        "price10Runs": 7036.28,
-        "pricePerRun": 703.63
+        "jitaSellPrice": 69976.41,
+        "price10Runs": 6997.64,
+        "pricePerRun": 699.76
     },
     {
         "blueprintTypeId": 31042,
@@ -3055,9 +3055,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 9746575.0,
-        "price10Runs": 243664.38,
-        "pricePerRun": 24366.44
+        "jitaSellPrice": 9958025.64,
+        "price10Runs": 248950.64,
+        "pricePerRun": 24895.06
     },
     {
         "blueprintTypeId": 995,
@@ -3067,9 +3067,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 159162500.0,
-        "price10Runs": 15916250.0,
-        "pricePerRun": 1591625.0
+        "jitaSellPrice": 159207692.31,
+        "price10Runs": 15920769.23,
+        "pricePerRun": 1592076.92
     },
     {
         "blueprintTypeId": 18055,
@@ -3079,9 +3079,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 488785.0,
-        "price10Runs": 48878.5,
-        "pricePerRun": 4887.85
+        "jitaSellPrice": 488851.28,
+        "price10Runs": 48885.13,
+        "pricePerRun": 4888.51
     },
     {
         "blueprintTypeId": 950,
@@ -3091,9 +3091,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 173125.0,
-        "price10Runs": 17312.5,
-        "pricePerRun": 1731.25
+        "jitaSellPrice": 169594.1,
+        "price10Runs": 16959.41,
+        "pricePerRun": 1695.94
     },
     {
         "blueprintTypeId": 40337,
@@ -3103,9 +3103,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 22205.0,
-        "price10Runs": 1887.43,
-        "pricePerRun": 188.74
+        "jitaSellPrice": 22029.23,
+        "price10Runs": 1872.48,
+        "pricePerRun": 187.25
     },
     {
         "blueprintTypeId": 35797,
@@ -3115,9 +3115,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 11996.1,
-        "price10Runs": 1019.67,
-        "pricePerRun": 101.97
+        "jitaSellPrice": 11976.77,
+        "price10Runs": 1018.03,
+        "pricePerRun": 101.8
     },
     {
         "blueprintTypeId": 40336,
@@ -3127,9 +3127,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 22669.0,
-        "price10Runs": 1926.87,
-        "pricePerRun": 192.69
+        "jitaSellPrice": 22615.64,
+        "price10Runs": 1922.33,
+        "pricePerRun": 192.23
     },
     {
         "blueprintTypeId": 35796,
@@ -3139,9 +3139,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 13279.25,
-        "price10Runs": 1128.74,
-        "pricePerRun": 112.87
+        "jitaSellPrice": 13134.62,
+        "price10Runs": 1116.44,
+        "pricePerRun": 111.64
     },
     {
         "blueprintTypeId": 803,
@@ -3151,9 +3151,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 330.39,
-        "price10Runs": 33.04,
-        "pricePerRun": 3.3
+        "jitaSellPrice": 328.97,
+        "price10Runs": 32.9,
+        "pricePerRun": 3.29
     },
     {
         "blueprintTypeId": 803,
@@ -3163,9 +3163,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 330.39,
-        "price10Runs": 8.26,
-        "pricePerRun": 0.83
+        "jitaSellPrice": 328.97,
+        "price10Runs": 8.22,
+        "pricePerRun": 0.82
     },
     {
         "blueprintTypeId": 26760,
@@ -3175,9 +3175,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 82.48,
-        "price10Runs": 8.25,
-        "pricePerRun": 0.82
+        "jitaSellPrice": 80.74,
+        "price10Runs": 8.07,
+        "pricePerRun": 0.81
     },
     {
         "blueprintTypeId": 808,
@@ -3187,8 +3187,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 78.93,
-        "price10Runs": 1.97,
+        "jitaSellPrice": 78.28,
+        "price10Runs": 1.96,
         "pricePerRun": 0.2
     },
     {
@@ -3199,8 +3199,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 78.93,
-        "price10Runs": 6.71,
+        "jitaSellPrice": 78.28,
+        "price10Runs": 6.65,
         "pricePerRun": 0.67
     },
     {
@@ -3223,9 +3223,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 19.76,
-        "price10Runs": 1.98,
-        "pricePerRun": 0.2
+        "jitaSellPrice": 18.67,
+        "price10Runs": 1.87,
+        "pricePerRun": 0.19
     },
     {
         "blueprintTypeId": 2513,
@@ -3235,8 +3235,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 19.76,
-        "price10Runs": 0.49,
+        "jitaSellPrice": 18.67,
+        "price10Runs": 0.47,
         "pricePerRun": 0.05
     },
     {
@@ -3247,9 +3247,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 298.94,
-        "price10Runs": 29.89,
-        "pricePerRun": 2.99
+        "jitaSellPrice": 307.17,
+        "price10Runs": 30.72,
+        "pricePerRun": 3.07
     },
     {
         "blueprintTypeId": 968,
@@ -3259,9 +3259,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 12106250.0,
-        "price10Runs": 1210625.0,
-        "pricePerRun": 121062.5
+        "jitaSellPrice": 12021538.46,
+        "price10Runs": 1202153.85,
+        "pricePerRun": 120215.38
     },
     {
         "blueprintTypeId": 33517,
@@ -3271,9 +3271,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.73,
         "qualityPercent": 73.0,
-        "jitaSellPrice": 1440125.0,
-        "price10Runs": 105129.12,
-        "pricePerRun": 10512.91
+        "jitaSellPrice": 1409435.9,
+        "price10Runs": 102888.82,
+        "pricePerRun": 10288.88
     },
     {
         "blueprintTypeId": 90039,
@@ -3283,9 +3283,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.385,
         "qualityPercent": 38.5,
-        "jitaSellPrice": 5820275.0,
-        "price10Runs": 224080.59,
-        "pricePerRun": 22408.06
+        "jitaSellPrice": 5696589.74,
+        "price10Runs": 219318.71,
+        "pricePerRun": 21931.87
     },
     {
         "blueprintTypeId": 33519,
@@ -3295,9 +3295,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 8338150.0,
-        "price10Runs": 833815.0,
-        "pricePerRun": 83381.5
+        "jitaSellPrice": 8319230.77,
+        "price10Runs": 831923.08,
+        "pricePerRun": 83192.31
     },
     {
         "blueprintTypeId": 17913,
@@ -3307,9 +3307,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.775,
         "qualityPercent": 77.5,
-        "jitaSellPrice": 5257525.0,
-        "price10Runs": 407458.19,
-        "pricePerRun": 40745.82
+        "jitaSellPrice": 5262307.69,
+        "price10Runs": 407828.85,
+        "pricePerRun": 40782.88
     },
     {
         "blueprintTypeId": 24701,
@@ -3319,9 +3319,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 51155500.0,
-        "price10Runs": 5115550.0,
-        "pricePerRun": 511555.0
+        "jitaSellPrice": 51466410.26,
+        "price10Runs": 5146641.03,
+        "pricePerRun": 514664.1
     },
     {
         "blueprintTypeId": 4307,
@@ -3331,9 +3331,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 74613250.0,
-        "price10Runs": 7461325.0,
-        "pricePerRun": 746132.5
+        "jitaSellPrice": 74216666.67,
+        "price10Runs": 7421666.67,
+        "pricePerRun": 742166.67
     },
     {
         "blueprintTypeId": 2739,
@@ -3343,9 +3343,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 25020.25,
-        "price10Runs": 2502.03,
-        "pricePerRun": 250.2
+        "jitaSellPrice": 25016.41,
+        "price10Runs": 2501.64,
+        "pricePerRun": 250.16
     },
     {
         "blueprintTypeId": 17330,
@@ -3355,9 +3355,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 46313.5,
-        "price10Runs": 4631.35,
-        "pricePerRun": 463.13
+        "jitaSellPrice": 45785.13,
+        "price10Runs": 4578.51,
+        "pricePerRun": 457.85
     },
     {
         "blueprintTypeId": 3187,
@@ -3367,9 +3367,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.775,
         "qualityPercent": 77.5,
-        "jitaSellPrice": 5469775.0,
-        "price10Runs": 423907.56,
-        "pricePerRun": 42390.76
+        "jitaSellPrice": 5475410.26,
+        "price10Runs": 424344.29,
+        "pricePerRun": 42434.43
     },
     {
         "blueprintTypeId": 22471,
@@ -3379,9 +3379,9 @@ const BPC_PRICING_DATA = [
         "te": 2,
         "quality": 0.445,
         "qualityPercent": 44.5,
-        "jitaSellPrice": 319502500.0,
-        "price10Runs": 14217861.25,
-        "pricePerRun": 1421786.12
+        "jitaSellPrice": 322005128.21,
+        "price10Runs": 14329228.21,
+        "pricePerRun": 1432922.82
     },
     {
         "blueprintTypeId": 806,
@@ -3391,9 +3391,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 190.83,
-        "price10Runs": 19.08,
-        "pricePerRun": 1.91
+        "jitaSellPrice": 188.06,
+        "price10Runs": 18.81,
+        "pricePerRun": 1.88
     },
     {
         "blueprintTypeId": 806,
@@ -3403,9 +3403,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 190.83,
-        "price10Runs": 4.77,
-        "pricePerRun": 0.48
+        "jitaSellPrice": 188.06,
+        "price10Runs": 4.7,
+        "pricePerRun": 0.47
     },
     {
         "blueprintTypeId": 21868,
@@ -3415,9 +3415,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 72.27,
-        "price10Runs": 7.23,
-        "pricePerRun": 0.72
+        "jitaSellPrice": 70.19,
+        "price10Runs": 7.02,
+        "pricePerRun": 0.7
     },
     {
         "blueprintTypeId": 807,
@@ -3427,8 +3427,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 77.33,
-        "price10Runs": 6.57,
+        "jitaSellPrice": 77.73,
+        "price10Runs": 6.61,
         "pricePerRun": 0.66
     },
     {
@@ -3439,8 +3439,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 11.23,
-        "price10Runs": 1.12,
+        "jitaSellPrice": 10.79,
+        "price10Runs": 1.08,
         "pricePerRun": 0.11
     },
     {
@@ -3451,9 +3451,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 10.54,
+        "jitaSellPrice": 10.46,
         "price10Runs": 1.05,
-        "pricePerRun": 0.11
+        "pricePerRun": 0.1
     },
     {
         "blueprintTypeId": 2517,
@@ -3463,7 +3463,7 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 10.54,
+        "jitaSellPrice": 10.46,
         "price10Runs": 0.26,
         "pricePerRun": 0.03
     },
@@ -3475,9 +3475,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 359.47,
-        "price10Runs": 35.95,
-        "pricePerRun": 3.59
+        "jitaSellPrice": 356.67,
+        "price10Runs": 35.67,
+        "pricePerRun": 3.57
     },
     {
         "blueprintTypeId": 896,
@@ -3487,9 +3487,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 18257.89,
-        "price10Runs": 1825.79,
-        "pricePerRun": 182.58
+        "jitaSellPrice": 18724.37,
+        "price10Runs": 1872.44,
+        "pricePerRun": 187.24
     },
     {
         "blueprintTypeId": 888,
@@ -3499,8 +3499,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 19.76,
-        "price10Runs": 1.98,
+        "jitaSellPrice": 19.53,
+        "price10Runs": 1.95,
         "pricePerRun": 0.2
     },
     {
@@ -3511,8 +3511,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 11.31,
-        "price10Runs": 0.28,
+        "jitaSellPrice": 12.49,
+        "price10Runs": 0.31,
         "pricePerRun": 0.03
     },
     {
@@ -3523,9 +3523,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 102603.0,
-        "price10Runs": 10260.3,
-        "pricePerRun": 1026.03
+        "jitaSellPrice": 101492.05,
+        "price10Runs": 10149.21,
+        "pricePerRun": 1014.92
     },
     {
         "blueprintTypeId": 23507,
@@ -3535,9 +3535,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 69025.5,
-        "price10Runs": 5867.17,
-        "pricePerRun": 586.72
+        "jitaSellPrice": 68964.62,
+        "price10Runs": 5861.99,
+        "pricePerRun": 586.2
     },
     {
         "blueprintTypeId": 2007,
@@ -3547,9 +3547,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 11887350.0,
-        "price10Runs": 1188735.0,
-        "pricePerRun": 118873.5
+        "jitaSellPrice": 11747538.46,
+        "price10Runs": 1174753.85,
+        "pricePerRun": 117475.38
     },
     {
         "blueprintTypeId": 29006,
@@ -3559,9 +3559,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 26040.75,
-        "price10Runs": 2604.08,
-        "pricePerRun": 260.41
+        "jitaSellPrice": 25051.79,
+        "price10Runs": 2505.18,
+        "pricePerRun": 250.52
     },
     {
         "blueprintTypeId": 29000,
@@ -3571,9 +3571,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 14720.25,
-        "price10Runs": 1251.22,
-        "pricePerRun": 125.12
+        "jitaSellPrice": 14619.74,
+        "price10Runs": 1242.68,
+        "pricePerRun": 124.27
     },
     {
         "blueprintTypeId": 4305,
@@ -3583,9 +3583,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 68928750.0,
-        "price10Runs": 6892875.0,
-        "pricePerRun": 689287.5
+        "jitaSellPrice": 68853333.33,
+        "price10Runs": 6885333.33,
+        "pricePerRun": 688533.33
     },
     {
         "blueprintTypeId": 28607,
@@ -3595,9 +3595,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.775,
         "qualityPercent": 77.5,
-        "jitaSellPrice": 1389550000.0,
-        "price10Runs": 107690125.0,
-        "pricePerRun": 10769012.5
+        "jitaSellPrice": 1376307692.31,
+        "price10Runs": 106663846.15,
+        "pricePerRun": 10666384.62
     },
     {
         "blueprintTypeId": 28607,
@@ -3607,9 +3607,9 @@ const BPC_PRICING_DATA = [
         "te": 16,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 1389550000.0,
-        "price10Runs": 118111750.0,
-        "pricePerRun": 11811175.0
+        "jitaSellPrice": 1376307692.31,
+        "price10Runs": 116986153.85,
+        "pricePerRun": 11698615.38
     },
     {
         "blueprintTypeId": 4313,
@@ -3619,9 +3619,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 17631.08,
-        "price10Runs": 1763.11,
-        "pricePerRun": 176.31
+        "jitaSellPrice": 17579.67,
+        "price10Runs": 1757.97,
+        "pricePerRun": 175.8
     },
     {
         "blueprintTypeId": 28660,
@@ -3631,9 +3631,9 @@ const BPC_PRICING_DATA = [
         "te": 10,
         "quality": 0.625,
         "qualityPercent": 62.5,
-        "jitaSellPrice": 1138425000.0,
-        "price10Runs": 71151562.5,
-        "pricePerRun": 7115156.25
+        "jitaSellPrice": 1120487179.49,
+        "price10Runs": 70030448.72,
+        "pricePerRun": 7003044.87
     },
     {
         "blueprintTypeId": 901,
@@ -3643,9 +3643,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 316.7,
-        "price10Runs": 31.67,
-        "pricePerRun": 3.17
+        "jitaSellPrice": 331.63,
+        "price10Runs": 33.16,
+        "pricePerRun": 3.32
     },
     {
         "blueprintTypeId": 893,
@@ -3655,7 +3655,7 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 92.33,
+        "jitaSellPrice": 92.28,
         "price10Runs": 9.23,
         "pricePerRun": 0.92
     },
@@ -3667,9 +3667,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 37167.0,
-        "price10Runs": 3716.7,
-        "pricePerRun": 371.67
+        "jitaSellPrice": 36812.31,
+        "price10Runs": 3681.23,
+        "pricePerRun": 368.12
     },
     {
         "blueprintTypeId": 17324,
@@ -3679,9 +3679,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 42739.75,
-        "price10Runs": 4273.98,
-        "pricePerRun": 427.4
+        "jitaSellPrice": 42288.72,
+        "price10Runs": 4228.87,
+        "pricePerRun": 422.89
     },
     {
         "blueprintTypeId": 1152,
@@ -3691,8 +3691,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 86.01,
-        "price10Runs": 8.6,
+        "jitaSellPrice": 85.63,
+        "price10Runs": 8.56,
         "pricePerRun": 0.86
     },
     {
@@ -3703,8 +3703,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 2286.15,
-        "price10Runs": 228.62,
+        "jitaSellPrice": 2285.87,
+        "price10Runs": 228.59,
         "pricePerRun": 22.86
     },
     {
@@ -3715,9 +3715,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 118046.0,
-        "price10Runs": 10033.91,
-        "pricePerRun": 1003.39
+        "jitaSellPrice": 133463.45,
+        "price10Runs": 11344.39,
+        "pricePerRun": 1134.44
     },
     {
         "blueprintTypeId": 23511,
@@ -3727,9 +3727,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 61168.0,
-        "price10Runs": 5199.28,
-        "pricePerRun": 519.93
+        "jitaSellPrice": 61118.46,
+        "price10Runs": 5195.07,
+        "pricePerRun": 519.51
     },
     {
         "blueprintTypeId": 690,
@@ -3739,9 +3739,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 553545.0,
-        "price10Runs": 55354.5,
-        "pricePerRun": 5535.45
+        "jitaSellPrice": 546133.33,
+        "price10Runs": 54613.33,
+        "pricePerRun": 5461.33
     },
     {
         "blueprintTypeId": 17481,
@@ -3751,9 +3751,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 40200250.0,
-        "price10Runs": 4020025.0,
-        "pricePerRun": 402002.5
+        "jitaSellPrice": 39750512.82,
+        "price10Runs": 3975051.28,
+        "pricePerRun": 397505.13
     },
     {
         "blueprintTypeId": 16234,
@@ -3763,9 +3763,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 52008250.0,
-        "price10Runs": 5200825.0,
-        "pricePerRun": 520082.5
+        "jitaSellPrice": 51876153.85,
+        "price10Runs": 5187615.38,
+        "pricePerRun": 518761.54
     },
     {
         "blueprintTypeId": 897,
@@ -3775,8 +3775,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 47.62,
-        "price10Runs": 4.76,
+        "jitaSellPrice": 47.91,
+        "price10Runs": 4.79,
         "pricePerRun": 0.48
     },
     {
@@ -3787,8 +3787,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 19.47,
-        "price10Runs": 1.95,
+        "jitaSellPrice": 18.91,
+        "price10Runs": 1.89,
         "pricePerRun": 0.19
     },
     {
@@ -3799,7 +3799,7 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 8.07,
+        "jitaSellPrice": 8.06,
         "price10Runs": 0.2,
         "pricePerRun": 0.02
     },
@@ -3811,9 +3811,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 651815.0,
-        "price10Runs": 65181.5,
-        "pricePerRun": 6518.15
+        "jitaSellPrice": 651251.28,
+        "price10Runs": 65125.13,
+        "pricePerRun": 6512.51
     },
     {
         "blueprintTypeId": 11872,
@@ -3823,9 +3823,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 635.25,
-        "price10Runs": 63.52,
-        "pricePerRun": 6.35
+        "jitaSellPrice": 631.21,
+        "price10Runs": 63.12,
+        "pricePerRun": 6.31
     },
     {
         "blueprintTypeId": 11873,
@@ -3835,9 +3835,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 805.94,
-        "price10Runs": 80.59,
-        "pricePerRun": 8.06
+        "jitaSellPrice": 804.58,
+        "price10Runs": 80.46,
+        "pricePerRun": 8.05
     },
     {
         "blueprintTypeId": 11870,
@@ -3847,9 +3847,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 826.4,
-        "price10Runs": 82.64,
-        "pricePerRun": 8.26
+        "jitaSellPrice": 821.51,
+        "price10Runs": 82.15,
+        "pricePerRun": 8.22
     },
     {
         "blueprintTypeId": 11859,
@@ -3859,9 +3859,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 685.41,
-        "price10Runs": 68.54,
-        "pricePerRun": 6.85
+        "jitaSellPrice": 673.78,
+        "price10Runs": 67.38,
+        "pricePerRun": 6.74
     },
     {
         "blueprintTypeId": 11887,
@@ -3871,9 +3871,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 753.11,
-        "price10Runs": 75.31,
-        "pricePerRun": 7.53
+        "jitaSellPrice": 745.56,
+        "price10Runs": 74.56,
+        "pricePerRun": 7.46
     },
     {
         "blueprintTypeId": 11889,
@@ -3883,9 +3883,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 599.69,
-        "price10Runs": 50.97,
-        "pricePerRun": 5.1
+        "jitaSellPrice": 598.66,
+        "price10Runs": 50.89,
+        "pricePerRun": 5.09
     },
     {
         "blueprintTypeId": 11890,
@@ -3895,9 +3895,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 620.31,
-        "price10Runs": 62.03,
-        "pricePerRun": 6.2
+        "jitaSellPrice": 626.51,
+        "price10Runs": 62.65,
+        "pricePerRun": 6.27
     },
     {
         "blueprintTypeId": 11891,
@@ -3907,9 +3907,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 652.54,
-        "price10Runs": 55.47,
-        "pricePerRun": 5.55
+        "jitaSellPrice": 659.34,
+        "price10Runs": 56.04,
+        "pricePerRun": 5.6
     },
     {
         "blueprintTypeId": 17336,
@@ -3919,9 +3919,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 24352.25,
-        "price10Runs": 2435.22,
-        "pricePerRun": 243.52
+        "jitaSellPrice": 24262.05,
+        "price10Runs": 2426.21,
+        "pricePerRun": 242.62
     },
     {
         "blueprintTypeId": 42888,
@@ -3931,9 +3931,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 580.86,
-        "price10Runs": 58.09,
-        "pricePerRun": 5.81
+        "jitaSellPrice": 579.69,
+        "price10Runs": 57.97,
+        "pricePerRun": 5.8
     },
     {
         "blueprintTypeId": 42876,
@@ -3943,9 +3943,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 589.62,
-        "price10Runs": 58.96,
-        "pricePerRun": 5.9
+        "jitaSellPrice": 587.28,
+        "price10Runs": 58.73,
+        "pricePerRun": 5.87
     },
     {
         "blueprintTypeId": 688,
@@ -3955,9 +3955,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 162670000.0,
-        "price10Runs": 16267000.0,
-        "pricePerRun": 1626700.0
+        "jitaSellPrice": 162446153.85,
+        "price10Runs": 16244615.38,
+        "pricePerRun": 1624461.54
     },
     {
         "blueprintTypeId": 22178,
@@ -3967,9 +3967,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 57410.75,
-        "price10Runs": 5741.07,
-        "pricePerRun": 574.11
+        "jitaSellPrice": 57427.18,
+        "price10Runs": 5742.72,
+        "pricePerRun": 574.27
     },
     {
         "blueprintTypeId": 17479,
@@ -3979,9 +3979,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 39476500.0,
-        "price10Runs": 3947650.0,
-        "pricePerRun": 394765.0
+        "jitaSellPrice": 39563333.33,
+        "price10Runs": 3956333.33,
+        "pricePerRun": 395633.33
     },
     {
         "blueprintTypeId": 24689,
@@ -3991,9 +3991,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 151827500.0,
-        "price10Runs": 15182750.0,
-        "pricePerRun": 1518275.0
+        "jitaSellPrice": 151887179.49,
+        "price10Runs": 15188717.95,
+        "pricePerRun": 1518871.79
     },
     {
         "blueprintTypeId": 974,
@@ -4003,9 +4003,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 10372500.0,
-        "price10Runs": 1037250.0,
-        "pricePerRun": 103725.0
+        "jitaSellPrice": 10428205.13,
+        "price10Runs": 1042820.51,
+        "pricePerRun": 104282.05
     },
     {
         "blueprintTypeId": 32982,
@@ -4015,9 +4015,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 53684.75,
-        "price10Runs": 5368.47,
-        "pricePerRun": 536.85
+        "jitaSellPrice": 53585.38,
+        "price10Runs": 5358.54,
+        "pricePerRun": 535.85
     },
     {
         "blueprintTypeId": 27812,
@@ -4039,9 +4039,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 46149.75,
-        "price10Runs": 4614.98,
-        "pricePerRun": 461.5
+        "jitaSellPrice": 45760.0,
+        "price10Runs": 4576.0,
+        "pricePerRun": 457.6
     },
     {
         "blueprintTypeId": 29014,
@@ -4051,9 +4051,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 17390.5,
-        "price10Runs": 1478.19,
-        "pricePerRun": 147.82
+        "jitaSellPrice": 17326.41,
+        "price10Runs": 1472.74,
+        "pricePerRun": 147.27
     },
     {
         "blueprintTypeId": 29012,
@@ -4063,9 +4063,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 12268.75,
-        "price10Runs": 1042.84,
-        "pricePerRun": 104.28
+        "jitaSellPrice": 12403.59,
+        "price10Runs": 1054.31,
+        "pricePerRun": 105.43
     },
     {
         "blueprintTypeId": 12821,
@@ -4075,9 +4075,9 @@ const BPC_PRICING_DATA = [
         "te": 14,
         "quality": 0.775,
         "qualityPercent": 77.5,
-        "jitaSellPrice": 312842.5,
-        "price10Runs": 24245.29,
-        "pricePerRun": 2424.53
+        "jitaSellPrice": 309620.51,
+        "price10Runs": 23995.59,
+        "pricePerRun": 2399.56
     },
     {
         "blueprintTypeId": 994,
@@ -4087,9 +4087,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 136520000.0,
-        "price10Runs": 13652000.0,
-        "pricePerRun": 1365200.0
+        "jitaSellPrice": 132030769.23,
+        "price10Runs": 13203076.92,
+        "pricePerRun": 1320307.69
     },
     {
         "blueprintTypeId": 804,
@@ -4099,8 +4099,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 207.19,
-        "price10Runs": 20.72,
+        "jitaSellPrice": 206.73,
+        "price10Runs": 20.67,
         "pricePerRun": 2.07
     },
     {
@@ -4111,8 +4111,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 207.19,
-        "price10Runs": 5.18,
+        "jitaSellPrice": 206.73,
+        "price10Runs": 5.17,
         "pricePerRun": 0.52
     },
     {
@@ -4123,8 +4123,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 65.09,
-        "price10Runs": 6.51,
+        "jitaSellPrice": 64.99,
+        "price10Runs": 6.5,
         "pricePerRun": 0.65
     },
     {
@@ -4135,8 +4135,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 68.29,
-        "price10Runs": 6.83,
+        "jitaSellPrice": 67.63,
+        "price10Runs": 6.76,
         "pricePerRun": 0.68
     },
     {
@@ -4147,8 +4147,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 16.25,
-        "price10Runs": 1.62,
+        "jitaSellPrice": 16.3,
+        "price10Runs": 1.63,
         "pricePerRun": 0.16
     },
     {
@@ -4159,7 +4159,7 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 5.66,
+        "jitaSellPrice": 5.68,
         "price10Runs": 0.57,
         "pricePerRun": 0.06
     },
@@ -4171,7 +4171,7 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5.66,
+        "jitaSellPrice": 5.68,
         "price10Runs": 0.14,
         "pricePerRun": 0.01
     },
@@ -4183,9 +4183,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 268.11,
-        "price10Runs": 26.81,
-        "pricePerRun": 2.68
+        "jitaSellPrice": 266.41,
+        "price10Runs": 26.64,
+        "pricePerRun": 2.66
     },
     {
         "blueprintTypeId": 976,
@@ -4195,9 +4195,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 9479250.0,
-        "price10Runs": 947925.0,
-        "pricePerRun": 94792.5
+        "jitaSellPrice": 9546974.36,
+        "price10Runs": 954697.44,
+        "pricePerRun": 95469.74
     },
     {
         "blueprintTypeId": 42879,
@@ -4207,8 +4207,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 437.06,
-        "price10Runs": 43.71,
+        "jitaSellPrice": 436.99,
+        "price10Runs": 43.7,
         "pricePerRun": 4.37
     },
     {
@@ -4219,9 +4219,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 16995000.0,
-        "price10Runs": 424875.0,
-        "pricePerRun": 42487.5
+        "jitaSellPrice": 16982051.28,
+        "price10Runs": 424551.28,
+        "pricePerRun": 42455.13
     },
     {
         "blueprintTypeId": 42884,
@@ -4231,9 +4231,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 686.21,
-        "price10Runs": 68.62,
-        "pricePerRun": 6.86
+        "jitaSellPrice": 681.91,
+        "price10Runs": 68.19,
+        "pricePerRun": 6.82
     },
     {
         "blueprintTypeId": 42885,
@@ -4243,9 +4243,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 587.05,
-        "price10Runs": 58.7,
-        "pricePerRun": 5.87
+        "jitaSellPrice": 589.36,
+        "price10Runs": 58.94,
+        "pricePerRun": 5.89
     },
     {
         "blueprintTypeId": 2332,
@@ -4255,9 +4255,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 19750.0,
-        "price10Runs": 1678.75,
-        "pricePerRun": 167.88
+        "jitaSellPrice": 19708.46,
+        "price10Runs": 1675.22,
+        "pricePerRun": 167.52
     },
     {
         "blueprintTypeId": 1026,
@@ -4267,9 +4267,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 26981.5,
-        "price10Runs": 674.54,
-        "pricePerRun": 67.45
+        "jitaSellPrice": 26344.62,
+        "price10Runs": 658.62,
+        "pricePerRun": 65.86
     },
     {
         "blueprintTypeId": 19745,
@@ -4279,9 +4279,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 2970925.0,
-        "price10Runs": 252528.62,
-        "pricePerRun": 25252.86
+        "jitaSellPrice": 2961435.9,
+        "price10Runs": 251722.05,
+        "pricePerRun": 25172.21
     },
     {
         "blueprintTypeId": 19745,
@@ -4291,9 +4291,9 @@ const BPC_PRICING_DATA = [
         "te": 16,
         "quality": 0.97,
         "qualityPercent": 97.0,
-        "jitaSellPrice": 2970925.0,
-        "price10Runs": 288179.72,
-        "pricePerRun": 28817.97
+        "jitaSellPrice": 2961435.9,
+        "price10Runs": 287259.28,
+        "pricePerRun": 28725.93
     },
     {
         "blueprintTypeId": 60341,
@@ -4303,9 +4303,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 52903.25,
-        "price10Runs": 5290.33,
-        "pricePerRun": 529.03
+        "jitaSellPrice": 50746.67,
+        "price10Runs": 5074.67,
+        "pricePerRun": 507.47
     },
     {
         "blueprintTypeId": 60342,
@@ -4315,9 +4315,9 @@ const BPC_PRICING_DATA = [
         "te": 4,
         "quality": 0.4,
         "qualityPercent": 40.0,
-        "jitaSellPrice": 205685.0,
-        "price10Runs": 8227.4,
-        "pricePerRun": 822.74
+        "jitaSellPrice": 205864.1,
+        "price10Runs": 8234.56,
+        "pricePerRun": 823.46
     },
     {
         "blueprintTypeId": 689,
@@ -4327,9 +4327,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 692785.0,
-        "price10Runs": 69278.5,
-        "pricePerRun": 6927.85
+        "jitaSellPrice": 658523.08,
+        "price10Runs": 65852.31,
+        "pricePerRun": 6585.23
     },
     {
         "blueprintTypeId": 33077,
@@ -4339,9 +4339,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 20795.25,
-        "price10Runs": 519.88,
-        "pricePerRun": 51.99
+        "jitaSellPrice": 21172.05,
+        "price10Runs": 529.3,
+        "pricePerRun": 52.93
     },
     {
         "blueprintTypeId": 31359,
@@ -4351,9 +4351,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 566892.5,
-        "price10Runs": 56689.25,
-        "pricePerRun": 5668.93
+        "jitaSellPrice": 562841.03,
+        "price10Runs": 56284.1,
+        "pricePerRun": 5628.41
     },
     {
         "blueprintTypeId": 32054,
@@ -4363,9 +4363,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1365450.0,
-        "price10Runs": 34136.25,
-        "pricePerRun": 3413.62
+        "jitaSellPrice": 1365410.26,
+        "price10Runs": 34135.26,
+        "pricePerRun": 3413.53
     },
     {
         "blueprintTypeId": 31130,
@@ -4375,9 +4375,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 36446.25,
-        "price10Runs": 3097.93,
-        "pricePerRun": 309.79
+        "jitaSellPrice": 36336.67,
+        "price10Runs": 3088.62,
+        "pricePerRun": 308.86
     },
     {
         "blueprintTypeId": 31717,
@@ -4387,9 +4387,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 22055.5,
-        "price10Runs": 2205.55,
-        "pricePerRun": 220.56
+        "jitaSellPrice": 22007.18,
+        "price10Runs": 2200.72,
+        "pricePerRun": 220.07
     },
     {
         "blueprintTypeId": 31016,
@@ -4399,9 +4399,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 4892000.0,
-        "price10Runs": 122300.0,
-        "pricePerRun": 12230.0
+        "jitaSellPrice": 4843692.31,
+        "price10Runs": 121092.31,
+        "pricePerRun": 12109.23
     },
     {
         "blueprintTypeId": 31214,
@@ -4411,9 +4411,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 20174.25,
-        "price10Runs": 1714.81,
-        "pricePerRun": 171.48
+        "jitaSellPrice": 20202.56,
+        "price10Runs": 1717.22,
+        "pricePerRun": 171.72
     },
     {
         "blueprintTypeId": 31221,
@@ -4423,9 +4423,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1200200.0,
-        "price10Runs": 30005.0,
-        "pricePerRun": 3000.5
+        "jitaSellPrice": 1200615.38,
+        "price10Runs": 30015.38,
+        "pricePerRun": 3001.54
     },
     {
         "blueprintTypeId": 31557,
@@ -4435,9 +4435,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1295600.0,
-        "price10Runs": 32390.0,
-        "pricePerRun": 3239.0
+        "jitaSellPrice": 1295076.92,
+        "price10Runs": 32376.92,
+        "pricePerRun": 3237.69
     },
     {
         "blueprintTypeId": 31599,
@@ -4447,9 +4447,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 178162.5,
-        "price10Runs": 15143.81,
-        "pricePerRun": 1514.38
+        "jitaSellPrice": 177979.49,
+        "price10Runs": 15128.26,
+        "pricePerRun": 1512.83
     },
     {
         "blueprintTypeId": 31741,
@@ -4459,9 +4459,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 58796.5,
-        "price10Runs": 5879.65,
-        "pricePerRun": 587.97
+        "jitaSellPrice": 58084.62,
+        "price10Runs": 5808.46,
+        "pricePerRun": 580.85
     },
     {
         "blueprintTypeId": 31154,
@@ -4471,9 +4471,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 162155.0,
-        "price10Runs": 16215.5,
-        "pricePerRun": 1621.55
+        "jitaSellPrice": 161451.28,
+        "price10Runs": 16145.13,
+        "pricePerRun": 1614.51
     },
     {
         "blueprintTypeId": 31413,
@@ -4483,9 +4483,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 3982050.0,
-        "price10Runs": 99551.25,
-        "pricePerRun": 9955.12
+        "jitaSellPrice": 3940923.08,
+        "price10Runs": 98523.08,
+        "pricePerRun": 9852.31
     },
     {
         "blueprintTypeId": 31621,
@@ -4495,9 +4495,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 240707.5,
-        "price10Runs": 20460.14,
-        "pricePerRun": 2046.01
+        "jitaSellPrice": 240228.21,
+        "price10Runs": 20419.4,
+        "pricePerRun": 2041.94
     },
     {
         "blueprintTypeId": 31633,
@@ -4507,9 +4507,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 193690.0,
-        "price10Runs": 16463.65,
-        "pricePerRun": 1646.37
+        "jitaSellPrice": 193620.51,
+        "price10Runs": 16457.74,
+        "pricePerRun": 1645.77
     },
     {
         "blueprintTypeId": 31645,
@@ -4519,9 +4519,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 133277.62,
-        "price10Runs": 11328.6,
-        "pricePerRun": 1132.86
+        "jitaSellPrice": 139341.15,
+        "price10Runs": 11844.0,
+        "pricePerRun": 1184.4
     },
     {
         "blueprintTypeId": 692,
@@ -4531,9 +4531,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 12304500.0,
-        "price10Runs": 1230450.0,
-        "pricePerRun": 123045.0
+        "jitaSellPrice": 12440769.23,
+        "price10Runs": 1244076.92,
+        "pricePerRun": 124407.69
     },
     {
         "blueprintTypeId": 1165,
@@ -4543,9 +4543,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 8185.27,
-        "price10Runs": 695.75,
-        "pricePerRun": 69.57
+        "jitaSellPrice": 8178.1,
+        "price10Runs": 695.14,
+        "pricePerRun": 69.51
     },
     {
         "blueprintTypeId": 37855,
@@ -4555,9 +4555,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 14242.5,
-        "price10Runs": 1424.25,
-        "pricePerRun": 142.43
+        "jitaSellPrice": 14572.05,
+        "price10Runs": 1457.21,
+        "pricePerRun": 145.72
     },
     {
         "blueprintTypeId": 37858,
@@ -4567,9 +4567,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 2624500.0,
-        "price10Runs": 262450.0,
-        "pricePerRun": 26245.0
+        "jitaSellPrice": 2782076.92,
+        "price10Runs": 278207.69,
+        "pricePerRun": 27820.77
     },
     {
         "blueprintTypeId": 37856,
@@ -4579,9 +4579,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 13244.75,
-        "price10Runs": 1324.47,
-        "pricePerRun": 132.45
+        "jitaSellPrice": 13518.97,
+        "price10Runs": 1351.9,
+        "pricePerRun": 135.19
     },
     {
         "blueprintTypeId": 45643,
@@ -4591,9 +4591,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 5449875000.0,
-        "price10Runs": 136246875.0,
-        "pricePerRun": 13624687.5
+        "jitaSellPrice": 5073769230.77,
+        "price10Runs": 126844230.77,
+        "pricePerRun": 12684423.08
     },
     {
         "blueprintTypeId": 37859,
@@ -4603,9 +4603,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 2289200.0,
-        "price10Runs": 228920.0,
-        "pricePerRun": 22892.0
+        "jitaSellPrice": 2324589.74,
+        "price10Runs": 232458.97,
+        "pricePerRun": 23245.9
     },
     {
         "blueprintTypeId": 37857,
@@ -4615,9 +4615,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 13128.83,
-        "price10Runs": 1312.88,
-        "pricePerRun": 131.29
+        "jitaSellPrice": 13125.97,
+        "price10Runs": 1312.6,
+        "pricePerRun": 131.26
     },
     {
         "blueprintTypeId": 45545,
@@ -4627,9 +4627,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 519482500.0,
-        "price10Runs": 12987062.5,
-        "pricePerRun": 1298706.25
+        "jitaSellPrice": 517948717.95,
+        "price10Runs": 12948717.95,
+        "pricePerRun": 1294871.79
     },
     {
         "blueprintTypeId": 32858,
@@ -4639,9 +4639,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 25561.25,
-        "price10Runs": 2556.12,
-        "pricePerRun": 255.61
+        "jitaSellPrice": 24788.21,
+        "price10Runs": 2478.82,
+        "pricePerRun": 247.88
     },
     {
         "blueprintTypeId": 27309,
@@ -4651,9 +4651,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 2860475.0,
-        "price10Runs": 286047.5,
-        "pricePerRun": 28604.75
+        "jitaSellPrice": 2847717.95,
+        "price10Runs": 284771.79,
+        "pricePerRun": 28477.18
     },
     {
         "blueprintTypeId": 17352,
@@ -4663,9 +4663,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 38015.5,
-        "price10Runs": 3801.55,
-        "pricePerRun": 380.16
+        "jitaSellPrice": 37738.46,
+        "price10Runs": 3773.85,
+        "pricePerRun": 377.38
     },
     {
         "blueprintTypeId": 4309,
@@ -4675,9 +4675,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 72928250.0,
-        "price10Runs": 7292825.0,
-        "pricePerRun": 729282.5
+        "jitaSellPrice": 72422051.28,
+        "price10Runs": 7242205.13,
+        "pricePerRun": 724220.51
     },
     {
         "blueprintTypeId": 32879,
@@ -4687,9 +4687,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1051122.5,
-        "price10Runs": 105112.25,
-        "pricePerRun": 10511.23
+        "jitaSellPrice": 1055176.92,
+        "price10Runs": 105517.69,
+        "pricePerRun": 10551.77
     },
     {
         "blueprintTypeId": 32879,
@@ -4699,9 +4699,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 1051122.5,
-        "price10Runs": 26278.06,
-        "pricePerRun": 2627.81
+        "jitaSellPrice": 1055176.92,
+        "price10Runs": 26379.42,
+        "pricePerRun": 2637.94
     },
     {
         "blueprintTypeId": 29016,
@@ -4711,9 +4711,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 13777.0,
-        "price10Runs": 1171.05,
-        "pricePerRun": 117.1
+        "jitaSellPrice": 13775.13,
+        "price10Runs": 1170.89,
+        "pricePerRun": 117.09
     },
     {
         "blueprintTypeId": 29010,
@@ -4723,9 +4723,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 17589.25,
-        "price10Runs": 1495.09,
-        "pricePerRun": 149.51
+        "jitaSellPrice": 17394.36,
+        "price10Runs": 1478.52,
+        "pricePerRun": 147.85
     },
     {
         "blueprintTypeId": 693,
@@ -4735,9 +4735,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 177940000.0,
-        "price10Runs": 17794000.0,
-        "pricePerRun": 1779400.0
+        "jitaSellPrice": 175674358.97,
+        "price10Runs": 17567435.9,
+        "pricePerRun": 1756743.59
     },
     {
         "blueprintTypeId": 23056,
@@ -4747,9 +4747,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 6044625.0,
-        "price10Runs": 604462.5,
-        "pricePerRun": 60446.25
+        "jitaSellPrice": 6036205.13,
+        "price10Runs": 603620.51,
+        "pricePerRun": 60362.05
     },
     {
         "blueprintTypeId": 17334,
@@ -4759,9 +4759,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 53357.75,
-        "price10Runs": 5335.77,
-        "pricePerRun": 533.58
+        "jitaSellPrice": 52864.62,
+        "price10Runs": 5286.46,
+        "pricePerRun": 528.65
     },
     {
         "blueprintTypeId": 972,
@@ -4771,9 +4771,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 12185450.0,
-        "price10Runs": 1218545.0,
-        "pricePerRun": 121854.5
+        "jitaSellPrice": 12249692.31,
+        "price10Runs": 1224969.23,
+        "pricePerRun": 122496.92
     },
     {
         "blueprintTypeId": 1150,
@@ -4783,9 +4783,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 119.9,
-        "price10Runs": 11.99,
-        "pricePerRun": 1.2
+        "jitaSellPrice": 121.02,
+        "price10Runs": 12.1,
+        "pricePerRun": 1.21
     },
     {
         "blueprintTypeId": 1142,
@@ -4795,8 +4795,8 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 44.17,
-        "price10Runs": 1.1,
+        "jitaSellPrice": 44.82,
+        "price10Runs": 1.12,
         "pricePerRun": 0.11
     },
     {
@@ -4807,9 +4807,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1975.95,
-        "price10Runs": 197.59,
-        "pricePerRun": 19.76
+        "jitaSellPrice": 1969.1,
+        "price10Runs": 196.91,
+        "pricePerRun": 19.69
     },
     {
         "blueprintTypeId": 16243,
@@ -4819,9 +4819,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 1099195.0,
-        "price10Runs": 109919.5,
-        "pricePerRun": 10991.95
+        "jitaSellPrice": 1099302.56,
+        "price10Runs": 109930.26,
+        "pricePerRun": 10993.03
     },
     {
         "blueprintTypeId": 17328,
@@ -4831,9 +4831,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 6475.95,
-        "price10Runs": 161.9,
-        "pricePerRun": 16.19
+        "jitaSellPrice": 6434.54,
+        "price10Runs": 160.86,
+        "pricePerRun": 16.09
     },
     {
         "blueprintTypeId": 899,
@@ -4843,8 +4843,8 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 117.28,
-        "price10Runs": 11.73,
+        "jitaSellPrice": 116.53,
+        "price10Runs": 11.65,
         "pricePerRun": 1.17
     },
     {
@@ -4855,9 +4855,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 94.48,
-        "price10Runs": 9.45,
-        "pricePerRun": 0.94
+        "jitaSellPrice": 95.19,
+        "price10Runs": 9.52,
+        "pricePerRun": 0.95
     },
     {
         "blueprintTypeId": 883,
@@ -4867,7 +4867,7 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 9.42,
+        "jitaSellPrice": 9.41,
         "price10Runs": 0.24,
         "pricePerRun": 0.02
     },
@@ -4879,9 +4879,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 740727.5,
-        "price10Runs": 74072.75,
-        "pricePerRun": 7407.28
+        "jitaSellPrice": 699576.92,
+        "price10Runs": 69957.69,
+        "pricePerRun": 6995.77
     },
     {
         "blueprintTypeId": 4311,
@@ -4891,9 +4891,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 72905250.0,
-        "price10Runs": 7290525.0,
-        "pricePerRun": 729052.5
+        "jitaSellPrice": 72876666.67,
+        "price10Runs": 7287666.67,
+        "pricePerRun": 728766.67
     },
     {
         "blueprintTypeId": 29008,
@@ -4903,9 +4903,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 16617.75,
-        "price10Runs": 1412.51,
-        "pricePerRun": 141.25
+        "jitaSellPrice": 16405.64,
+        "price10Runs": 1394.48,
+        "pricePerRun": 139.45
     },
     {
         "blueprintTypeId": 29002,
@@ -4915,9 +4915,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 17571.75,
-        "price10Runs": 1493.6,
-        "pricePerRun": 149.36
+        "jitaSellPrice": 16866.67,
+        "price10Runs": 1433.67,
+        "pricePerRun": 143.37
     },
     {
         "blueprintTypeId": 940,
@@ -4927,9 +4927,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 496482.5,
-        "price10Runs": 49648.25,
-        "pricePerRun": 4964.82
+        "jitaSellPrice": 494666.67,
+        "price10Runs": 49466.67,
+        "pricePerRun": 4946.67
     },
     {
         "blueprintTypeId": 17350,
@@ -4939,9 +4939,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 7556.77,
-        "price10Runs": 755.68,
-        "pricePerRun": 75.57
+        "jitaSellPrice": 7486.49,
+        "price10Runs": 748.65,
+        "pricePerRun": 74.86
     },
     {
         "blueprintTypeId": 998,
@@ -4951,9 +4951,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 168570000.0,
-        "price10Runs": 16857000.0,
-        "pricePerRun": 1685700.0
+        "jitaSellPrice": 171615384.62,
+        "price10Runs": 17161538.46,
+        "pricePerRun": 1716153.85
     },
     {
         "blueprintTypeId": 32343,
@@ -4963,9 +4963,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 13753500.0,
-        "price10Runs": 1375350.0,
-        "pricePerRun": 137535.0
+        "jitaSellPrice": 13753076.92,
+        "price10Runs": 1375307.69,
+        "pricePerRun": 137530.77
     },
     {
         "blueprintTypeId": 1135,
@@ -4975,7 +4975,7 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 18.19,
+        "jitaSellPrice": 18.21,
         "price10Runs": 1.82,
         "pricePerRun": 0.18
     },
@@ -4987,9 +4987,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 40316.75,
-        "price10Runs": 4031.68,
-        "pricePerRun": 403.17
+        "jitaSellPrice": 41893.85,
+        "price10Runs": 4189.38,
+        "pricePerRun": 418.94
     },
     {
         "blueprintTypeId": 23730,
@@ -4999,9 +4999,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 53038.25,
-        "price10Runs": 4508.25,
-        "pricePerRun": 450.83
+        "jitaSellPrice": 52995.9,
+        "price10Runs": 4504.65,
+        "pricePerRun": 450.47
     },
     {
         "blueprintTypeId": 23722,
@@ -5011,9 +5011,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 23839.25,
-        "price10Runs": 2026.34,
-        "pricePerRun": 202.63
+        "jitaSellPrice": 23674.36,
+        "price10Runs": 2012.32,
+        "pricePerRun": 201.23
     },
     {
         "blueprintTypeId": 60345,
@@ -5023,9 +5023,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 210992.5,
-        "price10Runs": 21099.25,
-        "pricePerRun": 2109.93
+        "jitaSellPrice": 210792.31,
+        "price10Runs": 21079.23,
+        "pricePerRun": 2107.92
     },
     {
         "blueprintTypeId": 60345,
@@ -5035,9 +5035,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 210992.5,
-        "price10Runs": 5274.81,
-        "pricePerRun": 527.48
+        "jitaSellPrice": 210792.31,
+        "price10Runs": 5269.81,
+        "pricePerRun": 526.98
     },
     {
         "blueprintTypeId": 32881,
@@ -5047,9 +5047,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 260810.0,
-        "price10Runs": 26081.0,
-        "pricePerRun": 2608.1
+        "jitaSellPrice": 255792.31,
+        "price10Runs": 25579.23,
+        "pricePerRun": 2557.92
     },
     {
         "blueprintTypeId": 23706,
@@ -5059,9 +5059,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 39849.25,
-        "price10Runs": 3387.19,
-        "pricePerRun": 338.72
+        "jitaSellPrice": 39573.08,
+        "price10Runs": 3363.71,
+        "pricePerRun": 336.37
     },
     {
         "blueprintTypeId": 15509,
@@ -5071,9 +5071,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 37280.5,
-        "price10Runs": 3728.05,
-        "pricePerRun": 372.81
+        "jitaSellPrice": 37339.74,
+        "price10Runs": 3733.97,
+        "pricePerRun": 373.4
     },
     {
         "blueprintTypeId": 971,
@@ -5083,9 +5083,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 12109750.0,
-        "price10Runs": 1210975.0,
-        "pricePerRun": 121097.5
+        "jitaSellPrice": 12102051.28,
+        "price10Runs": 1210205.13,
+        "pricePerRun": 121020.51
     },
     {
         "blueprintTypeId": 12792,
@@ -5095,8 +5095,8 @@ const BPC_PRICING_DATA = [
         "te": 4,
         "quality": 0.4,
         "qualityPercent": 40.0,
-        "jitaSellPrice": 199.82,
-        "price10Runs": 7.99,
+        "jitaSellPrice": 199.34,
+        "price10Runs": 7.97,
         "pricePerRun": 0.8
     },
     {
@@ -5107,9 +5107,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 78368.5,
-        "price10Runs": 7836.85,
-        "pricePerRun": 783.69
+        "jitaSellPrice": 77853.59,
+        "price10Runs": 7785.36,
+        "pricePerRun": 778.54
     },
     {
         "blueprintTypeId": 2487,
@@ -5119,9 +5119,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 9648.52,
-        "price10Runs": 964.85,
-        "pricePerRun": 96.49
+        "jitaSellPrice": 9612.9,
+        "price10Runs": 961.29,
+        "pricePerRun": 96.13
     },
     {
         "blueprintTypeId": 2489,
@@ -5131,9 +5131,9 @@ const BPC_PRICING_DATA = [
         "te": 4,
         "quality": 0.4,
         "qualityPercent": 40.0,
-        "jitaSellPrice": 339127.5,
-        "price10Runs": 13565.1,
-        "pricePerRun": 1356.51
+        "jitaSellPrice": 339269.23,
+        "price10Runs": 13570.77,
+        "pricePerRun": 1357.08
     },
     {
         "blueprintTypeId": 23732,
@@ -5143,9 +5143,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 8661.35,
-        "price10Runs": 736.21,
-        "pricePerRun": 73.62
+        "jitaSellPrice": 8659.13,
+        "price10Runs": 736.03,
+        "pricePerRun": 73.6
     },
     {
         "blueprintTypeId": 23724,
@@ -5155,9 +5155,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 9484.7,
-        "price10Runs": 806.2,
-        "pricePerRun": 80.62
+        "jitaSellPrice": 9381.62,
+        "price10Runs": 797.44,
+        "pricePerRun": 79.74
     },
     {
         "blueprintTypeId": 23474,
@@ -5167,9 +5167,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.85,
         "qualityPercent": 85.0,
-        "jitaSellPrice": 144275.0,
-        "price10Runs": 12263.37,
-        "pricePerRun": 1226.34
+        "jitaSellPrice": 143135.9,
+        "price10Runs": 12166.55,
+        "pricePerRun": 1216.66
     },
     {
         "blueprintTypeId": 10841,
@@ -5179,9 +5179,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 889790.0,
-        "price10Runs": 22244.75,
-        "pricePerRun": 2224.47
+        "jitaSellPrice": 889738.46,
+        "price10Runs": 22243.46,
+        "pricePerRun": 2224.35
     },
     {
         "blueprintTypeId": 41536,
@@ -5191,9 +5191,9 @@ const BPC_PRICING_DATA = [
         "te": 0,
         "quality": 0.25,
         "qualityPercent": 25.0,
-        "jitaSellPrice": 509837500.0,
-        "price10Runs": 12745937.5,
-        "pricePerRun": 1274593.75
+        "jitaSellPrice": 509092307.69,
+        "price10Runs": 12727307.69,
+        "pricePerRun": 1272730.77
     }
 ];
 
