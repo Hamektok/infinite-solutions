@@ -3990,25 +3990,16 @@ class AdminDashboard:
         cursor.execute("SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id IN (%s)" % placeholders, all_ids)
         snap_ts = cursor.fetchone()[0]
 
-        # N-day average per ore type — use same price column as the buy basis
-        ore_ph = ','.join('?' * len(all_ore_ids))
-        if 'JSV' in buy_basis:
-            avg_col    = 'AVG(best_sell)'
-            avg_filter = 'AND best_sell IS NOT NULL'
-        elif 'Split' in buy_basis:
-            avg_col    = 'AVG((best_buy + best_sell) / 2.0)'
-            avg_filter = 'AND best_buy IS NOT NULL AND best_sell IS NOT NULL'
-        else:  # JBV (default)
-            avg_col    = 'AVG(best_buy)'
-            avg_filter = 'AND best_buy IS NOT NULL'
+        # N-day average for ore AND product type_ids (minerals, ice products, moon mats)
+        # Used to compute avg refine value per unit for dev % calculation
         cursor.execute(f"""
-            SELECT type_id, {avg_col}
+            SELECT type_id, AVG(best_buy)
             FROM market_price_snapshots
-            WHERE type_id IN ({ore_ph})
-              {avg_filter}
+            WHERE type_id IN ({placeholders})
+              AND best_buy IS NOT NULL
               AND timestamp >= datetime('now', '-{dev_days} days')
             GROUP BY type_id
-        """, all_ore_ids)
+        """, all_ids)
         avg_prices = {r[0]: r[1] for r in cursor.fetchall()}
 
         # 7-day price range (high/low) for volatility column — same basis as avg
@@ -4111,9 +4102,7 @@ class AdminDashboard:
             profit  = prod_value - total_cost
             margin  = (profit / total_cost * 100) if total_cost > 0 else 0
 
-            # Deviation vs N-day average — both sides use the configured buy basis
-            avg_bb  = avg_prices.get(type_id)
-            dev_pct = ((raw_price - avg_bb) / avg_bb * 100) if (raw_price and avg_bb and avg_bb > 0) else None
+            avg_bb = avg_prices.get(type_id)   # N-day avg ore price (used for sug_bid/volatility)
 
             # ── Buy order analysis metrics ────────────────────────────────
             try:
@@ -4122,6 +4111,25 @@ class AdminDashboard:
                 target_margin_rate = 0.05
 
             value_pu = prod_value / portion          # refine value per unit
+
+            # Deviation vs N-day average — compare current refine value to avg refine value
+            # (matches Import Analysis tool: use avg mineral prices to recompute avg refine value)
+            _avg_rv = 0.0
+            _all_mats_avg = bool(ore_yields)
+            for _mat in ore_yields:
+                _mid = _mat['materialTypeID']
+                _qty = _mat['quantity']
+                if _mid not in self.ore_product_pct:
+                    continue
+                try:    _mpct = float(self.ore_product_pct[_mid].get()) / 100.0
+                except: _mpct = 1.0
+                _avg_mat = avg_prices.get(_mid)
+                if not _avg_mat:
+                    _all_mats_avg = False
+                    break
+                _avg_rv += _qty * refine_eff * _avg_mat * _mpct
+            _avg_refine_pu = (_avg_rv / portion) if (_all_mats_avg and _avg_rv > 0) else None
+            dev_pct = ((value_pu - _avg_refine_pu) / _avg_refine_pu * 100) if _avg_refine_pu else None
             ship_pu  = volume * ship_rate            # fixed shipping per unit (doesn't scale with price)
 
             # max_bid: max ISK/unit to place on buy order to hit target_margin

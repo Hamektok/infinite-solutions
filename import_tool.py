@@ -219,11 +219,11 @@ def ensure_market_snapshots(conn):
 
 # ── Treeview columns (no Sell % — all rates live in the panel) ───────────────
 COLS        = ('name', 'amarr', 'rens', 'hek', 'dodixie', 'jita',
-               'best_hub', 'margin', 'max_buy')
+               'best_hub', 'margin', 'max_buy', 'dev')
 COL_LABELS  = ('Item Name', 'Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita',
-               'Best Hub', 'Margin %', 'Max Buy Price')
-COL_WIDTHS  = (260, 120, 120, 120, 120, 120, 80, 80, 120)
-COL_ANCHORS = ('w', 'e', 'e', 'e', 'e', 'e', 'center', 'e', 'e')
+               'Best Hub', 'Margin %', 'Max Buy Price', 'vs N-Day Avg %')
+COL_WIDTHS  = (260, 120, 120, 120, 120, 120, 80, 80, 120, 100)
+COL_ANCHORS = ('w', 'e', 'e', 'e', 'e', 'e', 'center', 'e', 'e', 'e')
 HUB_COL_MAP = {'amarr': 'Amarr', 'rens': 'Rens', 'hek': 'Hek',
                'dodixie': 'Dodixie', 'jita': 'Jita'}
 
@@ -253,6 +253,8 @@ class ImportTool:
         self.buy_mode_var   = tk.StringVar(value='Sell Orders')
         self.coll_pct_var   = tk.DoubleVar(value=1.0)
         self.coll_basis_var = tk.StringVar(value='JBV')
+        self.hub_vars       = {hub: tk.BooleanVar(value=True) for hub in HUB_ORDER}
+        self.dev_days_var   = tk.IntVar(value=7)
 
         self._all_rows        = []
         self._sort_col        = None
@@ -269,6 +271,7 @@ class ImportTool:
         # Latest prices — populated in load_data, used by _calc_row for refine value
         self._all_prices    = {}   # (station_id, type_id) → (best_buy, best_sell)
         self._jita_fallback = {}   # type_id → (best_buy, best_sell) from market_price_snapshots
+        self._avg_prices    = {}   # type_id → N-day avg best_buy (from market_price_snapshots)
 
         self._build_ui()
         self._ensure_db()
@@ -364,6 +367,22 @@ class ImportTool:
             command=self._fetch_prices)
         self.fetch_btn.pack(side='right')
 
+        # Row 1b — Hub toggles
+        row1b = tk.Frame(inner, bg='#111a25')
+        row1b.pack(fill='x', pady=(0, 4))
+        tk.Label(row1b, text='Hubs:', bg='#111a25', fg='#7090a8',
+                 font=('Segoe UI', 10)).pack(side='left')
+        for hub_name in HUB_ORDER:
+            tk.Checkbutton(
+                row1b, text=hub_name,
+                variable=self.hub_vars[hub_name],
+                bg='#111a25', fg='#c8dff0',
+                selectcolor='#0d1117',
+                activebackground='#111a25', activeforeground='#e8f4ff',
+                font=('Segoe UI', 10),
+                command=self._apply_filter
+            ).pack(side='left', padx=(6, 0))
+
         # Row 2 — Calculation parameters
         row2 = tk.Frame(inner, bg='#111a25')
         row2.pack(fill='x')
@@ -423,6 +442,17 @@ class ImportTool:
                               command=self._apply_filter, relief='flat')
         tgt_spin.pack(side='left', padx=(4, 0))
         tgt_spin.bind('<Return>', lambda e: self._apply_filter())
+        sep()
+
+        tk.Label(row2, text='Dev Days:', bg='#111a25', fg='#7090a8',
+                 font=('Segoe UI', 10)).pack(side='left')
+        dev_spin = tk.Spinbox(row2, from_=1, to=90, increment=1,
+                              textvariable=self.dev_days_var, width=4,
+                              font=('Segoe UI', 10), bg='#0a2030', fg='#ffd700',
+                              buttonbackground='#1a3040', insertbackground='#ffd700',
+                              command=self._on_dev_days_change, relief='flat')
+        dev_spin.pack(side='left', padx=(4, 0))
+        dev_spin.bind('<Return>', lambda e: self._on_dev_days_change())
         sep()
 
         tk.Label(row2, text='Collateral %:', bg='#111a25', fg='#7090a8',
@@ -513,11 +543,13 @@ class ImportTool:
         vsb.pack(side='right',  fill='y')
         self.tree.pack(side='left', fill='both', expand=True)
 
-        self.tree.tag_configure('green',  foreground='#44dd88')
-        self.tree.tag_configure('yellow', foreground='#ffd700')
-        self.tree.tag_configure('red',    foreground='#ff6666')
-        self.tree.tag_configure('nodata', foreground='#445566')
-        self.tree.tag_configure('alt',    background='#0a1828')
+        self.tree.tag_configure('green',    foreground='#44dd88')
+        self.tree.tag_configure('yellow',   foreground='#ffd700')
+        self.tree.tag_configure('red',      foreground='#ff6666')
+        self.tree.tag_configure('nodata',   foreground='#445566')
+        self.tree.tag_configure('alt',      background='#0a1828')
+        self.tree.tag_configure('dev_high', foreground='#ff9a00')
+        self.tree.tag_configure('dev_low',  foreground='#00d4ff')
 
         # ── Status bar ──────────────────────────────────────────────────────
         self.status_var = tk.StringVar(value='Loading…')
@@ -700,6 +732,17 @@ class ImportTool:
 
         c.execute("SELECT MAX(fetched_at) FROM market_snapshots")
         last_fa = c.fetchone()[0]
+
+        # N-day average buy prices (Jita only, from market_price_snapshots)
+        n_days = self.dev_days_var.get()
+        c.execute("""
+            SELECT type_id, AVG(best_buy)
+            FROM market_price_snapshots
+            WHERE timestamp >= datetime('now', ?)
+            GROUP BY type_id
+        """, (f'-{n_days} days',))
+        self._avg_prices = {r[0]: r[1] for r in c.fetchall() if r[1] is not None}
+
         conn.close()
 
         # Hub price lookup: (station_id, type_id) → (best_buy, best_sell)
@@ -797,6 +840,9 @@ class ImportTool:
         self._update_subcat_combo()
         self._apply_filter()
 
+    def _on_dev_days_change(self):
+        self.load_data()
+
     def _apply_filter(self):
         try:    broker_pct = self.broker_var.get() / 100.0
         except: broker_pct = 0.0
@@ -883,6 +929,8 @@ class ImportTool:
         best_hub    = None
         best_margin = None
         for hub_name in HUB_ORDER:
+            if not self.hub_vars[hub_name].get():
+                continue
             if buy_mode == 'Buy Orders':
                 bp          = row['hub_buy'].get(hub_name)
                 broker_cost = (bp * broker_pct) if bp else 0.0
@@ -909,6 +957,35 @@ class ImportTool:
         else:
             max_buy = None
 
+        # N-day deviation: compare current value to N-day average
+        if db_cat in ORE_REFINE_CATEGORIES:
+            # For ore: compare current refine value to avg refine value
+            # (recompute refine value using N-day avg mineral prices)
+            mats_d    = self._sde_materials.get(type_id, [])
+            portion_d = self._sde_portions.get(type_id, 1)
+            eff_d     = refine_eff / 100.0
+            avg_rv    = 0.0
+            all_mats_have_avg = bool(mats_d)
+            for mat_id, qty in mats_d:
+                avg_mat = self._avg_prices.get(mat_id)
+                if not avg_mat:
+                    all_mats_have_avg = False
+                    break
+                pv = self._all_pcts.get(mat_id)
+                try:    mp = float(pv.get()) if pv else 100.0
+                except: mp = 100.0
+                avg_rv += qty * eff_d * avg_mat * mp / 100.0
+            avg_value     = (avg_rv / portion_d) if (all_mats_have_avg and portion_d > 0 and avg_rv > 0) else None
+            current_value = sell_price
+        else:
+            current_value = jita_jbv
+            avg_value     = self._avg_prices.get(type_id)
+
+        if current_value and avg_value and avg_value > 0:
+            dev_pct = (current_value - avg_value) / avg_value * 100.0
+        else:
+            dev_pct = None
+
         return {**row,
                 'item_pct':    item_pct,
                 'sell_price':  sell_price,
@@ -916,7 +993,8 @@ class ImportTool:
                 'collateral':  collateral,
                 'best_hub':    best_hub,
                 'best_margin': best_margin,
-                'max_buy':     max_buy}
+                'max_buy':     max_buy,
+                'dev_pct':     dev_pct}
 
     def _row_sort_key(self, row, col):
         if col == 'name':     return (row['name'].lower(),)
@@ -930,6 +1008,9 @@ class ImportTool:
         if col == 'max_buy':
             v = row['max_buy']
             return (1 if v is None else 0, -(v or 0))
+        if col == 'dev':
+            v = row.get('dev_pct')
+            return (1 if v is None else 0, v or 0)
         return ('',)
 
     # ── Tree population ──────────────────────────────────────────────────────
@@ -938,8 +1019,9 @@ class ImportTool:
         self.tree.delete(*self.tree.get_children())
 
         for i, row in enumerate(rows):
-            hs     = row['hub_sell']
-            margin = row['best_margin']
+            hs      = row['hub_sell']
+            margin  = row['best_margin']
+            dev_pct = row.get('dev_pct')
 
             vals = (
                 row['name'],
@@ -951,6 +1033,7 @@ class ImportTool:
                 row['best_hub'] or '—',
                 f'{margin:.1f}%' if margin is not None else '—',
                 fmt_isk(row['max_buy']) if row['max_buy'] else '—',
+                f'{dev_pct:+.1f}%' if dev_pct is not None else '—',
             )
 
             if margin is None:   colour = 'nodata'
@@ -958,8 +1041,14 @@ class ImportTool:
             elif margin >= 0.0:  colour = 'yellow'
             else:                colour = 'red'
 
-            tags = (colour, 'alt') if i % 2 == 1 else (colour,)
-            self.tree.insert('', 'end', values=vals, tags=tags)
+            tag_list = [colour]
+            if dev_pct is not None and dev_pct > 5:
+                tag_list.append('dev_high')
+            elif dev_pct is not None and dev_pct < -5:
+                tag_list.append('dev_low')
+            if i % 2 == 1:
+                tag_list.append('alt')
+            self.tree.insert('', 'end', values=vals, tags=tuple(tag_list))
 
         n = len(rows)
         self._set_status(f'{n} item{"s" if n != 1 else ""} displayed')
@@ -983,13 +1072,18 @@ class ImportTool:
         fetch_arg   = CATEGORY_FETCH_ARG.get(cat_display, 'import_all')
         label       = cat_display if cat_display != 'All' else 'All Categories'
 
+        # Only fetch checked hubs; fall back to 'all' if everything is checked
+        checked_hubs = [h.lower() for h in HUB_ORDER if self.hub_vars[h].get()]
+        hubs_arg     = ','.join(checked_hubs) if checked_hubs else 'all'
+        hubs_label   = ', '.join(h for h in HUB_ORDER if self.hub_vars[h].get()) or 'none'
+
         self.fetch_btn.configure(state='disabled', text='Fetching…')
-        self._set_status(f'Fetching {label} from ESI — this may take a few minutes…')
+        self._set_status(f'Fetching {label} [{hubs_label}] from ESI — this may take a few minutes…')
 
         def run():
             try:
                 proc = subprocess.Popen(
-                    [sys.executable, script, fetch_arg],
+                    [sys.executable, script, fetch_arg, hubs_arg],
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                     text=True, cwd=PROJECT_DIR)
                 for line in proc.stdout:
