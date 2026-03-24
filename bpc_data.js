@@ -1583,6 +1583,36 @@ const BPC_DATA = [
     "subcategory": "Frigate"
   },
   {
+    "typeId": 90734,
+    "name": "Mining Laser Efficiency Charge Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 200,
+    "quantity": 10,
+    "category": "Ammunition",
+    "subcategory": "Command Burst Charge Blueprint"
+  },
+  {
+    "typeId": 42881,
+    "name": "Mining Laser Field Enhancement Charge Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 200,
+    "quantity": 10,
+    "category": "Ammunition",
+    "subcategory": "Command Burst Charge Blueprint"
+  },
+  {
+    "typeId": 42882,
+    "name": "Mining Laser Optimization Charge Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 200,
+    "quantity": 10,
+    "category": "Ammunition",
+    "subcategory": "Command Burst Charge Blueprint"
+  },
+  {
     "typeId": 968,
     "name": "Moa Blueprint",
     "me": 10,
@@ -1893,6 +1923,16 @@ const BPC_DATA = [
     "subcategory": "Mining Barge Blueprint"
   },
   {
+    "typeId": 691,
+    "name": "Rifter Blueprint",
+    "me": 10,
+    "te": 20,
+    "runs": 2,
+    "quantity": 1,
+    "category": "Ships",
+    "subcategory": "Frigate"
+  },
+  {
     "typeId": 24689,
     "name": "Rokh Blueprint",
     "me": 10,
@@ -2028,7 +2068,7 @@ const BPC_DATA = [
     "me": 10,
     "te": 20,
     "runs": 2,
-    "quantity": 3,
+    "quantity": 4,
     "category": "Ships",
     "subcategory": "Frigate"
   },
@@ -2228,7 +2268,7 @@ const BPC_DATA = [
     "me": 10,
     "te": 20,
     "runs": 2,
-    "quantity": 2,
+    "quantity": 3,
     "category": "Ships",
     "subcategory": "Destroyer"
   },
