@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603240529"></script>
+    <script src="buyback_data.js?v=202603240532"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -426,6 +426,16 @@
             padding-bottom: 0;
         }
 
+        #salvage-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        #salvage-grid .item-grid {
+            margin-bottom: 16px;
+        }
+
         .salvage-tier-header {
             color: #00d9ff;
             font-size: 13px;
@@ -435,7 +445,7 @@
             padding: 12px 0 6px 0;
             margin-top: 8px;
             border-bottom: 1px solid rgba(0, 217, 255, 0.15);
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .salvage-tier-header:first-child {
@@ -2272,7 +2282,7 @@
 
                     <!-- SALVAGE SUB-CONTENT (hidden initially) -->
                     <div id="salvage-content" class="tab-content">
-                        <div class="item-grid" id="salvage-grid"></div>
+                        <div id="salvage-grid"></div>
                     </div>
 
                     <div class="footer">
