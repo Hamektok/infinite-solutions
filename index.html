@@ -2213,6 +2213,8 @@
                     <button class="sub-tab" onclick="showSubTab('ice')" data-market-tab="ice_products">Ice Products</button>
                     <button class="sub-tab" onclick="showSubTab('moon')" data-market-tab="moon_materials">Moon Materials</button>
                     <button class="sub-tab" onclick="showSubTab('pi')" data-market-tab="pi_materials">Planetary Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('gas')" data-market-tab="gas_cloud_materials">Gas Cloud Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('research')" data-market-tab="research_equipment">Research Equipment</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" style="display:none;">Salvage</button>
                 </div>
 
@@ -2246,6 +2248,26 @@
                             <button class="pi-tier-tab" onclick="filterPI(this, 'p4')" data-market-sub="pi_materials:p4">P4 - Advanced</button>
                         </div>
                         <div class="item-grid" id="pi-grid"></div>
+                    </div>
+
+                    <!-- GAS CLOUD MATERIALS SUB-CONTENT -->
+                    <div id="gas-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab gas-tier-tab active" onclick="filterGas(this, 'compressed_fullerene')" data-market-sub="gas_cloud_materials:compressed_fullerene">Compressed Fullerenes</button>
+                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'compressed_booster')" data-market-sub="gas_cloud_materials:compressed_booster">Compressed Booster Gas</button>
+                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'uncompressed_fullerene')" data-market-sub="gas_cloud_materials:uncompressed_fullerene">Uncompressed Fullerenes</button>
+                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'uncompressed_booster')" data-market-sub="gas_cloud_materials:uncompressed_booster">Uncompressed Booster Gas</button>
+                        </div>
+                        <div class="item-grid" id="gas-grid"></div>
+                    </div>
+
+                    <!-- RESEARCH EQUIPMENT SUB-CONTENT -->
+                    <div id="research-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab research-tier-tab active" onclick="filterResearch(this, 'datacores')" data-market-sub="research_equipment:datacores">Datacores</button>
+                            <button class="pi-tier-tab research-tier-tab" onclick="filterResearch(this, 'decryptors')" data-market-sub="research_equipment:decryptors">Decryptors</button>
+                        </div>
+                        <div class="item-grid" id="research-grid"></div>
                     </div>
 
                     <!-- SALVAGE SUB-CONTENT (hidden initially) -->
@@ -3213,7 +3235,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 192908
             },
             "blueprintsLastUpdated": "Mar 23, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Mar 24, 2026 03:55 EVE"
+            "inventoryLastUpdated": "Mar 24, 2026 04:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
