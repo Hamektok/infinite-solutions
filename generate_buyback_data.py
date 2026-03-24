@@ -55,7 +55,7 @@ CONFIG_TO_DB_CATEGORY = {
 }
 
 # Market tab visibility keys
-MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials']
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials', 'salvaged_materials']
 
 # Market subcategory definitions: (tab_key, sub_key, display_name)
 MARKET_SUBTAB_DEFS = [

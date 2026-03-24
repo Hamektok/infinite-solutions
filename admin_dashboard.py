@@ -55,7 +55,7 @@ COMP_INTEL_CATEGORIES = {
 }
 
 # Market tab visibility
-MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials']
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials', 'salvaged_materials']
 MARKET_TAB_LABELS = {
     'minerals':            'Minerals',
     'ice_products':        'Ice Products',
@@ -63,6 +63,7 @@ MARKET_TAB_LABELS = {
     'gas_cloud_materials': 'Gas Cloud Materials',
     'research_equipment':  'Research Equipment',
     'pi_materials':        'Planetary Materials',
+    'salvaged_materials':  'Salvaged Materials',
 }
 
 # Market subcategory definitions: (tab_key, sub_key, display_label)
