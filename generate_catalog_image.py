@@ -21,7 +21,23 @@ DB_PATH     = os.path.join(PROJECT_DIR, 'mydatabase.db')
 FONT_DIR    = r'C:\Windows\Fonts'
 
 SHOW_CATS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials',
-             'gas_cloud_materials', 'research_equipment']
+             'gas_cloud_materials', 'research_equipment', 'salvaged_materials']
+
+SALVAGE_TIERS_ORDER = ['Common', 'Uncommon', 'Rare', 'Very Rare', 'Rogue Drone']
+SALVAGE_TIER_RANGES = [
+    (range(1,  10),  'Common'),
+    (range(10, 22),  'Uncommon'),
+    (range(22, 33),  'Rare'),
+    (range(33, 43),  'Very Rare'),
+    (range(43, 100), 'Rogue Drone'),
+]
+TIER_HDR_H = 18   # height of in-image tier subheader rows
+
+def get_salvage_tier(display_order):
+    for r, name in SALVAGE_TIER_RANGES:
+        if display_order in r:
+            return name
+    return 'Other'
 
 # ── Palette ───────────────────────────────────────────────────────────────────
 BG      = (  8,  14,  24)
@@ -34,20 +50,22 @@ ACCENT  = (  0, 175, 255)
 GOLD    = (255, 200,  50)
 
 CAT_COLOURS = {
-    'minerals':           (  0, 175, 255),
-    'ice_products':       ( 40, 200, 200),
-    'moon_materials':     (200,  80, 220),
-    'pi_materials':       (255, 160,  30),
-    'gas_cloud_materials':(  0, 220, 140),
-    'research_equipment': (180, 120, 255),
+    'minerals':            (  0, 175, 255),
+    'ice_products':        ( 40, 200, 200),
+    'moon_materials':      (200,  80, 220),
+    'pi_materials':        (255, 160,  30),
+    'gas_cloud_materials': (  0, 220, 140),
+    'research_equipment':  (180, 120, 255),
+    'salvaged_materials':  (255, 140,  60),
 }
 CAT_LABELS = {
-    'minerals':           'Minerals',
-    'ice_products':       'Ice Products',
-    'moon_materials':     'Moon Materials',
-    'pi_materials':       'Planetary Materials',
-    'gas_cloud_materials':'Gas Cloud Materials',
-    'research_equipment': 'Research Equipment',
+    'minerals':            'Minerals',
+    'ice_products':        'Ice Products',
+    'moon_materials':      'Moon Materials',
+    'pi_materials':        'Planetary Materials',
+    'gas_cloud_materials': 'Gas Cloud Materials',
+    'research_equipment':  'Research Equipment',
+    'salvaged_materials':  'Salvaged Materials',
 }
 
 # ── Layout ────────────────────────────────────────────────────────────────────
@@ -178,6 +196,92 @@ def make_category_image(cat, items_stock, items_all, ts_str, fonts):
     return out
 
 
+def make_salvage_catalog_image(tier_groups_stock, n_all, n_stock, ts_str, fonts):
+    """Render catalog image for salvaged_materials with tier subheaders."""
+    f_banner, f_sub, f_head, f_item, f_small, f_price = fonts
+    cat    = 'salvaged_materials'
+    colour = CAT_COLOURS[cat]
+    label  = CAT_LABELS[cat]
+
+    _d_tmp    = ImageDraw.Draw(Image.new('RGB', (1, 1)))
+    pct_col_w = tw(_d_tmp, '100%',   f_price)
+    qty_col_w = tw(_d_tmp, '999.9M', f_price)
+    GAP       = 14
+    RIGHT_EDGE = IMG_W - PAD - 4
+    corp_right = RIGHT_EDGE
+    ally_right = corp_right - pct_col_w - GAP
+    qty_right  = ally_right - pct_col_w - GAP
+    NAME_W     = qty_right - qty_col_w - GAP - (PAD + 12)
+
+    n_item_rows = sum(len(items) for _, items in tier_groups_stock)
+    n_tier_hdrs = sum(1 for _, items in tier_groups_stock if items)
+    total_h = BANNER_H + ROW_H + n_tier_hdrs * TIER_HDR_H + n_item_rows * ROW_H + ROW_H + FOOTER_H
+
+    img = Image.new('RGB', (IMG_W, total_h), BG)
+    d   = ImageDraw.Draw(img)
+
+    # Banner
+    d.rectangle([0, 0, IMG_W, BANNER_H], fill=BG2)
+    d.rectangle([0, 0, IMG_W, 4], fill=colour)
+    d.text((PAD, 8),  f'LX-ZOJ  ·  {label}', font=f_banner, fill=WHITE)
+    d.text((PAD, 32), f'Updated  {ts_str}',    font=f_sub,    fill=SUBTEXT)
+
+    lx = IMG_W - PAD
+    ly = 8
+    corp_lbl_w = tw(d, 'Corp',     f_sub)
+    ally_lbl_w = tw(d, 'Alliance', f_sub)
+    sw, gap, sep = 8, 4, 14
+    d.text((lx, ly), 'Corp', font=f_sub, fill=GOLD, anchor='ra')
+    d.rectangle([lx - corp_lbl_w - gap - sw, ly + 1, lx - corp_lbl_w - gap, ly + 1 + sw], fill=GOLD)
+    _ar = lx - corp_lbl_w - gap - sw - sep
+    d.text((_ar, ly), 'Alliance', font=f_sub, fill=ACCENT, anchor='ra')
+    d.rectangle([_ar - ally_lbl_w - gap - sw, ly + 1, _ar - ally_lbl_w - gap, ly + 1 + sw], fill=ACCENT)
+    d.text((IMG_W - PAD, 22), '% of Jita Buy',               font=f_sub, fill=DIM,         anchor='ra')
+    d.text((IMG_W - PAD, 36), f'{n_stock} of {n_all} in stock', font=f_sub, fill=(50,80,100), anchor='ra')
+
+    # Column headers
+    y = BANNER_H
+    d.rectangle([0, y, IMG_W, y + ROW_H], fill=BG2)
+    d.text((PAD + 12,  y + 4), 'Item',     font=f_small, fill=DIM)
+    d.text((qty_right, y + 4), 'Qty',      font=f_small, fill=DIM, anchor='ra')
+    d.text((ally_right,y + 4), 'Alliance', font=f_small, fill=DIM, anchor='ra')
+    d.text((corp_right,y + 4), 'Corp',     font=f_small, fill=DIM, anchor='ra')
+    y += ROW_H
+
+    # Tier groups
+    row_index = 0
+    for tier_name, items in tier_groups_stock:
+        if not items:
+            continue
+        d.rectangle([0, y, IMG_W, y + TIER_HDR_H], fill=(14, 22, 36))
+        d.text((PAD + 4, y + 3), tier_name.upper(), font=f_small, fill=colour)
+        y += TIER_HDR_H
+
+        for name, qty, price_pct, alliance_disc in items:
+            row_bg = BG if row_index % 2 == 0 else BG2
+            d.rectangle([0, y, IMG_W, y + ROW_H], fill=row_bg)
+            d.ellipse([PAD, y + 6, PAD + 8, y + 14], fill=GREEN)
+            d.text((PAD + 12, y + 3), truncate(d, name, f_item, NAME_W), font=f_item, fill=WHITE)
+            d.text((qty_right, y + 4), fmt_qty(qty), font=f_price, fill=GREEN, anchor='ra')
+            if price_pct is not None:
+                d.text((ally_right, y + 4), f'{price_pct:.0f}%',
+                       font=f_price, fill=ACCENT, anchor='ra')
+                d.text((corp_right, y + 4), f'{price_pct - alliance_disc:.0f}%',
+                       font=f_price, fill=GOLD, anchor='ra')
+            y += ROW_H
+            row_index += 1
+
+    # Footer
+    d.line([0, y, IMG_W, y], fill=(20, 35, 50), width=1)
+    note = '@ or DM Hamektok Hakaari on Discord to purchase  ·  corp members only'
+    nw = tw(d, note, f_sub)
+    d.text(((IMG_W - nw) // 2, y + 10), note, font=f_sub, fill=SUBTEXT)
+
+    out = os.path.join(PROJECT_DIR, 'catalog_salvaged_materials.png')
+    img.save(out, optimize=True)
+    print(f'  Saved: catalog_salvaged_materials.png  ({IMG_W}×{total_h}px,  {n_stock}/{n_all} in stock)')
+
+
 def main():
     conn = sqlite3.connect(DB_PATH)
     c    = conn.cursor()
@@ -189,12 +293,13 @@ def main():
     vis = {k: (str(v) == '1') for k, v in vis_rows}
 
     cat_visible = {
-        'minerals':           vis.get('market_tab_minerals',            True),
-        'ice_products':       vis.get('market_tab_ice_products',        True),
-        'moon_materials':     vis.get('market_tab_moon_materials',      True),
-        'pi_materials':       vis.get('market_tab_pi_materials',        True),
-        'gas_cloud_materials':vis.get('market_tab_gas_cloud_materials', True),
-        'research_equipment': vis.get('market_tab_research_equipment',  True),
+        'minerals':            vis.get('market_tab_minerals',             True),
+        'ice_products':        vis.get('market_tab_ice_products',         True),
+        'moon_materials':      vis.get('market_tab_moon_materials',       True),
+        'pi_materials':        vis.get('market_tab_pi_materials',         True),
+        'gas_cloud_materials': vis.get('market_tab_gas_cloud_materials',  True),
+        'research_equipment':  vis.get('market_tab_research_equipment',   True),
+        'salvaged_materials':  vis.get('market_tab_salvaged_materials',   True),
     }
 
     ice_fuel     = vis.get('market_sub_ice_products_fuel_blocks',                  True)
@@ -258,6 +363,8 @@ def main():
     # ── Organise by category ──────────────────────────────────────────────────
     cat_all   = defaultdict(list)
     cat_stock = defaultdict(list)
+    salvage_tiered_all   = defaultdict(list)   # tier -> all items
+    salvage_tiered_stock = defaultdict(list)   # tier -> stocked items
 
     for cat, name, disp_ord, qty, price_pct, alliance_disc in rows:
         if cat not in SHOW_CATS or not cat_visible.get(cat, True):
@@ -266,6 +373,13 @@ def main():
         if cat == 'moon_materials'      and not moon_sub_visible(disp_ord):     continue
         if cat == 'gas_cloud_materials' and not gas_sub_visible(disp_ord):      continue
         if cat == 'research_equipment'  and not research_sub_visible(disp_ord): continue
+        if cat == 'salvaged_materials':
+            tier  = get_salvage_tier(disp_ord)
+            entry = (name, qty, price_pct, alliance_disc)
+            salvage_tiered_all[tier].append(entry)
+            if qty > 0:
+                salvage_tiered_stock[tier].append(entry)
+            continue
         entry = (name, qty, price_pct, alliance_disc)
         cat_all[cat].append(entry)
         if qty > 0:
@@ -287,13 +401,14 @@ def main():
         if not cat_visible.get(cat, True):
             print(f'  Skipped: {cat} (hidden)')
             continue
-        make_category_image(
-            cat,
-            cat_stock.get(cat, []),
-            cat_all.get(cat, []),
-            ts_str,
-            fonts,
-        )
+        if cat == 'salvaged_materials':
+            tier_groups = [(t, salvage_tiered_stock.get(t, []))
+                           for t in SALVAGE_TIERS_ORDER if salvage_tiered_all.get(t)]
+            n_all   = sum(len(v) for v in salvage_tiered_all.values())
+            n_stock = sum(len(v) for v in salvage_tiered_stock.values())
+            make_salvage_catalog_image(tier_groups, n_all, n_stock, ts_str, fonts)
+        else:
+            make_category_image(cat, cat_stock.get(cat, []), cat_all.get(cat, []), ts_str, fonts)
     print('Done.')
 
 

@@ -151,6 +151,7 @@ def main():
     show_research      = vis.get('market_tab_research_equipment',                        True)
     show_res_dc        = vis.get('market_sub_research_equipment_datacores',              True)
     show_res_dec       = vis.get('market_sub_research_equipment_decryptors',             True)
+    show_salvage       = vis.get('market_tab_salvaged_materials',                        True)
 
     # Fetch items only for visible categories
     visible_cats = [c_name for c_name, flag in [
@@ -159,6 +160,7 @@ def main():
         ('moon_materials',      show_moon),
         ('gas_cloud_materials', show_gas),
         ('research_equipment',  show_research),
+        ('salvaged_materials',  show_salvage),
     ] if flag]
 
     if not visible_cats:
@@ -215,11 +217,12 @@ def main():
             continue
         by_cat.setdefault(cat, []).append((name, qty, buyback, price_pct, alliance_disc))
 
-    minerals  = by_cat.get('minerals',            []) if show_minerals else []
-    ice       = by_cat.get('ice_products',        []) if show_ice      else []
-    moon_mats = by_cat.get('moon_materials',      []) if show_moon     else []
-    gas_mats      = by_cat.get('gas_cloud_materials', []) if show_gas      else []
+    minerals       = by_cat.get('minerals',            []) if show_minerals else []
+    ice            = by_cat.get('ice_products',        []) if show_ice      else []
+    moon_mats      = by_cat.get('moon_materials',      []) if show_moon     else []
+    gas_mats       = by_cat.get('gas_cloud_materials', []) if show_gas      else []
     research_items = by_cat.get('research_equipment',  []) if show_research else []
+    salvage_items  = by_cat.get('salvaged_materials',  []) if show_salvage  else []
 
     try:
         dt     = datetime.fromisoformat(snap_ts)
@@ -238,6 +241,7 @@ def main():
     half_moon     = (len(moon_mats)      + 1) // 2
     half_gas      = (len(gas_mats)       + 1) // 2
     half_research = (len(research_items) + 1) // 2
+    half_salvage  = (len(salvage_items)  + 1) // 2
 
     # Top pair: minerals and/or ice
     show_top = show_minerals or show_ice
@@ -259,6 +263,8 @@ def main():
         total_h += SEC_HDR + half_gas * ROW_H + GAP
     if show_research and research_items:
         total_h += SEC_HDR + half_research * ROW_H + GAP
+    if show_salvage and salvage_items:
+        total_h += SEC_HDR + half_salvage * ROW_H + GAP
     total_h += FOOTER
 
     # ── Render ───────────────────────────────────────────────────────────
@@ -353,6 +359,30 @@ def main():
                               price_pct, alliance_disc)
             if i < len(right_res):
                 name, qty, buyback, price_pct, alliance_disc = right_res[i]
+                draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
+            yr += ROW_H
+        y = yr + GAP
+
+    # Salvaged materials — full-width, two columns
+    if show_salvage and salvage_items:
+        draw.text((x_l, y), 'SALVAGED MATERIALS', font=F_HDR, fill=ACCENT)
+        line_y = y + 18
+        draw.line([(x_l, line_y), (x_l + full_w, line_y)], fill=DIM, width=1)
+        yr = line_y + 5
+
+        left_salv  = salvage_items[:half_salvage]
+        right_salv = salvage_items[half_salvage:]
+
+        for i in range(half_salvage):
+            row_bg = BG_ROW_B if i % 2 == 1 else BG_ROW_A
+            draw.rectangle([(x_l, yr), (x_l + full_w, yr + ROW_H - 1)], fill=row_bg)
+            if i < len(left_salv):
+                name, qty, buyback, price_pct, alliance_disc = left_salv[i]
+                draw_item_row(draw, x_l, yr, col_w, name, qty, buyback, row_bg,
+                              price_pct, alliance_disc)
+            if i < len(right_salv):
+                name, qty, buyback, price_pct, alliance_disc = right_salv[i]
                 draw_item_row(draw, x_r, yr, col_w, name, qty, buyback, row_bg,
                               price_pct, alliance_disc)
             yr += ROW_H
