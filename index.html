@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603240353"></script>
+    <script src="buyback_data.js?v=202603240409"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -2253,9 +2253,9 @@
                     <!-- GAS CLOUD MATERIALS SUB-CONTENT -->
                     <div id="gas-content" class="tab-content">
                         <div class="pi-tier-tabs">
-                            <button class="pi-tier-tab gas-tier-tab active" onclick="filterGas(this, 'compressed_fullerene')" data-market-sub="gas_cloud_materials:compressed_fullerene">Compressed Fullerenes</button>
+                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'compressed_fullerene')" data-market-sub="gas_cloud_materials:compressed_fullerene">Compressed Fullerenes</button>
                             <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'compressed_booster')" data-market-sub="gas_cloud_materials:compressed_booster">Compressed Booster Gas</button>
-                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'uncompressed_fullerene')" data-market-sub="gas_cloud_materials:uncompressed_fullerene">Uncompressed Fullerenes</button>
+                            <button class="pi-tier-tab gas-tier-tab active" onclick="filterGas(this, 'uncompressed_fullerene')" data-market-sub="gas_cloud_materials:uncompressed_fullerene">Uncompressed Fullerenes</button>
                             <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'uncompressed_booster')" data-market-sub="gas_cloud_materials:uncompressed_booster">Uncompressed Booster Gas</button>
                         </div>
                         <div class="item-grid" id="gas-grid"></div>
@@ -5268,6 +5268,60 @@ Tip: Copy directly from EVE inventory window"></textarea>
             ]
         };
 
+        const GAS_CLOUD_MATERIALS = {
+            'compressed_fullerene': [],
+            'compressed_booster': [],
+            'uncompressed_fullerene': [
+                'Fullerite-C28', 'Fullerite-C32', 'Fullerite-C320',
+                'Fullerite-C50', 'Fullerite-C540', 'Fullerite-C60',
+                'Fullerite-C70', 'Fullerite-C72', 'Fullerite-C84'
+            ],
+            'uncompressed_booster': [
+                'Amber Cytoserocin', 'Amber Mykoserocin',
+                'Azure Cytoserocin', 'Azure Mykoserocin',
+                'Celadon Cytoserocin', 'Celadon Mykoserocin',
+                'Golden Cytoserocin', 'Golden Mykoserocin',
+                'Lime Cytoserocin', 'Lime Mykoserocin',
+                'Malachite Cytoserocin', 'Malachite Mykoserocin',
+                'Vermillion Cytoserocin', 'Vermillion Mykoserocin',
+                'Viridian Cytoserocin', 'Viridian Mykoserocin'
+            ]
+        };
+
+        const RESEARCH_EQUIPMENT = {
+            'datacores': [
+                'Datacore - Amarrian Starship Engineering',
+                'Datacore - Caldari Starship Engineering',
+                'Datacore - Core Subsystems Engineering',
+                'Datacore - Defensive Subsystems Engineering',
+                'Datacore - Electromagnetic Physics',
+                'Datacore - Electronic Engineering',
+                'Datacore - Gallentean Starship Engineering',
+                'Datacore - Graviton Physics',
+                'Datacore - High Energy Physics',
+                'Datacore - Hydromagnetic Physics',
+                'Datacore - Laser Physics',
+                'Datacore - Mechanical Engineering',
+                'Datacore - Minmatar Starship Engineering',
+                'Datacore - Molecular Engineering',
+                'Datacore - Nanite Engineering',
+                'Datacore - Nuclear Physics',
+                'Datacore - Offensive Subsystems Engineering',
+                'Datacore - Plasma Physics',
+                'Datacore - Propulsion Subsystems Engineering',
+                'Datacore - Quantum Physics',
+                'Datacore - Rocket Science',
+                'Datacore - Triglavian Quantum Engineering',
+                'Datacore - Upwell Starship Engineering'
+            ],
+            'decryptors': [
+                'Accelerant Decryptor', 'Attainment Decryptor',
+                'Augmentation Decryptor', 'Optimized Attainment Decryptor',
+                'Optimized Augmentation Decryptor', 'Parity Decryptor',
+                'Process Decryptor', 'Symmetry Decryptor'
+            ]
+        };
+
         let allBlueprints = [];
         let filteredBlueprints = [];
 
@@ -5313,7 +5367,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         function showSubTab(subTabName) {
             // Hide all sub-content
-            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #salvage-content').forEach(content => {
+            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content').forEach(content => {
                 content.classList.remove('active');
             });
 
@@ -5341,6 +5395,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
             renderIceProducts(inventory, iceSubs);
             renderMoonMaterials(inventory);
             renderPlanetaryMaterials(inventory);
+            renderGasCloudMaterials(inventory);
+            renderResearchEquipment(inventory);
             renderSalvage(inventory);
         }
 
@@ -5675,6 +5731,40 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                 grid.appendChild(tierGrid);
             });
+        }
+
+        function renderGasCloudMaterials(inventory, tierFilter = 'uncompressed_fullerene') {
+            const grid = document.getElementById('gas-grid');
+            grid.innerHTML = '';
+            const materials = GAS_CLOUD_MATERIALS[tierFilter] || [];
+            materials.forEach(material => {
+                const quantity = inventory[material] || 0;
+                const item = createItemCard(material, quantity, getRates(material));
+                grid.appendChild(item);
+            });
+        }
+
+        function filterGas(btn, tier) {
+            document.querySelectorAll('.gas-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGasCloudMaterials(EMBEDDED_DATA.inventory, tier);
+        }
+
+        function renderResearchEquipment(inventory, tierFilter = 'datacores') {
+            const grid = document.getElementById('research-grid');
+            grid.innerHTML = '';
+            const materials = RESEARCH_EQUIPMENT[tierFilter] || [];
+            materials.forEach(material => {
+                const quantity = inventory[material] || 0;
+                const item = createItemCard(material, quantity, getRates(material));
+                grid.appendChild(item);
+            });
+        }
+
+        function filterResearch(btn, tier) {
+            document.querySelectorAll('.research-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderResearchEquipment(EMBEDDED_DATA.inventory, tier);
         }
 
         function createItemCard(name, quantity, rates) {

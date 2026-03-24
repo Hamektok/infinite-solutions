@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202603230427"></script>
+    <script src="buyback_data.js?v=202603240409"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -2213,6 +2213,8 @@
                     <button class="sub-tab" onclick="showSubTab('ice')" data-market-tab="ice_products">Ice Products</button>
                     <button class="sub-tab" onclick="showSubTab('moon')" data-market-tab="moon_materials">Moon Materials</button>
                     <button class="sub-tab" onclick="showSubTab('pi')" data-market-tab="pi_materials">Planetary Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('gas')" data-market-tab="gas_cloud_materials">Gas Cloud Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('research')" data-market-tab="research_equipment">Research Equipment</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" style="display:none;">Salvage</button>
                 </div>
 
@@ -2246,6 +2248,26 @@
                             <button class="pi-tier-tab" onclick="filterPI(this, 'p4')" data-market-sub="pi_materials:p4">P4 - Advanced</button>
                         </div>
                         <div class="item-grid" id="pi-grid"></div>
+                    </div>
+
+                    <!-- GAS CLOUD MATERIALS SUB-CONTENT -->
+                    <div id="gas-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'compressed_fullerene')" data-market-sub="gas_cloud_materials:compressed_fullerene">Compressed Fullerenes</button>
+                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'compressed_booster')" data-market-sub="gas_cloud_materials:compressed_booster">Compressed Booster Gas</button>
+                            <button class="pi-tier-tab gas-tier-tab active" onclick="filterGas(this, 'uncompressed_fullerene')" data-market-sub="gas_cloud_materials:uncompressed_fullerene">Uncompressed Fullerenes</button>
+                            <button class="pi-tier-tab gas-tier-tab" onclick="filterGas(this, 'uncompressed_booster')" data-market-sub="gas_cloud_materials:uncompressed_booster">Uncompressed Booster Gas</button>
+                        </div>
+                        <div class="item-grid" id="gas-grid"></div>
+                    </div>
+
+                    <!-- RESEARCH EQUIPMENT SUB-CONTENT -->
+                    <div id="research-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab research-tier-tab active" onclick="filterResearch(this, 'datacores')" data-market-sub="research_equipment:datacores">Datacores</button>
+                            <button class="pi-tier-tab research-tier-tab" onclick="filterResearch(this, 'decryptors')" data-market-sub="research_equipment:decryptors">Decryptors</button>
+                        </div>
+                        <div class="item-grid" id="research-grid"></div>
                     </div>
 
                     <!-- SALVAGE SUB-CONTENT (hidden initially) -->
@@ -2599,7 +2621,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
         // ============================================
         const EMBEDDED_DATA = {
             "inventory": {
-                        "Accelerant Decryptor": 1,
+                        "Accelerant Decryptor": 13,
                         "Alloyed Tritanium Bar": 36,
                         "Amber Cytoserocin": 0,
                         "Amber Mykoserocin": 0,
@@ -2608,10 +2630,10 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Arkonor III-Grade": 0,
                         "Arkonor IV-Grade": 0,
                         "Armor Plates": 3,
-                        "Artificial Neural Network": 13,
-                        "Atmospheric Gases": 0,
-                        "Attainment Decryptor": 1,
-                        "Augmentation Decryptor": 5,
+                        "Artificial Neural Network": 16,
+                        "Atmospheric Gases": 235654,
+                        "Attainment Decryptor": 2,
+                        "Augmentation Decryptor": 20,
                         "Azure Cytoserocin": 0,
                         "Azure Mykoserocin": 0,
                         "Bacteria": 0,
@@ -2646,9 +2668,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Carbon Polymers": 0,
                         "Carnotite": 64,
                         "Celadon Cytoserocin": 0,
-                        "Celadon Mykoserocin": 0,
+                        "Celadon Mykoserocin": 1760,
                         "Ceramic Powder": 0,
-                        "Charred Micro Circuit": 286,
+                        "Charred Micro Circuit": 294,
                         "Chiral Structures": 0,
                         "Chromite": 0,
                         "Chromium": 17728,
@@ -2680,16 +2702,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Brimful Bitumens": 76,
                         "Compressed Brimful Coesite": 22,
                         "Compressed Brimful Sylvite": 47,
-                        "Compressed Brimful Zeolites": 5,
+                        "Compressed Brimful Zeolites": 116002,
                         "Compressed Carnotite": 32,
                         "Compressed Celadon Cytoserocin": 0,
                         "Compressed Celadon Mykoserocin": 0,
                         "Compressed Chromite": 50,
                         "Compressed Cinnabar": 0,
-                        "Compressed Clear Icicle": 0,
+                        "Compressed Clear Icicle": 57,
                         "Compressed Clear Icicle IV-Grade": 0,
                         "Compressed Cobaltite": 0,
-                        "Compressed Coesite": 27,
+                        "Compressed Coesite": 168517,
                         "Compressed Copious Cobaltite": 0,
                         "Compressed Copious Euxenite": 0,
                         "Compressed Copious Scheelite": 0,
@@ -2697,12 +2719,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Crokite": 29,
                         "Compressed Crokite II-Grade": 83,
                         "Compressed Crokite III-Grade": 90,
-                        "Compressed Crokite IV-Grade": 45,
+                        "Compressed Crokite IV-Grade": 384,
                         "Compressed Dark Glitter": 0,
                         "Compressed Dark Ochre": 10,
-                        "Compressed Dark Ochre II-Grade": 35,
-                        "Compressed Dark Ochre III-Grade": 60,
-                        "Compressed Dark Ochre IV-Grade": 0,
+                        "Compressed Dark Ochre II-Grade": 57678,
+                        "Compressed Dark Ochre III-Grade": 2204,
+                        "Compressed Dark Ochre IV-Grade": 6052,
                         "Compressed Ducinium": 0,
                         "Compressed Ducinium II-Grade": 62,
                         "Compressed Ducinium III-Grade": 0,
@@ -2722,16 +2744,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Fullerite-C72": 0,
                         "Compressed Fullerite-C84": 0,
                         "Compressed Gelidus": 0,
-                        "Compressed Glacial Mass": 0,
+                        "Compressed Glacial Mass": 4,
                         "Compressed Glacial Mass IV-Grade": 0,
                         "Compressed Glare Crust": 0,
                         "Compressed Glistening Bitumens": 10,
                         "Compressed Glistening Coesite": 30,
                         "Compressed Glistening Sylvite": 67,
-                        "Compressed Glistening Zeolites": 92,
+                        "Compressed Glistening Zeolites": 10637,
                         "Compressed Glowing Carnotite": 0,
                         "Compressed Glowing Cinnabar": 0,
-                        "Compressed Glowing Pollucite": 0,
+                        "Compressed Glowing Pollucite": 8,
                         "Compressed Glowing Zircon": 0,
                         "Compressed Gneiss": 75,
                         "Compressed Gneiss II-Grade": 26,
@@ -2754,23 +2776,23 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Hezorime": 75,
                         "Compressed Hezorime II-Grade": 66,
                         "Compressed Hezorime III-Grade": 32,
-                        "Compressed Hezorime IV-Grade": 0,
+                        "Compressed Hezorime IV-Grade": 48684,
                         "Compressed Jaspet": 0,
                         "Compressed Jaspet II-Grade": 98,
                         "Compressed Jaspet III-Grade": 70,
                         "Compressed Jaspet IV-Grade": 0,
                         "Compressed Kernite": 92,
                         "Compressed Kernite II-Grade": 39,
-                        "Compressed Kernite III-Grade": 78,
+                        "Compressed Kernite III-Grade": 381,
                         "Compressed Kernite IV-Grade": 0,
                         "Compressed Krystallos": 0,
                         "Compressed Kylixium": 11,
                         "Compressed Kylixium II-Grade": 61,
                         "Compressed Kylixium III-Grade": 27,
                         "Compressed Kylixium IV-Grade": 71,
-                        "Compressed Lavish Chromite": 86,
+                        "Compressed Lavish Chromite": 51668,
                         "Compressed Lavish Otavite": 2,
-                        "Compressed Lavish Sperrylite": 86,
+                        "Compressed Lavish Sperrylite": 32032,
                         "Compressed Lavish Vanadinite": 42,
                         "Compressed Lime Cytoserocin": 0,
                         "Compressed Lime Mykoserocin": 0,
@@ -2778,15 +2800,15 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Malachite Cytoserocin": 0,
                         "Compressed Malachite Mykoserocin": 0,
                         "Compressed Mercoxit": 18,
-                        "Compressed Mercoxit II-Grade": 22,
+                        "Compressed Mercoxit II-Grade": 2115,
                         "Compressed Mercoxit III-Grade": 2,
-                        "Compressed Monazite": 60,
+                        "Compressed Monazite": 61,
                         "Compressed Mordunium": 0,
                         "Compressed Mordunium II-Grade": 0,
                         "Compressed Mordunium III-Grade": 24,
                         "Compressed Mordunium IV-Grade": 22,
                         "Compressed Nocxite": 14,
-                        "Compressed Nocxite II-Grade": 92,
+                        "Compressed Nocxite II-Grade": 106931,
                         "Compressed Nocxite III-Grade": 43,
                         "Compressed Nocxite IV-Grade": 11,
                         "Compressed Omber": 94,
@@ -2796,16 +2818,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Otavite": 0,
                         "Compressed Plagioclase": 45,
                         "Compressed Plagioclase II-Grade": 46,
-                        "Compressed Plagioclase III-Grade": 94,
+                        "Compressed Plagioclase III-Grade": 187733,
                         "Compressed Plagioclase IV-Grade": 82,
-                        "Compressed Pollucite": 0,
+                        "Compressed Pollucite": 26854,
                         "Compressed Pyroxeres": 10,
                         "Compressed Pyroxeres II-Grade": 45,
                         "Compressed Pyroxeres III-Grade": 94,
                         "Compressed Pyroxeres IV-Grade": 94,
                         "Compressed Replete Carnotite": 0,
                         "Compressed Replete Cinnabar": 26,
-                        "Compressed Replete Pollucite": 0,
+                        "Compressed Replete Pollucite": 18,
                         "Compressed Replete Zircon": 0,
                         "Compressed Scheelite": 1,
                         "Compressed Scordite": 52,
@@ -2836,9 +2858,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Ueganite III-Grade": 0,
                         "Compressed Ueganite IV-Grade": 0,
                         "Compressed Vanadinite": 0,
-                        "Compressed Veldspar": 65,
-                        "Compressed Veldspar II-Grade": 81,
-                        "Compressed Veldspar III-Grade": 39,
+                        "Compressed Veldspar": 13476003,
+                        "Compressed Veldspar II-Grade": 1948497,
+                        "Compressed Veldspar III-Grade": 272993,
                         "Compressed Veldspar IV-Grade": 31,
                         "Compressed Vermillion Cytoserocin": 0,
                         "Compressed Vermillion Mykoserocin": 0,
@@ -2847,16 +2869,16 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed White Glaze": 0,
                         "Compressed White Glaze IV-Grade": 0,
                         "Compressed Xenotime": 69,
-                        "Compressed Ytirium": 67,
+                        "Compressed Ytirium": 72893,
                         "Compressed Ytirium II-Grade": 0,
                         "Compressed Ytirium III-Grade": 0,
                         "Compressed Ytirium IV-Grade": 5,
                         "Compressed Ytterbite": 94,
-                        "Compressed Zeolites": 9,
+                        "Compressed Zeolites": 145497,
                         "Compressed Zircon": 0,
                         "Condensates": 0,
                         "Conductive Polymer": 81,
-                        "Conductive Thermoplastic": 1,
+                        "Conductive Thermoplastic": 35,
                         "Construction Blocks": 0,
                         "Consumer Electronics": 0,
                         "Contaminated Lorentz Fluid": 16,
@@ -2873,7 +2895,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Cryoprotectant Solution": 0,
                         "Crystalline Carbonide": 0,
                         "Crystallite Alloy": 0,
-                        "Current Pump": 1,
+                        "Current Pump": 4,
                         "Damaged Artificial Neural Network": 254,
                         "Dark Glitter": 0,
                         "Dark Ochre": 0,
@@ -2881,38 +2903,38 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Dark Ochre III-Grade": 0,
                         "Dark Ochre IV-Grade": 0,
                         "Data Chips": 0,
-                        "Datacore - Amarrian Starship Engineering": 0,
-                        "Datacore - Caldari Starship Engineering": 7,
-                        "Datacore - Core Subsystems Engineering": 0,
-                        "Datacore - Defensive Subsystems Engineering": 0,
-                        "Datacore - Electromagnetic Physics": 0,
-                        "Datacore - Electronic Engineering": 0,
-                        "Datacore - Gallentean Starship Engineering": 0,
-                        "Datacore - Graviton Physics": 17,
+                        "Datacore - Amarrian Starship Engineering": 231,
+                        "Datacore - Caldari Starship Engineering": 321,
+                        "Datacore - Core Subsystems Engineering": 150,
+                        "Datacore - Defensive Subsystems Engineering": 150,
+                        "Datacore - Electromagnetic Physics": 27,
+                        "Datacore - Electronic Engineering": 300,
+                        "Datacore - Gallentean Starship Engineering": 276,
+                        "Datacore - Graviton Physics": 345,
                         "Datacore - High Energy Physics": 0,
-                        "Datacore - Hydromagnetic Physics": 24,
-                        "Datacore - Laser Physics": 0,
-                        "Datacore - Mechanical Engineering": 4,
+                        "Datacore - Hydromagnetic Physics": 425,
+                        "Datacore - Laser Physics": 500,
+                        "Datacore - Mechanical Engineering": 433,
                         "Datacore - Minmatar Starship Engineering": 0,
-                        "Datacore - Molecular Engineering": 0,
-                        "Datacore - Nanite Engineering": 0,
-                        "Datacore - Nuclear Physics": 0,
-                        "Datacore - Offensive Subsystems Engineering": 0,
-                        "Datacore - Plasma Physics": 0,
-                        "Datacore - Propulsion Subsystems Engineering": 0,
-                        "Datacore - Quantum Physics": 0,
-                        "Datacore - Rocket Science": 0,
-                        "Datacore - Triglavian Quantum Engineering": 0,
+                        "Datacore - Molecular Engineering": 649,
+                        "Datacore - Nanite Engineering": 500,
+                        "Datacore - Nuclear Physics": 85,
+                        "Datacore - Offensive Subsystems Engineering": 150,
+                        "Datacore - Plasma Physics": 140,
+                        "Datacore - Propulsion Subsystems Engineering": 204,
+                        "Datacore - Quantum Physics": 230,
+                        "Datacore - Rocket Science": 68,
+                        "Datacore - Triglavian Quantum Engineering": 82,
                         "Datacore - Upwell Starship Engineering": 0,
-                        "Defective Current Pump": 14,
+                        "Defective Current Pump": 31,
                         "Drone Capillary Fluid": 0,
                         "Drone Cerebral Fragment": 8,
                         "Drone Coronary Unit": 0,
                         "Drone Epidermal Shielding Chunk": 0,
                         "Drone Graviton Emitter": 0,
                         "Drone Synaptic Relay Wiring": 59,
-                        "Drone Tactical Limb": 70,
-                        "Drone Transceiver": 6,
+                        "Drone Tactical Limb": 72,
+                        "Drone Transceiver": 18,
                         "Ducinium": 0,
                         "Ducinium II-Grade": 0,
                         "Ducinium III-Grade": 0,
@@ -2938,14 +2960,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Fried Interface Circuit": 432,
                         "Fullerides": 0,
                         "Fullerite-C28": 0,
-                        "Fullerite-C32": 0,
+                        "Fullerite-C32": 2685,
                         "Fullerite-C320": 0,
-                        "Fullerite-C50": 0,
+                        "Fullerite-C50": 25497,
                         "Fullerite-C540": 0,
-                        "Fullerite-C60": 0,
+                        "Fullerite-C60": 18463,
                         "Fullerite-C70": 0,
                         "Fullerite-C72": 0,
-                        "Fullerite-C84": 0,
+                        "Fullerite-C84": 12410,
                         "Gel-Matrix Biopaste": 0,
                         "Gelidus": 0,
                         "Genetically Enhanced Livestock": 0,
@@ -2991,8 +3013,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Hezorime III-Grade": 0,
                         "Hezorime IV-Grade": 0,
                         "High-Tech Transmitters": 0,
-                        "Hydrocarbons": 497889,
-                        "Hydrogen Fuel Block": 0,
+                        "Hydrocarbons": 532001,
+                        "Hydrogen Fuel Block": 6000,
                         "Hydrogen Isotopes": 6003,
                         "Hyperflurite": 0,
                         "Hypersynaptic Fibers": 0,
@@ -3021,14 +3043,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Lavish Otavite": 0,
                         "Lavish Sperrylite": 53,
                         "Lavish Vanadinite": 72,
-                        "Lime Cytoserocin": 0,
+                        "Lime Cytoserocin": 48,
                         "Lime Mykoserocin": 0,
                         "Liquid Ozone": 2567385,
                         "Logic Circuit": 39,
                         "Loparite": 56,
                         "Lorentz Fluid": 9,
                         "Malachite Cytoserocin": 0,
-                        "Malachite Mykoserocin": 0,
+                        "Malachite Mykoserocin": 161,
                         "Malfunctioning Shield Emitter": 302,
                         "Mechanical Parts": 0,
                         "Megacyte": 395667,
@@ -3038,7 +3060,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Mercoxit III-Grade": 0,
                         "Mercury": 0,
                         "Mexallon": 0,
-                        "Micro Circuit": 22,
+                        "Micro Circuit": 25,
                         "Microfiber Shielding": 0,
                         "Miniature Electronics": 0,
                         "Monazite": 0,
@@ -3054,7 +3076,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Neo Mercurite": 0,
                         "Neocoms": 0,
                         "Neodymium": 64463,
-                        "Nitrogen Fuel Block": 0,
+                        "Nitrogen Fuel Block": 6000,
                         "Nitrogen Isotopes": 273896,
                         "Nocxite": 0,
                         "Nocxite II-Grade": 0,
@@ -3075,9 +3097,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Oxidizing Compound": 0,
                         "Oxy-Organic Solvents": 0,
                         "Oxygen": 0,
-                        "Oxygen Fuel Block": 10,
+                        "Oxygen Fuel Block": 6000,
                         "Oxygen Isotopes": 249592,
-                        "Parity Decryptor": 3,
+                        "Parity Decryptor": 17,
                         "Phenolic Composites": 0,
                         "Photonic Metamaterials": 0,
                         "Plagioclase": 0,
@@ -3095,7 +3117,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Power Circuit": 40,
                         "Power Conduit": 0,
                         "Precious Metals": 0,
-                        "Process Decryptor": 3,
+                        "Process Decryptor": 26,
                         "Promethium": 18118,
                         "Promethium Mercurite": 0,
                         "Prometium": 102,
@@ -3151,7 +3173,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Supertensile Plastics": 0,
                         "Sylramic Fibers": 0,
                         "Sylvite": 0,
-                        "Symmetry Decryptor": 1,
+                        "Symmetry Decryptor": 8,
                         "Synthetic Oil": 0,
                         "Synthetic Synapses": 0,
                         "Tangled Power Conduit": 8,
@@ -3173,7 +3195,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Trigger Unit": 6,
                         "Tripped Power Circuit": 340,
                         "Tritanium": 0,
-                        "Tungsten": 66642,
+                        "Tungsten": 67664,
                         "Tungsten Carbide": 0,
                         "Twinkling Cobaltite": 0,
                         "Twinkling Euxenite": 0,
@@ -3193,7 +3215,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Veldspar III-Grade": 0,
                         "Veldspar IV-Grade": 0,
                         "Vermillion Cytoserocin": 0,
-                        "Vermillion Mykoserocin": 0,
+                        "Vermillion Mykoserocin": 1500,
                         "Viral Agent": 0,
                         "Viridian Cytoserocin": 0,
                         "Viridian Mykoserocin": 0,
@@ -3213,7 +3235,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 192908
             },
             "blueprintsLastUpdated": "Mar 23, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Mar 23, 2026 12:08 EVE"
+            "inventoryLastUpdated": "Mar 24, 2026 04:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5246,6 +5268,60 @@ Tip: Copy directly from EVE inventory window"></textarea>
             ]
         };
 
+        const GAS_CLOUD_MATERIALS = {
+            'compressed_fullerene': [],
+            'compressed_booster': [],
+            'uncompressed_fullerene': [
+                'Fullerite-C28', 'Fullerite-C32', 'Fullerite-C320',
+                'Fullerite-C50', 'Fullerite-C540', 'Fullerite-C60',
+                'Fullerite-C70', 'Fullerite-C72', 'Fullerite-C84'
+            ],
+            'uncompressed_booster': [
+                'Amber Cytoserocin', 'Amber Mykoserocin',
+                'Azure Cytoserocin', 'Azure Mykoserocin',
+                'Celadon Cytoserocin', 'Celadon Mykoserocin',
+                'Golden Cytoserocin', 'Golden Mykoserocin',
+                'Lime Cytoserocin', 'Lime Mykoserocin',
+                'Malachite Cytoserocin', 'Malachite Mykoserocin',
+                'Vermillion Cytoserocin', 'Vermillion Mykoserocin',
+                'Viridian Cytoserocin', 'Viridian Mykoserocin'
+            ]
+        };
+
+        const RESEARCH_EQUIPMENT = {
+            'datacores': [
+                'Datacore - Amarrian Starship Engineering',
+                'Datacore - Caldari Starship Engineering',
+                'Datacore - Core Subsystems Engineering',
+                'Datacore - Defensive Subsystems Engineering',
+                'Datacore - Electromagnetic Physics',
+                'Datacore - Electronic Engineering',
+                'Datacore - Gallentean Starship Engineering',
+                'Datacore - Graviton Physics',
+                'Datacore - High Energy Physics',
+                'Datacore - Hydromagnetic Physics',
+                'Datacore - Laser Physics',
+                'Datacore - Mechanical Engineering',
+                'Datacore - Minmatar Starship Engineering',
+                'Datacore - Molecular Engineering',
+                'Datacore - Nanite Engineering',
+                'Datacore - Nuclear Physics',
+                'Datacore - Offensive Subsystems Engineering',
+                'Datacore - Plasma Physics',
+                'Datacore - Propulsion Subsystems Engineering',
+                'Datacore - Quantum Physics',
+                'Datacore - Rocket Science',
+                'Datacore - Triglavian Quantum Engineering',
+                'Datacore - Upwell Starship Engineering'
+            ],
+            'decryptors': [
+                'Accelerant Decryptor', 'Attainment Decryptor',
+                'Augmentation Decryptor', 'Optimized Attainment Decryptor',
+                'Optimized Augmentation Decryptor', 'Parity Decryptor',
+                'Process Decryptor', 'Symmetry Decryptor'
+            ]
+        };
+
         let allBlueprints = [];
         let filteredBlueprints = [];
 
@@ -5291,7 +5367,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         function showSubTab(subTabName) {
             // Hide all sub-content
-            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #salvage-content').forEach(content => {
+            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content').forEach(content => {
                 content.classList.remove('active');
             });
 
@@ -5319,6 +5395,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
             renderIceProducts(inventory, iceSubs);
             renderMoonMaterials(inventory);
             renderPlanetaryMaterials(inventory);
+            renderGasCloudMaterials(inventory);
+            renderResearchEquipment(inventory);
             renderSalvage(inventory);
         }
 
@@ -5653,6 +5731,40 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
                 grid.appendChild(tierGrid);
             });
+        }
+
+        function renderGasCloudMaterials(inventory, tierFilter = 'uncompressed_fullerene') {
+            const grid = document.getElementById('gas-grid');
+            grid.innerHTML = '';
+            const materials = GAS_CLOUD_MATERIALS[tierFilter] || [];
+            materials.forEach(material => {
+                const quantity = inventory[material] || 0;
+                const item = createItemCard(material, quantity, getRates(material));
+                grid.appendChild(item);
+            });
+        }
+
+        function filterGas(btn, tier) {
+            document.querySelectorAll('.gas-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGasCloudMaterials(EMBEDDED_DATA.inventory, tier);
+        }
+
+        function renderResearchEquipment(inventory, tierFilter = 'datacores') {
+            const grid = document.getElementById('research-grid');
+            grid.innerHTML = '';
+            const materials = RESEARCH_EQUIPMENT[tierFilter] || [];
+            materials.forEach(material => {
+                const quantity = inventory[material] || 0;
+                const item = createItemCard(material, quantity, getRates(material));
+                grid.appendChild(item);
+            });
+        }
+
+        function filterResearch(btn, tier) {
+            document.querySelectorAll('.research-tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderResearchEquipment(EMBEDDED_DATA.inventory, tier);
         }
 
         function createItemCard(name, quantity, rates) {
