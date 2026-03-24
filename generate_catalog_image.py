@@ -20,7 +20,8 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH     = os.path.join(PROJECT_DIR, 'mydatabase.db')
 FONT_DIR    = r'C:\Windows\Fonts'
 
-SHOW_CATS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials']
+SHOW_CATS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials',
+             'gas_cloud_materials', 'research_equipment']
 
 # ── Palette ───────────────────────────────────────────────────────────────────
 BG      = (  8,  14,  24)
@@ -33,16 +34,20 @@ ACCENT  = (  0, 175, 255)
 GOLD    = (255, 200,  50)
 
 CAT_COLOURS = {
-    'minerals':      (  0, 175, 255),
-    'ice_products':  ( 40, 200, 200),
-    'moon_materials':(200,  80, 220),
-    'pi_materials':  (255, 160,  30),
+    'minerals':           (  0, 175, 255),
+    'ice_products':       ( 40, 200, 200),
+    'moon_materials':     (200,  80, 220),
+    'pi_materials':       (255, 160,  30),
+    'gas_cloud_materials':(  0, 220, 140),
+    'research_equipment': (180, 120, 255),
 }
 CAT_LABELS = {
-    'minerals':      'Minerals',
-    'ice_products':  'Ice Products',
-    'moon_materials':'Moon Materials',
-    'pi_materials':  'Planetary Materials',
+    'minerals':           'Minerals',
+    'ice_products':       'Ice Products',
+    'moon_materials':     'Moon Materials',
+    'pi_materials':       'Planetary Materials',
+    'gas_cloud_materials':'Gas Cloud Materials',
+    'research_equipment': 'Research Equipment',
 }
 
 # ── Layout ────────────────────────────────────────────────────────────────────
@@ -184,18 +189,26 @@ def main():
     vis = {k: (str(v) == '1') for k, v in vis_rows}
 
     cat_visible = {
-        'minerals':      vis.get('market_tab_minerals',       True),
-        'ice_products':  vis.get('market_tab_ice_products',   True),
-        'moon_materials':vis.get('market_tab_moon_materials', True),
-        'pi_materials':  vis.get('market_tab_pi_materials',   True),
+        'minerals':           vis.get('market_tab_minerals',            True),
+        'ice_products':       vis.get('market_tab_ice_products',        True),
+        'moon_materials':     vis.get('market_tab_moon_materials',      True),
+        'pi_materials':       vis.get('market_tab_pi_materials',        True),
+        'gas_cloud_materials':vis.get('market_tab_gas_cloud_materials', True),
+        'research_equipment': vis.get('market_tab_research_equipment',  True),
     }
 
-    ice_fuel     = vis.get('market_sub_ice_products_fuel_blocks',  True)
-    ice_refined  = vis.get('market_sub_ice_products_refined_ice',  True)
-    ice_isotopes = vis.get('market_sub_ice_products_isotopes',     True)
-    moon_raw     = vis.get('market_sub_moon_materials_raw',        True)
-    moon_proc    = vis.get('market_sub_moon_materials_processed',  True)
-    moon_adv     = vis.get('market_sub_moon_materials_advanced',   True)
+    ice_fuel     = vis.get('market_sub_ice_products_fuel_blocks',                  True)
+    ice_refined  = vis.get('market_sub_ice_products_refined_ice',                  True)
+    ice_isotopes = vis.get('market_sub_ice_products_isotopes',                     True)
+    moon_raw     = vis.get('market_sub_moon_materials_raw',                        True)
+    moon_proc    = vis.get('market_sub_moon_materials_processed',                  True)
+    moon_adv     = vis.get('market_sub_moon_materials_advanced',                   True)
+    gas_cf       = vis.get('market_sub_gas_cloud_materials_compressed_fullerene',  True)
+    gas_cb       = vis.get('market_sub_gas_cloud_materials_compressed_booster',    True)
+    gas_uf       = vis.get('market_sub_gas_cloud_materials_uncompressed_fullerene',True)
+    gas_ub       = vis.get('market_sub_gas_cloud_materials_uncompressed_booster',  True)
+    res_dc       = vis.get('market_sub_research_equipment_datacores',              True)
+    res_dec      = vis.get('market_sub_research_equipment_decryptors',             True)
 
     def ice_sub_visible(display_order):
         if display_order <= 8:  return ice_fuel
@@ -206,6 +219,16 @@ def main():
         if display_order < 100: return moon_raw
         if display_order < 200: return moon_proc
         return moon_adv
+
+    def gas_sub_visible(display_order):
+        if display_order < 100: return gas_cf
+        if display_order < 200: return gas_cb
+        if display_order < 300: return gas_uf
+        return gas_ub
+
+    def research_sub_visible(display_order):
+        if display_order < 100: return res_dc
+        return res_dec
 
     # ── Query items ───────────────────────────────────────────────────────────
     rows = c.execute('''
@@ -239,10 +262,10 @@ def main():
     for cat, name, disp_ord, qty, price_pct, alliance_disc in rows:
         if cat not in SHOW_CATS or not cat_visible.get(cat, True):
             continue
-        if cat == 'ice_products'   and not ice_sub_visible(disp_ord):
-            continue
-        if cat == 'moon_materials' and not moon_sub_visible(disp_ord):
-            continue
+        if cat == 'ice_products'        and not ice_sub_visible(disp_ord):      continue
+        if cat == 'moon_materials'      and not moon_sub_visible(disp_ord):     continue
+        if cat == 'gas_cloud_materials' and not gas_sub_visible(disp_ord):      continue
+        if cat == 'research_equipment'  and not research_sub_visible(disp_ord): continue
         entry = (name, qty, price_pct, alliance_disc)
         cat_all[cat].append(entry)
         if qty > 0:
