@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-03-30 00:44 UTC
+// Generated: 2026-03-30 00:47 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -1285,7 +1285,7 @@ const BUYBACK_DATA = {
       "name": "Isogen",
       "category": "minerals",
       "displayCategory": "Minerals",
-      "rate": 98,
+      "rate": 95,
       "sellRate": 99,
       "corpRate": 98,
       "allianceDiscount": 1,
@@ -9265,5 +9265,5 @@ const BUYBACK_DATA = {
     }
   },
   "refiningEfficiency": 90.63,
-  "generated": "2026-03-30 00:44 UTC"
+  "generated": "2026-03-30 00:47 UTC"
 };
