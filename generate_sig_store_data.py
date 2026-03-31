@@ -59,26 +59,26 @@ def main():
     rbd_visible = cfg.get('sig_rbd_visible', '0') == '1'
     ammo_visible = cfg.get('sig_fw_sub_ammo_charges', '1') == '1'
 
-    # ── FW tracked items + inventory + Jita prices ────────────────────────────
+    # ── FW tracked items + inventory ─────────────────────────────────────────
     c.execute('''
         SELECT t.type_id, t.type_name, t.price_percentage,
                COALESCE(i.quantity, 0),
-               COALESCE(ms.best_buy, 0),
                COALESCE(it.group_id, 0)
         FROM tracked_market_items t
         LEFT JOIN fw_current_inventory i ON i.type_id = t.type_id
         LEFT JOIN inv_types it ON it.type_id = t.type_id
-        LEFT JOIN market_snapshots ms
-            ON ms.type_id = t.type_id
-            AND ms.station_id = 60003760
-            AND ms.fetched_at = (
-                SELECT MAX(fetched_at) FROM market_snapshots
-                WHERE type_id = t.type_id AND station_id = 60003760
-            )
         WHERE t.site = 'fw'
         ORDER BY t.display_order, t.type_name
     ''')
     rows = c.fetchall()
+
+    # ── Item flags ────────────────────────────────────────────────────────────
+    flag_rows = c.execute(
+        'SELECT type_id, flag_key FROM item_flags'
+    ).fetchall()
+    flags_by_type = {}
+    for type_id, flag_key in flag_rows:
+        flags_by_type.setdefault(type_id, []).append(flag_key)
 
     snap_ts = c.execute(
         'SELECT MAX(snapshot_timestamp) FROM fw_current_inventory'
@@ -93,19 +93,22 @@ def main():
 
     # ── Bucket items into ammo groups ─────────────────────────────────────────
     buckets = {g: [] for g in AMMO_GROUP_ORDER}
-    for type_id, name, pct, qty, buy, group_id in rows:
+    for type_id, name, pct, qty, group_id in rows:
         group_label = AMMO_GROUP_LABELS.get(group_id, 'Misc')
         if group_label not in buckets:
             buckets[group_label] = []
-        price = round(buy * pct / 100)
+        item_flags = flags_by_type.get(type_id, [])
         buckets[group_label].append({
-            'name': name, 'qty': qty, 'price': price, 'typeId': type_id
+            'name': name, 'qty': qty, 'pricePct': pct,
+            'typeId': type_id, 'flags': item_flags
         })
 
     # ── Build groups JS array ─────────────────────────────────────────────────
     def js_item(it):
+        flags_js = '[' + ','.join(f'"{f}"' for f in it['flags']) + ']'
         return (f'{{name:{_js_str(it["name"])},qty:{it["qty"]},'
-                f'price:{it["price"]},typeId:{it["typeId"]}}}')
+                f'pricePct:{it["pricePct"]},typeId:{it["typeId"]},'
+                f'flags:{flags_js}}}')
 
     groups_parts = []
     for label in AMMO_GROUP_ORDER:
