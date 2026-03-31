@@ -2,7 +2,7 @@
 generate_new_offerings_banner.py
 
 Discord announcement banner for LX-ZOJ's new market categories:
-  Gas Cloud Materials, Research Equipment, Salvaged Materials
+  Fuel Blocks, Gas Cloud Materials, Research Equipment, Salvaged Materials
 
 Output: new_offerings_banner.png
 Run any time:  python generate_new_offerings_banner.py
@@ -25,18 +25,19 @@ DIM      = ( 70, 100, 128)
 SUBTEXT  = ( 90, 138, 170)
 GREEN    = ( 50, 210, 120)
 
+FUEL_COL = ( 80, 180, 255)
 GAS_COL  = (  0, 220, 140)
 RES_COL  = (180, 120, 255)
 SAL_COL  = (255, 140,  60)
 
 # ── Layout ────────────────────────────────────────────────────────────────────
-W        = 940
+W        = 1200
 PAD      = 22
-GAP      = 14
+GAP      = 12
 HDR_H    = 96
 FOOTER_H = 46
 PANEL_H  = 280
-PANEL_W  = (W - 2 * PAD - 2 * GAP) // 3
+PANEL_W  = (W - 2 * PAD - 3 * GAP) // 4
 H        = HDR_H + PAD + PANEL_H + PAD + FOOTER_H
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -53,52 +54,48 @@ def center_x(d, text, font, panel_x, panel_w, y, fill):
     d.text((x, y), text, font=font, fill=fill)
 
 
-def draw_panel(d, px, py, colour, title, tagline, item_count, in_stock, fonts):
-    f_title, f_tag, f_count, f_stock = fonts
+def draw_panel(d, px, py, colour, title, subcategories, in_stock, total, fonts):
+    """
+    subcategories: list of strings — one per line in the panel body
+    """
+    f_title, f_sub_line, f_stock = fonts
+
+    STRIPE   = 52
+    STOCK_H  = 30
+    LINE_H   = 22
+    DOT_R    = 3
 
     # Panel background
     d.rectangle([px, py, px + PANEL_W, py + PANEL_H], fill=BG_PANEL)
 
-    # Thick coloured left-edge bar
-    d.rectangle([px, py, px + 5, py + PANEL_H], fill=colour)
-
     # Coloured top stripe
-    STRIPE = 52
     d.rectangle([px, py, px + PANEL_W, py + STRIPE], fill=colour)
 
-    # Darken the stripe slightly for text readability
+    # Darken stripe for text legibility
     overlay = Image.new('RGBA', (PANEL_W, STRIPE), (0, 0, 0, 60))
     d._image.paste(overlay, (px, py), overlay)
 
-    # Category title on stripe — large, bold, dark
-    ty = py + (STRIPE - (f_title.size if hasattr(f_title, 'size') else 18)) // 2
+    # Category title centred on stripe
+    ty = py + (STRIPE - (f_title.size if hasattr(f_title, 'size') else 16)) // 2
     center_x(d, title, f_title, px, PANEL_W, ty, BG)
 
-    # Tagline below stripe
-    y = py + STRIPE + 14
-    center_x(d, tagline, f_tag, px, PANEL_W, y, SUBTEXT)
-
-    # Divider
-    y += (f_tag.size if hasattr(f_tag, 'size') else 10) + 12
-    d.line([px + 20, y, px + PANEL_W - 20, y], fill=(20, 35, 55), width=1)
-    y += 10
-
-    # Item count — large centred
-    count_str = f'{item_count}'
-    d.text(
-        (px + (PANEL_W - tw(d, count_str, f_count)) // 2, y),
-        count_str, font=f_count, fill=colour
-    )
-    y += (f_count.size if hasattr(f_count, 'size') else 36) + 4
-
-    label_str = 'items available'
-    center_x(d, label_str, f_tag, px, PANEL_W, y, DIM)
+    # Subcategory lines — centred with a coloured dot
+    y = py + STRIPE + 18
+    for label in subcategories:
+        text_w = tw(d, label, f_sub_line)
+        total_w = DOT_R * 2 + 8 + text_w
+        lx = px + (PANEL_W - total_w) // 2
+        mid_y = y + (LINE_H // 2)
+        d.ellipse([lx, mid_y - DOT_R, lx + DOT_R * 2, mid_y + DOT_R], fill=colour)
+        d.text((lx + DOT_R * 2 + 8, y + (LINE_H - (f_sub_line.size if hasattr(f_sub_line, 'size') else 11)) // 2),
+               label, font=f_sub_line, fill=WHITE)
+        y += LINE_H
 
     # Stock strip at bottom
-    stock_y = py + PANEL_H - 30
+    stock_y = py + PANEL_H - STOCK_H
     d.rectangle([px, stock_y, px + PANEL_W, py + PANEL_H], fill=(14, 24, 38))
-    stock_str = f'{in_stock} of {item_count} lines currently in stock'
-    center_x(d, stock_str, f_stock, px, PANEL_W, stock_y + 8, GREEN)
+    stock_str = f'{in_stock} of {total} lines currently in stock'
+    center_x(d, stock_str, f_stock, px, PANEL_W, stock_y + 9, GREEN)
 
 
 def main():
@@ -114,6 +111,16 @@ def main():
         ''', (cat,))
         total, stocked = c.fetchone()
         return total or 0, stocked or 0
+
+    # Fuel blocks = ice_products with display_order <= 8
+    c.execute('''
+        SELECT COUNT(*), SUM(CASE WHEN i.quantity > 0 THEN 1 ELSE 0 END)
+        FROM tracked_market_items t
+        JOIN lx_zoj_current_inventory i ON t.type_id = i.type_id
+        WHERE t.category = 'ice_products' AND t.display_order <= 8
+    ''')
+    fuel_row = c.fetchone()
+    fuel_total, fuel_in = fuel_row[0] or 0, fuel_row[1] or 0
 
     gas_total, gas_in = get_stock('gas_cloud_materials')
     res_total, res_in = get_stock('research_equipment')
@@ -131,13 +138,12 @@ def main():
 
     # ── Fonts ─────────────────────────────────────────────────────────────────
     f_hero   = load_font('segoeuib.ttf', 26)   # main header title
-    f_badge  = load_font('segoeuib.ttf', 12)   # "new additions" badge
+    f_badge  = load_font('segoeuib.ttf', 12)   # "now stocking" badge
     f_sub    = load_font('segoeui.ttf',  11)   # header subtitle + footer
     f_ptitle = load_font('segoeuib.ttf', 16)   # panel category title
-    f_tag    = load_font('segoeui.ttf',  10)   # panel tagline / labels
-    f_count  = load_font('segoeuib.ttf', 48)   # big item count number
+    f_line   = load_font('segoeui.ttf',  12)   # subcategory lines
     f_stock  = load_font('segoeuib.ttf',  9)   # stock strip text
-    panel_fonts = (f_ptitle, f_tag, f_count, f_stock)
+    panel_fonts = (f_ptitle, f_line, f_stock)
 
     # ── Canvas ─────────────────────────────────────────────────────────────────
     img = Image.new('RGB', (W, H), BG)
@@ -146,11 +152,12 @@ def main():
     # ── Header ────────────────────────────────────────────────────────────────
     d.rectangle([0, 0, W, HDR_H], fill=BG2)
 
-    # Tri-colour top stripe
-    seg = W // 3
-    d.rectangle([0,       0, seg,     5], fill=GAS_COL)
-    d.rectangle([seg,     0, seg * 2, 5], fill=RES_COL)
-    d.rectangle([seg * 2, 0, W,       5], fill=SAL_COL)
+    # Quad-colour top stripe
+    seg = W // 4
+    d.rectangle([0,       0, seg,     5], fill=FUEL_COL)
+    d.rectangle([seg,     0, seg * 2, 5], fill=GAS_COL)
+    d.rectangle([seg * 2, 0, seg * 3, 5], fill=RES_COL)
+    d.rectangle([seg * 3, 0, W,       5], fill=SAL_COL)
 
     # "NOW STOCKING" badge
     badge = '★  NOW STOCKING'
@@ -165,29 +172,37 @@ def main():
     d.text(((W - tw(d, title, f_hero)) // 2, 36), title, font=f_hero, fill=WHITE)
 
     # Subtitle
-    sub = 'Three new market categories now open — visit the Materials & Resources Market tab'
+    sub = 'New market offerings — visit the Materials & Resources Market tab'
     d.text(((W - tw(d, sub, f_sub)) // 2, 70), sub, font=f_sub, fill=SUBTEXT)
 
     # ── Panels ────────────────────────────────────────────────────────────────
     py = HDR_H + PAD
-    px_gas = PAD
-    px_res = PAD + PANEL_W + GAP
-    px_sal = PAD + 2 * (PANEL_W + GAP)
+    px_fuel = PAD
+    px_gas  = PAD + PANEL_W + GAP
+    px_res  = PAD + 2 * (PANEL_W + GAP)
+    px_sal  = PAD + 3 * (PANEL_W + GAP)
+
+    draw_panel(d, px_fuel, py, FUEL_COL,
+               'FUEL BLOCKS',
+               ['Amarr Fuel Block', 'Caldari Fuel Block',
+                'Gallente Fuel Block', 'Minmatar Fuel Block'],
+               fuel_in, fuel_total, panel_fonts)
 
     draw_panel(d, px_gas, py, GAS_COL,
                'GAS CLOUD MATERIALS',
-               'Fullerenes  ·  Cytoserocin  ·  Mykoserocin',
-               gas_total, gas_in, panel_fonts)
+               ['Compressed Fullerenes', 'Compressed Booster Gas',
+                'Uncompressed Fullerenes', 'Uncompressed Booster Gas'],
+               gas_in, gas_total, panel_fonts)
 
     draw_panel(d, px_res, py, RES_COL,
                'RESEARCH EQUIPMENT',
-               'Datacores  ·  Decryptors',
-               res_total, res_in, panel_fonts)
+               ['Datacores', 'Decryptors'],
+               res_in, res_total, panel_fonts)
 
     draw_panel(d, px_sal, py, SAL_COL,
                'SALVAGED MATERIALS',
-               'Common  ·  Uncommon  ·  Rare  ·  Very Rare  ·  Rogue Drone',
-               sal_total, sal_in, panel_fonts)
+               ['Common', 'Uncommon', 'Rare', 'Very Rare', 'Rogue Drone'],
+               sal_in, sal_total, panel_fonts)
 
     # ── Footer ────────────────────────────────────────────────────────────────
     fy = H - FOOTER_H

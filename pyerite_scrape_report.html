@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pyerite Scrape Report — LX-ZOJ</title>
+
+<style>
+  body      { background:#0d1117; color:#c8dff0; font-family:'Segoe UI',sans-serif; margin:0; padding:20px; }
+  h1        { color:#e8f4ff; font-size:1.4em; margin-bottom:4px; }
+  .subtitle { color:#507090; font-size:.85em; margin-bottom:18px; }
+  .summary  { background:#111a25; border:1px solid #1a2a3a; border-radius:6px;
+               padding:14px 18px; margin-bottom:18px; display:flex; flex-wrap:wrap; gap:18px; }
+  .stat     { display:flex; flex-direction:column; }
+  .stat-val { color:#00d9ff; font-size:1.3em; font-weight:bold; }
+  .stat-lbl { color:#507090; font-size:.78em; }
+  .mineral-prices { background:#0a1828; border:1px solid #1a2a3a; border-radius:4px;
+                     padding:8px 14px; margin-bottom:18px; font-size:.8em; color:#507090; }
+  .mineral-prices td { padding:0 12px 0 0; }
+  table     { width:100%; border-collapse:collapse; font-size:.85em; }
+  th        { background:#1a2a3a; color:#00d9ff; padding:8px 10px; text-align:right;
+               font-weight:600; border-bottom:2px solid #253a4a; position:sticky; top:0; }
+  th.left   { text-align:left; }
+  td        { padding:6px 10px; border-bottom:1px solid #0a1828; }
+  td.num    { text-align:right; font-variant-numeric:tabular-nums; }
+  td.name   { color:#e8f4ff; }
+  td.grp    { color:#7090a8; font-size:.82em; }
+  tr.alt td { background:#080f18; }
+  .pos      { color:#44dd88; }
+  .margin-high { color:#44dd88; font-weight:bold; }
+  .margin-mid  { color:#ffd700; }
+  .margin-low  { color:#7090a8; }
+  .pye-high    { color:#ff9a00; font-weight:bold; }
+  .note     { color:#446677; font-size:.8em; margin-top:14px; }
+  .cat-header td { background:#0d2035; color:#00d9ff; font-weight:600;
+                    font-size:.8em; letter-spacing:.06em; text-transform:uppercase;
+                    padding:10px 10px 6px; border-top:2px solid #1a3a5a; }
+</style>
+</head>
+<body>
+<h1>Pyerite Scrape Arbitrage — LX-ZOJ</h1>
+<div class="subtitle">
+  Modules where 55% null-sec reprocessing yield &gt; cheapest Jita sell order &nbsp;·&nbsp;
+  Generated: 2026-03-23 18:25 UTC
+</div>
+
+<div class="summary">
+  <div class="stat"><span class="stat-val">56</span><span class="stat-lbl">Profitable modules</span></div>
+  <div class="stat"><span class="stat-val">4,587</span><span class="stat-lbl">Modules checked</span></div>
+  <div class="stat"><span class="stat-val">513.6%</span><span class="stat-lbl">Best margin</span></div>
+  <div class="stat"><span class="stat-val">400,146</span><span class="stat-lbl">Total pyerite units (if all bought)</span></div>
+  <div class="stat"><span class="stat-val">6.20M</span><span class="stat-lbl">Pyerite ISK value (if all bought)</span></div>
+</div>
+
+<div class="mineral-prices">
+  <b style="color:#7090a8">Jita Mineral Buy Prices:</b>&nbsp;
+  <table><tr><td class="num">Tritanium: 3.65 ISK</td><td class="num">Pyerite: 15.50 ISK</td><td class="num">Mexallon: 53.28 ISK</td><td class="num">Isogen: 177.40 ISK</td><td class="num">Nocxium: 896.00 ISK</td><td class="num">Zydrine: 1.02K ISK</td><td class="num">Megacyte: 2.21K ISK</td><td class="num">Morphite: 18.90K ISK</td></tr></table>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th class="left">Item Name</th>
+      <th class="left">Group</th>
+      <th>Vol m³</th>
+      <th>Jita Sell Price</th>
+      <th>Mineral Value</th>
+      <th>Profit</th>
+      <th>Margin %</th>
+      <th>Pyerite Units</th>
+      <th>Pyerite Value</th>
+      <th>Pyerite %</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+        <tr class="cat-header">
+          <td colspan="12">Charge &nbsp;·&nbsp; 24 profitable items</td>
+        </tr>
+        <tr class="">
+          <td class="num">1</td>
+          <td class="name">Blood Microwave S</td>
+          <td class="grp">Frequency Crystal</td>
+          <td class="num">1.00</td>
+          <td class="num">300.90</td>
+          <td class="num">1.85K</td>
+          <td class="num pos">1.55K</td>
+          <td class="num margin-high">513.6%</td>
+          <td class="num">1</td>
+          <td class="num">8.53</td>
+          <td class="num ">0.5%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">2</td>
+          <td class="name">Arch Angel Titanium Sabot S</td>
+          <td class="grp">Projectile Ammo</td>
+          <td class="num">0.00</td>
+          <td class="num">1.32</td>
+          <td class="num">6.91</td>
+          <td class="num pos">5.59</td>
+          <td class="num margin-high">423.7%</td>
+          <td class="num">0</td>
+          <td class="num">5.46</td>
+          <td class="num pye-high">78.9%</td>
+        </tr>
+        <tr class="">
+          <td class="num">3</td>
+          <td class="name">Guardian Iron Charge M</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.01</td>
+          <td class="num">2.07</td>
+          <td class="num">7.67</td>
+          <td class="num pos">5.60</td>
+          <td class="num margin-high">270.5%</td>
+          <td class="num">0</td>
+          <td class="num">1.45</td>
+          <td class="num ">18.9%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">4</td>
+          <td class="name">Shadow Iridium Charge M</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.01</td>
+          <td class="num">6.06</td>
+          <td class="num">17.47</td>
+          <td class="num pos">11.41</td>
+          <td class="num margin-high">188.2%</td>
+          <td class="num">1</td>
+          <td class="num">14.15</td>
+          <td class="num pye-high">81.0%</td>
+        </tr>
+        <tr class="">
+          <td class="num">5</td>
+          <td class="name">Sanshas Microwave S</td>
+          <td class="grp">Frequency Crystal</td>
+          <td class="num">1.00</td>
+          <td class="num">711.60</td>
+          <td class="num">1.85K</td>
+          <td class="num pos">1.13K</td>
+          <td class="num margin-high">159.5%</td>
+          <td class="num">1</td>
+          <td class="num">8.53</td>
+          <td class="num ">0.5%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">6</td>
+          <td class="name">Domination Carbonized Lead S</td>
+          <td class="grp">Projectile Ammo</td>
+          <td class="num">0.00</td>
+          <td class="num">1.01</td>
+          <td class="num">2.33</td>
+          <td class="num pos">1.32</td>
+          <td class="num margin-high">130.9%</td>
+          <td class="num">0</td>
+          <td class="num">1.79</td>
+          <td class="num pye-high">76.8%</td>
+        </tr>
+        <tr class="">
+          <td class="num">7</td>
+          <td class="name">Shadow Iron Charge M</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.01</td>
+          <td class="num">3.51</td>
+          <td class="num">7.67</td>
+          <td class="num pos">4.16</td>
+          <td class="num margin-high">118.5%</td>
+          <td class="num">0</td>
+          <td class="num">1.45</td>
+          <td class="num ">18.9%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">8</td>
+          <td class="name">Sanshas Radio S</td>
+          <td class="grp">Frequency Crystal</td>
+          <td class="num">1.00</td>
+          <td class="num">683.90</td>
+          <td class="num">1.42K</td>
+          <td class="num pos">732.46</td>
+          <td class="num margin-high">107.1%</td>
+          <td class="num">4</td>
+          <td class="num">68.20</td>
+          <td class="num ">4.8%</td>
+        </tr>
+        <tr class="">
+          <td class="num">9</td>
+          <td class="name">Carbonized Lead M</td>
+          <td class="grp">Projectile Ammo</td>
+          <td class="num">0.01</td>
+          <td class="num">4.12</td>
+          <td class="num">7.67</td>
+          <td class="num pos">3.55</td>
+          <td class="num margin-high">86.1%</td>
+          <td class="num">0</td>
+          <td class="num">1.45</td>
+          <td class="num ">18.9%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">10</td>
+          <td class="name">Arch Angel Carbonized Lead L</td>
+          <td class="grp">Projectile Ammo</td>
+          <td class="num">0.03</td>
+          <td class="num">12.86</td>
+          <td class="num">22.85</td>
+          <td class="num pos">9.99</td>
+          <td class="num margin-high">77.7%</td>
+          <td class="num">1</td>
+          <td class="num">16.88</td>
+          <td class="num pye-high">73.9%</td>
+        </tr>
+        <tr class="">
+          <td class="num">11</td>
+          <td class="name">Arch Angel Nuclear L</td>
+          <td class="grp">Projectile Ammo</td>
+          <td class="num">0.03</td>
+          <td class="num">18.00</td>
+          <td class="num">31.36</td>
+          <td class="num pos">13.36</td>
+          <td class="num margin-high">74.2%</td>
+          <td class="num">1</td>
+          <td class="num">8.53</td>
+          <td class="num ">27.2%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">12</td>
+          <td class="name">Lead Charge M</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.01</td>
+          <td class="num">10.18</td>
+          <td class="num">17.18</td>
+          <td class="num pos">7.00</td>
+          <td class="num margin-high">68.7%</td>
+          <td class="num">0</td>
+          <td class="num">0.17</td>
+          <td class="num ">1.0%</td>
+        </tr>
+        <tr class="">
+          <td class="num">13</td>
+          <td class="name">Arch Angel Nuclear S</td>
+          <td class="grp">Projectile Ammo</td>
+          <td class="num">0.00</td>
+          <td class="num">2.11</td>
+          <td class="num">3.49</td>
+          <td class="num pos">1.38</td>
+          <td class="num margin-high">65.4%</td>
+          <td class="num">0</td>
+          <td class="num">2.73</td>
+          <td class="num pye-high">78.1%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">14</td>
+          <td class="name">Guristas Iron Charge L</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.03</td>
+          <td class="num">15.93</td>
+          <td class="num">22.85</td>
+          <td class="num pos">6.92</td>
+          <td class="num margin-high">43.5%</td>
+          <td class="num">1</td>
+          <td class="num">16.88</td>
+          <td class="num pye-high">73.9%</td>
+        </tr>
+        <tr class="">
+          <td class="num">15</td>
+          <td class="name">Gamma M</td>
+          <td class="grp">Frequency Crystal</td>
+          <td class="num">1.00</td>
+          <td class="num">6.17K</td>
+          <td class="num">8.06K</td>
+          <td class="num pos">1.89K</td>
+          <td class="num margin-high">30.6%</td>
+          <td class="num">2</td>
+          <td class="num">25.58</td>
+          <td class="num ">0.3%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">16</td>
+          <td class="name">Infrared M</td>
+          <td class="grp">Frequency Crystal</td>
+          <td class="num">1.00</td>
+          <td class="num">2.40K</td>
+          <td class="num">3.05K</td>
+          <td class="num pos">648.40</td>
+          <td class="num margin-high">27.0%</td>
+          <td class="num">1</td>
+          <td class="num">17.05</td>
+          <td class="num ">0.6%</td>
+        </tr>
+        <tr class="">
+          <td class="num">17</td>
+          <td class="name">Nuclear L</td>
+          <td class="grp">Projectile Ammo</td>
+          <td class="num">0.03</td>
+          <td class="num">24.79</td>
+          <td class="num">31.36</td>
+          <td class="num pos">6.57</td>
+          <td class="num margin-high">26.5%</td>
+          <td class="num">1</td>
+          <td class="num">8.53</td>
+          <td class="num ">27.2%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">18</td>
+          <td class="name">Sanshas Radio L</td>
+          <td class="grp">Frequency Crystal</td>
+          <td class="num">1.00</td>
+          <td class="num">54.59K</td>
+          <td class="num">63.25K</td>
+          <td class="num pos">8.66K</td>
+          <td class="num margin-mid">15.9%</td>
+          <td class="num">3</td>
+          <td class="num">51.15</td>
+          <td class="num ">0.1%</td>
+        </tr>
+        <tr class="">
+          <td class="num">19</td>
+          <td class="name">Guristas Tungsten Charge L</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.03</td>
+          <td class="num">29.00</td>
+          <td class="num">31.36</td>
+          <td class="num pos">2.36</td>
+          <td class="num margin-mid">8.1%</td>
+          <td class="num">1</td>
+          <td class="num">8.53</td>
+          <td class="num ">27.2%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">20</td>
+          <td class="name">Iridium Charge L</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.03</td>
+          <td class="num">43.74</td>
+          <td class="num">46.75</td>
+          <td class="num pos">3.01</td>
+          <td class="num margin-mid">6.9%</td>
+          <td class="num">2</td>
+          <td class="num">36.49</td>
+          <td class="num pye-high">78.1%</td>
+        </tr>
+        <tr class="">
+          <td class="num">21</td>
+          <td class="name">Xray L</td>
+          <td class="grp">Frequency Crystal</td>
+          <td class="num">1.00</td>
+          <td class="num">48.35K</td>
+          <td class="num">50.72K</td>
+          <td class="num pos">2.37K</td>
+          <td class="num margin-low">4.9%</td>
+          <td class="num">1</td>
+          <td class="num">17.05</td>
+          <td class="num ">0.0%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">22</td>
+          <td class="name">Tungsten Charge L</td>
+          <td class="grp">Hybrid Charge</td>
+          <td class="num">0.03</td>
+          <td class="num">29.96</td>
+          <td class="num">31.36</td>
+          <td class="num pos">1.40</td>
+          <td class="num margin-low">4.7%</td>
+          <td class="num">1</td>
+          <td class="num">8.53</td>
+          <td class="num ">27.2%</td>
+        </tr>
+        <tr class="">
+          <td class="num">23</td>
+          <td class="name">Inferno Torpedo</td>
+          <td class="grp">Torpedo</td>
+          <td class="num">0.05</td>
+          <td class="num">352.00</td>
+          <td class="num">362.19</td>
+          <td class="num pos">10.19</td>
+          <td class="num margin-low">2.9%</td>
+          <td class="num">16</td>
+          <td class="num">250.55</td>
+          <td class="num pye-high">69.2%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">24</td>
+          <td class="name">Mjolnir Auto-Targeting Heavy Missile I</td>
+          <td class="grp">Auto-Targeting Heavy Missile</td>
+          <td class="num">0.03</td>
+          <td class="num">38.06</td>
+          <td class="num">38.57</td>
+          <td class="num pos">0.51</td>
+          <td class="num margin-low">1.3%</td>
+          <td class="num">1</td>
+          <td class="num">18.76</td>
+          <td class="num ">48.6%</td>
+        </tr>
+        <tr class="cat-header">
+          <td colspan="12">Module &nbsp;·&nbsp; 32 profitable items</td>
+        </tr>
+        <tr class="">
+          <td class="num">25</td>
+          <td class="name">Small Automated Structural Restoration</td>
+          <td class="grp">Hull Repair Unit</td>
+          <td class="num">5.00</td>
+          <td class="num">7.10K</td>
+          <td class="num">8.76K</td>
+          <td class="num pos">1.66K</td>
+          <td class="num margin-high">23.3%</td>
+          <td class="num">196</td>
+          <td class="num">3.03K</td>
+          <td class="num ">34.6%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">26</td>
+          <td class="name">Compact Explosive Shield Hardener</td>
+          <td class="grp">Shield Hardener</td>
+          <td class="num">5.00</td>
+          <td class="num">27.99K</td>
+          <td class="num">32.71K</td>
+          <td class="num pos">4.72K</td>
+          <td class="num margin-mid">16.9%</td>
+          <td class="num">70</td>
+          <td class="num">1.09K</td>
+          <td class="num ">3.3%</td>
+        </tr>
+        <tr class="">
+          <td class="num">27</td>
+          <td class="name">Small Asymmetric Enduring Remote Shield Booster</td>
+          <td class="grp">Remote Shield Booster</td>
+          <td class="num">5.00</td>
+          <td class="num">42.95K</td>
+          <td class="num">49.73K</td>
+          <td class="num pos">6.78K</td>
+          <td class="num margin-mid">15.8%</td>
+          <td class="num">114</td>
+          <td class="num">1.77K</td>
+          <td class="num ">3.6%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">28</td>
+          <td class="name">Tachyon Afocal Laser I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">523.60K</td>
+          <td class="num">575.46K</td>
+          <td class="num pos">51.86K</td>
+          <td class="num margin-mid">9.9%</td>
+          <td class="num">7,230</td>
+          <td class="num">112.07K</td>
+          <td class="num ">19.5%</td>
+        </tr>
+        <tr class="">
+          <td class="num">29</td>
+          <td class="name">Heavy Afocal Laser I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">10.00</td>
+          <td class="num">65.00K</td>
+          <td class="num">71.17K</td>
+          <td class="num pos">6.17K</td>
+          <td class="num margin-mid">9.5%</td>
+          <td class="num">738</td>
+          <td class="num">11.43K</td>
+          <td class="num ">16.1%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">30</td>
+          <td class="name">'YF-12a' Compact Small Plasma Smartbomb</td>
+          <td class="grp">Smart Bomb</td>
+          <td class="num">5.00</td>
+          <td class="num">14.98K</td>
+          <td class="num">16.03K</td>
+          <td class="num pos">1.05K</td>
+          <td class="num margin-mid">7.0%</td>
+          <td class="num">150</td>
+          <td class="num">2.32K</td>
+          <td class="num ">14.5%</td>
+        </tr>
+        <tr class="">
+          <td class="num">31</td>
+          <td class="name">M51 Benefactor Compact Shield Recharger</td>
+          <td class="grp">Shield Recharger</td>
+          <td class="num">5.00</td>
+          <td class="num">3.90K</td>
+          <td class="num">4.11K</td>
+          <td class="num pos">211.33</td>
+          <td class="num margin-mid">5.4%</td>
+          <td class="num">151</td>
+          <td class="num">2.34K</td>
+          <td class="num pye-high">56.8%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">32</td>
+          <td class="name">Dual Modulated Heavy Energy Beam I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">254.10K</td>
+          <td class="num">267.01K</td>
+          <td class="num pos">12.91K</td>
+          <td class="num margin-mid">5.1%</td>
+          <td class="num">3,007</td>
+          <td class="num">46.61K</td>
+          <td class="num ">17.5%</td>
+        </tr>
+        <tr class="">
+          <td class="num">33</td>
+          <td class="name">Limited 'Limos' Rapid Light Missile Launcher</td>
+          <td class="grp">Missile Launcher Rapid Light</td>
+          <td class="num">10.00</td>
+          <td class="num">4.00K</td>
+          <td class="num">4.18K</td>
+          <td class="num pos">184.75</td>
+          <td class="num margin-low">4.6%</td>
+          <td class="num">122</td>
+          <td class="num">1.88K</td>
+          <td class="num ">45.1%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">34</td>
+          <td class="name">Highstroke Scoped Guidance Disruptor</td>
+          <td class="grp">Weapon Disruptor</td>
+          <td class="num">5.00</td>
+          <td class="num">7.11K</td>
+          <td class="num">7.41K</td>
+          <td class="num pos">302.17</td>
+          <td class="num margin-low">4.2%</td>
+          <td class="num">38</td>
+          <td class="num">588.23</td>
+          <td class="num ">7.9%</td>
+        </tr>
+        <tr class="">
+          <td class="num">35</td>
+          <td class="name">Upgraded Explosive Coating I</td>
+          <td class="grp">Armor Coating</td>
+          <td class="num">5.00</td>
+          <td class="num">5.00K</td>
+          <td class="num">5.18K</td>
+          <td class="num pos">182.67</td>
+          <td class="num margin-low">3.7%</td>
+          <td class="num">249</td>
+          <td class="num">3.85K</td>
+          <td class="num pye-high">74.3%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">36</td>
+          <td class="name">'Concussion' Compact Medium Graviton Smartbomb</td>
+          <td class="grp">Smart Bomb</td>
+          <td class="num">10.00</td>
+          <td class="num">624.70K</td>
+          <td class="num">645.47K</td>
+          <td class="num pos">20.77K</td>
+          <td class="num margin-low">3.3%</td>
+          <td class="num">520</td>
+          <td class="num">8.06K</td>
+          <td class="num ">1.2%</td>
+        </tr>
+        <tr class="">
+          <td class="num">37</td>
+          <td class="name">500MN Quad LiF Restrained Microwarpdrive</td>
+          <td class="grp">Propulsion Module</td>
+          <td class="num">10.00</td>
+          <td class="num">599.00K</td>
+          <td class="num">618.71K</td>
+          <td class="num pos">19.71K</td>
+          <td class="num margin-low">3.3%</td>
+          <td class="num">8,109</td>
+          <td class="num">125.68K</td>
+          <td class="num ">20.3%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">38</td>
+          <td class="name">Regulated Ion Phase Cannon I</td>
+          <td class="grp">Hybrid Weapon</td>
+          <td class="num">10.00</td>
+          <td class="num">40.89K</td>
+          <td class="num">42.22K</td>
+          <td class="num pos">1.33K</td>
+          <td class="num margin-low">3.2%</td>
+          <td class="num">406</td>
+          <td class="num">6.30K</td>
+          <td class="num ">14.9%</td>
+        </tr>
+        <tr class="">
+          <td class="num">39</td>
+          <td class="name">Mega Modal Laser I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">459.50K</td>
+          <td class="num">474.37K</td>
+          <td class="num pos">14.87K</td>
+          <td class="num margin-low">3.2%</td>
+          <td class="num">5,823</td>
+          <td class="num">90.25K</td>
+          <td class="num ">19.0%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">40</td>
+          <td class="name">Mega Afocal Pulse Laser I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">359.40K</td>
+          <td class="num">370.85K</td>
+          <td class="num pos">11.45K</td>
+          <td class="num margin-low">3.2%</td>
+          <td class="num">4,415</td>
+          <td class="num">68.43K</td>
+          <td class="num ">18.5%</td>
+        </tr>
+        <tr class="">
+          <td class="num">41</td>
+          <td class="name">500MN Y-T8 Compact Microwarpdrive</td>
+          <td class="grp">Propulsion Module</td>
+          <td class="num">10.00</td>
+          <td class="num">599.70K</td>
+          <td class="num">618.71K</td>
+          <td class="num pos">19.01K</td>
+          <td class="num margin-low">3.2%</td>
+          <td class="num">8,109</td>
+          <td class="num">125.68K</td>
+          <td class="num ">20.3%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">42</td>
+          <td class="name">425mm Carbide Railgun I</td>
+          <td class="grp">Hybrid Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">558.70K</td>
+          <td class="num">575.46K</td>
+          <td class="num pos">16.76K</td>
+          <td class="num margin-low">3.0%</td>
+          <td class="num">7,230</td>
+          <td class="num">112.07K</td>
+          <td class="num ">19.5%</td>
+        </tr>
+        <tr class="">
+          <td class="num">43</td>
+          <td class="name">Dual Modal Heavy Laser I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">259.50K</td>
+          <td class="num">267.01K</td>
+          <td class="num pos">7.51K</td>
+          <td class="num margin-low">2.9%</td>
+          <td class="num">3,007</td>
+          <td class="num">46.61K</td>
+          <td class="num ">17.5%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">44</td>
+          <td class="name">800mm Heavy Gallium Repeating Cannon</td>
+          <td class="grp">Projectile Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">363.80K</td>
+          <td class="num">370.85K</td>
+          <td class="num pos">7.05K</td>
+          <td class="num margin-low">1.9%</td>
+          <td class="num">4,415</td>
+          <td class="num">68.43K</td>
+          <td class="num ">18.5%</td>
+        </tr>
+        <tr class="">
+          <td class="num">45</td>
+          <td class="name">Experimental Enduring Thermal Armor Hardener I</td>
+          <td class="grp">Armor Hardener</td>
+          <td class="num">5.00</td>
+          <td class="num">255.10K</td>
+          <td class="num">259.73K</td>
+          <td class="num pos">4.63K</td>
+          <td class="num margin-low">1.8%</td>
+          <td class="num">11,989</td>
+          <td class="num">185.84K</td>
+          <td class="num pye-high">71.6%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">46</td>
+          <td class="name">Shadow Serpentis EM Energized Membrane</td>
+          <td class="grp">Energized Armor Membrane</td>
+          <td class="num">5.00</td>
+          <td class="num">69.99K</td>
+          <td class="num">71.09K</td>
+          <td class="num pos">1.10K</td>
+          <td class="num margin-low">1.6%</td>
+          <td class="num">3,215</td>
+          <td class="num">49.83K</td>
+          <td class="num pye-high">70.1%</td>
+        </tr>
+        <tr class="">
+          <td class="num">47</td>
+          <td class="name">Capital Emergency Hull Energizer I</td>
+          <td class="grp">Damage Control</td>
+          <td class="num">8,000.00</td>
+          <td class="num">30.23M</td>
+          <td class="num">30.55M</td>
+          <td class="num pos">321.91K</td>
+          <td class="num margin-low">1.1%</td>
+          <td class="num">300,922</td>
+          <td class="num">4.66M</td>
+          <td class="num ">15.3%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">48</td>
+          <td class="name">'Notos' Compact Medium Proton Smartbomb</td>
+          <td class="grp">Smart Bomb</td>
+          <td class="num">10.00</td>
+          <td class="num">640.00K</td>
+          <td class="num">645.47K</td>
+          <td class="num pos">5.47K</td>
+          <td class="num margin-low">0.9%</td>
+          <td class="num">520</td>
+          <td class="num">8.06K</td>
+          <td class="num ">1.2%</td>
+        </tr>
+        <tr class="">
+          <td class="num">49</td>
+          <td class="name">Mega Afocal Laser I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">471.20K</td>
+          <td class="num">474.37K</td>
+          <td class="num pos">3.17K</td>
+          <td class="num margin-low">0.7%</td>
+          <td class="num">5,823</td>
+          <td class="num">90.25K</td>
+          <td class="num ">19.0%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">50</td>
+          <td class="name">Type-D Restrained Shield Flux Coil</td>
+          <td class="grp">Shield Flux Coil</td>
+          <td class="num">5.00</td>
+          <td class="num">2.00K</td>
+          <td class="num">2.01K</td>
+          <td class="num pos">12.94</td>
+          <td class="num margin-low">0.6%</td>
+          <td class="num">76</td>
+          <td class="num">1.18K</td>
+          <td class="num pye-high">58.5%</td>
+        </tr>
+        <tr class="">
+          <td class="num">51</td>
+          <td class="name">Heavy Jigoro Enduring Stasis Grappler</td>
+          <td class="grp">Stasis Grappler</td>
+          <td class="num">50.00</td>
+          <td class="num">728.10K</td>
+          <td class="num">732.08K</td>
+          <td class="num pos">3.98K</td>
+          <td class="num margin-low">0.5%</td>
+          <td class="num">4,400</td>
+          <td class="num">68.20K</td>
+          <td class="num ">9.3%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">52</td>
+          <td class="name">500MN Cold-Gas Enduring Microwarpdrive</td>
+          <td class="grp">Propulsion Module</td>
+          <td class="num">10.00</td>
+          <td class="num">615.80K</td>
+          <td class="num">618.71K</td>
+          <td class="num pos">2.91K</td>
+          <td class="num margin-low">0.5%</td>
+          <td class="num">8,109</td>
+          <td class="num">125.68K</td>
+          <td class="num ">20.3%</td>
+        </tr>
+        <tr class="">
+          <td class="num">53</td>
+          <td class="name">Small I-b Polarized Structural Regenerator</td>
+          <td class="grp">Hull Repair Unit</td>
+          <td class="num">5.00</td>
+          <td class="num">8.72K</td>
+          <td class="num">8.76K</td>
+          <td class="num pos">39.67</td>
+          <td class="num margin-low">0.5%</td>
+          <td class="num">196</td>
+          <td class="num">3.03K</td>
+          <td class="num ">34.6%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">54</td>
+          <td class="name">Heavy Karelin Scoped Stasis Grappler</td>
+          <td class="grp">Stasis Grappler</td>
+          <td class="num">50.00</td>
+          <td class="num">729.70K</td>
+          <td class="num">732.08K</td>
+          <td class="num pos">2.38K</td>
+          <td class="num margin-low">0.3%</td>
+          <td class="num">4,400</td>
+          <td class="num">68.20K</td>
+          <td class="num ">9.3%</td>
+        </tr>
+        <tr class="">
+          <td class="num">55</td>
+          <td class="name">Heavy Knave Scoped Energy Nosferatu</td>
+          <td class="grp">Energy Nosferatu</td>
+          <td class="num">5.00</td>
+          <td class="num">464.50K</td>
+          <td class="num">465.97K</td>
+          <td class="num pos">1.47K</td>
+          <td class="num margin-low">0.3%</td>
+          <td class="num">3,355</td>
+          <td class="num">52.00K</td>
+          <td class="num ">11.2%</td>
+        </tr>
+        <tr class=" alt">
+          <td class="num">56</td>
+          <td class="name">Dual Afocal Heavy Laser I</td>
+          <td class="grp">Energy Weapon</td>
+          <td class="num">20.00</td>
+          <td class="num">266.60K</td>
+          <td class="num">267.01K</td>
+          <td class="num pos">407.93</td>
+          <td class="num margin-low">0.2%</td>
+          <td class="num">3,007</td>
+          <td class="num">46.61K</td>
+          <td class="num ">17.5%</td>
+        </tr>
+  </tbody>
+</table>
+
+<p class="note">
+  Buy prices: live Jita sell orders (cheapest available at time of run).
+  Efficiency: 55% scrapmetal reprocessing. Mineral prices: Jita best buy from market_snapshots (2026-03-23 18:25 UTC).
+</p>
+</body>
+</html>
