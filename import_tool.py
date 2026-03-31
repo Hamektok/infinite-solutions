@@ -62,21 +62,23 @@ CATEGORY_DISPLAY = {
     'standard_ore':       'Compressed Ore',
     'ice_ore':            'Compressed Ice',
     'moon_ore':           'Compressed Moon Ore',
+    'fw_ammo':            'Crucible of the Faithful',
 }
 DISPLAY_TO_CAT = {v: k for k, v in CATEGORY_DISPLAY.items()}
 
 CATEGORY_FETCH_ARG = {
-    'All':                  'import_all',
-    'Minerals':             'minerals',
-    'Ice Products':         'ice_products',
-    'Reaction Materials':   'moon_materials',
-    'Gas Cloud Materials':  'gas_cloud_materials',
-    'Research Equipment':   'research_equipment',
-    'Planetary Materials':  'pi_materials',
-    'Salvaged Materials':   'salvaged_materials',
-    'Compressed Ore':       'compressed_standard_ore',
-    'Compressed Ice':       'compressed_ice_ore',
-    'Compressed Moon Ore':  'compressed_moon_ore',
+    'All':                       'import_all',
+    'Minerals':                  'minerals',
+    'Ice Products':              'ice_products',
+    'Reaction Materials':        'moon_materials',
+    'Gas Cloud Materials':       'gas_cloud_materials',
+    'Research Equipment':        'research_equipment',
+    'Planetary Materials':       'pi_materials',
+    'Salvaged Materials':        'salvaged_materials',
+    'Compressed Ore':            'compressed_standard_ore',
+    'Compressed Ice':            'compressed_ice_ore',
+    'Compressed Moon Ore':       'compressed_moon_ore',
+    'Crucible of the Faithful':  'fw_ammo',
 }
 
 PI_GROUP_MAP = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
@@ -234,6 +236,7 @@ TAB_DEFS = [
     ('Planetary Materials',   ['pi_materials']),
     ('Salvaged Materials',    ['salvaged_materials']),
     ('Compressed Ore',        ['standard_ore', 'ice_ore', 'moon_ore']),
+    ('Crucible of the Faithful', ['fw_ammo']),
 ]
 
 
