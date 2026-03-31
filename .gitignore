@@ -37,3 +37,5 @@ sde/
 
 # Standalone HTML templates (not part of the live site)
 discord_banner_template.html
+intel_report.html
+preview_opt*.png
