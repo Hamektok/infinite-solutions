@@ -428,9 +428,9 @@ def commit_and_push_to_github(snapshot_time):
     print(f"\n>>> Pushing to GitHub...")
 
     try:
-        # Check if there are changes to index.html
+        # Check if there are changes to index.html or sig_store.html
         result = subprocess.run(
-            ['git', 'diff', '--quiet', 'index.html'],
+            ['git', 'diff', '--quiet', 'index.html', 'sig_store.html'],
             cwd=PROJECT_DIR,
             capture_output=True
         )
@@ -439,14 +439,14 @@ def commit_and_push_to_github(snapshot_time):
             print("[!] No changes to commit (inventory unchanged)")
             return True
 
-        # Add index.html
+        # Add index.html and sig_store.html
         subprocess.run(
-            ['git', 'add', 'index.html'],
+            ['git', 'add', 'index.html', 'sig_store.html'],
             cwd=PROJECT_DIR,
             check=True,
             capture_output=True
         )
-        print("[OK] Staged index.html")
+        print("[OK] Staged index.html + sig_store.html")
 
         # Create commit message
         commit_msg = f"Auto-update inventory - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
