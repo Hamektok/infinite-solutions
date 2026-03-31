@@ -32,6 +32,9 @@ CHARACTER_ID = 2114278577
 # LX-ZOJ Structure ID
 LX_ZOJ_STRUCTURE_ID = 1027625808467
 
+# FW Staging Structure ID — loaded from site_config at runtime (blank = disabled)
+FW_STRUCTURE_ID = None  # populated in main() from site_config
+
 # EVE container type IDs (Secure Containers, GSCs, etc.)
 CONTAINER_TYPE_IDS = {3462, 3463, 3464, 3465, 3466, 11489, 17366, 33003, 33005, 33007, 33009, 33011}
 
@@ -224,13 +227,45 @@ def sync_consignor_quantities(conn):
     conn.commit()
     print(f"[OK] Synced current_qty for {updated} consignor(s) from container snapshot")
 
-def get_tracked_items(conn):
-    """Get list of tracked item type_ids from database."""
+def get_tracked_items(conn, site='lxzoj'):
+    """Get list of tracked item type_ids from database for the given site."""
     cursor = conn.cursor()
-    cursor.execute('SELECT type_id, type_name FROM tracked_market_items')
+    cursor.execute('SELECT type_id, type_name FROM tracked_market_items WHERE site = ?', (site,))
     tracked = {row[0]: row[1] for row in cursor.fetchall()}
-    print(f"[OK] Loaded {len(tracked)} tracked items from database")
+    print(f"[OK] Loaded {len(tracked)} tracked items for site='{site}'")
     return tracked
+
+def filter_fw_items(all_assets, fw_structure_id):
+    """Filter assets to the FW staging structure hangar (direct hangar items only)."""
+    result = []
+    for asset in all_assets:
+        if (asset.get('location_id') == fw_structure_id
+                and asset.get('location_flag') == 'Hangar'):
+            result.append(asset)
+    print(f"[OK] FW staging hangar: {len(result)} direct items")
+    return result
+
+def store_fw_inventory_snapshot(conn, fw_structure_id, inventory, tracked_items):
+    """Store FW inventory snapshot in fw_current_inventory table."""
+    cursor = conn.cursor()
+    snapshot_time = datetime.now(timezone.utc).isoformat()
+
+    # Clear previous snapshot
+    cursor.execute('DELETE FROM fw_current_inventory')
+
+    items_inserted = 0
+    for type_id, type_name in tracked_items.items():
+        qty = inventory.get(type_id, 0)
+        cursor.execute(
+            'INSERT INTO fw_current_inventory (type_id, type_name, quantity, snapshot_timestamp) '
+            'VALUES (?, ?, ?, ?)',
+            (type_id, type_name, qty, snapshot_time)
+        )
+        items_inserted += 1
+
+    conn.commit()
+    print(f"[OK] FW snapshot stored: {items_inserted} items at {snapshot_time}")
+    return snapshot_time
 
 def match_tracked_inventory(lx_zoj_items, tracked_items):
     """
@@ -315,6 +350,29 @@ def get_current_inventory_from_db(conn):
 
     inventory = {row[1]: row[2] for row in cursor.fetchall()}  # {type_name: quantity}
     return inventory
+
+def generate_sig_store_html():
+    """Embed fw_current_inventory into sig_store.html via generate_sig_store_data.py."""
+    import subprocess
+    script = os.path.join(PROJECT_DIR, 'generate_sig_store_data.py')
+    if not os.path.exists(script):
+        print('[INFO] generate_sig_store_data.py not found — skipping Chapter Store update')
+        return
+    try:
+        result = subprocess.run(
+            [sys.executable, script],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        if result.returncode == 0:
+            print('[OK] Chapter Store (sig_store.html) updated')
+        else:
+            print(f'[WARNING] Chapter Store update failed: {result.stderr.strip()}')
+    except Exception as e:
+        print(f'[WARNING] Could not update Chapter Store: {e}')
+
 
 def update_html_inventory(inventory):
     """Update index.html with current inventory quantities by calling update_html_data.py."""
@@ -668,8 +726,25 @@ def main():
     conn = sqlite3.connect(DB_PATH)
 
     try:
-        # Get tracked items list
-        tracked_items = get_tracked_items(conn)
+        # Load FW structure ID from site_config (blank = FW fetch disabled)
+        global FW_STRUCTURE_ID
+        fw_row = conn.execute(
+            "SELECT value FROM site_config WHERE key='fw_structure_id'"
+        ).fetchone()
+        fw_structure_id_str = (fw_row[0] or '').strip() if fw_row else ''
+        if fw_structure_id_str:
+            try:
+                FW_STRUCTURE_ID = int(fw_structure_id_str)
+                print(f"[OK] FW structure ID loaded: {FW_STRUCTURE_ID}")
+            except ValueError:
+                print(f"[WARN] fw_structure_id in site_config is not a valid integer: {fw_structure_id_str!r}")
+                FW_STRUCTURE_ID = None
+        else:
+            print("[INFO] fw_structure_id not configured — skipping FW inventory fetch")
+            FW_STRUCTURE_ID = None
+
+        # Get tracked items list (LX-ZOJ site only)
+        tracked_items = get_tracked_items(conn, site='lxzoj')
 
         # Fetch all character assets
         all_assets = get_character_assets(headers)
@@ -716,6 +791,17 @@ def main():
         # Store per-container snapshot for consignor quantity tracking
         store_container_snapshot(conn, lx_zoj_items, tracked_items, snapshot_time)
 
+        # ── FW Staging inventory fetch ────────────────────────────────────────
+        if FW_STRUCTURE_ID:
+            print(f"\n>>> Fetching FW staging inventory ({FW_STRUCTURE_ID})...")
+            fw_tracked = get_tracked_items(conn, site='fw')
+            if fw_tracked:
+                fw_items = filter_fw_items(all_assets, FW_STRUCTURE_ID)
+                fw_inventory = match_tracked_inventory(fw_items, fw_tracked)
+                store_fw_inventory_snapshot(conn, FW_STRUCTURE_ID, fw_inventory, fw_tracked)
+            else:
+                print("[INFO] No FW tracked items configured — skipping FW snapshot")
+
         # Update each consignor's current_qty from their assigned container
         sync_consignor_quantities(conn)
 
@@ -724,6 +810,9 @@ def main():
 
         # Update HTML file (regenerates from database, so we don't need to pass inventory)
         html_success = update_html_inventory(None)
+
+        # Update Chapter Store HTML (embeds fw_current_inventory into sig_store.html)
+        generate_sig_store_html()
 
         # Commit and push to GitHub
         git_success = False

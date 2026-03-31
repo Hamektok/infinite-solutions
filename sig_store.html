@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Solutions — Corp Chapter Store</title>
+
+    <!-- SIG_STORE_DATA_START -->
+<script>
+const SIG_STORE_DATA = {
+  snapshotTime: "31 Mar 2026  14:08 EVE",
+  chapters: {
+    cof: {
+      label: "Crucible of the Faithful",
+      visible: true,
+      subtabs: {
+        ammo_charges: {
+          label: "Ammunition & Charges",
+          visible: true,
+          groups: [
+          {label:"Projectile Ammo", items:[{name:"Quake S",qty:0,price:0,typeId:12631}, {name:"Tremor S",qty:0,price:0,typeId:12633}]},
+          {label:"Missiles", items:[{name:"Mjolnir Rage Rocket",qty:0,price:0,typeId:2817}, {name:"Scourge Rage Rocket",qty:0,price:0,typeId:24471}]},
+          {label:"Hybrid Charges", items:[{name:"Void S",qty:0,price:0,typeId:12612}]},
+          {label:"Misc", items:[{name:"Nanite Repair Paste",qty:0,price:0,typeId:28668}]}
+        ]
+        }
+      }
+    },
+    rbd: {
+      label: "Rockbound Disciples",
+      visible: false,
+      subtabs: {}
+    }
+  }
+};
+// 6 items in Crucible of the Faithful
+</script>
+<!-- SIG_STORE_DATA_END -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+        :root {
+            --accent:       #ff4444;
+            --accent2:      #ff8833;
+            --accent-dim:   #882222;
+            --bg:           #0a0a0a;
+            --panel:        #0d1117;
+            --panel2:       #0e1118;
+            --border:       #2a1818;
+            --border-item:  rgba(180,60,40,0.25);
+            --text:         #e8d8d0;
+            --text-dim:     #806060;
+            --green:        #44dd88;
+            --yellow:       #ffcc44;
+            --red:          #ff5555;
+            --gold:         #ffd700;
+            --divider-bg:   rgba(255,80,40,0.12);
+            --divider-line: rgba(255,80,40,0.35);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 2vh 2vw;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text);
+        }
+
+        .container { width: 100%; max-width: 1400px; }
+
+        /* ── Shell ──────────────────────────────────────────────── */
+        .inventory-view {
+            position: relative;
+            background: linear-gradient(135deg, #0a0000 0%, #100808 60%, #080010 100%);
+            border: 1px solid var(--accent-dim);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 0 40px rgba(255,60,60,0.12), inset 0 0 80px rgba(180,30,30,0.04);
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+            background-image:
+                radial-gradient(1px 1px at 15% 25%, rgba(255,200,200,.5) 0%, transparent 100%),
+                radial-gradient(1px 1px at 55% 65%, rgba(255,200,200,.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 80% 15%, rgba(255,220,180,.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 35% 85%, rgba(255,180,160,.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 45%, rgba(255,200,200,.3) 0%, transparent 100%);
+        }
+
+        /* ── Header ─────────────────────────────────────────────── */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative; z-index: 1;
+        }
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2em; font-weight: 900;
+            margin: 0 0 4px 0;
+            background: linear-gradient(135deg, #ff6644, #ffaa44, #ff4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+        }
+        .header .tagline {
+            font-size: 1em; color: var(--text-dim);
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+        .header .corp-badge {
+            display: inline-block;
+            margin-top: 6px;
+            background: rgba(255,60,60,0.12);
+            border: 1px solid var(--accent-dim);
+            border-radius: 4px;
+            padding: 2px 14px;
+            font-size: 0.8em; color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        /* ── Main tabs (nav) ────────────────────────────────────── */
+        .main-tabs {
+            display: flex;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 2px solid var(--accent-dim);
+            border-radius: 6px 6px 0 0;
+            position: relative; z-index: 1;
+        }
+        .main-tab {
+            padding: 11px 20px;
+            background: transparent; border: none;
+            color: var(--accent); cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95em; font-weight: 600; letter-spacing: 1px;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent; opacity: 0.7;
+        }
+        .main-tab:hover { opacity: 1; background: rgba(255,60,60,0.08); }
+        .main-tab.active { opacity: 1; border-bottom: 3px solid var(--accent); color: var(--accent2); }
+        .main-tab.nav-link { color: #8899aa; opacity: 0.6; font-size: 0.88em; }
+        .main-tab.nav-link:hover { opacity: 0.9; color: #aabbcc; }
+
+        /* ── Chapter tabs ───────────────────────────────────────── */
+        .chapter-tabs {
+            display: flex;
+            background: rgba(0,0,0,0.25);
+            border-bottom: 1px solid var(--border);
+            position: relative; z-index: 1;
+        }
+        .chapter-tab {
+            padding: 10px 24px;
+            background: transparent; border: none;
+            color: var(--text-dim); cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.05em; font-weight: 600; letter-spacing: 1px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .chapter-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+        .chapter-tab:hover { color: var(--text); background: rgba(255,100,50,0.06); }
+
+        /* ── Sub-tabs ───────────────────────────────────────────── */
+        .sub-tabs {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding: 10px 0 6px 0;
+            position: relative; z-index: 1;
+        }
+        .sub-tab {
+            padding: 6px 16px;
+            background: rgba(255,60,60,0.08);
+            border: 1px solid var(--accent-dim);
+            border-radius: 4px; color: var(--text-dim); cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.92em; font-weight: 600; letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+        .sub-tab.active { background: rgba(255,80,50,0.2); color: var(--accent2); border-color: var(--accent); }
+        .sub-tab:hover { color: var(--text); border-color: var(--accent); }
+
+        /* ── Tab content ────────────────────────────────────────── */
+        .tab-content { display: none; position: relative; z-index: 1; }
+        .tab-content.active { display: block; }
+
+        /* ── Group divider ──────────────────────────────────────── */
+        .group-divider {
+            display: flex; align-items: center;
+            gap: 12px; margin: 20px 0 10px 0;
+        }
+        .group-divider:first-child { margin-top: 8px; }
+        .group-divider-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72em; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--accent2);
+            white-space: nowrap;
+            background: var(--divider-bg);
+            border: 1px solid var(--divider-line);
+            padding: 4px 14px; border-radius: 3px;
+        }
+        .group-divider-line {
+            flex: 1; height: 1px;
+            background: var(--divider-line);
+        }
+
+        /* ── Item grid ──────────────────────────────────────────── */
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        /* ── Item card (matches industrial site style) ───────────── */
+        .item {
+            background: rgba(80, 20, 10, 0.22);
+            border: 1px solid var(--border-item);
+            border-radius: 6px;
+            padding: 18px 20px;
+            box-shadow: inset 0 0 15px rgba(255, 80, 40, 0.04);
+            transition: border-color 0.2s;
+        }
+        .item:hover { border-color: rgba(255,120,60,0.45); }
+
+        .item-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px; font-weight: 600;
+            line-height: 1.3; color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .item-details {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+
+        .detail-row {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px; line-height: 1.5;
+            display: flex; justify-content: space-between;
+        }
+        .detail-label { color: #9a6a60; }
+        .detail-value { color: #00ff99; font-weight: 600; }
+        .out-of-stock { color: #ff6666 !important; }
+
+        .price-tier { font-size: 18px; line-height: 1.4; }
+        .corp-label { color: var(--gold); }
+        .corp-price { color: var(--gold); font-weight: 700; }
+
+        /* ── Empty state ────────────────────────────────────────── */
+        .empty-state {
+            text-align: center; padding: 56px 0;
+            color: var(--text-dim); font-size: 1.1em;
+        }
+
+        /* ── Snapshot + footer ──────────────────────────────────── */
+        .snapshot-line {
+            text-align: right; font-size: 0.8em;
+            color: var(--text-dim); padding: 6px 2px 0 0;
+            position: relative; z-index: 1;
+        }
+        .footer {
+            margin-top: 24px; padding-top: 14px;
+            border-top: 1px solid var(--border);
+            text-align: center; color: var(--text-dim);
+            font-size: 0.88em; position: relative; z-index: 1;
+        }
+        .footer .contact { color: var(--accent2); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="inventory-view">
+        <div class="stars"></div>
+
+        <!-- HEADER -->
+        <div class="header">
+            <h1>INFINITE SOLUTIONS</h1>
+            <div class="tagline">Corp Chapter Store — Special Operations Resupply</div>
+            <div class="corp-badge">★ CORP MEMBERS ONLY</div>
+        </div>
+
+        <!-- NAV TABS -->
+        <div class="main-tabs">
+            <button class="main-tab nav-link" onclick="window.location='index.html'">← Industrial Market</button>
+            <button class="main-tab active">⚔ Corp Chapter Store</button>
+        </div>
+
+        <!-- CHAPTER TABS -->
+        <div class="chapter-tabs" id="chapterTabs"></div>
+
+        <!-- CHAPTER CONTENT -->
+        <div id="chapterContent"></div>
+
+        <!-- SNAPSHOT -->
+        <div class="snapshot-line" id="snapshotLine"></div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            Contact <span class="contact">Hamektok Hakaari</span> on Discord to purchase
+            &nbsp;·&nbsp; Corp members only
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const data = SIG_STORE_DATA;
+
+    document.getElementById('snapshotLine').textContent =
+        data.snapshotTime ? 'Stock as of ' + data.snapshotTime : '';
+
+    const chapterTabsEl  = document.getElementById('chapterTabs');
+    const chapterContent = document.getElementById('chapterContent');
+
+    // Only render visible chapters
+    const visibleChapters = Object.entries(data.chapters)
+        .filter(([, ch]) => ch.visible !== false);
+
+    if (visibleChapters.length === 0) {
+        chapterContent.innerHTML = '<div class="empty-state">No chapters are currently active.</div>';
+        return;
+    }
+
+    visibleChapters.forEach(([chKey, chapter], ci) => {
+        // Chapter tab button
+        const btn = document.createElement('button');
+        btn.className = 'chapter-tab' + (ci === 0 ? ' active' : '');
+        btn.textContent = chapter.label;
+        btn.dataset.chKey = chKey;
+        btn.onclick = () => showChapter(chKey);
+        chapterTabsEl.appendChild(btn);
+
+        // Chapter wrapper
+        const wrapper = document.createElement('div');
+        wrapper.id = 'ch-' + chKey;
+        wrapper.className = 'tab-content' + (ci === 0 ? ' active' : '');
+
+        const subtabKeys = Object.keys(chapter.subtabs || {})
+            .filter(k => chapter.subtabs[k].visible !== false);
+
+        if (subtabKeys.length === 0) {
+            wrapper.innerHTML = '<div class="empty-state">No items currently available in this chapter.</div>';
+            chapterContent.appendChild(wrapper);
+            return;
+        }
+
+        // Sub-tab bar
+        const subBar = document.createElement('div');
+        subBar.className = 'sub-tabs';
+        wrapper.appendChild(subBar);
+
+        const subHost = document.createElement('div');
+        wrapper.appendChild(subHost);
+
+        subtabKeys.forEach((subKey, si) => {
+            const sub = chapter.subtabs[subKey];
+
+            const subBtn = document.createElement('button');
+            subBtn.className = 'sub-tab' + (si === 0 ? ' active' : '');
+            subBtn.textContent = sub.label;
+            subBtn.dataset.chKey  = chKey;
+            subBtn.dataset.subKey = subKey;
+            subBtn.onclick = () => showSubTab(chKey, subKey);
+            subBar.appendChild(subBtn);
+
+            const subDiv = document.createElement('div');
+            subDiv.id = 'sub-' + chKey + '-' + subKey;
+            subDiv.className = 'tab-content' + (si === 0 ? ' active' : '');
+            subDiv.appendChild(buildGroupedContent(sub.groups || []));
+            subHost.appendChild(subDiv);
+        });
+
+        chapterContent.appendChild(wrapper);
+    });
+
+    // ── Show chapter ──────────────────────────────────────────────────────────
+    function showChapter(chKey) {
+        document.querySelectorAll('.chapter-tab').forEach(b =>
+            b.classList.toggle('active', b.dataset.chKey === chKey));
+        document.querySelectorAll('#chapterContent > .tab-content').forEach(d =>
+            d.classList.toggle('active', d.id === 'ch-' + chKey));
+    }
+
+    // ── Show sub-tab ──────────────────────────────────────────────────────────
+    function showSubTab(chKey, subKey) {
+        const wrapper = document.getElementById('ch-' + chKey);
+        if (!wrapper) return;
+        wrapper.querySelectorAll('.sub-tab').forEach(b =>
+            b.classList.toggle('active', b.dataset.subKey === subKey));
+        wrapper.querySelectorAll(':scope > div > .tab-content').forEach(d =>
+            d.classList.toggle('active', d.id === 'sub-' + chKey + '-' + subKey));
+    }
+
+    // ── Build grouped content (group dividers + item grid) ────────────────────
+    function buildGroupedContent(groups) {
+        const container = document.createElement('div');
+
+        if (!groups || groups.length === 0) {
+            container.innerHTML = '<div class="empty-state">No items currently stocked.</div>';
+            return container;
+        }
+
+        let hasAny = false;
+        groups.forEach(group => {
+            if (!group.items || group.items.length === 0) return;
+            hasAny = true;
+
+            // Group divider header
+            const dividerRow = document.createElement('div');
+            dividerRow.className = 'group-divider';
+            dividerRow.innerHTML =
+                '<span class="group-divider-label">' + escHtml(group.label) + '</span>' +
+                '<span class="group-divider-line"></span>';
+            container.appendChild(dividerRow);
+
+            // Item grid for this group
+            const grid = document.createElement('div');
+            grid.className = 'item-grid';
+
+            group.items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item';
+
+                const qtyClass = item.qty === 0 ? 'out-of-stock'
+                               : item.qty < 500 ? 'detail-value' : 'detail-value';
+                const qtyText  = item.qty === 0 ? 'Out of Stock'
+                               : item.qty < 500 ? item.qty.toLocaleString() + ' (Low)'
+                               : item.qty.toLocaleString();
+
+                const priceHtml = item.price > 0
+                    ? `<div class="detail-row price-tier">
+                           <span class="corp-label">Corp</span>
+                           <span class="corp-price">${item.price.toLocaleString()} ISK</span>
+                       </div>`
+                    : `<div class="detail-row price-tier">
+                           <span class="detail-label">Price</span>
+                           <span class="corp-price">On request</span>
+                       </div>`;
+
+                card.innerHTML = `
+                    <div class="item-name">${escHtml(item.name)}</div>
+                    <div class="item-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Qty</span>
+                            <span class="${qtyClass}${item.qty === 0 ? ' out-of-stock' : ''}">${qtyText}</span>
+                        </div>
+                        ${priceHtml}
+                    </div>`;
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+        });
+
+        if (!hasAny) {
+            container.innerHTML = '<div class="empty-state">No items currently stocked.</div>';
+        }
+
+        return container;
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+})();
+</script>
+</body>
+</html>

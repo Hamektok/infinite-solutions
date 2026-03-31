@@ -3,7 +3,7 @@ Infinite Solutions - Admin Dashboard
 Local GUI for managing buyback rates, viewing inventory, and deploying updates.
 """
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, simpledialog
 import sqlite3
 import subprocess
 import os
@@ -315,6 +315,11 @@ class AdminDashboard:
         self.build_req_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.build_req_frame, text='  Build Requests  ')
         self._build_build_requests_tab()
+
+        # Tab 13: SIG Store
+        self.sig_store_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.sig_store_frame, text='  SIG Store  ')
+        self._build_sig_store_tab()
 
     def build_rates_tab(self):
         """Build the Market Rates management tab."""
@@ -1090,6 +1095,8 @@ class AdminDashboard:
              self.action_generate_stock_image),
             ("Generate Fuel Image", "Create a Discord-ready PNG of fuel/ice products (fuel_image.png)",
              self.action_generate_fuel_image),
+            ("Generate SIG Store", "Embed current FW stock data into sig_store.html (run after Update Inventory)",
+             self.action_generate_sig_store),
             ("Generate Buyback Image", "Create a Discord-ready PNG of accepted buyback items and quotas (buyback_image.png)",
              self.action_generate_buyback_image),
             ("Generate Catalog Images", "Create per-category Discord PNGs showing prices (catalog_*.png)",
@@ -2628,6 +2635,40 @@ class AdminDashboard:
                                             "catalog_gas_cloud_materials.png\ncatalog_research_equipment.png\n"
                                             "catalog_salvaged_materials.png\n\n"
                                             "Ready to drag into Discord.")
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def action_generate_sig_store(self):
+        """Embed SIG store data into sig_store.html in a background thread."""
+        import threading, sys as _sys
+        script_path = os.path.join(PROJECT_DIR, 'generate_sig_store_data.py')
+        if not os.path.exists(script_path):
+            messagebox.showerror("Not Found", f"Script not found:\n{script_path}")
+            return
+        self.update_status('Generating SIG store data...')
+        error_holder = [None]
+
+        def _worker():
+            try:
+                result = subprocess.run(
+                    [_sys.executable, script_path],
+                    cwd=PROJECT_DIR,
+                    capture_output=True, text=True, timeout=30
+                )
+                if result.returncode != 0:
+                    error_holder[0] = (result.stderr or result.stdout or 'Unknown error').strip()[-300:]
+            except Exception as e:
+                error_holder[0] = str(e)
+            self.root.after(0, _done)
+
+        def _done():
+            if error_holder[0]:
+                self.update_status('SIG store generation failed')
+                messagebox.showerror("Failed", f"SIG store generation failed:\n\n{error_holder[0]}")
+            else:
+                self.update_status('SIG store updated (sig_store.html)')
+                messagebox.showinfo("Done", "sig_store.html has been updated with current FW stock.\n"
+                                            "Deploy to make it live.")
 
         threading.Thread(target=_worker, daemon=True).start()
 
@@ -8037,6 +8078,410 @@ class AdminDashboard:
         row  = conn.execute('SELECT value FROM site_config WHERE key=?', (key,)).fetchone()
         conn.close()
         return row[0] if row else default
+
+    # ── Chapter Store Tab ─────────────────────────────────────────────────────
+
+    # EVE inv_group_id → display group label
+    _AMMO_GROUP_MAP = {
+        376: 'Projectile Ammo',
+        85:  'Projectile Ammo',
+        377: 'Hybrid Charges',
+        83:  'Hybrid Charges',
+        384: 'Missiles',
+        385: 'Missiles',
+        386: 'Missiles',
+        387: 'Missiles',
+        648: 'Missiles',
+        82:  'Laser Charges',
+        916: 'Misc',
+    }
+
+    def _build_sig_store_tab(self):
+        frame = self.sig_store_frame
+        BG, FG, ENTRY_BG = '#0a1520', '#c8d8e8', '#0d1e30'
+
+        # ── Config row ────────────────────────────────────────────────────────
+        cfg_row = tk.Frame(frame, bg=BG, pady=6)
+        cfg_row.pack(fill='x', padx=14, pady=(10, 0))
+
+        tk.Label(cfg_row, text='FW Structure ID:', bg=BG, fg=FG,
+                 font=('Segoe UI', 9)).pack(side='left')
+        self._sig_struct_id_var = tk.StringVar(value=self._get_cfg('fw_structure_id'))
+        tk.Entry(cfg_row, textvariable=self._sig_struct_id_var, width=22,
+                 bg=ENTRY_BG, fg=FG, insertbackground=FG,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(4, 12))
+
+        tk.Label(cfg_row, text='Name:', bg=BG, fg=FG,
+                 font=('Segoe UI', 9)).pack(side='left')
+        self._sig_struct_name_var = tk.StringVar(value=self._get_cfg('fw_structure_name'))
+        tk.Entry(cfg_row, textvariable=self._sig_struct_name_var, width=32,
+                 bg=ENTRY_BG, fg=FG, insertbackground=FG,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(4, 12))
+
+        tk.Button(cfg_row, text='Save Config', bg='#1a3020', fg='#44dd88',
+                  font=('Segoe UI', 9, 'bold'), relief='flat', padx=8,
+                  command=self._sig_save_config).pack(side='left')
+
+        # ── Chapter visibility toggles ────────────────────────────────────────
+        vis_row = tk.Frame(frame, bg=BG)
+        vis_row.pack(fill='x', padx=14, pady=(6, 0))
+        tk.Label(vis_row, text='Chapters visible on site:', bg=BG, fg=FG,
+                 font=('Segoe UI', 9, 'bold')).pack(side='left', padx=(0, 10))
+        self._sig_chapter_vars = {}
+        for cfg_key, label in [('sig_cof_visible', 'Crucible of the Faithful'),
+                                ('sig_rbd_visible', 'Rockbound Disciples')]:
+            val = self._get_cfg(cfg_key, '0') == '1'
+            var = tk.BooleanVar(value=val)
+            self._sig_chapter_vars[cfg_key] = var
+            tk.Checkbutton(vis_row, text=label, variable=var,
+                           bg=BG, fg='#ff9966', selectcolor='#2a1a10',
+                           activebackground=BG, activeforeground='#ff9966',
+                           font=('Segoe UI', 9, 'bold')).pack(side='left', padx=6)
+        tk.Button(vis_row, text='Save Visibility', bg='#1a2030', fg=FG,
+                  font=('Segoe UI', 9), relief='flat', padx=8,
+                  command=self._sig_save_visibility).pack(side='left', padx=(12, 0))
+
+        # ── Add item row ──────────────────────────────────────────────────────
+        add_row = tk.Frame(frame, bg=BG)
+        add_row.pack(fill='x', padx=14, pady=(6, 0))
+        tk.Label(add_row, text='Add item:', bg=BG, fg=FG,
+                 font=('Segoe UI', 9)).pack(side='left')
+        self._sig_search_var = tk.StringVar()
+        self._sig_search_entry = tk.Entry(add_row, textvariable=self._sig_search_var,
+                                          width=36, bg=ENTRY_BG, fg=FG,
+                                          insertbackground=FG, font=('Segoe UI', 9))
+        self._sig_search_entry.pack(side='left', padx=(4, 4))
+        self._sig_search_entry.bind('<Return>', lambda e: self._sig_search_item())
+        tk.Button(add_row, text='Search', bg='#1a2030', fg=FG,
+                  font=('Segoe UI', 9), relief='flat', padx=6,
+                  command=self._sig_search_item).pack(side='left', padx=(0, 4))
+
+        self._sig_match_var = tk.StringVar()
+        self._sig_match_box = ttk.Combobox(add_row, textvariable=self._sig_match_var,
+                                           width=40, state='readonly')
+        self._sig_match_box.pack(side='left', padx=(0, 4))
+        self._sig_match_box._matches = []
+
+        tk.Label(add_row, text='Price%:', bg=BG, fg=FG,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(8, 2))
+        self._sig_pct_var = tk.StringVar(value='100')
+        tk.Entry(add_row, textvariable=self._sig_pct_var, width=5,
+                 bg=ENTRY_BG, fg=FG, insertbackground=FG,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(0, 4))
+
+        tk.Button(add_row, text='Add Item', bg='#203020', fg='#44dd88',
+                  font=('Segoe UI', 9, 'bold'), relief='flat', padx=8,
+                  command=self._sig_add_item).pack(side='left')
+
+        # ── Item treeview ─────────────────────────────────────────────────────
+        tree_frame = tk.Frame(frame, bg=BG)
+        tree_frame.pack(fill='both', expand=True, padx=14, pady=(8, 4))
+
+        cols = ('name', 'subcat', 'price_pct', 'flags')
+        self._sig_tree = ttk.Treeview(tree_frame, columns=cols,
+                                       show='headings', selectmode='extended')
+        self._sig_tree.heading('name',      text='Item Name')
+        self._sig_tree.heading('subcat',    text='Ammo Type')
+        self._sig_tree.heading('price_pct', text='Price %')
+        self._sig_tree.heading('flags',     text='Flags')
+        self._sig_tree.column('name',      width=280, anchor='w')
+        self._sig_tree.column('subcat',    width=150, anchor='center')
+        self._sig_tree.column('price_pct', width=70,  anchor='center')
+        self._sig_tree.column('flags',     width=200, anchor='w')
+        vsb = ttk.Scrollbar(tree_frame, orient='vertical',
+                            command=self._sig_tree.yview)
+        self._sig_tree.configure(yscrollcommand=vsb.set)
+        self._sig_tree.pack(side='left', fill='both', expand=True)
+        vsb.pack(side='right', fill='y')
+
+        # ── Bottom editor panel ───────────────────────────────────────────────
+        editor = ttk.Frame(frame, style='Card.TFrame')
+        editor.pack(fill='x', padx=14, pady=(0, 10))
+
+        # Row 1: selected item + price spinbox + quick buttons
+        row1 = ttk.Frame(editor)
+        row1.pack(fill='x', padx=16, pady=(10, 4))
+
+        ttk.Label(row1, text='Selected:', font=('Segoe UI', 10)).pack(side='left', padx=(0, 6))
+        self._sig_selected_lbl = ttk.Label(row1, text='(click a row above)',
+                                            style='Value.TLabel')
+        self._sig_selected_lbl.pack(side='left', padx=(0, 24))
+
+        ttk.Label(row1, text='Price % of JBV:',
+                  font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 5))
+        self._sig_edit_pct_var = tk.IntVar(value=100)
+        tk.Spinbox(row1, from_=50, to=150, textvariable=self._sig_edit_pct_var,
+                   width=5, font=('Segoe UI', 13, 'bold'),
+                   bg='#0a2030', fg='#ff9966', buttonbackground='#1a3040',
+                   insertbackground='#ff9966', justify='center').pack(side='left', padx=(0, 8))
+        tk.Button(row1, text='Apply', bg='#1a3040', fg='#ff9966',
+                  font=('Segoe UI', 9, 'bold'), relief='flat', padx=8,
+                  command=self._sig_apply_price).pack(side='left', padx=(0, 16))
+
+        ttk.Label(row1, text='Quick:', font=('Segoe UI', 9)).pack(side='left', padx=(0, 4))
+        for pct in [90, 95, 96, 97, 98, 99, 100, 101]:
+            tk.Button(row1, text=f'{pct}%', width=4,
+                      font=('Segoe UI', 9, 'bold'),
+                      bg='#1a2030', fg='#ff9966', relief='flat',
+                      activebackground='#2a3040', activeforeground='#ffcc88',
+                      command=lambda p=pct: self._sig_quick_price(p)).pack(side='left', padx=2)
+
+        # Row 2: flags + remove button
+        row2 = ttk.Frame(editor)
+        row2.pack(fill='x', padx=16, pady=(0, 10))
+
+        self._sig_flags_lbl = ttk.Label(row2, text='Flags:', font=('Segoe UI', 9, 'bold'))
+        self._sig_flags_lbl.pack(side='left', padx=(0, 8))
+
+        self._sig_flag_btns = {}
+        for flag_key, flag_label, flag_color in ITEM_FLAGS:
+            btn = tk.Button(row2, text=flag_label,
+                            font=('Segoe UI', 9), width=13,
+                            bg='#1a2030', fg='#445566', relief='flat', padx=4,
+                            activebackground='#2a3040', activeforeground=flag_color,
+                            command=lambda k=flag_key: self._sig_toggle_flag_btn(k))
+            btn.pack(side='left', padx=2)
+            self._sig_flag_btns[flag_key] = btn
+
+        tk.Button(row2, text='Apply Flags', bg='#1a2030', fg=FG,
+                  font=('Segoe UI', 9), relief='flat', padx=8,
+                  command=self._sig_apply_flags).pack(side='left', padx=(12, 0))
+
+        tk.Button(row2, text='Remove Item', bg='#301510', fg='#ff6644',
+                  font=('Segoe UI', 9), relief='flat', padx=8,
+                  command=self._sig_remove_item).pack(side='right')
+
+        # Flag state
+        self._sig_pending_flags = set()
+        self._sig_flags_active_iids = []
+        self._sig_tree_items = {}  # iid -> type_id
+
+        self._sig_tree.bind('<<TreeviewSelect>>', self._sig_on_select)
+
+        self._sig_refresh_tree()
+
+    def _sig_refresh_tree(self):
+        self._sig_tree.delete(*self._sig_tree.get_children())
+        self._sig_tree_items = {}
+        flag_labels = {key: label for key, label, _ in ITEM_FLAGS}
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute(
+            "SELECT t.type_id, t.type_name, t.price_percentage, "
+            "COALESCE(it.group_id, 0) "
+            "FROM tracked_market_items t "
+            "LEFT JOIN inv_types it ON it.type_id = t.type_id "
+            "WHERE t.site='fw' ORDER BY t.type_name"
+        ).fetchall()
+        conn.close()
+        for type_id, name, pct, group_id in rows:
+            label = self._AMMO_GROUP_MAP.get(group_id, 'Misc')
+            active_flags = self._item_flags_db.get(type_id, set())
+            flags_str = ', '.join(
+                flag_labels[k] for k, _, _ in ITEM_FLAGS if k in active_flags)
+            iid = str(type_id)
+            self._sig_tree.insert('', 'end', iid=iid,
+                                  values=(name, label, f'{pct}%', flags_str))
+            self._sig_tree_items[iid] = type_id
+
+    def _sig_save_config(self):
+        struct_id   = self._sig_struct_id_var.get().strip()
+        struct_name = self._sig_struct_name_var.get().strip()
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("INSERT OR REPLACE INTO site_config (key,value) VALUES ('fw_structure_id',?)",
+                     (struct_id,))
+        conn.execute("INSERT OR REPLACE INTO site_config (key,value) VALUES ('fw_structure_name',?)",
+                     (struct_name,))
+        conn.commit()
+        conn.close()
+        self.update_status('FW structure config saved')
+        messagebox.showinfo('Saved', 'FW structure configuration saved.')
+
+    def _sig_save_visibility(self):
+        conn = sqlite3.connect(DB_PATH)
+        for key, var in self._sig_chapter_vars.items():
+            conn.execute("INSERT OR REPLACE INTO site_config (key,value) VALUES (?,?)",
+                         (key, '1' if var.get() else '0'))
+        conn.commit()
+        conn.close()
+        self.update_status('Chapter Store visibility saved')
+
+    def _sig_search_item(self):
+        term = self._sig_search_var.get().strip()
+        if len(term) < 2:
+            messagebox.showwarning('Too short', 'Enter at least 2 characters.')
+            return
+        conn = sqlite3.connect(DB_PATH)
+        rows = conn.execute(
+            "SELECT it.type_id, it.type_name, it.group_id "
+            "FROM inv_types it "
+            "WHERE it.type_name LIKE ? AND it.published = 1 "
+            "ORDER BY it.type_name LIMIT 80",
+            (f'%{term}%',)
+        ).fetchall()
+        conn.close()
+        if not rows:
+            messagebox.showinfo('No results', f'No items found matching "{term}".')
+            return
+        self._sig_match_box._matches = rows
+        self._sig_match_box['values'] = [r[1] for r in rows]
+        self._sig_match_box.current(0)
+
+    def _sig_add_item(self):
+        matches = self._sig_match_box._matches
+        sel_name = self._sig_match_var.get()
+        if not sel_name or not matches:
+            messagebox.showwarning('No item', 'Search and select an item first.')
+            return
+        match = next((r for r in matches if r[1] == sel_name), None)
+        if not match:
+            return
+        type_id, name, group_id = match
+        try:
+            pct = int(self._sig_pct_var.get())
+        except ValueError:
+            messagebox.showwarning('Invalid', 'Price % must be a whole number.')
+            return
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(
+            "INSERT OR IGNORE INTO tracked_market_items "
+            "(type_id, type_name, category, site, price_percentage, display_order) "
+            "VALUES (?,?,?,?,?,0)",
+            (type_id, name, 'fw_ammo', 'fw', pct)
+        )
+        conn.commit()
+        conn.close()
+        self._sig_refresh_tree()
+        self.update_status(f'Added: {name}')
+
+    def _sig_remove_item(self):
+        sel = self._sig_tree.selection()
+        if not sel:
+            messagebox.showwarning('Nothing selected', 'Select an item to remove.')
+            return
+        type_id = int(sel[0])
+        name = self._sig_tree.item(sel[0], 'values')[0]
+        if not messagebox.askyesno('Confirm', f'Remove "{name}" from SIG Store?'):
+            return
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("DELETE FROM tracked_market_items WHERE type_id=? AND site='fw'",
+                     (type_id,))
+        conn.commit()
+        conn.close()
+        self._sig_refresh_tree()
+        self.update_status(f'Removed: {name}')
+
+    def _sig_on_select(self, event=None):
+        iids = list(self._sig_tree.selection())
+        self._sig_flags_active_iids = iids
+        if not iids:
+            self._sig_selected_lbl.configure(text='(click a row above)')
+            self._sig_flags_lbl.configure(text='Flags:')
+            self._sig_pending_flags = set()
+            self._sig_refresh_flag_btns(set())
+            return
+        if len(iids) == 1:
+            vals = self._sig_tree.item(iids[0], 'values')
+            self._sig_selected_lbl.configure(text=vals[0])
+            type_id = self._sig_tree_items.get(iids[0])
+            active = self._item_flags_db.get(type_id, set()) if type_id else set()
+            self._sig_flags_lbl.configure(text='Flags:')
+            try:
+                self._sig_edit_pct_var.set(int(vals[2].rstrip('%')))
+            except (ValueError, IndexError):
+                pass
+        else:
+            self._sig_selected_lbl.configure(text=f'({len(iids)} items selected)')
+            self._sig_flags_lbl.configure(text=f'Flags ({len(iids)} items):')
+            active = set()
+        self._sig_pending_flags = set(active)
+        self._sig_refresh_flag_btns(active)
+
+    def _sig_refresh_flag_btns(self, active):
+        for flag_key, _, flag_color in ITEM_FLAGS:
+            btn = self._sig_flag_btns.get(flag_key)
+            if btn is None:
+                continue
+            if flag_key in active:
+                btn.configure(bg='#2a1a20', fg=flag_color, relief='groove')
+            else:
+                btn.configure(bg='#1a2030', fg='#445566', relief='flat')
+
+    def _sig_toggle_flag_btn(self, flag_key):
+        if not self._sig_flags_active_iids:
+            return
+        flag_color = next((c for k, _, c in ITEM_FLAGS if k == flag_key), '#ffffff')
+        if flag_key in self._sig_pending_flags:
+            self._sig_pending_flags.discard(flag_key)
+            self._sig_flag_btns[flag_key].configure(bg='#1a2030', fg='#445566',
+                                                     relief='flat')
+        else:
+            self._sig_pending_flags.add(flag_key)
+            self._sig_flag_btns[flag_key].configure(bg='#2a1a20', fg=flag_color,
+                                                     relief='groove')
+
+    def _sig_apply_flags(self):
+        if not self._sig_flags_active_iids:
+            return
+        targets = [(iid, self._sig_tree_items[iid])
+                   for iid in self._sig_flags_active_iids
+                   if iid in self._sig_tree_items]
+        if not targets:
+            return
+        flag_labels = {key: label for key, label, _ in ITEM_FLAGS}
+        flags_str = ', '.join(
+            flag_labels[k] for k, _, _ in ITEM_FLAGS if k in self._sig_pending_flags)
+        try:
+            conn = sqlite3.connect(DB_PATH, timeout=5)
+            for _, type_id in targets:
+                conn.execute("DELETE FROM item_flags WHERE type_id=?", (type_id,))
+                for fk in self._sig_pending_flags:
+                    conn.execute(
+                        "INSERT OR IGNORE INTO item_flags (type_id, flag_key) VALUES (?,?)",
+                        (type_id, fk))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            self.update_status(f'Error saving flags: {e}')
+            return
+        for iid, type_id in targets:
+            self._item_flags_db[type_id] = set(self._sig_pending_flags)
+            vals = list(self._sig_tree.item(iid, 'values'))
+            vals[3] = flags_str
+            self._sig_tree.item(iid, values=vals)
+        self.update_status(f'Flags saved for {len(targets)} item(s)')
+
+    def _sig_apply_price(self):
+        iids = list(self._sig_tree.selection())
+        if not iids:
+            messagebox.showwarning('Nothing selected', 'Select an item first.')
+            return
+        try:
+            pct = int(self._sig_edit_pct_var.get())
+        except (ValueError, tk.TclError):
+            messagebox.showwarning('Invalid', 'Price % must be a whole number.')
+            return
+        try:
+            conn = sqlite3.connect(DB_PATH, timeout=5)
+            for iid in iids:
+                type_id = self._sig_tree_items.get(iid)
+                if type_id:
+                    conn.execute(
+                        "UPDATE tracked_market_items SET price_percentage=? "
+                        "WHERE type_id=? AND site='fw'", (pct, type_id))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            self.update_status(f'Error saving price: {e}')
+            return
+        for iid in iids:
+            vals = list(self._sig_tree.item(iid, 'values'))
+            vals[2] = f'{pct}%'
+            self._sig_tree.item(iid, values=vals)
+        self.update_status(f'Price set to {pct}% for {len(iids)} item(s)')
+
+    def _sig_quick_price(self, pct):
+        self._sig_edit_pct_var.set(pct)
+        self._sig_apply_price()
 
 
 def main():
