@@ -319,7 +319,7 @@ BLUEPRINT_DATA = [
   {
     "name": "Einherji I Blueprint",
     "me": 10,
-    "te": 14,
+    "te": 20,
     "category": "Drones",
     "subcategory": "Fighters"
   },
@@ -1551,7 +1551,7 @@ BLUEPRINT_DATA = [
   {
     "name": "Sigil Blueprint",
     "me": 10,
-    "te": 0,
+    "te": 20,
     "category": "Ships",
     "subcategory": "Hauler"
   },
