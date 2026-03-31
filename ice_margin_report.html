@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ice Ore Margin Report — LX-ZOJ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #0a1520;
+    --bg2:     #0e1e30;
+    --bg3:     #122540;
+    --text:    #c8d8e8;
+    --muted:   #7898a8;
+    --cyan:    #00d9ff;
+    --gold:    #ffd700;
+    --green:   #00e676;
+    --red:     #ff3d3d;
+    --yellow:  #ffcc44;
+    --border:  #1a3555;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  a { color: var(--cyan); text-decoration: none; }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 16px 40px; }
+  .report-header {
+    background: linear-gradient(135deg, #0e1e30 0%, #122540 100%);
+    border-bottom: 2px solid var(--cyan);
+    padding: 24px 16px 16px;
+    margin-bottom: 24px;
+  }
+  .report-header h1 {
+    font-size: 22px; font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 1px;
+  }
+  .report-meta { color: var(--muted); font-size: 11px; margin-top: 6px; }
+  .report-params {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    margin-top: 10px; font-size: 11px; color: var(--muted);
+  }
+  .report-params span { color: var(--text); }
+
+  .section-title {
+    font-size: 16px; font-weight: 700;
+    color: var(--cyan);
+    border-left: 3px solid var(--cyan);
+    padding-left: 10px;
+    margin: 28px 0 16px;
+  }
+  .sub-heading {
+    font-size: 12px; font-weight: 600;
+    color: var(--gold);
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-cards { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    min-width: 180px; flex: 1;
+  }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+  .stat-value { font-size: 22px; font-weight: 700; margin: 4px 0 2px; }
+  .stat-name  { font-size: 11px; color: var(--muted); }
+
+  .exec-para {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  .table-scroll { overflow-x: auto; }
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px;
+  }
+  .data-table th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 1;
+  }
+  .data-table th.num { text-align: right; }
+  .data-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #0f2035;
+  }
+  .data-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .data-table tr:hover { background: rgba(0,217,255,0.04); }
+
+  .row-green  { background: rgba(0,230,118,0.06); }
+  .row-yellow { background: rgba(255,204,68,0.06); }
+  .row-red    { background: rgba(255,61,61,0.07); }
+  .row-nodata { background: rgba(40,60,80,0.3); opacity: 0.6; }
+
+  .signal { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; }
+  .sig-strong-buy { background: #004a20; color: #00e676; }
+  .sig-buy        { background: #003520; color: #34d058; }
+  .sig-watch      { background: #3a2e00; color: #ffcc44; }
+  .sig-marginal   { background: #2a2000; color: #aa9900; }
+  .sig-avoid      { background: #3a0000; color: #ff3d3d; }
+  .sig-thin       { background: #202040; color: #aaaaff; }
+  .sig-nodata     { background: #1a2535; color: #5a7090; }
+
+  .pos     { color: var(--green); }
+  .neg     { color: var(--red); }
+  .neutral { color: var(--muted); }
+  .nodata  { color: var(--muted); font-style: italic; }
+
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .filter-btn {
+    padding: 4px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg3);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .filter-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+
+  .family-cards { display: flex; flex-direction: column; gap: 16px; }
+  .family-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .family-header {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .family-name { font-size: 15px; font-weight: 700; color: var(--gold); }
+  .family-margin { font-size: 14px; font-weight: 700; }
+  .family-chg { font-size: 12px; }
+
+  .family-narrative {
+    font-size: 12px; color: var(--text);
+    background: rgba(0,217,255,0.03);
+    border-left: 2px solid var(--cyan);
+    padding: 8px 12px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+
+  .sparkline-row {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-top: 8px;
+  }
+  .spark-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    min-width: 120px;
+    flex: 1;
+  }
+  .spark-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .tier-section { margin-bottom: 24px; }
+  .tier-summary { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+  #rankings-table-container { max-height: 600px; overflow-y: auto; }
+  .variant-table td, .variant-table th { padding: 5px 8px; }
+
+  @media (max-width: 768px) {
+    .stat-card { min-width: 140px; }
+    .sparkline-row .spark-wrap { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div class="container" style="padding-bottom:0;">
+    <h1>Ice Ore Margin Report — LX-ZOJ</h1>
+    <div class="report-meta">
+      Generated: 2026-03-17 23:59:16 &nbsp;|&nbsp;
+      Price data through: 2026-03-18 02:50:42 UTC
+    </div>
+    <div class="report-params">
+      Buy basis: <span>JSV  (instant)</span> &nbsp;
+      Buy %: <span>100%</span> &nbsp;
+      Shipping: <span>125 ISK/m³</span> &nbsp;
+      Collateral: <span>1.0%</span> &nbsp;
+      Refine eff: <span>90.63%</span> &nbsp;
+      Broker: <span>0% (JSV)</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Section 1: Executive Summary -->
+  <h2 class="section-title">Executive Summary</h2>
+  <div class="exec-para">Ice ore margins are mixed — 6 ores trending up, 6 down, 0 flat over 30 days. Best opportunity: Compressed Gelidus at 29.3% margin. Avoid Compressed Glacial Mass IV-Grade (-32.0% margin). Biggest 30-day gainer: Compressed Gelidus (+27.9 pp). Biggest 30-day loser: Compressed White Glaze IV-Grade (-22.7 pp).</div>
+  <div class="stat-cards">
+    <div class='stat-card'><div class='stat-label'>Best Margin</div><div class='stat-value pos'>29.3%</div><div class='stat-name'>Compressed Gelidus</div></div><div class='stat-card'><div class='stat-label'>Worst Margin</div><div class='stat-value neg'>-32.0%</div><div class='stat-name'>Compressed Glacial Mass IV-Grade</div></div><div class='stat-card'><div class='stat-label'>Most Improved (30d)</div><div class='stat-value pos'>+27.9 pp</div><div class='stat-name'>Compressed Gelidus</div></div><div class='stat-card'><div class='stat-label'>Biggest Decline (30d)</div><div class='stat-value neg'>-22.7 pp</div><div class='stat-name'>Compressed White Glaze IV-Grade</div></div>
+  </div>
+
+  <!-- Section 2: Rankings Table -->
+  <h2 class="section-title">Ice Ore Rankings</h2>
+  <div id="rankings-table-container">
+    <table class="data-table" id="rankings-table">
+      <thead><tr>
+        <th>Name</th>
+        <th class="num">Margin</th>
+        <th class="num">7d Chg</th>
+        <th class="num">30d Chg</th>
+        <th>Primary Driver</th>
+        <th>Signal</th>
+      </tr></thead>
+      <tbody id="rankings-tbody">
+        <tr class='row-green'><td>Compressed Gelidus</td><td class='num pos'>29.3%</td><td class='num pos'>+25.1%</td><td class='num pos'>+27.9%</td><td>Strontium Clathrates</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green'><td>Compressed Krystallos</td><td class='num pos'>22.8%</td><td class='num pos'>+22.9%</td><td class='num pos'>+20.2%</td><td>Strontium Clathrates</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green'><td>Compressed Dark Glitter</td><td class='num pos'>14.0%</td><td class='num pos'>+10.9%</td><td class='num pos'>+10.9%</td><td>Strontium Clathrates</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green'><td>Compressed White Glaze</td><td class='num pos'>13.1%</td><td class='num pos'>+18.3%</td><td class='num pos'>+8.8%</td><td>Nitrogen Isotopes</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green'><td>Compressed Glare Crust</td><td class='num pos'>9.8%</td><td class='num pos'>+10.8%</td><td class='num neg'>-0.8%</td><td>Heavy Water</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-yellow'><td>Compressed Glacial Mass</td><td class='num pos'>4.4%</td><td class='num pos'>+12.3%</td><td class='num pos'>+10.0%</td><td>Hydrogen Isotopes</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow'><td>Compressed Blue Ice</td><td class='num pos'>3.2%</td><td class='num neg'>-1.7%</td><td class='num neg'>-2.9%</td><td>Oxygen Isotopes</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-red'><td>Compressed Clear Icicle</td><td class='num neg'>-1.1%</td><td class='num pos'>+4.6%</td><td class='num neg'>-5.8%</td><td>Helium Isotopes</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red'><td>Compressed Blue Ice IV-Grade</td><td class='num neg'>-7.7%</td><td class='num pos'>+0.1%</td><td class='num neg'>-10.2%</td><td>Oxygen Isotopes</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red'><td>Compressed Clear Icicle IV-Grade</td><td class='num neg'>-15.9%</td><td class='num pos'>+3.4%</td><td class='num neg'>-14.7%</td><td>Helium Isotopes</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red'><td>Compressed White Glaze IV-Grade</td><td class='num neg'>-19.5%</td><td class='num pos'>+4.0%</td><td class='num neg'>-22.7%</td><td>Nitrogen Isotopes</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red'><td>Compressed Glacial Mass IV-Grade</td><td class='num neg'>-32.0%</td><td class='num pos'>+6.0%</td><td class='num pos'>+0.9%</td><td>Hydrogen Isotopes</td><td><span class='signal sig-avoid'>Avoid</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 3: Family Cards -->
+  <h2 class="section-title">Per-Family Analysis</h2>
+  <div class="family-cards" id="family-cards-container">
+    
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">Blue Ice</span>
+                <span class="family-margin pos">3.2%</span>
+                <span class="family-chg neg">30d: -2.9%</span>
+            </div>
+            <p class="family-narrative">The base Blue Ice ore currently offers a thin margin of 3.2% ROI. Oxygen Isotopes is the dominant value driver, contributing 95% of batch revenue. Oxygen Isotopes has fallen 7.7% over the past 30 days, compressing margins. Secondary contributors: Strontium Clathrates (1% of value, rising 13.2%), Liquid Ozone (1% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>69</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>6.2K</td><td class='num'>2.4%</td><td class='num neg'>-127</td></tr><tr><td>Liquid Ozone</td><td class='num'>35</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>2.7K</td><td class='num'>1.0%</td><td class='num neg'>-227</td></tr><tr><td>Strontium Clathrates</td><td class='num'>1</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>3.4K</td><td class='num'>1.3%</td><td class='num pos'>398</td></tr><tr><td>Oxygen Isotopes</td><td class='num'>414</td><td class='num'>700</td><td class='num neg'>-2.1%</td><td class='num neg'>-4.3%</td><td class='num neg'>-7.7%</td><td class='num'>249.6K</td><td class='num'>95.3%</td><td class='num neg'>-20.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-yellow'><td>Compressed Blue Ice</td><td>Base</td><td class='num pos'>3.2%</td><td class='num'>239.0K</td><td class='num'>227.4K</td></tr><tr class='row-red'><td>Compressed Blue Ice IV-Grade</td><td>IV-Grade</td><td class='num neg'>-7.7%</td><td class='num'>318.4K</td><td class='num'>296.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28433_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28433_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28433_16275' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Oxygen Isotopes</div><canvas id='spark_28433_17887' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28433_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28433_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28433_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28433_17887');
+                if (!ctx) return;
+                var data = [758.72, 778.96, 784.98, 779.94, 759.52, 744.08, 716.5, 725.02, 744.69, 751.6, 747.5, 748.69, 745.96, 749.65, 741.01, 740.69, 731.9, 685.55, 687.51, 693.66, 700.59, 705.52, 709.13, 714.98, 719.18, 719.21, 709.8, 693.08, 684.84, 691.31, 700.2];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">Clear Icicle</span>
+                <span class="family-margin neg">-1.1%</span>
+                <span class="family-chg neg">30d: -5.8%</span>
+            </div>
+            <p class="family-narrative">The base Clear Icicle ore currently offers a negative margin of -1.1% ROI. Helium Isotopes is the dominant value driver, contributing 96% of batch revenue. Helium Isotopes has fallen 8.8% over the past 30 days, compressing margins. Secondary contributors: Strontium Clathrates (1% of value, rising 13.2%), Liquid Ozone (1% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>69</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>6.2K</td><td class='num'>2.2%</td><td class='num neg'>-127</td></tr><tr><td>Liquid Ozone</td><td class='num'>35</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>2.7K</td><td class='num'>1.0%</td><td class='num neg'>-227</td></tr><tr><td>Helium Isotopes</td><td class='num'>414</td><td class='num'>750</td><td class='num pos'>+4.2%</td><td class='num neg'>-3.0%</td><td class='num neg'>-8.8%</td><td class='num'>267.3K</td><td class='num'>95.6%</td><td class='num neg'>-25.8K</td></tr><tr><td>Strontium Clathrates</td><td class='num'>1</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>3.4K</td><td class='num'>1.2%</td><td class='num pos'>398</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Clear Icicle</td><td>Base</td><td class='num neg'>-1.1%</td><td class='num'>267.7K</td><td class='num'>239.0K</td></tr><tr class='row-red'><td>Compressed Clear Icicle IV-Grade</td><td>IV-Grade</td><td class='num neg'>-15.9%</td><td class='num'>375.0K</td><td class='num'>325.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28434_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28434_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Helium Isotopes</div><canvas id='spark_28434_16274' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28434_16275' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28434_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28434_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28434_16274');
+                if (!ctx) return;
+                var data = [822.43, 826.4, 840.5, 840.0, 855.7, 852.52, 853.4, 842.15, 831.33, 825.56, 826.52, 802.66, 786.26, 800.03, 791.62, 784.29, 773.44, 774.05, 779.19, 776.62, 768.22, 763.08, 722.92, 720.0, 721.22, 732.84, 721.35, 725.85, 743.59, 746.28, 750.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28434_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">Dark Glitter</span>
+                <span class="family-margin pos">14.0%</span>
+                <span class="family-chg pos">30d: +10.9%</span>
+            </div>
+            <p class="family-narrative">The base Dark Glitter ore currently offers a solid margin of 14.0% ROI. Strontium Clathrates is the dominant value driver, contributing 58% of batch revenue. Strontium Clathrates has risen 13.2% over the past 30 days, boosting returns. Secondary contributors: Liquid Ozone (27% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>691</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>62.5K</td><td class='num'>15.4%</td><td class='num neg'>-1.3K</td></tr><tr><td>Liquid Ozone</td><td class='num'>1381</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>107.6K</td><td class='num'>26.5%</td><td class='num neg'>-9.0K</td></tr><tr><td>Strontium Clathrates</td><td class='num'>69</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>235.6K</td><td class='num'>58.1%</td><td class='num pos'>27.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Dark Glitter</td><td>Base</td><td class='num pos'>14.0%</td><td class='num'>340.0K</td><td class='num'>304.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28435_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28435_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28435_16275' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28435_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28435_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28435_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">Gelidus</span>
+                <span class="family-margin pos">29.3%</span>
+                <span class="family-chg pos">30d: +27.9%</span>
+            </div>
+            <p class="family-narrative">The base Gelidus ore currently offers a excellent margin of 29.3% ROI. Strontium Clathrates is the dominant value driver, contributing 81% of batch revenue. Strontium Clathrates has risen 13.2% over the past 30 days, boosting returns. Secondary contributors: Liquid Ozone (12% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>345</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>31.2K</td><td class='num'>7.1%</td><td class='num neg'>-634</td></tr><tr><td>Liquid Ozone</td><td class='num'>691</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>53.8K</td><td class='num'>12.2%</td><td class='num neg'>-4.5K</td></tr><tr><td>Strontium Clathrates</td><td class='num'>104</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>355.1K</td><td class='num'>80.7%</td><td class='num pos'>41.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Gelidus</td><td>Base</td><td class='num pos'>29.3%</td><td class='num'>324.6K</td><td class='num'>273.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28437_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28437_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28437_16275' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28437_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28437_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28437_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">Glacial Mass</span>
+                <span class="family-margin pos">4.4%</span>
+                <span class="family-chg pos">30d: +10.0%</span>
+            </div>
+            <p class="family-narrative">The base Glacial Mass ore currently offers a thin margin of 4.4% ROI. Hydrogen Isotopes is the dominant value driver, contributing 94% of batch revenue. Hydrogen Isotopes has fallen 10.3% over the past 30 days, compressing margins. Secondary contributors: Strontium Clathrates (2% of value, rising 13.2%), Liquid Ozone (1% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>69</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>6.2K</td><td class='num'>3.1%</td><td class='num neg'>-127</td></tr><tr><td>Liquid Ozone</td><td class='num'>35</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>2.7K</td><td class='num'>1.4%</td><td class='num neg'>-227</td></tr><tr><td>Strontium Clathrates</td><td class='num'>1</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>3.4K</td><td class='num'>1.7%</td><td class='num pos'>398</td></tr><tr><td>Hydrogen Isotopes</td><td class='num'>414</td><td class='num'>529</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.4%</td><td class='num neg'>-10.3%</td><td class='num'>188.5K</td><td class='num'>93.8%</td><td class='num neg'>-21.6K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-yellow'><td>Compressed Glacial Mass</td><td>Base</td><td class='num pos'>4.4%</td><td class='num'>178.1K</td><td class='num'>106.6K</td></tr><tr class='row-red'><td>Compressed Glacial Mass IV-Grade</td><td>IV-Grade</td><td class='num neg'>-32.0%</td><td class='num'>332.9K</td><td class='num'>244.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28438_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28438_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28438_16275' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Hydrogen Isotopes</div><canvas id='spark_28438_17889' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28438_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28438_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28438_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28438_17889');
+                if (!ctx) return;
+                var data = [589.23, 601.0, 602.25, 600.77, 597.36, 594.4, 600.7, 613.52, 583.79, 514.16, 452.58, 486.41, 492.38, 503.17, 508.18, 514.57, 547.21, 575.61, 582.48, 572.73, 556.59, 571.5, 539.72, 527.14, 527.84, 533.48, 538.08, 519.42, 518.55, 524.38, 528.7];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">Glare Crust</span>
+                <span class="family-margin pos">9.8%</span>
+                <span class="family-chg neg">30d: -0.8%</span>
+            </div>
+            <p class="family-narrative">The base Glare Crust ore currently offers a modest margin of 9.8% ROI. Heavy Water is the dominant value driver, contributing 42% of batch revenue. Heavy Water pricing has been stable over the past 30 days. Secondary contributors: Strontium Clathrates (40% of value, rising 13.2%), Liquid Ozone (18% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>1381</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>124.8K</td><td class='num'>41.9%</td><td class='num neg'>-2.5K</td></tr><tr><td>Liquid Ozone</td><td class='num'>691</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>53.8K</td><td class='num'>18.1%</td><td class='num neg'>-4.5K</td></tr><tr><td>Strontium Clathrates</td><td class='num'>35</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>119.5K</td><td class='num'>40.1%</td><td class='num pos'>13.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Glare Crust</td><td>Base</td><td class='num pos'>9.8%</td><td class='num'>256.4K</td><td class='num'>230.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28439_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28439_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28439_16275' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28439_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28439_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28439_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">Krystallos</span>
+                <span class="family-margin pos">22.8%</span>
+                <span class="family-chg pos">30d: +20.2%</span>
+            </div>
+            <p class="family-narrative">The base Krystallos ore currently offers a excellent margin of 22.8% ROI. Strontium Clathrates is the dominant value driver, contributing 89% of batch revenue. Strontium Clathrates has risen 13.2% over the past 30 days, boosting returns. Secondary contributors: Liquid Ozone (8% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>173</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>15.6K</td><td class='num'>2.4%</td><td class='num neg'>-318</td></tr><tr><td>Liquid Ozone</td><td class='num'>691</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>53.8K</td><td class='num'>8.2%</td><td class='num neg'>-4.5K</td></tr><tr><td>Strontium Clathrates</td><td class='num'>173</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>590.7K</td><td class='num'>89.5%</td><td class='num pos'>68.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Krystallos</td><td>Base</td><td class='num pos'>22.8%</td><td class='num'>520.0K</td><td class='num'>491.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28440_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28440_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28440_16275' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28440_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28440_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28440_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card">
+            <div class="family-header">
+                <span class="family-name">White Glaze</span>
+                <span class="family-margin pos">13.1%</span>
+                <span class="family-chg pos">30d: +8.8%</span>
+            </div>
+            <p class="family-narrative">The base White Glaze ore currently offers a solid margin of 13.1% ROI. Nitrogen Isotopes is the dominant value driver, contributing 95% of batch revenue. Nitrogen Isotopes has fallen 19.0% over the past 30 days, compressing margins. Secondary contributors: Strontium Clathrates (2% of value, rising 13.2%), Liquid Ozone (1% of value, falling 7.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>69</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num neg'>-3.0%</td><td class='num neg'>-2.0%</td><td class='num'>6.2K</td><td class='num'>2.8%</td><td class='num neg'>-127</td></tr><tr><td>Liquid Ozone</td><td class='num'>35</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.9%</td><td class='num neg'>-7.7%</td><td class='num'>2.7K</td><td class='num'>1.2%</td><td class='num neg'>-227</td></tr><tr><td>Strontium Clathrates</td><td class='num'>1</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num pos'>+10.4%</td><td class='num pos'>+13.2%</td><td class='num'>3.4K</td><td class='num'>1.5%</td><td class='num pos'>398</td></tr><tr><td>Nitrogen Isotopes</td><td class='num'>414</td><td class='num'>598</td><td class='num pos'>+2.4%</td><td class='num neg'>-10.6%</td><td class='num neg'>-19.0%</td><td class='num'>213.3K</td><td class='num'>94.5%</td><td class='num neg'>-50.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed White Glaze</td><td>Base</td><td class='num pos'>13.1%</td><td class='num'>185.2K</td><td class='num'>181.7K</td></tr><tr class='row-red'><td>Compressed White Glaze IV-Grade</td><td>IV-Grade</td><td class='num neg'>-19.5%</td><td class='num'>314.7K</td><td class='num'>278.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Heavy Water</div><canvas id='spark_28444_16272' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Liquid Ozone</div><canvas id='spark_28444_16273' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Strontium Clathrates</div><canvas id='spark_28444_16275' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nitrogen Isotopes</div><canvas id='spark_28444_17888' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_28444_16272');
+                if (!ctx) return;
+                var data = [107.13, 106.38, 105.9, 104.89, 105.84, 102.38, 103.1, 101.61, 101.59, 101.58, 101.77, 102.34, 103.06, 105.6, 106.57, 106.09, 108.3, 105.06, 103.14, 103.42, 104.06, 102.43, 102.9, 104.67, 106.2, 106.36, 105.1, 103.83, 103.8, 105.38, 105.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28444_16273');
+                if (!ctx) return;
+                var data = [98.05, 97.84, 96.15, 95.58, 92.73, 90.67, 90.84, 90.73, 90.93, 89.66, 89.25, 89.1, 89.1, 89.1, 89.75, 89.65, 89.72, 90.24, 89.68, 89.67, 90.01, 90.28, 90.23, 91.11, 91.49, 91.61, 90.3, 90.38, 90.43, 90.52, 90.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28444_16275');
+                if (!ctx) return;
+                var data = [3504.17, 3286.6, 3043.0, 3070.71, 3161.4, 3223.2, 3253.5, 3277.62, 3293.56, 3294.6, 3298.67, 3313.29, 3329.6, 3361.67, 3423.0, 3457.47, 3591.75, 3769.38, 3791.5, 3799.33, 3809.78, 3450.78, 3341.92, 3516.75, 3678.33, 3727.0, 3769.0, 3791.67, 3914.77, 3980.78, 3966.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_28444_17888');
+                if (!ctx) return;
+                var data = [738.73, 724.02, 719.63, 715.8, 710.58, 710.3, 710.48, 686.62, 687.11, 686.52, 687.27, 688.01, 682.32, 685.38, 685.62, 684.59, 669.62, 656.15, 653.36, 652.37, 659.54, 659.63, 643.65, 584.42, 584.94, 599.29, 594.36, 598.73, 600.35, 597.86, 598.4];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+  </div>
+
+  <!-- Section 4: Product Market Overview -->
+  <h2 class="section-title">Ice Product Market Overview</h2>
+  
+        <div class="tier-section">
+            <p class="tier-summary">Ice products are under selling pressure (-6.0% over 30 days).</p>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th>
+                    <th class="num">JBV now</th>
+                    <th class="num">7d %</th>
+                    <th class="num">14d %</th>
+                    <th class="num">30d %</th>
+                    <th>Trend</th>
+                </tr></thead>
+                <tbody><tr><td>Heavy Water</td><td class='num'>105</td><td class='num pos'>+0.3%</td><td class='num'>N/A</td><td class='num neg'>-2.0%</td><td>→ Stable</td></tr><tr><td>Liquid Ozone</td><td class='num'>90</td><td class='num neg'>-0.7%</td><td class='num'>N/A</td><td class='num neg'>-7.7%</td><td>▼ Falling</td></tr><tr><td>Helium Isotopes</td><td class='num'>750</td><td class='num pos'>+4.2%</td><td class='num'>N/A</td><td class='num neg'>-8.8%</td><td>▼ Falling</td></tr><tr><td>Strontium Clathrates</td><td class='num'>4.0K</td><td class='num pos'>+12.8%</td><td class='num'>N/A</td><td class='num pos'>+13.2%</td><td>▲ Rising</td></tr><tr><td>Oxygen Isotopes</td><td class='num'>700</td><td class='num neg'>-2.1%</td><td class='num'>N/A</td><td class='num neg'>-7.7%</td><td>▼ Falling</td></tr><tr><td>Nitrogen Isotopes</td><td class='num'>598</td><td class='num pos'>+2.4%</td><td class='num'>N/A</td><td class='num neg'>-19.0%</td><td>▼ Falling</td></tr><tr><td>Hydrogen Isotopes</td><td class='num'>529</td><td class='num pos'>+0.3%</td><td class='num'>N/A</td><td class='num neg'>-10.3%</td><td>▼ Falling</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+
+
+</div><!-- /container -->
+
+</body>
+</html>

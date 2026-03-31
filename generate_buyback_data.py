@@ -20,6 +20,8 @@ CATEGORY_DISPLAY = {
     'minerals': 'Minerals',
     'ice_products': 'Ice Products',
     'moon_materials': 'Reaction Materials',
+    'gas_cloud_materials': 'Gas Cloud Materials',
+    'research_equipment': 'Research Equipment',
     'pi_materials': 'Planetary Materials',
     'salvaged_materials': 'Salvaged Materials',
     'standard_ore': 'Standard Ore',
@@ -53,20 +55,26 @@ CONFIG_TO_DB_CATEGORY = {
 }
 
 # Market tab visibility keys
-MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials']
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials', 'salvaged_materials']
 
 # Market subcategory definitions: (tab_key, sub_key, display_name)
 MARKET_SUBTAB_DEFS = [
-    ('ice_products',   'fuel_blocks',  'Fuel Blocks'),
-    ('ice_products',   'refined_ice',  'Refined Ice'),
-    ('ice_products',   'isotopes',     'Isotopes'),
-    ('moon_materials', 'raw',          'Raw'),
-    ('moon_materials', 'processed',    'Processed'),
-    ('moon_materials', 'advanced',     'Advanced'),
-    ('pi_materials',   'p1',           'P1'),
-    ('pi_materials',   'p2',           'P2'),
-    ('pi_materials',   'p3',           'P3'),
-    ('pi_materials',   'p4',           'P4'),
+    ('ice_products',        'fuel_blocks',           'Fuel Blocks'),
+    ('ice_products',        'refined_ice',           'Refined Ice'),
+    ('ice_products',        'isotopes',              'Isotopes'),
+    ('moon_materials',      'raw',                   'Raw'),
+    ('moon_materials',      'processed',             'Processed'),
+    ('moon_materials',      'advanced',              'Advanced'),
+    ('gas_cloud_materials', 'compressed_fullerene',  'Compressed Fullerenes'),
+    ('gas_cloud_materials', 'compressed_booster',    'Compressed Booster Gas'),
+    ('gas_cloud_materials', 'uncompressed_fullerene','Uncompressed Fullerenes'),
+    ('gas_cloud_materials', 'uncompressed_booster',  'Uncompressed Booster Gas'),
+    ('research_equipment',  'datacores',             'Datacores'),
+    ('research_equipment',  'decryptors',            'Decryptors'),
+    ('pi_materials',        'p1',                    'P1'),
+    ('pi_materials',        'p2',                    'P2'),
+    ('pi_materials',        'p3',                    'P3'),
+    ('pi_materials',        'p4',                    'P4'),
 ]
 
 

@@ -29,6 +29,8 @@ CATEGORY_DISPLAY = {
     'minerals': 'Minerals',
     'ice_products': 'Ice Products',
     'moon_materials': 'Reaction Materials',
+    'gas_cloud_materials': 'Gas Cloud Materials',
+    'research_equipment': 'Research Equipment',
     'pi_materials': 'Planetary Materials',
     'salvaged_materials': 'Salvaged Materials',
     'standard_ore': 'Standard Ore',
@@ -48,31 +50,40 @@ COMP_TABS = [
 ]
 # DB categories covered by the competitor sheet (for tree tag colouring)
 COMP_INTEL_CATEGORIES = {
-    'minerals', 'ice_products', 'moon_materials', 'pi_materials',
+    'minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials',
     'standard_ore', 'ice_ore', 'moon_ore',
 }
 
 # Market tab visibility
-MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'pi_materials']
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials', 'salvaged_materials']
 MARKET_TAB_LABELS = {
-    'minerals':       'Minerals',
-    'ice_products':   'Ice Products',
-    'moon_materials': 'Moon Materials',
-    'pi_materials':   'Planetary Materials',
+    'minerals':            'Minerals',
+    'ice_products':        'Ice Products',
+    'moon_materials':      'Moon Materials',
+    'gas_cloud_materials': 'Gas Cloud Materials',
+    'research_equipment':  'Research Equipment',
+    'pi_materials':        'Planetary Materials',
+    'salvaged_materials':  'Salvaged Materials',
 }
 
 # Market subcategory definitions: (tab_key, sub_key, display_label)
 MARKET_SUBTAB_DEFS = [
-    ('ice_products',   'fuel_blocks',  'Fuel Blocks'),
-    ('ice_products',   'refined_ice',  'Refined Ice'),
-    ('ice_products',   'isotopes',     'Isotopes'),
-    ('moon_materials', 'raw',          'Raw'),
-    ('moon_materials', 'processed',    'Processed'),
-    ('moon_materials', 'advanced',     'Advanced'),
-    ('pi_materials',   'p1',           'P1'),
-    ('pi_materials',   'p2',           'P2'),
-    ('pi_materials',   'p3',           'P3'),
-    ('pi_materials',   'p4',           'P4'),
+    ('ice_products',        'fuel_blocks',           'Fuel Blocks'),
+    ('ice_products',        'refined_ice',           'Refined Ice'),
+    ('ice_products',        'isotopes',              'Isotopes'),
+    ('moon_materials',      'raw',                   'Raw'),
+    ('moon_materials',      'processed',             'Processed'),
+    ('moon_materials',      'advanced',              'Advanced'),
+    ('gas_cloud_materials', 'compressed_fullerene',  'Compressed Fullerenes'),
+    ('gas_cloud_materials', 'compressed_booster',    'Compressed Booster Gas'),
+    ('gas_cloud_materials', 'uncompressed_fullerene','Uncompressed Fullerenes'),
+    ('gas_cloud_materials', 'uncompressed_booster',  'Uncompressed Booster Gas'),
+    ('research_equipment',  'datacores',             'Datacores'),
+    ('research_equipment',  'decryptors',            'Decryptors'),
+    ('pi_materials',        'p1',                    'P1'),
+    ('pi_materials',        'p2',                    'P2'),
+    ('pi_materials',        'p3',                    'P3'),
+    ('pi_materials',        'p4',                    'P4'),
 ]
 
 
@@ -88,6 +99,20 @@ def _get_moon_subcat(display_order):
     if display_order <= 35:  return 'Raw'
     if display_order <= 124: return 'Processed'
     return 'Advanced'
+
+
+def _get_gas_subcat(display_order):
+    if display_order is None: return ''
+    if display_order < 100:  return 'compressed_fullerene'
+    if display_order < 200:  return 'compressed_booster'
+    if display_order < 300:  return 'uncompressed_fullerene'
+    return 'uncompressed_booster'
+
+
+def _get_research_subcat(display_order):
+    if display_order is None: return ''
+    if display_order < 100:  return 'datacores'
+    return 'decryptors'
 
 
 PI_GROUP_MAP = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
@@ -582,7 +607,7 @@ class AdminDashboard:
         # Buyback category names (must match what the website uses)
         self.buyback_categories = [
             'Minerals', 'Ice Products', 'Reaction Materials',
-            'Salvaged Materials', 'Gas Clouds Materials', 'Planetary Materials',
+            'Salvaged Materials', 'Gas Cloud Materials', 'Research Equipment', 'Planetary Materials',
             'Standard Ore', 'Ice Ore', 'Moon Ore',
         ]
         self._ore_categories = {'Standard Ore', 'Ice Ore', 'Moon Ore'}
@@ -1065,6 +1090,8 @@ class AdminDashboard:
              self.action_generate_stock_image),
             ("Generate Fuel Image", "Create a Discord-ready PNG of fuel/ice products (fuel_image.png)",
              self.action_generate_fuel_image),
+            ("Generate Buyback Image", "Create a Discord-ready PNG of accepted buyback items and quotas (buyback_image.png)",
+             self.action_generate_buyback_image),
             ("Generate Catalog Images", "Create per-category Discord PNGs showing prices (catalog_*.png)",
              self.action_generate_catalog_images),
             ("Update Blueprints", "Refresh blueprint data, BPC pricing, and research jobs",
@@ -1184,6 +1211,10 @@ class AdminDashboard:
                 subcat = _get_ice_subcat(display_order)
             elif category == 'moon_materials':
                 subcat = _get_moon_subcat(display_order)
+            elif category == 'gas_cloud_materials':
+                subcat = _get_gas_subcat(display_order)
+            elif category == 'research_equipment':
+                subcat = _get_research_subcat(display_order)
             elif category == 'pi_materials':
                 subcat = PI_GROUP_MAP.get(mkt_group_id, '')
             else:
@@ -2593,7 +2624,44 @@ class AdminDashboard:
             else:
                 self.update_status('Catalog images saved (catalog_*.png)')
                 messagebox.showinfo("Done", "catalog_minerals.png\ncatalog_ice_products.png\n"
-                                            "catalog_moon_materials.png\ncatalog_pi_materials.png\n\n"
+                                            "catalog_moon_materials.png\ncatalog_pi_materials.png\n"
+                                            "catalog_gas_cloud_materials.png\ncatalog_research_equipment.png\n"
+                                            "catalog_salvaged_materials.png\n\n"
+                                            "Ready to drag into Discord.")
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def action_generate_buyback_image(self):
+        """Generate Discord buyback image in a background thread."""
+        import threading, sys as _sys
+        script_path = os.path.join(PROJECT_DIR, 'generate_buyback_image.py')
+        if not os.path.exists(script_path):
+            messagebox.showerror("Not Found", f"Script not found:\n{script_path}")
+            return
+        self.update_status('Generating buyback image...')
+        error_holder = [None]
+
+        def _worker():
+            try:
+                result = subprocess.run(
+                    [_sys.executable, script_path],
+                    cwd=PROJECT_DIR,
+                    capture_output=True, text=True, timeout=30
+                )
+                if result.returncode != 0:
+                    error_holder[0] = (result.stderr or result.stdout or 'Unknown error').strip()[-300:]
+            except Exception as e:
+                error_holder[0] = str(e)
+            self.root.after(0, _done)
+
+        def _done():
+            if error_holder[0]:
+                self.update_status('Buyback image generation failed')
+                messagebox.showerror("Failed", f"Image generation failed:\n\n{error_holder[0]}")
+            else:
+                self.update_status('Buyback images saved (buyback_miners.png, buyback_salvage.png)')
+                messagebox.showinfo("Done", "buyback_miners.png  —  Minerals, Ice, Moon, Gas\n"
+                                            "buyback_salvage.png  —  Salvage & Research\n\n"
                                             "Ready to drag into Discord.")
 
         threading.Thread(target=_worker, daemon=True).start()
@@ -3962,25 +4030,16 @@ class AdminDashboard:
         cursor.execute("SELECT MAX(timestamp) FROM market_price_snapshots WHERE type_id IN (%s)" % placeholders, all_ids)
         snap_ts = cursor.fetchone()[0]
 
-        # N-day average per ore type — use same price column as the buy basis
-        ore_ph = ','.join('?' * len(all_ore_ids))
-        if 'JSV' in buy_basis:
-            avg_col    = 'AVG(best_sell)'
-            avg_filter = 'AND best_sell IS NOT NULL'
-        elif 'Split' in buy_basis:
-            avg_col    = 'AVG((best_buy + best_sell) / 2.0)'
-            avg_filter = 'AND best_buy IS NOT NULL AND best_sell IS NOT NULL'
-        else:  # JBV (default)
-            avg_col    = 'AVG(best_buy)'
-            avg_filter = 'AND best_buy IS NOT NULL'
+        # N-day average for ore AND product type_ids (minerals, ice products, moon mats)
+        # Used to compute avg refine value per unit for dev % calculation
         cursor.execute(f"""
-            SELECT type_id, {avg_col}
+            SELECT type_id, AVG(best_buy)
             FROM market_price_snapshots
-            WHERE type_id IN ({ore_ph})
-              {avg_filter}
+            WHERE type_id IN ({placeholders})
+              AND best_buy IS NOT NULL
               AND timestamp >= datetime('now', '-{dev_days} days')
             GROUP BY type_id
-        """, all_ore_ids)
+        """, all_ids)
         avg_prices = {r[0]: r[1] for r in cursor.fetchall()}
 
         # 7-day price range (high/low) for volatility column — same basis as avg
@@ -4083,9 +4142,7 @@ class AdminDashboard:
             profit  = prod_value - total_cost
             margin  = (profit / total_cost * 100) if total_cost > 0 else 0
 
-            # Deviation vs N-day average — both sides use the configured buy basis
-            avg_bb  = avg_prices.get(type_id)
-            dev_pct = ((raw_price - avg_bb) / avg_bb * 100) if (raw_price and avg_bb and avg_bb > 0) else None
+            avg_bb = avg_prices.get(type_id)   # N-day avg ore price (used for sug_bid/volatility)
 
             # ── Buy order analysis metrics ────────────────────────────────
             try:
@@ -4094,6 +4151,25 @@ class AdminDashboard:
                 target_margin_rate = 0.05
 
             value_pu = prod_value / portion          # refine value per unit
+
+            # Deviation vs N-day average — compare current refine value to avg refine value
+            # (matches Import Analysis tool: use avg mineral prices to recompute avg refine value)
+            _avg_rv = 0.0
+            _all_mats_avg = bool(ore_yields)
+            for _mat in ore_yields:
+                _mid = _mat['materialTypeID']
+                _qty = _mat['quantity']
+                if _mid not in self.ore_product_pct:
+                    continue
+                try:    _mpct = float(self.ore_product_pct[_mid].get()) / 100.0
+                except: _mpct = 1.0
+                _avg_mat = avg_prices.get(_mid)
+                if not _avg_mat:
+                    _all_mats_avg = False
+                    break
+                _avg_rv += _qty * refine_eff * _avg_mat * _mpct
+            _avg_refine_pu = (_avg_rv / portion) if (_all_mats_avg and _avg_rv > 0) else None
+            dev_pct = ((value_pu - _avg_refine_pu) / _avg_refine_pu * 100) if _avg_refine_pu else None
             ship_pu  = volume * ship_rate            # fixed shipping per unit (doesn't scale with price)
 
             # max_bid: max ISK/unit to place on buy order to hit target_margin

@@ -1,0 +1,2828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moon Ore Margin Report — LX-ZOJ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #0a1520;
+    --bg2:     #0e1e30;
+    --bg3:     #122540;
+    --text:    #c8d8e8;
+    --muted:   #7898a8;
+    --cyan:    #00d9ff;
+    --gold:    #ffd700;
+    --green:   #00e676;
+    --red:     #ff3d3d;
+    --yellow:  #ffcc44;
+    --border:  #1a3555;
+    --r4-col:  #4a9eff;
+    --r8-col:  #34d058;
+    --r16-col: #f4a700;
+    --r32-col: #d97bff;
+    --r64-col: #ff6b6b;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  a { color: var(--cyan); text-decoration: none; }
+
+  /* ── Layout ── */
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 16px 40px; }
+  .report-header {
+    background: linear-gradient(135deg, #0e1e30 0%, #122540 100%);
+    border-bottom: 2px solid var(--cyan);
+    padding: 24px 16px 16px;
+    margin-bottom: 24px;
+  }
+  .report-header h1 {
+    font-size: 22px; font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 1px;
+  }
+  .report-meta {
+    color: var(--muted); font-size: 11px; margin-top: 6px;
+  }
+  .report-params {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    margin-top: 10px; font-size: 11px; color: var(--muted);
+  }
+  .report-params span { color: var(--text); }
+
+  /* ── Section headings ── */
+  .section-title {
+    font-size: 16px; font-weight: 700;
+    color: var(--cyan);
+    border-left: 3px solid var(--cyan);
+    padding-left: 10px;
+    margin: 28px 0 16px;
+  }
+  .sub-heading {
+    font-size: 12px; font-weight: 600;
+    color: var(--gold);
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Stat cards ── */
+  .stat-cards { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    min-width: 180px; flex: 1;
+  }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+  .stat-value { font-size: 22px; font-weight: 700; margin: 4px 0 2px; }
+  .stat-name  { font-size: 11px; color: var(--muted); }
+
+  /* ── Exec summary paragraph ── */
+  .exec-para {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  /* ── Tables ── */
+  .table-scroll { overflow-x: auto; }
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px;
+  }
+  .data-table th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 1;
+  }
+  .data-table th.num { text-align: right; }
+  .data-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #0f2035;
+  }
+  .data-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .data-table tr:hover { background: rgba(0,217,255,0.04); }
+
+  .row-green  { background: rgba(0,230,118,0.06); }
+  .row-yellow { background: rgba(255,204,68,0.06); }
+  .row-red    { background: rgba(255,61,61,0.07); }
+  .row-nodata { background: rgba(40,60,80,0.3); opacity: 0.6; }
+
+  /* ── Tier badges ── */
+  .badge-r4  { color: var(--r4-col);  font-weight: 700; }
+  .badge-r8  { color: var(--r8-col);  font-weight: 700; }
+  .badge-r16 { color: var(--r16-col); font-weight: 700; }
+  .badge-r32 { color: var(--r32-col); font-weight: 700; }
+  .badge-r64 { color: var(--r64-col); font-weight: 700; }
+
+  /* ── Signal badges ── */
+  .signal { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; }
+  .sig-strong-buy { background: #004a20; color: #00e676; }
+  .sig-buy        { background: #003520; color: #34d058; }
+  .sig-watch      { background: #3a2e00; color: #ffcc44; }
+  .sig-marginal   { background: #2a2000; color: #aa9900; }
+  .sig-avoid      { background: #3a0000; color: #ff3d3d; }
+  .sig-thin       { background: #202040; color: #aaaaff; }
+  .sig-nodata     { background: #1a2535; color: #5a7090; }
+
+  /* ── Positive/negative colors ── */
+  .pos     { color: var(--green); }
+  .neg     { color: var(--red); }
+  .neutral { color: var(--muted); }
+  .nodata  { color: var(--muted); font-style: italic; }
+
+  /* ── Filter buttons ── */
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .filter-btn {
+    padding: 4px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg3);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .filter-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+
+  /* ── Family cards ── */
+  .family-cards { display: flex; flex-direction: column; gap: 16px; }
+  .family-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .family-header {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .family-name { font-size: 15px; font-weight: 700; color: var(--gold); }
+  .family-tier { font-size: 12px; font-weight: 700; }
+  .family-margin { font-size: 14px; font-weight: 700; }
+  .family-chg { font-size: 12px; }
+
+  .family-narrative {
+    font-size: 12px; color: var(--text);
+    background: rgba(0,217,255,0.03);
+    border-left: 2px solid var(--cyan);
+    padding: 8px 12px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+
+  /* ── Sparklines ── */
+  .sparkline-row {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-top: 8px;
+  }
+  .spark-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    min-width: 120px;
+    flex: 1;
+  }
+  .spark-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  /* ── Tier section ── */
+  .tier-section { margin-bottom: 24px; }
+  .tier-heading {
+    font-size: 14px; font-weight: 700;
+    margin-bottom: 6px;
+    padding: 4px 10px;
+    background: var(--bg3);
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .tier-summary {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ── Rankings table container ── */
+  #rankings-table-container { max-height: 600px; overflow-y: auto; }
+  .variant-table td, .variant-table th { padding: 5px 8px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .stat-card { min-width: 140px; }
+    .sparkline-row .spark-wrap { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div class="container" style="padding-bottom:0;">
+    <h1>Moon Ore Margin Report — LX-ZOJ</h1>
+    <div class="report-meta">
+      Generated: 2026-03-18 11:15:51 &nbsp;|&nbsp;
+      Price data through: 2026-03-18 15:06:32 UTC
+    </div>
+    <div class="report-params">
+      Buy basis: <span>JSV  (instant)</span> &nbsp;
+      Buy %: <span>100%</span> &nbsp;
+      Shipping: <span>125 ISK/m³</span> &nbsp;
+      Collateral: <span>1.0%</span> &nbsp;
+      Refine eff: <span>90.63%</span> &nbsp;
+      Broker: <span>0% (JSV)</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── Section 1: Executive Summary ── -->
+  <h2 class="section-title">Executive Summary</h2>
+  <div class="exec-para">Moon ore margins are declining across most ores — 15 ores trending up, 29 down, 7 flat over 30 days. R64 ores average -11.9% ROI. Best opportunity: Compressed Bountiful Monazite at 16.8% margin. Avoid Compressed Lavish Otavite (-97.4% margin). Biggest 30-day gainer: Compressed Glowing Cinnabar (+41.9 pp). Biggest 30-day loser: Compressed Glowing Carnotite (-58.0 pp).</div>
+  <div class="stat-cards">
+    <div class='stat-card'><div class='stat-label'>Best Margin</div><div class='stat-value pos'>16.8%</div><div class='stat-name'>Compressed Bountiful Monazite</div></div><div class='stat-card'><div class='stat-label'>Worst Margin</div><div class='stat-value neg'>-97.4%</div><div class='stat-name'>Compressed Lavish Otavite</div></div><div class='stat-card'><div class='stat-label'>Most Improved (30d)</div><div class='stat-value pos'>+41.9 pp</div><div class='stat-name'>Compressed Glowing Cinnabar</div></div><div class='stat-card'><div class='stat-label'>Biggest Decline (30d)</div><div class='stat-value neg'>-58.0 pp</div><div class='stat-name'>Compressed Glowing Carnotite</div></div>
+  </div>
+
+  <!-- ── Section 2: Rankings Table ── -->
+  <h2 class="section-title">Ore Rankings</h2>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterRankings('all')">All</button>
+    <button class="filter-btn badge-r4"  onclick="filterRankings('R4')">R4</button>
+    <button class="filter-btn badge-r8"  onclick="filterRankings('R8')">R8</button>
+    <button class="filter-btn badge-r16" onclick="filterRankings('R16')">R16</button>
+    <button class="filter-btn badge-r32" onclick="filterRankings('R32')">R32</button>
+    <button class="filter-btn badge-r64" onclick="filterRankings('R64')">R64</button>
+  </div>
+  <div id="rankings-table-container">
+    <table class="data-table" id="rankings-table">
+      <thead><tr>
+        <th>Name</th>
+        <th>Tier</th>
+        <th class="num">Margin</th>
+        <th class="num">7d Chg</th>
+        <th class="num">30d Chg</th>
+        <th>Primary Driver</th>
+        <th>Signal</th>
+      </tr></thead>
+      <tbody id="rankings-tbody">
+        <tr class='row-green' data-tier='R64'><td>Compressed Bountiful Monazite</td><td><span class='badge-r64'>R64</span></td><td class='num pos'>16.8%</td><td class='num pos'>+12.6%</td><td class='num pos'>+20.6%</td><td>Neodymium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-tier='R64'><td>Compressed Loparite</td><td><span class='badge-r64'>R64</span></td><td class='num pos'>9.3%</td><td class='num pos'>+7.2%</td><td class='num pos'>+7.7%</td><td>Promethium</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-tier='R64'><td>Compressed Monazite</td><td><span class='badge-r64'>R64</span></td><td class='num pos'>7.9%</td><td class='num neg'>-2.8%</td><td class='num pos'>+4.2%</td><td>Neodymium</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-tier='R64'><td>Compressed Xenotime</td><td><span class='badge-r64'>R64</span></td><td class='num pos'>5.7%</td><td class='num pos'>+8.1%</td><td class='num pos'>+17.7%</td><td>Dysprosium</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Otavite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-1.1%</td><td class='num pos'>+10.3%</td><td class='num pos'>+10.1%</td><td>Cadmium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Lavish Sperrylite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-3.5%</td><td class='num pos'>+17.1%</td><td class='num pos'>+10.6%</td><td>Platinum</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R64'><td>Compressed Shining Loparite</td><td><span class='badge-r64'>R64</span></td><td class='num neg'>-6.9%</td><td class='num pos'>+6.3%</td><td class='num pos'>+31.9%</td><td>Promethium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Lavish Chromite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-8.7%</td><td class='num pos'>+6.3%</td><td class='num neg'>-0.8%</td><td>Chromium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Replete Carnotite</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-9.3%</td><td class='num neg'>-2.8%</td><td class='num neg'>-2.3%</td><td>Technetium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Glowing Cinnabar</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-9.9%</td><td class='num pos'>+1.4%</td><td class='num pos'>+41.9%</td><td>Mercury</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R8'><td>Compressed Twinkling Titanite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-10.1%</td><td class='num '>N/A</td><td class='num '>N/A</td><td>Titanium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Carnotite</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-10.4%</td><td class='num pos'>+3.0%</td><td class='num '>N/A</td><td>Technetium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Replete Zircon</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-11.1%</td><td class='num pos'>+5.1%</td><td class='num neg'>-2.6%</td><td>Hafnium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Zircon</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-11.2%</td><td class='num pos'>+6.2%</td><td class='num neg'>-1.5%</td><td>Hafnium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Chromite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-15.0%</td><td class='num pos'>+19.0%</td><td class='num neg'>-0.3%</td><td>Chromium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R64'><td>Compressed Bountiful Xenotime</td><td><span class='badge-r64'>R64</span></td><td class='num neg'>-15.1%</td><td class='num pos'>+5.7%</td><td class='num neg'>-10.7%</td><td>Dysprosium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Replete Pollucite</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-15.3%</td><td class='num '>N/A</td><td class='num '>N/A</td><td>Caesium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Shimmering Chromite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-22.5%</td><td class='num pos'>+5.0%</td><td class='num neg'>-3.1%</td><td>Chromium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Pollucite</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-24.6%</td><td class='num neg'>-3.3%</td><td class='num '>N/A</td><td>Caesium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Shimmering Otavite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-29.5%</td><td class='num pos'>+7.4%</td><td class='num neg'>-2.8%</td><td>Cadmium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R64'><td>Compressed Bountiful Loparite</td><td><span class='badge-r64'>R64</span></td><td class='num neg'>-30.7%</td><td class='num pos'>+5.2%</td><td class='num neg'>-33.6%</td><td>Promethium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Replete Cinnabar</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-31.4%</td><td class='num pos'>+1.3%</td><td class='num neg'>-14.8%</td><td>Mercury</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R64'><td>Compressed Shining Xenotime</td><td><span class='badge-r64'>R64</span></td><td class='num neg'>-31.8%</td><td class='num pos'>+4.5%</td><td class='num pos'>+0.9%</td><td>Dysprosium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Glowing Carnotite</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-32.6%</td><td class='num pos'>+2.9%</td><td class='num neg'>-58.0%</td><td>Technetium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R64'><td>Compressed Bountiful Ytterbite</td><td><span class='badge-r64'>R64</span></td><td class='num neg'>-32.6%</td><td class='num pos'>+4.7%</td><td class='num pos'>+22.1%</td><td>Thulium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Shimmering Vanadinite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-35.1%</td><td class='num pos'>+1.2%</td><td class='num '>N/A</td><td>Vanadium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R64'><td>Compressed Ytterbite</td><td><span class='badge-r64'>R64</span></td><td class='num neg'>-41.6%</td><td class='num pos'>+3.9%</td><td class='num neg'>-11.1%</td><td>Thulium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R32'><td>Compressed Cinnabar</td><td><span class='badge-r32'>R32</span></td><td class='num neg'>-45.7%</td><td class='num pos'>+1.9%</td><td class='num neg'>-10.7%</td><td>Mercury</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R8'><td>Compressed Titanite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-61.6%</td><td class='num neg'>-3.5%</td><td class='num '>N/A</td><td>Titanium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Lavish Vanadinite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-63.6%</td><td class='num pos'>+0.7%</td><td class='num neg'>-7.9%</td><td>Vanadium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Vanadinite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-63.9%</td><td class='num pos'>+0.8%</td><td class='num neg'>-4.5%</td><td>Vanadium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Glistening Coesite</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-73.6%</td><td class='num pos'>+2.2%</td><td class='num pos'>+1.0%</td><td>Silicates</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Brimful Coesite</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-75.1%</td><td class='num pos'>+1.4%</td><td class='num neg'>-0.4%</td><td>Silicates</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Bitumens</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-75.3%</td><td class='num pos'>+3.0%</td><td class='num neg'>-1.1%</td><td>Hydrocarbons</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R8'><td>Compressed Copious Scheelite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-76.4%</td><td class='num neg'>-0.6%</td><td class='num pos'>+16.9%</td><td>Tungsten</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Brimful Bitumens</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-77.1%</td><td class='num pos'>+1.7%</td><td class='num neg'>-2.2%</td><td>Hydrocarbons</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Glistening Bitumens</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-77.9%</td><td class='num pos'>+2.1%</td><td class='num neg'>-2.4%</td><td>Hydrocarbons</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R8'><td>Compressed Scheelite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-79.6%</td><td class='num pos'>+3.0%</td><td class='num '>N/A</td><td>Tungsten</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Coesite</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-81.9%</td><td class='num neg'>-9.4%</td><td class='num neg'>-7.0%</td><td>Silicates</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Glistening Sylvite</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-84.1%</td><td class='num neg'>-0.7%</td><td class='num neg'>-0.2%</td><td>Evaporite Deposits</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Sylvite</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-84.7%</td><td class='num neg'>-2.4%</td><td class='num neg'>-1.2%</td><td>Evaporite Deposits</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Brimful Sylvite</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-84.9%</td><td class='num neg'>-1.5%</td><td class='num neg'>-1.2%</td><td>Evaporite Deposits</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-nodata' data-tier='R8'><td>Compressed Euxenite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-85.1%</td><td class='num pos'>+4.0%</td><td class='num pos'>+3.7%</td><td>Scandium</td><td><span class='signal sig-thin'>Thin Market</span></td></tr><tr class='row-red' data-tier='R8'><td>Compressed Cobaltite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-87.8%</td><td class='num neg'>-0.7%</td><td class='num pos'>+0.8%</td><td>Cobalt</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R16'><td>Compressed Sperrylite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-89.9%</td><td class='num neg'>-52.6%</td><td class='num neg'>-8.5%</td><td>Platinum</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Brimful Zeolites</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-91.1%</td><td class='num pos'>+0.1%</td><td class='num neg'>-0.4%</td><td>Atmospheric Gases</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Glistening Zeolites</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-91.2%</td><td class='num pos'>+0.5%</td><td class='num neg'>-0.5%</td><td>Atmospheric Gases</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-nodata' data-tier='R8'><td>Compressed Copious Titanite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-91.4%</td><td class='num pos'>+3.3%</td><td class='num pos'>+2.3%</td><td>Titanium</td><td><span class='signal sig-thin'>Thin Market</span></td></tr><tr class='row-red' data-tier='R4'><td>Compressed Zeolites</td><td><span class='badge-r4'>R4</span></td><td class='num neg'>-91.5%</td><td class='num neg'>-0.1%</td><td class='num neg'>-1.0%</td><td>Atmospheric Gases</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-nodata' data-tier='R8'><td>Compressed Copious Euxenite</td><td><span class='badge-r8'>R8</span></td><td class='num neg'>-96.2%</td><td class='num pos'>+0.1%</td><td class='num neg'>-0.2%</td><td>Scandium</td><td><span class='signal sig-thin'>Thin Market</span></td></tr><tr class='row-nodata' data-tier='R16'><td>Compressed Lavish Otavite</td><td><span class='badge-r16'>R16</span></td><td class='num neg'>-97.4%</td><td class='num neg'>-84.7%</td><td class='num neg'>-0.1%</td><td>Cadmium</td><td><span class='signal sig-thin'>Thin Market</span></td></tr><tr class='row-nodata' data-tier='R8'><td>Compressed Copious Cobaltite</td><td><span class='badge-r8'>R8</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R8'><td>Compressed Twinkling Cobaltite</td><td><span class='badge-r8'>R8</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R8'><td>Compressed Twinkling Euxenite</td><td><span class='badge-r8'>R8</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R8'><td>Compressed Twinkling Scheelite</td><td><span class='badge-r8'>R8</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R16'><td>Compressed Shimmering Sperrylite</td><td><span class='badge-r16'>R16</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R32'><td>Compressed Glowing Zircon</td><td><span class='badge-r32'>R32</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R32'><td>Compressed Glowing Pollucite</td><td><span class='badge-r32'>R32</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R64'><td>Compressed Shining Monazite</td><td><span class='badge-r64'>R64</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr><tr class='row-nodata' data-tier='R64'><td>Compressed Shining Ytterbite</td><td><span class='badge-r64'>R64</span></td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td></td><td><span class='signal sig-nodata'>No Data</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Section 3: Family Cards ── -->
+  <h2 class="section-title">Per-Ore Family Analysis</h2>
+  <div class="filter-bar" id="family-filter-bar">
+    <button class="filter-btn active" onclick="filterFamilies('all', this)">All Tiers</button>
+    <button class="filter-btn badge-r4"  onclick="filterFamilies('R4',  this)">R4</button>
+    <button class="filter-btn badge-r8"  onclick="filterFamilies('R8',  this)">R8</button>
+    <button class="filter-btn badge-r16" onclick="filterFamilies('R16', this)">R16</button>
+    <button class="filter-btn badge-r32" onclick="filterFamilies('R32', this)">R32</button>
+    <button class="filter-btn badge-r64" onclick="filterFamilies('R64', this)">R64</button>
+  </div>
+  <div class="family-cards" id="family-cards-container">
+    
+        <div class="family-card" data-tier="R4">
+            <div class="family-header">
+                <span class="family-name">Bitumens</span>
+                <span class="family-tier badge-r4">R4</span>
+                <span class="family-margin neg">-75.3%</span>
+                <span class="family-chg neg">30d: -1.1%</span>
+            </div>
+            <p class="family-narrative">The base Bitumens ore currently offers a negative margin of -75.3% ROI. Hydrocarbons is the dominant value driver, contributing 100% of batch revenue. Hydrocarbons has fallen 14.4% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>35</td><td class='num'>6000</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>36</td><td class='num'>400</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>Hydrocarbons</td><td class='num'>65</td><td class='num'>521</td><td class='num pos'>+8.6%</td><td class='num neg'>-10.3%</td><td class='num neg'>-14.4%</td><td class='num'>29.8K</td><td class='num'>100.0%</td><td class='num neg'>-5.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Bitumens</td><td>Base</td><td class='neg'>-75.3%</td><td>1.2K</td><td>1.2K</td></tr><tr class='row-red'><td>Compressed Brimful Bitumens</td><td>Mid</td><td class='neg'>-77.1%</td><td>1.5K</td><td>1.4K</td></tr><tr class='row-red'><td>Compressed Glistening Bitumens</td><td>High</td><td class='neg'>-77.9%</td><td>2.7K</td><td>2.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>35</div><canvas id='spark_62454_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>36</div><canvas id='spark_62454_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Hydrocarbons</div><canvas id='spark_62454_16633' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62454_35');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62454_36');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62454_16633');
+                if (!ctx) return;
+                var data = [609.38, 609.0, 608.87, 576.51, 590.68, 619.54, 623.33, 589.67, 561.2, 568.66, 576.4, 571.23, 575.1, 573.35, 574.89, 580.67, 581.34, 573.62, 568.72, 555.51, 556.84, 562.66, 522.04, 479.87, 488.08, 495.94, 505.76, 513.15, 517.59, 518.01, 521.36];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R4">
+            <div class="family-header">
+                <span class="family-name">Coesite</span>
+                <span class="family-tier badge-r4">R4</span>
+                <span class="family-margin neg">-81.9%</span>
+                <span class="family-chg neg">30d: -7.0%</span>
+            </div>
+            <p class="family-narrative">The base Coesite ore currently offers a negative margin of -81.9% ROI. Silicates is the dominant value driver, contributing 100% of batch revenue. Silicates pricing has been stable over the past 30 days.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>35</td><td class='num'>2000</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>36</td><td class='num'>400</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>Silicates</td><td class='num'>65</td><td class='num'>352</td><td class='num pos'>+6.3%</td><td class='num neg'>-5.2%</td><td class='num pos'>+1.3%</td><td class='num'>20.1K</td><td class='num'>100.0%</td><td class='num pos'>258</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Coesite</td><td>Base</td><td class='neg'>-81.9%</td><td>1.1K</td><td>628</td></tr><tr class='row-red'><td>Compressed Brimful Coesite</td><td>Mid</td><td class='neg'>-75.1%</td><td>909</td><td>751</td></tr><tr class='row-red'><td>Compressed Glistening Coesite</td><td>High</td><td class='neg'>-73.6%</td><td>1.5K</td><td>1.1K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>35</div><canvas id='spark_62457_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>36</div><canvas id='spark_62457_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Silicates</div><canvas id='spark_62457_16636' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62457_35');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62457_36');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62457_16636');
+                if (!ctx) return;
+                var data = [347.1, 345.62, 348.02, 349.99, 361.66, 369.7, 388.2, 385.91, 363.43, 365.99, 380.82, 386.71, 384.4, 384.23, 384.71, 383.76, 370.82, 365.86, 366.3, 366.07, 364.57, 314.17, 326.08, 330.64, 335.09, 365.8, 358.16, 351.53, 352.73, 354.03, 351.61];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R4">
+            <div class="family-header">
+                <span class="family-name">Sylvite</span>
+                <span class="family-tier badge-r4">R4</span>
+                <span class="family-margin neg">-84.7%</span>
+                <span class="family-chg neg">30d: -1.2%</span>
+            </div>
+            <p class="family-narrative">The base Sylvite ore currently offers a negative margin of -84.7% ROI. Evaporite Deposits is the dominant value driver, contributing 100% of batch revenue. Evaporite Deposits has fallen 8.5% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>35</td><td class='num'>4000</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>36</td><td class='num'>400</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>Evaporite Deposits</td><td class='num'>65</td><td class='num'>261</td><td class='num neg'>-7.9%</td><td class='num neg'>-13.1%</td><td class='num neg'>-8.5%</td><td class='num'>14.9K</td><td class='num'>100.0%</td><td class='num neg'>-1.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Sylvite</td><td>Base</td><td class='neg'>-84.7%</td><td>954</td><td>793</td></tr><tr class='row-red'><td>Compressed Brimful Sylvite</td><td>Mid</td><td class='neg'>-84.9%</td><td>1.1K</td><td>937</td></tr><tr class='row-red'><td>Compressed Glistening Sylvite</td><td>High</td><td class='neg'>-84.1%</td><td>1.8K</td><td>1.7K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>35</div><canvas id='spark_62460_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>36</div><canvas id='spark_62460_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Evaporite Deposits</div><canvas id='spark_62460_16635' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62460_35');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62460_36');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62460_16635');
+                if (!ctx) return;
+                var data = [285.63, 251.9, 254.27, 263.97, 298.7, 311.38, 313.78, 293.14, 265.77, 274.07, 291.57, 297.95, 299.5, 299.62, 294.91, 301.42, 300.65, 302.66, 293.22, 284.66, 284.92, 290.07, 283.78, 283.56, 276.47, 278.17, 273.12, 269.38, 264.45, 261.31, 261.21];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R4">
+            <div class="family-header">
+                <span class="family-name">Zeolites</span>
+                <span class="family-tier badge-r4">R4</span>
+                <span class="family-margin neg">-91.5%</span>
+                <span class="family-chg neg">30d: -1.0%</span>
+            </div>
+            <p class="family-narrative">The base Zeolites ore currently offers a negative margin of -91.5% ROI. Atmospheric Gases is the dominant value driver, contributing 100% of batch revenue. Atmospheric Gases has fallen 11.5% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>35</td><td class='num'>8000</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>36</td><td class='num'>400</td><td class='num'>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num '>N/A</td><td class='num'>N/A</td><td class='num'>N/A</td><td class='num '>N/A</td></tr><tr><td>Atmospheric Gases</td><td class='num'>65</td><td class='num'>231</td><td class='num neg'>-1.0%</td><td class='num neg'>-1.2%</td><td class='num neg'>-11.5%</td><td class='num'>13.2K</td><td class='num'>100.0%</td><td class='num neg'>-1.7K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Zeolites</td><td>Base</td><td class='neg'>-91.5%</td><td>1.5K</td><td>1.4K</td></tr><tr class='row-red'><td>Compressed Brimful Zeolites</td><td>Mid</td><td class='neg'>-91.1%</td><td>1.7K</td><td>1.6K</td></tr><tr class='row-red'><td>Compressed Glistening Zeolites</td><td>High</td><td class='neg'>-91.2%</td><td>3.0K</td><td>2.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>35</div><canvas id='spark_62463_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>36</div><canvas id='spark_62463_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Atmospheric Gases</div><canvas id='spark_62463_16634' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62463_35');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62463_36');
+                if (!ctx) return;
+                var data = [];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62463_16634');
+                if (!ctx) return;
+                var data = [260.93, 258.44, 235.1, 221.8, 225.08, 227.48, 230.78, 232.72, 234.15, 233.97, 234.08, 239.47, 243.2, 234.98, 241.24, 241.12, 233.79, 233.07, 232.59, 233.02, 234.69, 237.18, 235.2, 233.21, 234.48, 239.68, 231.68, 229.17, 228.64, 227.67, 230.89];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R8">
+            <div class="family-header">
+                <span class="family-name">Cobaltite</span>
+                <span class="family-tier badge-r8">R8</span>
+                <span class="family-margin neg">-87.8%</span>
+                <span class="family-chg pos">30d: +0.8%</span>
+            </div>
+            <p class="family-narrative">The base Cobaltite ore currently offers a negative margin of -87.8% ROI. Cobalt is the dominant value driver, contributing 100% of batch revenue. Cobalt has fallen 18.7% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Cobalt</td><td class='num'>40</td><td class='num'>596</td><td class='num neg'>-5.2%</td><td class='num neg'>-4.4%</td><td class='num neg'>-18.7%</td><td class='num'>21.2K</td><td class='num'>100.0%</td><td class='num neg'>-4.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Cobaltite</td><td>Base</td><td class='neg'>-87.8%</td><td>1.7K</td><td>239</td></tr><tr class='row-nodata'><td>Compressed Copious Cobaltite</td><td>Mid</td><td class=''>N/A</td><td>N/A</td><td>100</td></tr><tr class='row-nodata'><td>Compressed Twinkling Cobaltite</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>150</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Cobalt</div><canvas id='spark_62474_16640' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62474_16640');
+                if (!ctx) return;
+                var data = [733.18, 727.78, 702.5, 700.44, 689.9, 684.74, 687.23, 515.48, 455.61, 519.89, 516.85, 600.72, 608.62, 616.17, 617.69, 619.8, 623.26, 624.64, 627.06, 626.63, 624.52, 624.21, 625.99, 628.22, 616.62, 623.26, 573.51, 556.83, 581.34, 592.23, 595.73];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R8">
+            <div class="family-header">
+                <span class="family-name">Euxenite</span>
+                <span class="family-tier badge-r8">R8</span>
+                <span class="family-margin neg">-85.1%</span>
+                <span class="family-chg pos">30d: +3.7%</span>
+            </div>
+            <p class="family-narrative">The base Euxenite ore currently offers a negative margin of -85.1% ROI. Scandium is the dominant value driver, contributing 100% of batch revenue. Scandium has fallen 5.2% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Scandium</td><td class='num'>40</td><td class='num'>462</td><td class='num pos'>+2.4%</td><td class='num pos'>+0.4%</td><td class='num neg'>-5.2%</td><td class='num'>16.4K</td><td class='num'>100.0%</td><td class='num neg'>-892</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-nodata'><td>Compressed Euxenite</td><td>Base</td><td class='neg'>-85.1%</td><td>1.1K</td><td>0</td></tr><tr class='row-nodata'><td>Compressed Copious Euxenite</td><td>Mid</td><td class='neg'>-96.2%</td><td>4.9K</td><td>229</td></tr><tr class='row-nodata'><td>Compressed Twinkling Euxenite</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>300</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Scandium</div><canvas id='spark_62471_16639' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62471_16639');
+                if (!ctx) return;
+                var data = [487.48, 486.92, 483.33, 473.24, 455.22, 455.64, 460.08, 464.85, 455.89, 451.14, 457.15, 456.4, 451.42, 424.42, 460.09, 460.72, 460.38, 458.73, 437.2, 423.07, 421.02, 424.42, 429.98, 451.58, 451.17, 454.48, 457.04, 464.02, 424.78, 456.9, 462.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R8">
+            <div class="family-header">
+                <span class="family-name">Scheelite</span>
+                <span class="family-tier badge-r8">R8</span>
+                <span class="family-margin neg">-79.6%</span>
+                <span class="family-chg ">30d: N/A</span>
+            </div>
+            <p class="family-narrative">The base Scheelite ore currently offers a negative margin of -79.6% ROI. Tungsten is the dominant value driver, contributing 100% of batch revenue. Tungsten has risen 6.1% over the past 30 days, boosting returns.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tungsten</td><td class='num'>40</td><td class='num'>1.4K</td><td class='num pos'>+16.6%</td><td class='num neg'>-5.1%</td><td class='num pos'>+6.1%</td><td class='num'>49.7K</td><td class='num'>100.0%</td><td class='num pos'>2.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Scheelite</td><td>Base</td><td class='neg'>-79.6%</td><td>2.4K</td><td>N/A</td></tr><tr class='row-red'><td>Compressed Copious Scheelite</td><td>Mid</td><td class='neg'>-76.4%</td><td>2.4K</td><td>407</td></tr><tr class='row-nodata'><td>Compressed Twinkling Scheelite</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>697</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tungsten</div><canvas id='spark_62468_16637' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62468_16637');
+                if (!ctx) return;
+                var data = [1319.33, 1327.6, 1338.33, 1341.0, 1343.6, 1352.6, 1342.83, 1353.38, 1374.0, 1395.43, 1421.67, 1425.45, 1452.0, 1437.33, 1435.64, 1456.23, 1475.5, 1501.86, 1461.3, 1364.87, 1291.11, 1248.0, 1201.0, 1201.33, 1202.3, 1322.78, 1301.62, 1307.83, 1348.46, 1377.11, 1400.25];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R8">
+            <div class="family-header">
+                <span class="family-name">Titanite</span>
+                <span class="family-tier badge-r8">R8</span>
+                <span class="family-margin neg">-61.6%</span>
+                <span class="family-chg ">30d: N/A</span>
+            </div>
+            <p class="family-narrative">The base Titanite ore currently offers a negative margin of -61.6% ROI. Titanium is the dominant value driver, contributing 100% of batch revenue. Titanium has fallen 23.7% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Titanium</td><td class='num'>40</td><td class='num'>642</td><td class='num neg'>-8.4%</td><td class='num neg'>-15.5%</td><td class='num neg'>-23.7%</td><td class='num'>22.8K</td><td class='num'>100.0%</td><td class='num neg'>-7.1K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Titanite</td><td>Base</td><td class='neg'>-61.6%</td><td>576</td><td>176</td></tr><tr class='row-nodata'><td>Compressed Copious Titanite</td><td>Mid</td><td class='neg'>-91.4%</td><td>3.0K</td><td>0</td></tr><tr class='row-red'><td>Compressed Twinkling Titanite</td><td>High</td><td class='neg'>-10.1%</td><td>490</td><td>400</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Titanium</div><canvas id='spark_62477_16638' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62477_16638');
+                if (!ctx) return;
+                var data = [842.22, 808.72, 793.57, 793.29, 772.96, 761.24, 761.53, 761.49, 762.92, 763.93, 764.48, 763.41, 762.84, 761.37, 760.61, 760.59, 760.01, 760.49, 761.08, 761.22, 699.4, 693.07, 697.02, 701.36, 701.95, 701.83, 704.2, 702.85, 688.05, 641.68, 642.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R16">
+            <div class="family-header">
+                <span class="family-name">Chromite</span>
+                <span class="family-tier badge-r16">R16</span>
+                <span class="family-margin neg">-15.0%</span>
+                <span class="family-chg neg">30d: -0.3%</span>
+            </div>
+            <p class="family-narrative">The base Chromite ore currently offers a negative margin of -15.0% ROI. Chromium is the dominant value driver, contributing 98% of batch revenue. Chromium pricing has been stable over the past 30 days. Secondary contributors: Hydrocarbons (2% of value, falling 14.4%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Hydrocarbons</td><td class='num'>10</td><td class='num'>521</td><td class='num pos'>+8.6%</td><td class='num neg'>-10.3%</td><td class='num neg'>-14.4%</td><td class='num'>4.6K</td><td class='num'>2.1%</td><td class='num neg'>-774</td></tr><tr><td>Chromium</td><td class='num'>40</td><td class='num'>5.9K</td><td class='num pos'>+6.9%</td><td class='num pos'>+6.3%</td><td class='num neg'>-3.5%</td><td class='num'>211.0K</td><td class='num'>97.9%</td><td class='num neg'>-7.7K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Chromite</td><td>Base</td><td class='neg'>-15.0%</td><td>2.5K</td><td>2.0K</td></tr><tr class='row-red'><td>Compressed Lavish Chromite</td><td>Mid</td><td class='neg'>-8.7%</td><td>2.7K</td><td>1.9K</td></tr><tr class='row-red'><td>Compressed Shimmering Chromite</td><td>High</td><td class='neg'>-22.5%</td><td>5.5K</td><td>3.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Hydrocarbons</div><canvas id='spark_62480_16633' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Chromium</div><canvas id='spark_62480_16641' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62480_16633');
+                if (!ctx) return;
+                var data = [609.38, 609.0, 608.87, 576.51, 590.68, 619.54, 623.33, 589.67, 561.2, 568.66, 576.4, 571.23, 575.1, 573.35, 574.89, 580.67, 581.34, 573.62, 568.72, 555.51, 556.84, 562.66, 522.04, 479.87, 488.08, 495.94, 505.76, 513.15, 517.59, 518.01, 521.36];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62480_16641');
+                if (!ctx) return;
+                var data = [6094.67, 5920.8, 5629.0, 5685.71, 5824.4, 5834.6, 5711.67, 5700.88, 5702.8, 5705.86, 4325.0, 4942.0, 5084.0, 5238.67, 5398.82, 5479.69, 5528.62, 5581.93, 5621.1, 5673.4, 5570.67, 5445.56, 5486.85, 5499.67, 5545.2, 5701.67, 5796.0, 5814.67, 5829.38, 5852.56, 5879.25];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R16">
+            <div class="family-header">
+                <span class="family-name">Otavite</span>
+                <span class="family-tier badge-r16">R16</span>
+                <span class="family-margin neg">-1.1%</span>
+                <span class="family-chg pos">30d: +10.1%</span>
+            </div>
+            <p class="family-narrative">The base Otavite ore currently offers a negative margin of -1.1% ROI. Cadmium is the dominant value driver, contributing 99% of batch revenue. Cadmium pricing has been stable over the past 30 days. Secondary contributors: Atmospheric Gases (1% of value, falling 11.5%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Atmospheric Gases</td><td class='num'>10</td><td class='num'>231</td><td class='num neg'>-1.0%</td><td class='num neg'>-1.2%</td><td class='num neg'>-11.5%</td><td class='num'>2.0K</td><td class='num'>1.2%</td><td class='num neg'>-264</td></tr><tr><td>Cadmium</td><td class='num'>40</td><td class='num'>4.7K</td><td class='num pos'>+11.9%</td><td class='num pos'>+10.8%</td><td class='num neg'>-3.9%</td><td class='num'>169.2K</td><td class='num'>98.8%</td><td class='num neg'>-6.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Otavite</td><td>Base</td><td class='neg'>-1.1%</td><td>1.7K</td><td>1.3K</td></tr><tr class='row-nodata'><td>Compressed Lavish Otavite</td><td>Mid</td><td class='neg'>-97.4%</td><td>74.8K</td><td>1.5K</td></tr><tr class='row-red'><td>Compressed Shimmering Otavite</td><td>High</td><td class='neg'>-29.5%</td><td>4.8K</td><td>2.7K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Atmospheric Gases</div><canvas id='spark_62483_16634' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Cadmium</div><canvas id='spark_62483_16643' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62483_16634');
+                if (!ctx) return;
+                var data = [260.93, 258.44, 235.1, 221.8, 225.08, 227.48, 230.78, 232.72, 234.15, 233.97, 234.08, 239.47, 243.2, 234.98, 241.24, 241.12, 233.79, 233.07, 232.59, 233.02, 234.69, 237.18, 235.2, 233.21, 234.48, 239.68, 231.68, 229.17, 228.64, 227.67, 230.89];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62483_16643');
+                if (!ctx) return;
+                var data = [4906.33, 4583.0, 4517.67, 4593.57, 4767.6, 4581.0, 4431.33, 4293.38, 4139.9, 4146.71, 4189.5, 4210.27, 4230.0, 4194.67, 4209.64, 4214.69, 4253.25, 4263.79, 4287.0, 4316.07, 4218.11, 4183.67, 4180.69, 4214.22, 4329.5, 4549.22, 4473.88, 4437.83, 4451.0, 4569.56, 4714.12];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R16">
+            <div class="family-header">
+                <span class="family-name">Sperrylite</span>
+                <span class="family-tier badge-r16">R16</span>
+                <span class="family-margin neg">-89.9%</span>
+                <span class="family-chg neg">30d: -8.5%</span>
+            </div>
+            <p class="family-narrative">The base Sperrylite ore currently offers a negative margin of -89.9% ROI. Platinum is the dominant value driver, contributing 99% of batch revenue. Platinum has fallen 9.7% over the past 30 days, compressing margins. Secondary contributors: Evaporite Deposits (1% of value, falling 8.5%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Evaporite Deposits</td><td class='num'>10</td><td class='num'>261</td><td class='num neg'>-7.9%</td><td class='num neg'>-13.1%</td><td class='num neg'>-8.5%</td><td class='num'>2.3K</td><td class='num'>0.9%</td><td class='num neg'>-215</td></tr><tr><td>Platinum</td><td class='num'>40</td><td class='num'>7.1K</td><td class='num pos'>+10.8%</td><td class='num pos'>+3.7%</td><td class='num neg'>-9.7%</td><td class='num'>253.0K</td><td class='num'>99.1%</td><td class='num neg'>-27.2K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Sperrylite</td><td>Base</td><td class='neg'>-89.9%</td><td>25.0K</td><td>3.0K</td></tr><tr class='row-red'><td>Compressed Lavish Sperrylite</td><td>Mid</td><td class='neg'>-3.5%</td><td>3.0K</td><td>2.6K</td></tr><tr class='row-nodata'><td>Compressed Shimmering Sperrylite</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>1.3K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Evaporite Deposits</div><canvas id='spark_62486_16635' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Platinum</div><canvas id='spark_62486_16644' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62486_16635');
+                if (!ctx) return;
+                var data = [285.63, 251.9, 254.27, 263.97, 298.7, 311.38, 313.78, 293.14, 265.77, 274.07, 291.57, 297.95, 299.5, 299.62, 294.91, 301.42, 300.65, 302.66, 293.22, 284.66, 284.92, 290.07, 283.78, 283.56, 276.47, 278.17, 273.12, 269.38, 264.45, 261.31, 261.21];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62486_16644');
+                if (!ctx) return;
+                var data = [7809.0, 7710.2, 7643.33, 7598.86, 7655.6, 7680.2, 7329.33, 7199.88, 7136.5, 7178.14, 6756.33, 6998.27, 7138.2, 7179.33, 7232.55, 7165.38, 6796.88, 6824.71, 6892.3, 6890.2, 6842.44, 6841.67, 6323.62, 6364.0, 6397.4, 6651.33, 6843.12, 6855.5, 6925.92, 7018.78, 7050.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R16">
+            <div class="family-header">
+                <span class="family-name">Vanadinite</span>
+                <span class="family-tier badge-r16">R16</span>
+                <span class="family-margin neg">-63.9%</span>
+                <span class="family-chg neg">30d: -4.5%</span>
+            </div>
+            <p class="family-narrative">The base Vanadinite ore currently offers a negative margin of -63.9% ROI. Vanadium is the dominant value driver, contributing 96% of batch revenue. Vanadium has fallen 22.2% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Silicates</td><td class='num'>10</td><td class='num'>352</td><td class='num pos'>+6.3%</td><td class='num neg'>-5.2%</td><td class='num pos'>+1.3%</td><td class='num'>3.1K</td><td class='num'>4.4%</td><td class='num pos'>40</td></tr><tr><td>Vanadium</td><td class='num'>40</td><td class='num'>1.9K</td><td class='num pos'>+1.7%</td><td class='num neg'>-9.4%</td><td class='num neg'>-22.2%</td><td class='num'>67.2K</td><td class='num'>95.6%</td><td class='num neg'>-19.2K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Vanadinite</td><td>Base</td><td class='neg'>-63.9%</td><td>1.9K</td><td>623</td></tr><tr class='row-red'><td>Compressed Lavish Vanadinite</td><td>Mid</td><td class='neg'>-63.6%</td><td>2.2K</td><td>944</td></tr><tr class='row-red'><td>Compressed Shimmering Vanadinite</td><td>High</td><td class='neg'>-35.1%</td><td>2.1K</td><td>1.1K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Silicates</div><canvas id='spark_62489_16636' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Vanadium</div><canvas id='spark_62489_16642' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62489_16636');
+                if (!ctx) return;
+                var data = [347.1, 345.62, 348.02, 349.99, 361.66, 369.7, 388.2, 385.91, 363.43, 365.99, 380.82, 386.71, 384.4, 384.23, 384.71, 383.76, 370.82, 365.86, 366.3, 366.07, 364.57, 314.17, 326.08, 330.64, 335.09, 365.8, 358.16, 351.53, 352.73, 354.03, 351.61];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62489_16642');
+                if (!ctx) return;
+                var data = [2407.83, 2109.4, 1943.83, 1961.71, 1972.4, 1877.8, 1868.5, 1903.12, 1945.4, 1958.0, 1999.5, 2029.91, 2058.8, 2030.83, 2047.45, 2047.69, 2067.5, 2061.36, 1912.6, 1900.93, 1873.56, 1841.78, 1844.08, 1841.0, 1856.0, 1913.0, 1949.25, 1967.83, 1845.46, 1826.0, 1872.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R32">
+            <div class="family-header">
+                <span class="family-name">Carnotite</span>
+                <span class="family-tier badge-r32">R32</span>
+                <span class="family-margin neg">-10.4%</span>
+                <span class="family-chg ">30d: N/A</span>
+            </div>
+            <p class="family-narrative">The base Carnotite ore currently offers a negative margin of -10.4% ROI. Technetium is the dominant value driver, contributing 99% of batch revenue. Technetium has fallen 10.4% over the past 30 days, compressing margins. Secondary contributors: Cobalt (1% of value, falling 18.7%), Atmospheric Gases (0% of value, falling 11.5%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Atmospheric Gases</td><td class='num'>15</td><td class='num'>231</td><td class='num neg'>-1.0%</td><td class='num neg'>-1.2%</td><td class='num neg'>-11.5%</td><td class='num'>3.0K</td><td class='num'>0.4%</td><td class='num neg'>-396</td></tr><tr><td>Cobalt</td><td class='num'>10</td><td class='num'>596</td><td class='num neg'>-5.2%</td><td class='num neg'>-4.4%</td><td class='num neg'>-18.7%</td><td class='num'>5.3K</td><td class='num'>0.6%</td><td class='num neg'>-1.2K</td></tr><tr><td>Technetium</td><td class='num'>50</td><td class='num'>18.6K</td><td class='num pos'>+4.6%</td><td class='num neg'>-0.2%</td><td class='num neg'>-10.4%</td><td class='num'>843.5K</td><td class='num'>99.0%</td><td class='num neg'>-97.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Carnotite</td><td>Base</td><td class='neg'>-10.4%</td><td>9.4K</td><td>5.5K</td></tr><tr class='row-red'><td>Compressed Replete Carnotite</td><td>Mid</td><td class='neg'>-9.3%</td><td>10.8K</td><td>5.0K</td></tr><tr class='row-red'><td>Compressed Glowing Carnotite</td><td>High</td><td class='neg'>-32.6%</td><td>25.0K</td><td>6.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Atmospheric Gases</div><canvas id='spark_62492_16634' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Cobalt</div><canvas id='spark_62492_16640' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Technetium</div><canvas id='spark_62492_16649' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62492_16634');
+                if (!ctx) return;
+                var data = [260.93, 258.44, 235.1, 221.8, 225.08, 227.48, 230.78, 232.72, 234.15, 233.97, 234.08, 239.47, 243.2, 234.98, 241.24, 241.12, 233.79, 233.07, 232.59, 233.02, 234.69, 237.18, 235.2, 233.21, 234.48, 239.68, 231.68, 229.17, 228.64, 227.67, 230.89];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62492_16640');
+                if (!ctx) return;
+                var data = [733.18, 727.78, 702.5, 700.44, 689.9, 684.74, 687.23, 515.48, 455.61, 519.89, 516.85, 600.72, 608.62, 616.17, 617.69, 619.8, 623.26, 624.64, 627.06, 626.63, 624.52, 624.21, 625.99, 628.22, 616.62, 623.26, 573.51, 556.83, 581.34, 592.23, 595.73];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62492_16649');
+                if (!ctx) return;
+                var data = [20765.0, 19570.0, 18461.67, 18658.57, 18554.0, 19470.0, 19048.33, 18077.5, 18797.0, 18737.14, 19013.33, 18849.09, 18534.0, 17785.0, 18171.82, 17973.08, 18651.25, 19019.29, 18974.0, 18752.67, 18316.67, 18350.0, 18610.0, 17800.0, 17350.0, 17375.56, 17870.0, 18018.33, 18123.85, 18368.89, 18613.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R32">
+            <div class="family-header">
+                <span class="family-name">Cinnabar</span>
+                <span class="family-tier badge-r32">R32</span>
+                <span class="family-margin neg">-45.7%</span>
+                <span class="family-chg neg">30d: -10.7%</span>
+            </div>
+            <p class="family-narrative">The base Cinnabar ore currently offers a negative margin of -45.7% ROI. Mercury is the dominant value driver, contributing 90% of batch revenue. Mercury has fallen 19.8% over the past 30 days, compressing margins. Secondary contributors: Tungsten (8% of value, rising 6.1%), Evaporite Deposits (2% of value, falling 8.5%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Evaporite Deposits</td><td class='num'>15</td><td class='num'>261</td><td class='num neg'>-7.9%</td><td class='num neg'>-13.1%</td><td class='num neg'>-8.5%</td><td class='num'>3.4K</td><td class='num'>2.2%</td><td class='num neg'>-322</td></tr><tr><td>Tungsten</td><td class='num'>10</td><td class='num'>1.4K</td><td class='num pos'>+16.6%</td><td class='num neg'>-5.1%</td><td class='num pos'>+6.1%</td><td class='num'>12.4K</td><td class='num'>7.8%</td><td class='num pos'>719</td></tr><tr><td>Mercury</td><td class='num'>50</td><td class='num'>3.2K</td><td class='num pos'>+0.7%</td><td class='num neg'>-10.2%</td><td class='num neg'>-19.8%</td><td class='num'>144.0K</td><td class='num'>90.1%</td><td class='num neg'>-35.6K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Cinnabar</td><td>Base</td><td class='neg'>-45.7%</td><td>2.9K</td><td>1.5K</td></tr><tr class='row-red'><td>Compressed Replete Cinnabar</td><td>Mid</td><td class='neg'>-31.4%</td><td>2.7K</td><td>1.2K</td></tr><tr class='row-red'><td>Compressed Glowing Cinnabar</td><td>High</td><td class='neg'>-9.9%</td><td>3.5K</td><td>1.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Evaporite Deposits</div><canvas id='spark_62495_16635' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Tungsten</div><canvas id='spark_62495_16637' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Mercury</div><canvas id='spark_62495_16646' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62495_16635');
+                if (!ctx) return;
+                var data = [285.63, 251.9, 254.27, 263.97, 298.7, 311.38, 313.78, 293.14, 265.77, 274.07, 291.57, 297.95, 299.5, 299.62, 294.91, 301.42, 300.65, 302.66, 293.22, 284.66, 284.92, 290.07, 283.78, 283.56, 276.47, 278.17, 273.12, 269.38, 264.45, 261.31, 261.21];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62495_16637');
+                if (!ctx) return;
+                var data = [1319.33, 1327.6, 1338.33, 1341.0, 1343.6, 1352.6, 1342.83, 1353.38, 1374.0, 1395.43, 1421.67, 1425.45, 1452.0, 1437.33, 1435.64, 1456.23, 1475.5, 1501.86, 1461.3, 1364.87, 1291.11, 1248.0, 1201.0, 1201.33, 1202.3, 1322.78, 1301.62, 1307.83, 1348.46, 1377.11, 1400.25];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62495_16646');
+                if (!ctx) return;
+                var data = [3962.5, 3950.4, 3932.33, 3836.57, 3774.8, 3790.2, 3875.33, 3905.38, 3670.1, 3622.14, 3239.67, 3163.09, 3338.2, 3312.33, 3490.09, 3696.31, 3536.75, 3429.21, 3410.8, 3187.67, 3102.78, 3116.22, 3133.0, 3155.89, 3164.6, 3189.44, 2404.75, 2855.83, 3106.54, 3133.67, 3177.12];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R32">
+            <div class="family-header">
+                <span class="family-name">Pollucite</span>
+                <span class="family-tier badge-r32">R32</span>
+                <span class="family-margin neg">-24.6%</span>
+                <span class="family-chg ">30d: N/A</span>
+            </div>
+            <p class="family-narrative">The base Pollucite ore currently offers a negative margin of -24.6% ROI. Caesium is the dominant value driver, contributing 95% of batch revenue. Caesium has fallen 15.4% over the past 30 days, compressing margins. Secondary contributors: Hydrocarbons (3% of value, falling 14.4%), Scandium (2% of value, falling 5.2%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Hydrocarbons</td><td class='num'>15</td><td class='num'>521</td><td class='num pos'>+8.6%</td><td class='num neg'>-10.3%</td><td class='num neg'>-14.4%</td><td class='num'>6.9K</td><td class='num'>3.0%</td><td class='num neg'>-1.2K</td></tr><tr><td>Scandium</td><td class='num'>10</td><td class='num'>462</td><td class='num pos'>+2.4%</td><td class='num pos'>+0.4%</td><td class='num neg'>-5.2%</td><td class='num'>4.1K</td><td class='num'>1.8%</td><td class='num neg'>-223</td></tr><tr><td>Caesium</td><td class='num'>50</td><td class='num'>4.8K</td><td class='num neg'>-4.3%</td><td class='num neg'>-3.5%</td><td class='num neg'>-15.4%</td><td class='num'>218.5K</td><td class='num'>95.2%</td><td class='num neg'>-39.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Pollucite</td><td>Base</td><td class='neg'>-24.6%</td><td>3.0K</td><td>1.5K</td></tr><tr class='row-red'><td>Compressed Replete Pollucite</td><td>Mid</td><td class='neg'>-15.3%</td><td>3.1K</td><td>1.5K</td></tr><tr class='row-nodata'><td>Compressed Glowing Pollucite</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>3.7K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Hydrocarbons</div><canvas id='spark_62498_16633' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Scandium</div><canvas id='spark_62498_16639' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Caesium</div><canvas id='spark_62498_16647' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62498_16633');
+                if (!ctx) return;
+                var data = [609.38, 609.0, 608.87, 576.51, 590.68, 619.54, 623.33, 589.67, 561.2, 568.66, 576.4, 571.23, 575.1, 573.35, 574.89, 580.67, 581.34, 573.62, 568.72, 555.51, 556.84, 562.66, 522.04, 479.87, 488.08, 495.94, 505.76, 513.15, 517.59, 518.01, 521.36];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62498_16639');
+                if (!ctx) return;
+                var data = [487.48, 486.92, 483.33, 473.24, 455.22, 455.64, 460.08, 464.85, 455.89, 451.14, 457.15, 456.4, 451.42, 424.42, 460.09, 460.72, 460.38, 458.73, 437.2, 423.07, 421.02, 424.42, 429.98, 451.58, 451.17, 454.48, 457.04, 464.02, 424.78, 456.9, 462.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62498_16647');
+                if (!ctx) return;
+                var data = [5699.5, 5500.8, 5457.0, 5507.14, 5586.4, 5333.6, 5294.5, 5360.0, 5191.6, 5176.14, 5190.83, 5203.82, 5180.4, 4951.67, 4969.45, 4981.08, 4995.0, 5023.07, 5042.2, 5072.0, 5070.89, 5060.44, 5056.31, 5039.33, 4979.2, 5158.11, 5214.88, 4947.67, 4808.85, 4809.78, 4822.25];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R32">
+            <div class="family-header">
+                <span class="family-name">Zircon</span>
+                <span class="family-tier badge-r32">R32</span>
+                <span class="family-margin neg">-11.2%</span>
+                <span class="family-chg neg">30d: -1.5%</span>
+            </div>
+            <p class="family-narrative">The base Zircon ore currently offers a negative margin of -11.2% ROI. Hafnium is the dominant value driver, contributing 97% of batch revenue. Hafnium has fallen 5.8% over the past 30 days, compressing margins. Secondary contributors: Titanium (1% of value, falling 23.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Silicates</td><td class='num'>15</td><td class='num'>352</td><td class='num pos'>+6.3%</td><td class='num neg'>-5.2%</td><td class='num pos'>+1.3%</td><td class='num'>4.6K</td><td class='num'>1.1%</td><td class='num pos'>60</td></tr><tr><td>Titanium</td><td class='num'>10</td><td class='num'>642</td><td class='num neg'>-8.4%</td><td class='num neg'>-15.5%</td><td class='num neg'>-23.7%</td><td class='num'>5.7K</td><td class='num'>1.4%</td><td class='num neg'>-1.8K</td></tr><tr><td>Hafnium</td><td class='num'>50</td><td class='num'>8.9K</td><td class='num pos'>+2.9%</td><td class='num neg'>-0.1%</td><td class='num neg'>-5.8%</td><td class='num'>402.1K</td><td class='num'>97.5%</td><td class='num neg'>-24.6K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Zircon</td><td>Base</td><td class='neg'>-11.2%</td><td>4.6K</td><td>3.1K</td></tr><tr class='row-red'><td>Compressed Replete Zircon</td><td>Mid</td><td class='neg'>-11.1%</td><td>5.3K</td><td>4.0K</td></tr><tr class='row-nodata'><td>Compressed Glowing Zircon</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>3.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Silicates</div><canvas id='spark_62501_16636' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Titanium</div><canvas id='spark_62501_16638' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Hafnium</div><canvas id='spark_62501_16648' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62501_16636');
+                if (!ctx) return;
+                var data = [347.1, 345.62, 348.02, 349.99, 361.66, 369.7, 388.2, 385.91, 363.43, 365.99, 380.82, 386.71, 384.4, 384.23, 384.71, 383.76, 370.82, 365.86, 366.3, 366.07, 364.57, 314.17, 326.08, 330.64, 335.09, 365.8, 358.16, 351.53, 352.73, 354.03, 351.61];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62501_16638');
+                if (!ctx) return;
+                var data = [842.22, 808.72, 793.57, 793.29, 772.96, 761.24, 761.53, 761.49, 762.92, 763.93, 764.48, 763.41, 762.84, 761.37, 760.61, 760.59, 760.01, 760.49, 761.08, 761.22, 699.4, 693.07, 697.02, 701.36, 701.95, 701.83, 704.2, 702.85, 688.05, 641.68, 642.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62501_16648');
+                if (!ctx) return;
+                var data = [9417.83, 9113.2, 8078.33, 8225.29, 8860.0, 9092.4, 9223.5, 9288.38, 8992.0, 9058.0, 9011.17, 8991.55, 9040.4, 9014.5, 9010.27, 8936.92, 8879.12, 8497.29, 8140.5, 8298.2, 8480.0, 8580.33, 8595.23, 8624.11, 8680.8, 8968.78, 8753.38, 8805.67, 8857.85, 8852.22, 8874.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R64">
+            <div class="family-header">
+                <span class="family-name">Loparite</span>
+                <span class="family-tier badge-r64">R64</span>
+                <span class="family-margin pos">9.3%</span>
+                <span class="family-chg pos">30d: +7.7%</span>
+            </div>
+            <p class="family-narrative">The base Loparite ore currently offers a modest margin of 9.3% ROI. Promethium is the dominant value driver, contributing 94% of batch revenue. Promethium has risen 7.6% over the past 30 days, boosting returns. Secondary contributors: Platinum (4% of value, falling 9.7%), Hydrocarbons (1% of value, falling 14.4%), Scandium (1% of value, falling 5.2%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Hydrocarbons</td><td class='num'>20</td><td class='num'>521</td><td class='num pos'>+8.6%</td><td class='num neg'>-10.3%</td><td class='num neg'>-14.4%</td><td class='num'>9.2K</td><td class='num'>0.7%</td><td class='num neg'>-1.5K</td></tr><tr><td>Scandium</td><td class='num'>20</td><td class='num'>462</td><td class='num pos'>+2.4%</td><td class='num pos'>+0.4%</td><td class='num neg'>-5.2%</td><td class='num'>8.2K</td><td class='num'>0.6%</td><td class='num neg'>-446</td></tr><tr><td>Platinum</td><td class='num'>10</td><td class='num'>7.1K</td><td class='num pos'>+10.8%</td><td class='num pos'>+3.7%</td><td class='num neg'>-9.7%</td><td class='num'>63.3K</td><td class='num'>4.5%</td><td class='num neg'>-6.8K</td></tr><tr><td>Promethium</td><td class='num'>22</td><td class='num'>65.9K</td><td class='num pos'>+7.1%</td><td class='num neg'>-1.2%</td><td class='num pos'>+7.6%</td><td class='num'>1.33M</td><td class='num'>94.3%</td><td class='num pos'>94.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Loparite</td><td>Base</td><td class='pos'>9.3%</td><td>12.7K</td><td>10.1K</td></tr><tr class='row-red'><td>Compressed Bountiful Loparite</td><td>Mid</td><td class='neg'>-30.7%</td><td>22.9K</td><td>11.0K</td></tr><tr class='row-red'><td>Compressed Shining Loparite</td><td>High</td><td class='neg'>-6.9%</td><td>29.9K</td><td>15.1K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Hydrocarbons</div><canvas id='spark_62504_16633' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Scandium</div><canvas id='spark_62504_16639' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Platinum</div><canvas id='spark_62504_16644' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Promethium</div><canvas id='spark_62504_16652' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62504_16633');
+                if (!ctx) return;
+                var data = [609.38, 609.0, 608.87, 576.51, 590.68, 619.54, 623.33, 589.67, 561.2, 568.66, 576.4, 571.23, 575.1, 573.35, 574.89, 580.67, 581.34, 573.62, 568.72, 555.51, 556.84, 562.66, 522.04, 479.87, 488.08, 495.94, 505.76, 513.15, 517.59, 518.01, 521.36];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62504_16639');
+                if (!ctx) return;
+                var data = [487.48, 486.92, 483.33, 473.24, 455.22, 455.64, 460.08, 464.85, 455.89, 451.14, 457.15, 456.4, 451.42, 424.42, 460.09, 460.72, 460.38, 458.73, 437.2, 423.07, 421.02, 424.42, 429.98, 451.58, 451.17, 454.48, 457.04, 464.02, 424.78, 456.9, 462.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62504_16644');
+                if (!ctx) return;
+                var data = [7809.0, 7710.2, 7643.33, 7598.86, 7655.6, 7680.2, 7329.33, 7199.88, 7136.5, 7178.14, 6756.33, 6998.27, 7138.2, 7179.33, 7232.55, 7165.38, 6796.88, 6824.71, 6892.3, 6890.2, 6842.44, 6841.67, 6323.62, 6364.0, 6397.4, 6651.33, 6843.12, 6855.5, 6925.92, 7018.78, 7050.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62504_16652');
+                if (!ctx) return;
+                var data = [61248.33, 61186.0, 60830.0, 60215.71, 61884.0, 61444.0, 58338.33, 61217.5, 62005.0, 61830.0, 63181.67, 63914.55, 65408.0, 65330.0, 65210.0, 65400.0, 66708.75, 66720.71, 66936.0, 67210.0, 66707.78, 66608.89, 67108.46, 61530.0, 61011.0, 63752.22, 64321.25, 64775.0, 65350.0, 65760.0, 65913.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R64">
+            <div class="family-header">
+                <span class="family-name">Monazite</span>
+                <span class="family-tier badge-r64">R64</span>
+                <span class="family-margin pos">7.9%</span>
+                <span class="family-chg pos">30d: +4.2%</span>
+            </div>
+            <p class="family-narrative">The base Monazite ore currently offers a modest margin of 7.9% ROI. Neodymium is the dominant value driver, contributing 94% of batch revenue. Neodymium pricing has been stable over the past 30 days. Secondary contributors: Tungsten (2% of value, rising 6.1%), Evaporite Deposits (0% of value, falling 8.5%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Evaporite Deposits</td><td class='num'>20</td><td class='num'>261</td><td class='num neg'>-7.9%</td><td class='num neg'>-13.1%</td><td class='num neg'>-8.5%</td><td class='num'>4.6K</td><td class='num'>0.3%</td><td class='num neg'>-429</td></tr><tr><td>Tungsten</td><td class='num'>20</td><td class='num'>1.4K</td><td class='num pos'>+16.6%</td><td class='num neg'>-5.1%</td><td class='num pos'>+6.1%</td><td class='num'>24.9K</td><td class='num'>1.8%</td><td class='num pos'>1.4K</td></tr><tr><td>Chromium</td><td class='num'>10</td><td class='num'>5.9K</td><td class='num pos'>+6.9%</td><td class='num pos'>+6.3%</td><td class='num neg'>-3.5%</td><td class='num'>52.8K</td><td class='num'>3.8%</td><td class='num neg'>-1.9K</td></tr><tr><td>Neodymium</td><td class='num'>22</td><td class='num'>65.2K</td><td class='num pos'>+0.2%</td><td class='num pos'>+10.7%</td><td class='num pos'>+2.7%</td><td class='num'>1.31M</td><td class='num'>94.1%</td><td class='num pos'>34.3K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Monazite</td><td>Base</td><td class='pos'>7.9%</td><td>12.8K</td><td>8.5K</td></tr><tr class='row-green'><td>Compressed Bountiful Monazite</td><td>Mid</td><td class='pos'>16.8%</td><td>13.5K</td><td>10.0K</td></tr><tr class='row-nodata'><td>Compressed Shining Monazite</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>10.1K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Evaporite Deposits</div><canvas id='spark_62507_16635' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Tungsten</div><canvas id='spark_62507_16637' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Chromium</div><canvas id='spark_62507_16641' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Neodymium</div><canvas id='spark_62507_16651' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62507_16635');
+                if (!ctx) return;
+                var data = [285.63, 251.9, 254.27, 263.97, 298.7, 311.38, 313.78, 293.14, 265.77, 274.07, 291.57, 297.95, 299.5, 299.62, 294.91, 301.42, 300.65, 302.66, 293.22, 284.66, 284.92, 290.07, 283.78, 283.56, 276.47, 278.17, 273.12, 269.38, 264.45, 261.31, 261.21];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62507_16637');
+                if (!ctx) return;
+                var data = [1319.33, 1327.6, 1338.33, 1341.0, 1343.6, 1352.6, 1342.83, 1353.38, 1374.0, 1395.43, 1421.67, 1425.45, 1452.0, 1437.33, 1435.64, 1456.23, 1475.5, 1501.86, 1461.3, 1364.87, 1291.11, 1248.0, 1201.0, 1201.33, 1202.3, 1322.78, 1301.62, 1307.83, 1348.46, 1377.11, 1400.25];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62507_16641');
+                if (!ctx) return;
+                var data = [6094.67, 5920.8, 5629.0, 5685.71, 5824.4, 5834.6, 5711.67, 5700.88, 5702.8, 5705.86, 4325.0, 4942.0, 5084.0, 5238.67, 5398.82, 5479.69, 5528.62, 5581.93, 5621.1, 5673.4, 5570.67, 5445.56, 5486.85, 5499.67, 5545.2, 5701.67, 5796.0, 5814.67, 5829.38, 5852.56, 5879.25];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62507_16651');
+                if (!ctx) return;
+                var data = [63535.0, 62950.0, 63543.33, 63984.29, 63396.0, 65240.0, 66095.0, 66035.0, 64096.0, 63677.14, 64333.33, 64256.36, 65088.0, 64296.67, 60359.09, 57342.31, 58948.75, 60689.29, 62129.0, 63965.33, 64535.56, 64648.89, 64863.85, 65118.89, 65507.0, 66283.33, 65230.0, 65430.0, 65461.54, 65124.44, 65240.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R64">
+            <div class="family-header">
+                <span class="family-name">Xenotime</span>
+                <span class="family-tier badge-r64">R64</span>
+                <span class="family-margin pos">5.7%</span>
+                <span class="family-chg pos">30d: +17.7%</span>
+            </div>
+            <p class="family-narrative">The base Xenotime ore currently offers a modest margin of 5.7% ROI. Dysprosium is the dominant value driver, contributing 97% of batch revenue. Dysprosium pricing has been stable over the past 30 days. Secondary contributors: Vanadium (1% of value, falling 22.2%), Cobalt (1% of value, falling 18.7%), Atmospheric Gases (0% of value, falling 11.5%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Atmospheric Gases</td><td class='num'>20</td><td class='num'>231</td><td class='num neg'>-1.0%</td><td class='num neg'>-1.2%</td><td class='num neg'>-11.5%</td><td class='num'>4.1K</td><td class='num'>0.3%</td><td class='num neg'>-528</td></tr><tr><td>Cobalt</td><td class='num'>20</td><td class='num'>596</td><td class='num neg'>-5.2%</td><td class='num neg'>-4.4%</td><td class='num neg'>-18.7%</td><td class='num'>10.6K</td><td class='num'>0.9%</td><td class='num neg'>-2.4K</td></tr><tr><td>Vanadium</td><td class='num'>10</td><td class='num'>1.9K</td><td class='num pos'>+1.7%</td><td class='num neg'>-9.4%</td><td class='num neg'>-22.2%</td><td class='num'>16.8K</td><td class='num'>1.4%</td><td class='num neg'>-4.8K</td></tr><tr><td>Dysprosium</td><td class='num'>22</td><td class='num'>58.3K</td><td class='num pos'>+7.4%</td><td class='num pos'>+4.3%</td><td class='num pos'>+2.1%</td><td class='num'>1.17M</td><td class='num'>97.4%</td><td class='num pos'>24.1K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Xenotime</td><td>Base</td><td class='pos'>5.7%</td><td>11.3K</td><td>8.0K</td></tr><tr class='row-red'><td>Compressed Bountiful Xenotime</td><td>Mid</td><td class='neg'>-15.1%</td><td>16.0K</td><td>8.1K</td></tr><tr class='row-red'><td>Compressed Shining Xenotime</td><td>High</td><td class='neg'>-31.8%</td><td>35.0K</td><td>11.3K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Atmospheric Gases</div><canvas id='spark_62510_16634' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Cobalt</div><canvas id='spark_62510_16640' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Vanadium</div><canvas id='spark_62510_16642' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Dysprosium</div><canvas id='spark_62510_16650' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62510_16634');
+                if (!ctx) return;
+                var data = [260.93, 258.44, 235.1, 221.8, 225.08, 227.48, 230.78, 232.72, 234.15, 233.97, 234.08, 239.47, 243.2, 234.98, 241.24, 241.12, 233.79, 233.07, 232.59, 233.02, 234.69, 237.18, 235.2, 233.21, 234.48, 239.68, 231.68, 229.17, 228.64, 227.67, 230.89];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62510_16640');
+                if (!ctx) return;
+                var data = [733.18, 727.78, 702.5, 700.44, 689.9, 684.74, 687.23, 515.48, 455.61, 519.89, 516.85, 600.72, 608.62, 616.17, 617.69, 619.8, 623.26, 624.64, 627.06, 626.63, 624.52, 624.21, 625.99, 628.22, 616.62, 623.26, 573.51, 556.83, 581.34, 592.23, 595.73];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62510_16642');
+                if (!ctx) return;
+                var data = [2407.83, 2109.4, 1943.83, 1961.71, 1972.4, 1877.8, 1868.5, 1903.12, 1945.4, 1958.0, 1999.5, 2029.91, 2058.8, 2030.83, 2047.45, 2047.69, 2067.5, 2061.36, 1912.6, 1900.93, 1873.56, 1841.78, 1844.08, 1841.0, 1856.0, 1913.0, 1949.25, 1967.83, 1845.46, 1826.0, 1872.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62510_16650');
+                if (!ctx) return;
+                var data = [57123.33, 56456.0, 57711.67, 58760.0, 56754.0, 59004.0, 57193.33, 56238.75, 56460.0, 56850.0, 58030.0, 58131.82, 58510.0, 57536.67, 56517.27, 56010.0, 55933.75, 51959.29, 51546.0, 52062.0, 52714.44, 53090.0, 54089.23, 54326.67, 56330.0, 57443.33, 58027.5, 58116.67, 58150.0, 58227.78, 58320.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-tier="R64">
+            <div class="family-header">
+                <span class="family-name">Ytterbite</span>
+                <span class="family-tier badge-r64">R64</span>
+                <span class="family-margin neg">-41.6%</span>
+                <span class="family-chg neg">30d: -11.1%</span>
+            </div>
+            <p class="family-narrative">The base Ytterbite ore currently offers a negative margin of -41.6% ROI. Thulium is the dominant value driver, contributing 91% of batch revenue. Thulium has fallen 17.4% over the past 30 days, compressing margins. Secondary contributors: Titanium (2% of value, falling 23.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Silicates</td><td class='num'>20</td><td class='num'>352</td><td class='num pos'>+6.3%</td><td class='num neg'>-5.2%</td><td class='num pos'>+1.3%</td><td class='num'>6.2K</td><td class='num'>0.9%</td><td class='num pos'>79</td></tr><tr><td>Titanium</td><td class='num'>20</td><td class='num'>642</td><td class='num neg'>-8.4%</td><td class='num neg'>-15.5%</td><td class='num neg'>-23.7%</td><td class='num'>11.4K</td><td class='num'>1.6%</td><td class='num neg'>-3.5K</td></tr><tr><td>Cadmium</td><td class='num'>10</td><td class='num'>4.7K</td><td class='num pos'>+11.9%</td><td class='num pos'>+10.8%</td><td class='num neg'>-3.9%</td><td class='num'>42.3K</td><td class='num'>6.0%</td><td class='num neg'>-1.7K</td></tr><tr><td>Thulium</td><td class='num'>22</td><td class='num'>31.9K</td><td class='num pos'>+7.3%</td><td class='num neg'>-4.0%</td><td class='num neg'>-17.4%</td><td class='num'>642.9K</td><td class='num'>91.5%</td><td class='num neg'>-135.2K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Quality</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Ytterbite</td><td>Base</td><td class='neg'>-41.6%</td><td>11.9K</td><td>3.9K</td></tr><tr class='row-red'><td>Compressed Bountiful Ytterbite</td><td>Mid</td><td class='neg'>-32.6%</td><td>11.8K</td><td>5.4K</td></tr><tr class='row-nodata'><td>Compressed Shining Ytterbite</td><td>High</td><td class=''>N/A</td><td>N/A</td><td>8.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Silicates</div><canvas id='spark_62513_16636' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Titanium</div><canvas id='spark_62513_16638' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Cadmium</div><canvas id='spark_62513_16643' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Thulium</div><canvas id='spark_62513_16653' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62513_16636');
+                if (!ctx) return;
+                var data = [347.1, 345.62, 348.02, 349.99, 361.66, 369.7, 388.2, 385.91, 363.43, 365.99, 380.82, 386.71, 384.4, 384.23, 384.71, 383.76, 370.82, 365.86, 366.3, 366.07, 364.57, 314.17, 326.08, 330.64, 335.09, 365.8, 358.16, 351.53, 352.73, 354.03, 351.61];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62513_16638');
+                if (!ctx) return;
+                var data = [842.22, 808.72, 793.57, 793.29, 772.96, 761.24, 761.53, 761.49, 762.92, 763.93, 764.48, 763.41, 762.84, 761.37, 760.61, 760.59, 760.01, 760.49, 761.08, 761.22, 699.4, 693.07, 697.02, 701.36, 701.95, 701.83, 704.2, 702.85, 688.05, 641.68, 642.38];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62513_16643');
+                if (!ctx) return;
+                var data = [4906.33, 4583.0, 4517.67, 4593.57, 4767.6, 4581.0, 4431.33, 4293.38, 4139.9, 4146.71, 4189.5, 4210.27, 4230.0, 4194.67, 4209.64, 4214.69, 4253.25, 4263.79, 4287.0, 4316.07, 4218.11, 4183.67, 4180.69, 4214.22, 4329.5, 4549.22, 4473.88, 4437.83, 4451.0, 4569.56, 4714.12];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62513_16653');
+                if (!ctx) return;
+                var data = [38640.0, 35594.0, 35471.67, 34834.29, 35144.0, 35108.0, 33498.33, 31861.25, 32937.0, 33437.14, 34185.0, 34179.09, 34122.0, 34156.67, 34410.0, 33214.62, 33252.5, 33764.29, 32910.0, 32084.67, 32245.56, 32895.56, 32164.62, 29758.89, 30219.0, 30795.56, 31158.75, 31425.0, 31628.46, 31846.67, 31926.25];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+  </div>
+
+  <!-- ── Section 4: Product Market Overview ── -->
+  <h2 class="section-title">Product Market Overview</h2>
+  
+        <div class="tier-section">
+            <h3 class="tier-heading badge-r4">R4 Materials</h3>
+            <p class="tier-summary">R4 products are under selling pressure (-8.3% over 30 days).</p>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th>
+                    <th class="num">JBV now</th>
+                    <th class="num">7d %</th>
+                    <th class="num">14d %</th>
+                    <th class="num">30d %</th>
+                    <th>Trend</th>
+                </tr></thead>
+                <tbody><tr><td>Hydrocarbons</td><td class='num'>521</td><td class='num pos'>+8.6%</td><td class='num'>N/A</td><td class='num neg'>-14.4%</td><td>▼ Falling</td></tr><tr><td>Atmospheric Gases</td><td class='num'>231</td><td class='num neg'>-1.0%</td><td class='num'>N/A</td><td class='num neg'>-11.5%</td><td>▼ Falling</td></tr><tr><td>Evaporite Deposits</td><td class='num'>261</td><td class='num neg'>-7.9%</td><td class='num'>N/A</td><td class='num neg'>-8.5%</td><td>▼ Falling</td></tr><tr><td>Silicates</td><td class='num'>352</td><td class='num pos'>+6.3%</td><td class='num'>N/A</td><td class='num pos'>+1.3%</td><td>→ Stable</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+
+
+        <div class="tier-section">
+            <h3 class="tier-heading badge-r8">R8 Materials</h3>
+            <p class="tier-summary">R8 products are under selling pressure (-10.4% over 30 days).</p>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th>
+                    <th class="num">JBV now</th>
+                    <th class="num">7d %</th>
+                    <th class="num">14d %</th>
+                    <th class="num">30d %</th>
+                    <th>Trend</th>
+                </tr></thead>
+                <tbody><tr><td>Tungsten</td><td class='num'>1.4K</td><td class='num pos'>+16.6%</td><td class='num'>N/A</td><td class='num pos'>+6.1%</td><td>▲ Rising</td></tr><tr><td>Titanium</td><td class='num'>642</td><td class='num neg'>-8.4%</td><td class='num'>N/A</td><td class='num neg'>-23.7%</td><td>▼ Falling</td></tr><tr><td>Scandium</td><td class='num'>462</td><td class='num pos'>+2.4%</td><td class='num'>N/A</td><td class='num neg'>-5.2%</td><td>▼ Falling</td></tr><tr><td>Cobalt</td><td class='num'>596</td><td class='num neg'>-5.2%</td><td class='num'>N/A</td><td class='num neg'>-18.7%</td><td>▼ Falling</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+
+
+        <div class="tier-section">
+            <h3 class="tier-heading badge-r16">R16 Materials</h3>
+            <p class="tier-summary">R16 products are under selling pressure (-9.8% over 30 days).</p>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th>
+                    <th class="num">JBV now</th>
+                    <th class="num">7d %</th>
+                    <th class="num">14d %</th>
+                    <th class="num">30d %</th>
+                    <th>Trend</th>
+                </tr></thead>
+                <tbody><tr><td>Chromium</td><td class='num'>5.9K</td><td class='num pos'>+6.9%</td><td class='num'>N/A</td><td class='num neg'>-3.5%</td><td>→ Stable</td></tr><tr><td>Vanadium</td><td class='num'>1.9K</td><td class='num pos'>+1.7%</td><td class='num'>N/A</td><td class='num neg'>-22.2%</td><td>▼ Falling</td></tr><tr><td>Cadmium</td><td class='num'>4.7K</td><td class='num pos'>+11.9%</td><td class='num'>N/A</td><td class='num neg'>-3.9%</td><td>→ Stable</td></tr><tr><td>Platinum</td><td class='num'>7.1K</td><td class='num pos'>+10.8%</td><td class='num'>N/A</td><td class='num neg'>-9.7%</td><td>▼ Falling</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+
+
+        <div class="tier-section">
+            <h3 class="tier-heading badge-r32">R32 Materials</h3>
+            <p class="tier-summary">R32 products are under selling pressure (-12.8% over 30 days).</p>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th>
+                    <th class="num">JBV now</th>
+                    <th class="num">7d %</th>
+                    <th class="num">14d %</th>
+                    <th class="num">30d %</th>
+                    <th>Trend</th>
+                </tr></thead>
+                <tbody><tr><td>Mercury</td><td class='num'>3.2K</td><td class='num pos'>+0.7%</td><td class='num'>N/A</td><td class='num neg'>-19.8%</td><td>▼ Falling</td></tr><tr><td>Caesium</td><td class='num'>4.8K</td><td class='num neg'>-4.3%</td><td class='num'>N/A</td><td class='num neg'>-15.4%</td><td>▼ Falling</td></tr><tr><td>Hafnium</td><td class='num'>8.9K</td><td class='num pos'>+2.9%</td><td class='num'>N/A</td><td class='num neg'>-5.8%</td><td>▼ Falling</td></tr><tr><td>Technetium</td><td class='num'>18.6K</td><td class='num pos'>+4.6%</td><td class='num'>N/A</td><td class='num neg'>-10.4%</td><td>▼ Falling</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+
+
+        <div class="tier-section">
+            <h3 class="tier-heading badge-r64">R64 Materials</h3>
+            <p class="tier-summary">R64 products have been broadly stable over the past 30 days (avg -1.2%).</p>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th>
+                    <th class="num">JBV now</th>
+                    <th class="num">7d %</th>
+                    <th class="num">14d %</th>
+                    <th class="num">30d %</th>
+                    <th>Trend</th>
+                </tr></thead>
+                <tbody><tr><td>Dysprosium</td><td class='num'>58.3K</td><td class='num pos'>+7.4%</td><td class='num'>N/A</td><td class='num pos'>+2.1%</td><td>→ Stable</td></tr><tr><td>Neodymium</td><td class='num'>65.2K</td><td class='num pos'>+0.2%</td><td class='num'>N/A</td><td class='num pos'>+2.7%</td><td>→ Stable</td></tr><tr><td>Promethium</td><td class='num'>65.9K</td><td class='num pos'>+7.1%</td><td class='num'>N/A</td><td class='num pos'>+7.6%</td><td>▲ Rising</td></tr><tr><td>Thulium</td><td class='num'>31.9K</td><td class='num pos'>+7.3%</td><td class='num'>N/A</td><td class='num neg'>-17.4%</td><td>▼ Falling</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+
+
+</div><!-- /container -->
+
+<script>
+// ── Filter: Rankings Table ──────────────────────────────────────────────────
+function filterRankings(tier) {
+  var rows  = document.querySelectorAll('#rankings-tbody tr');
+  var btns  = document.querySelectorAll('.filter-bar .filter-btn');
+  // deactivate all ranking filter buttons (first filter-bar only)
+  document.querySelector('.filter-bar').querySelectorAll('.filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  event.target.classList.add('active');
+
+  rows.forEach(function(r) {
+    if (tier === 'all' || r.dataset.tier === tier) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+
+// ── Filter: Family Cards ────────────────────────────────────────────────────
+function filterFamilies(tier, btn) {
+  document.querySelectorAll('#family-filter-bar .filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  document.querySelectorAll('#family-cards-container .family-card').forEach(function(card) {
+    if (tier === 'all' || card.dataset.tier === tier) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+
+</body>
+</html>

@@ -193,6 +193,25 @@ ALL_ORE_IDS = list(set(
 
 # ── DB helpers ─────────────────────────────────────────────────────────────
 
+def ensure_market_snapshots(conn):
+    """Create market_snapshots table if it doesn't exist."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS market_snapshots (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fetched_at TEXT,
+            region_id INTEGER,
+            station_id INTEGER,
+            type_id INTEGER,
+            best_buy REAL,
+            best_sell REAL,
+            spread_pct REAL,
+            buy_volume INTEGER,
+            sell_volume INTEGER
+        )
+    """)
+    conn.commit()
+
+
 def get_tracked_type_ids(conn):
     """Return all type_ids from tracked_market_items."""
     c = conn.cursor()
@@ -305,6 +324,7 @@ def main():
             target_hubs[h] = HUBS[h]
 
     conn = sqlite3.connect(DB_PATH, timeout=30)
+    ensure_market_snapshots(conn)
 
     # Build type ID list
     if category == 'tracked':
@@ -331,27 +351,59 @@ def main():
         type_ids = MINERAL_IDS
         label    = f'minerals only ({len(type_ids)} type IDs)'
     elif category == 'ice_products':
-        type_ids = ICE_PRODUCT_IDS
-        label    = f'ice products only ({len(type_ids)} type IDs)'
+        cur = conn.cursor()
+        cur.execute("SELECT DISTINCT type_id FROM tracked_market_items WHERE category = 'ice_products'")
+        type_ids = [r[0] for r in cur.fetchall()]
+        label    = f'ice products ({len(type_ids)} type IDs from DB)'
     elif category == 'moon_materials':
         type_ids = MOON_MATERIAL_IDS
         label    = f'moon materials only ({len(type_ids)} type IDs)'
-    elif category in ('pi_materials', 'salvaged_materials'):
+    elif category == 'compressed_standard_ore':
         cur = conn.cursor()
-        cur.execute("SELECT DISTINCT type_id FROM tracked_market_items WHERE category = ?",
-                    (category,))
+        cur.execute("""SELECT DISTINCT type_id FROM tracked_market_items
+                       WHERE category = 'standard_ore' AND display_order >= 101""")
         type_ids = [r[0] for r in cur.fetchall()]
-        label    = f'{category.replace("_", " ")} ({len(type_ids)} type IDs)'
+        label    = f'compressed standard ore ({len(type_ids)} type IDs)'
+    elif category == 'compressed_ice_ore':
+        cur = conn.cursor()
+        cur.execute("""SELECT DISTINCT type_id FROM tracked_market_items
+                       WHERE category = 'ice_ore' AND display_order >= 101""")
+        type_ids = [r[0] for r in cur.fetchall()]
+        label    = f'compressed ice ({len(type_ids)} type IDs)'
+    elif category == 'compressed_moon_ore':
+        cur = conn.cursor()
+        cur.execute("""SELECT DISTINCT type_id FROM tracked_market_items
+                       WHERE category = 'moon_ore' AND display_order >= 101""")
+        type_ids = [r[0] for r in cur.fetchall()]
+        label    = f'compressed moon ore ({len(type_ids)} type IDs)'
+    elif category == 'import_all':
+        # All tracked items; for ore/ice/moon_ore only compressed (display_order >= 101)
+        cur = conn.cursor()
+        cur.execute("""SELECT DISTINCT type_id FROM tracked_market_items
+                       WHERE NOT (category IN ('standard_ore', 'ice_ore', 'moon_ore')
+                                  AND (display_order IS NULL OR display_order < 101))""")
+        type_ids = [r[0] for r in cur.fetchall()]
+        label    = f'import_all — all tracked incl. compressed ore ({len(type_ids)} type IDs)'
     elif category == 'all':
         tracked  = get_tracked_type_ids(conn)
         type_ids = list(set(ALL_ORE_IDS + GAS_IDS + tracked))
         label    = f'all ({len(type_ids)} type IDs)'
     else:
-        print(f'Unknown category "{category}". '
-              f'Use: standard | ice | moon | minerals | ice_products | moon_materials'
-              f' | pi_materials | salvaged_materials | gas | tracked | all')
-        conn.close()
-        sys.exit(1)
+        # Generic fallback: treat as a tracked_market_items category key
+        cur = conn.cursor()
+        cur.execute("SELECT DISTINCT type_id FROM tracked_market_items WHERE category = ?",
+                    (category,))
+        rows = cur.fetchall()
+        if not rows:
+            print(f'Unknown category "{category}". '
+                  f'Use: standard | ice | moon | minerals | ice_products | moon_materials'
+                  f' | pi_materials | salvaged_materials | gas_cloud_materials'
+                  f' | research_equipment | compressed_standard_ore | compressed_ice_ore'
+                  f' | compressed_moon_ore | gas | tracked | import_all | all')
+            conn.close()
+            sys.exit(1)
+        type_ids = [r[0] for r in rows]
+        label    = f'{category.replace("_", " ")} ({len(type_ids)} type IDs)'
 
     print(f'fetch_hub_prices — {label}')
     print(f'Hubs: {", ".join(target_hubs)}')

@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Standard Ore Margin Report — LX-ZOJ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #0a1520;
+    --bg2:     #0e1e30;
+    --bg3:     #122540;
+    --text:    #c8d8e8;
+    --muted:   #7898a8;
+    --cyan:    #00d9ff;
+    --gold:    #ffd700;
+    --green:   #00e676;
+    --red:     #ff3d3d;
+    --yellow:  #ffcc44;
+    --border:  #1a3555;
+    --highsec: #4a9eff;
+    --lowsec:  #34d058;
+    --nullsec: #f4a700;
+    --special: #d97bff;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  a { color: var(--cyan); text-decoration: none; }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 16px 40px; }
+  .report-header {
+    background: linear-gradient(135deg, #0e1e30 0%, #122540 100%);
+    border-bottom: 2px solid var(--cyan);
+    padding: 24px 16px 16px;
+    margin-bottom: 24px;
+  }
+  .report-header h1 {
+    font-size: 22px; font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 1px;
+  }
+  .report-meta { color: var(--muted); font-size: 11px; margin-top: 6px; }
+  .report-params {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    margin-top: 10px; font-size: 11px; color: var(--muted);
+  }
+  .report-params span { color: var(--text); }
+
+  .section-title {
+    font-size: 16px; font-weight: 700;
+    color: var(--cyan);
+    border-left: 3px solid var(--cyan);
+    padding-left: 10px;
+    margin: 28px 0 16px;
+  }
+  .sub-heading {
+    font-size: 12px; font-weight: 600;
+    color: var(--gold);
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-cards { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    min-width: 180px; flex: 1;
+  }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+  .stat-value { font-size: 22px; font-weight: 700; margin: 4px 0 2px; }
+  .stat-name  { font-size: 11px; color: var(--muted); }
+
+  .exec-para {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  .table-scroll { overflow-x: auto; }
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px;
+  }
+  .data-table th {
+    background: var(--bg3);
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 1;
+  }
+  .data-table th.num { text-align: right; }
+  .data-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #0f2035;
+  }
+  .data-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .data-table tr:hover { background: rgba(0,217,255,0.04); }
+
+  .row-green  { background: rgba(0,230,118,0.06); }
+  .row-yellow { background: rgba(255,204,68,0.06); }
+  .row-red    { background: rgba(255,61,61,0.07); }
+  .row-nodata { background: rgba(40,60,80,0.3); opacity: 0.6; }
+
+  /* Sec class badges */
+  .badge-highsec { color: var(--highsec); font-weight: 700; }
+  .badge-lowsec  { color: var(--lowsec);  font-weight: 700; }
+  .badge-nullsec { color: var(--nullsec); font-weight: 700; }
+  .badge-special { color: var(--special); font-weight: 700; }
+
+  .signal { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; }
+  .sig-strong-buy { background: #004a20; color: #00e676; }
+  .sig-buy        { background: #003520; color: #34d058; }
+  .sig-watch      { background: #3a2e00; color: #ffcc44; }
+  .sig-marginal   { background: #2a2000; color: #aa9900; }
+  .sig-avoid      { background: #3a0000; color: #ff3d3d; }
+  .sig-thin       { background: #202040; color: #aaaaff; }
+  .sig-nodata     { background: #1a2535; color: #5a7090; }
+
+  .pos     { color: var(--green); }
+  .neg     { color: var(--red); }
+  .neutral { color: var(--muted); }
+  .nodata  { color: var(--muted); font-style: italic; }
+
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .filter-btn {
+    padding: 4px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg3);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .filter-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+
+  .family-cards { display: flex; flex-direction: column; gap: 16px; }
+  .family-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .family-header {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .family-name { font-size: 15px; font-weight: 700; color: var(--gold); }
+  .family-sec  { font-size: 12px; font-weight: 700; }
+  .family-margin { font-size: 14px; font-weight: 700; }
+  .family-chg { font-size: 12px; }
+
+  .family-narrative {
+    font-size: 12px; color: var(--text);
+    background: rgba(0,217,255,0.03);
+    border-left: 2px solid var(--cyan);
+    padding: 8px 12px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+
+  .sparkline-row {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-top: 8px;
+  }
+  .spark-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    min-width: 120px;
+    flex: 1;
+  }
+  .spark-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .tier-section { margin-bottom: 24px; }
+  .tier-summary { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+  #rankings-table-container { max-height: 600px; overflow-y: auto; }
+  .variant-table td, .variant-table th { padding: 5px 8px; }
+
+  @media (max-width: 768px) {
+    .stat-card { min-width: 140px; }
+    .sparkline-row .spark-wrap { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div class="container" style="padding-bottom:0;">
+    <h1>Standard Ore Margin Report — LX-ZOJ</h1>
+    <div class="report-meta">
+      Generated: 2026-03-23 11:07:00 &nbsp;|&nbsp;
+      Price data through: 2026-03-23 12:10:44 UTC
+    </div>
+    <div class="report-params">
+      Buy basis: <span>JBV  (place order)</span> &nbsp;
+      Buy %: <span>100%</span> &nbsp;
+      Shipping: <span>0 ISK/m³</span> &nbsp;
+      Collateral: <span>0.0%</span> &nbsp;
+      Refine eff: <span>90.63%</span> &nbsp;
+      Broker: <span>1.5%</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Section 1: Executive Summary -->
+  <h2 class="section-title">Executive Summary</h2>
+  <div class="exec-para">Standard ore margins are improving broadly — 38 ores trending up, 34 down, 0 flat over 30 days. High-Sec avg: 4.6% ROI. Low-Sec avg: 26.2% ROI. Null-Sec avg: -5.2% ROI. Special avg: 15.6% ROI. Best opportunity: Compressed Hedbergite IV-Grade at 62.3% margin. Avoid Compressed Spodumain IV-Grade (-72.2% margin). Biggest 30-day gainer: Compressed Mercoxit II-Grade (+53.8 pp). Biggest 30-day loser: Compressed Spodumain IV-Grade (-52.6 pp).</div>
+  <div class="stat-cards">
+    <div class='stat-card'><div class='stat-label'>Best Margin</div><div class='stat-value pos'>62.3%</div><div class='stat-name'>Compressed Hedbergite IV-Grade</div></div><div class='stat-card'><div class='stat-label'>Worst Margin</div><div class='stat-value neg'>-72.2%</div><div class='stat-name'>Compressed Spodumain IV-Grade</div></div><div class='stat-card'><div class='stat-label'>Most Improved (30d)</div><div class='stat-value pos'>+53.8 pp</div><div class='stat-name'>Compressed Mercoxit II-Grade</div></div><div class='stat-card'><div class='stat-label'>Biggest Decline (30d)</div><div class='stat-value neg'>-52.6 pp</div><div class='stat-name'>Compressed Spodumain IV-Grade</div></div>
+  </div>
+
+  <!-- Section 2: Rankings Table -->
+  <h2 class="section-title">Ore Rankings</h2>
+  <div class="filter-bar" id="rankings-filter-bar">
+    <button class="filter-btn active" onclick="filterRankings('all', this)">All</button>
+    <button class="filter-btn badge-highsec" onclick="filterRankings('High-Sec', this)">High-Sec</button>
+    <button class="filter-btn badge-lowsec"  onclick="filterRankings('Low-Sec',  this)">Low-Sec</button>
+    <button class="filter-btn badge-nullsec" onclick="filterRankings('Null-Sec', this)">Null-Sec</button>
+    <button class="filter-btn badge-special" onclick="filterRankings('Special',  this)">Special</button>
+  </div>
+  <div id="rankings-table-container">
+    <table class="data-table" id="rankings-table">
+      <thead><tr>
+        <th>Name</th>
+        <th>Class</th>
+        <th class="num">Margin</th>
+        <th class="num">7d Chg</th>
+        <th class="num">30d Chg</th>
+        <th>Primary Driver</th>
+        <th>Signal</th>
+      </tr></thead>
+      <tbody id="rankings-tbody">
+        <tr class='row-green' data-sec='Low-Sec'><td>Compressed Hedbergite IV-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>62.3%</td><td class='num pos'>+6.8%</td><td class='num pos'>+26.1%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Mercoxit II-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>60.9%</td><td class='num pos'>+55.7%</td><td class='num pos'>+53.8%</td><td>Morphite</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Hedbergite III-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>45.3%</td><td class='num pos'>+6.6%</td><td class='num pos'>+26.2%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Special'><td>Compressed Bezdnacine III-Grade</td><td><span class='badge-special'>Special</span></td><td class='num pos'>44.3%</td><td class='num neg'>-12.2%</td><td class='num pos'>+38.7%</td><td>Isogen</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Special'><td>Compressed Rakovene II-Grade</td><td><span class='badge-special'>Special</span></td><td class='num pos'>39.6%</td><td class='num neg'>-3.4%</td><td class='num neg'>-2.4%</td><td>Isogen</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Hemorphite IV-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>38.4%</td><td class='num pos'>+0.9%</td><td class='num neg'>-16.4%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed  Crokite IV-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>35.7%</td><td class='num pos'>+0.4%</td><td class='num pos'>+9.5%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Hedbergite II-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>34.9%</td><td class='num pos'>+6.4%</td><td class='num pos'>+21.0%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Jaspet III-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>33.4%</td><td class='num neg'>-48.5%</td><td class='num neg'>-28.0%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Crokite II-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>30.9%</td><td class='num pos'>+1.8%</td><td class='num pos'>+11.9%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Crokite III-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>28.3%</td><td class='num pos'>+2.7%</td><td class='num pos'>+5.0%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Veldspar II-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>26.2%</td><td class='num pos'>+6.9%</td><td class='num pos'>+8.4%</td><td>Tritanium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Veldspar</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>24.0%</td><td class='num pos'>+9.3%</td><td class='num pos'>+5.5%</td><td>Tritanium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Hemorphite</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>23.6%</td><td class='num pos'>+1.9%</td><td class='num pos'>+10.2%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Hedbergite</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>21.2%</td><td class='num pos'>+5.4%</td><td class='num pos'>+3.8%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Plagioclase III-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>21.0%</td><td class='num pos'>+12.6%</td><td class='num pos'>+13.5%</td><td>Mexallon</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Omber IV-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>20.5%</td><td class='num neg'>-8.5%</td><td class='num pos'>+8.1%</td><td>Isogen</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Hemorphite II-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>20.5%</td><td class='num pos'>+2.2%</td><td class='num pos'>+8.9%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Crokite</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>20.3%</td><td class='num neg'>-4.8%</td><td class='num pos'>+4.6%</td><td>Nocxium</td><td><span class='signal sig-strong-buy'>Strong Buy</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Hemorphite III-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>18.9%</td><td class='num pos'>+2.1%</td><td class='num pos'>+10.7%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Veldspar III-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>17.6%</td><td class='num pos'>+5.4%</td><td class='num pos'>+3.1%</td><td>Tritanium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Special'><td>Compressed Rakovene</td><td><span class='badge-special'>Special</span></td><td class='num pos'>16.7%</td><td class='num neg'>-2.2%</td><td class='num neg'>-7.7%</td><td>Isogen</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Special'><td>Compressed Talassonite</td><td><span class='badge-special'>Special</span></td><td class='num pos'>16.0%</td><td class='num pos'>+3.2%</td><td class='num pos'>+17.7%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Kernite III-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>15.4%</td><td class='num pos'>+3.4%</td><td class='num pos'>+5.7%</td><td>Isogen</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Dark Ochre IV-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>14.6%</td><td class='num neg'>-2.1%</td><td class='num pos'>+1.4%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Kernite IV-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>13.7%</td><td class='num neg'>-8.7%</td><td class='num neg'>-0.4%</td><td>Isogen</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Omber III-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>13.5%</td><td class='num neg'>-5.6%</td><td class='num neg'>-11.1%</td><td>Isogen</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Mercoxit III-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>13.5%</td><td class='num pos'>+9.8%</td><td class='num pos'>+10.9%</td><td>Morphite</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Dark Ochre II-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>12.2%</td><td class='num neg'>-1.8%</td><td class='num pos'>+3.8%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Dark Ochre</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>12.1%</td><td class='num neg'>-2.4%</td><td class='num pos'>+1.8%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Plagioclase</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>11.8%</td><td class='num neg'>-1.7%</td><td class='num pos'>+7.9%</td><td>Mexallon</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Omber II-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>11.4%</td><td class='num neg'>-5.2%</td><td class='num neg'>-21.5%</td><td>Isogen</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Plagioclase II-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>10.7%</td><td class='num neg'>-1.2%</td><td class='num pos'>+5.1%</td><td>Mexallon</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Dark Ochre III-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>10.7%</td><td class='num neg'>-1.4%</td><td class='num pos'>+2.0%</td><td>Nocxium</td><td><span class='signal sig-buy'>Buy</span></td></tr><tr class='row-green' data-sec='Special'><td>Compressed Bezdnacine II-Grade</td><td><span class='badge-special'>Special</span></td><td class='num pos'>9.8%</td><td class='num neg'>-9.0%</td><td class='num neg'>-16.1%</td><td>Isogen</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-sec='Null-Sec'><td>Compressed Mercoxit</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>9.2%</td><td class='num neg'>-7.3%</td><td class='num pos'>+8.2%</td><td>Morphite</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Jaspet IV-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>7.1%</td><td class='num pos'>+2.6%</td><td class='num pos'>+16.1%</td><td>Nocxium</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-sec='Special'><td>Compressed Talassonite II-Grade</td><td><span class='badge-special'>Special</span></td><td class='num pos'>7.1%</td><td class='num neg'>-40.0%</td><td class='num pos'>+2.9%</td><td>Nocxium</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-sec='Low-Sec'><td>Compressed Jaspet II-Grade</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>7.0%</td><td class='num pos'>+2.6%</td><td class='num pos'>+13.5%</td><td>Nocxium</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Omber</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>6.8%</td><td class='num neg'>-8.1%</td><td class='num neg'>-9.8%</td><td>Isogen</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-sec='High-Sec'><td>Compressed Scordite II-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>5.6%</td><td class='num neg'>-2.6%</td><td class='num neg'>-8.7%</td><td>Pyerite</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-green' data-sec='Special'><td>Compressed Rakovene III-Grade</td><td><span class='badge-special'>Special</span></td><td class='num pos'>5.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-6.9%</td><td>Isogen</td><td><span class='signal sig-watch'>Watch</span></td></tr><tr class='row-yellow' data-sec='High-Sec'><td>Compressed Kernite II-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>4.8%</td><td class='num neg'>-2.5%</td><td class='num neg'>-3.7%</td><td>Isogen</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow' data-sec='High-Sec'><td>Compressed Plagioclase IV-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>4.3%</td><td class='num neg'>-11.0%</td><td class='num neg'>-7.8%</td><td>Mexallon</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow' data-sec='Special'><td>Compressed Talassonite III-Grade</td><td><span class='badge-special'>Special</span></td><td class='num pos'>4.1%</td><td class='num neg'>-9.9%</td><td class='num pos'>+1.7%</td><td>Nocxium</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow' data-sec='High-Sec'><td>Compressed Scordite III-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>3.0%</td><td class='num neg'>-7.1%</td><td class='num neg'>-7.0%</td><td>Pyerite</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow' data-sec='Low-Sec'><td>Compressed Jaspet</td><td><span class='badge-lowsec'>Low-Sec</span></td><td class='num pos'>2.0%</td><td class='num pos'>+2.6%</td><td class='num pos'>+15.5%</td><td>Nocxium</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow' data-sec='High-Sec'><td>Compressed Scordite</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>1.7%</td><td class='num neg'>-2.0%</td><td class='num neg'>-1.5%</td><td>Pyerite</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow' data-sec='Null-Sec'><td>Compressed Gneiss IV-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num pos'>0.7%</td><td class='num neg'>-9.1%</td><td class='num neg'>-9.1%</td><td>Isogen</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-yellow' data-sec='High-Sec'><td>Compressed Kernite</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num pos'>0.1%</td><td class='num neg'>-6.7%</td><td class='num neg'>-8.1%</td><td>Isogen</td><td><span class='signal sig-marginal'>Marginal</span></td></tr><tr class='row-red' data-sec='High-Sec'><td>Compressed Pyroxeres II-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num neg'>-0.6%</td><td class='num pos'>+7.0%</td><td class='num pos'>+0.0%</td><td>Mexallon</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Gneiss III-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-0.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.9%</td><td>Isogen</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Gneiss</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-1.2%</td><td class='num neg'>-6.6%</td><td class='num neg'>-7.9%</td><td>Isogen</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Special'><td>Compressed Bezdnacine</td><td><span class='badge-special'>Special</span></td><td class='num neg'>-2.4%</td><td class='num neg'>-19.0%</td><td class='num neg'>-7.9%</td><td>Isogen</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Gneiss II-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-3.8%</td><td class='num neg'>-2.3%</td><td class='num neg'>-12.9%</td><td>Isogen</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='High-Sec'><td>Compressed Pyroxeres III-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num neg'>-5.6%</td><td class='num neg'>-5.0%</td><td class='num neg'>-10.8%</td><td>Mexallon</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Bistot</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-8.8%</td><td class='num neg'>-1.2%</td><td class='num pos'>+18.4%</td><td>Zydrine</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='High-Sec'><td>Compressed Pyroxeres</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num neg'>-9.2%</td><td class='num neg'>-7.1%</td><td class='num pos'>+4.8%</td><td>Mexallon</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Arkonor</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-9.5%</td><td class='num pos'>+5.8%</td><td class='num pos'>+5.6%</td><td>Megacyte</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Bistot IV-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-11.3%</td><td class='num neg'>-2.6%</td><td class='num neg'>-3.2%</td><td>Zydrine</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='High-Sec'><td>Compressed Pyroxeres IV-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num neg'>-15.1%</td><td class='num neg'>-6.5%</td><td class='num neg'>-5.9%</td><td>Mexallon</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Bistot III-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-22.5%</td><td class='num neg'>-1.0%</td><td class='num neg'>-1.0%</td><td>Zydrine</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='High-Sec'><td>Compressed Scordite IV-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num neg'>-22.6%</td><td class='num neg'>-0.8%</td><td class='num neg'>-4.3%</td><td>Pyerite</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Arkonor IV-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-24.6%</td><td class='num neg'>-14.3%</td><td class='num neg'>-21.1%</td><td>Megacyte</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Bistot II-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-28.3%</td><td class='num neg'>-1.0%</td><td class='num neg'>-2.8%</td><td>Zydrine</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Arkonor III-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-33.4%</td><td class='num neg'>-12.8%</td><td class='num neg'>-20.2%</td><td>Megacyte</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Arkonor II-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-33.8%</td><td class='num neg'>-12.8%</td><td class='num neg'>-15.7%</td><td>Megacyte</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Spodumain II-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-37.3%</td><td class='num neg'>-1.7%</td><td class='num neg'>-1.8%</td><td>Tritanium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='High-Sec'><td>Compressed Veldspar IV-Grade</td><td><span class='badge-highsec'>High-Sec</span></td><td class='num neg'>-49.5%</td><td class='num pos'>+0.6%</td><td class='num pos'>+5.3%</td><td>Tritanium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Spodumain III-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-50.0%</td><td class='num neg'>-1.6%</td><td class='num neg'>-2.8%</td><td>Tritanium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Spodumain</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-51.8%</td><td class='num neg'>-1.7%</td><td class='num neg'>-8.5%</td><td>Tritanium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr><tr class='row-red' data-sec='Null-Sec'><td>Compressed Spodumain IV-Grade</td><td><span class='badge-nullsec'>Null-Sec</span></td><td class='num neg'>-72.2%</td><td class='num neg'>-46.9%</td><td class='num neg'>-52.6%</td><td>Tritanium</td><td><span class='signal sig-avoid'>Avoid</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 3: Family Cards -->
+  <h2 class="section-title">Per-Ore Family Analysis</h2>
+  <div class="filter-bar" id="family-filter-bar">
+    <button class="filter-btn active" onclick="filterFamilies('all', this)">All</button>
+    <button class="filter-btn badge-highsec" onclick="filterFamilies('High-Sec', this)">High-Sec</button>
+    <button class="filter-btn badge-lowsec"  onclick="filterFamilies('Low-Sec',  this)">Low-Sec</button>
+    <button class="filter-btn badge-nullsec" onclick="filterFamilies('Null-Sec', this)">Null-Sec</button>
+    <button class="filter-btn badge-special" onclick="filterFamilies('Special',  this)">Special</button>
+  </div>
+  <div class="family-cards" id="family-cards-container">
+    
+        <div class="family-card" data-sec="High-Sec">
+            <div class="family-header">
+                <span class="family-name">Veldspar</span>
+                <span class="family-sec badge-highsec">High-Sec</span>
+                <span class="family-margin pos">24.0%</span>
+                <span class="family-chg pos">30d: +5.5%</span>
+            </div>
+            <p class="family-narrative">Veldspar (High-Sec) currently offers a excellent margin of 24.0% ROI. Tritanium is the dominant value driver, contributing 100% of batch revenue. Tritanium has fallen 5.8% over the past 30 days, compressing margins.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>400</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-5.8%</td><td class='num'>1.3K</td><td class='num'>100.0%</td><td class='num neg'>-82</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Veldspar</td><td>Base</td><td class='num pos'>24.0%</td><td class='num'>11</td><td class='num'>11</td></tr><tr class='row-green'><td>Compressed Veldspar II-Grade</td><td>II-Grade</td><td class='num pos'>26.2%</td><td class='num'>12</td><td class='num'>11</td></tr><tr class='row-green'><td>Compressed Veldspar III-Grade</td><td>III-Grade</td><td class='num pos'>17.6%</td><td class='num'>13</td><td class='num'>12</td></tr><tr class='row-red'><td>Compressed Veldspar IV-Grade</td><td>IV-Grade</td><td class='num neg'>-49.5%</td><td class='num'>N/A</td><td class='num'>30</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tritanium</div><canvas id='spark_62516_34' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62516_34');
+                if (!ctx) return;
+                var data = [4.04, 4.04, 4.01, 3.93, 3.91, 3.96, 3.91, 3.9, 3.89, 3.88, 3.87, 3.83, 3.68, 3.72, 3.88, 3.75, 3.88, 3.91, 3.85, 3.81, 3.81, 3.84, 3.84, 3.75, 3.84, 3.75, 3.72, 3.64, 3.7, 3.69, 3.8];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="High-Sec">
+            <div class="family-header">
+                <span class="family-name">Scordite</span>
+                <span class="family-sec badge-highsec">High-Sec</span>
+                <span class="family-margin pos">1.7%</span>
+                <span class="family-chg neg">30d: -1.5%</span>
+            </div>
+            <p class="family-narrative">Scordite (High-Sec) currently offers a thin margin of 1.7% ROI. Pyerite is the dominant value driver, contributing 77% of batch revenue. Pyerite has fallen 5.6% over the past 30 days, compressing margins. Secondary contributors: Tritanium (23% of value, falling 5.8%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>150</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-5.8%</td><td class='num'>501</td><td class='num'>23.5%</td><td class='num neg'>-31</td></tr><tr><td>Pyerite</td><td class='num'>110</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>1.6K</td><td class='num'>76.5%</td><td class='num neg'>-97</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-yellow'><td>Compressed Scordite</td><td>Base</td><td class='num pos'>1.7%</td><td class='num'>22</td><td class='num'>21</td></tr><tr class='row-green'><td>Compressed Scordite II-Grade</td><td>II-Grade</td><td class='num pos'>5.6%</td><td class='num'>22</td><td class='num'>21</td></tr><tr class='row-yellow'><td>Compressed Scordite III-Grade</td><td>III-Grade</td><td class='num pos'>3.0%</td><td class='num'>24</td><td class='num'>22</td></tr><tr class='row-red'><td>Compressed Scordite IV-Grade</td><td>IV-Grade</td><td class='num neg'>-22.6%</td><td class='num'>36</td><td class='num'>31</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tritanium</div><canvas id='spark_62520_34' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62520_35' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62520_34');
+                if (!ctx) return;
+                var data = [4.04, 4.04, 4.01, 3.93, 3.91, 3.96, 3.91, 3.9, 3.89, 3.88, 3.87, 3.83, 3.68, 3.72, 3.88, 3.75, 3.88, 3.91, 3.85, 3.81, 3.81, 3.84, 3.84, 3.75, 3.84, 3.75, 3.72, 3.64, 3.7, 3.69, 3.8];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62520_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="High-Sec">
+            <div class="family-header">
+                <span class="family-name">Pyroxeres</span>
+                <span class="family-sec badge-highsec">High-Sec</span>
+                <span class="family-margin neg">-9.2%</span>
+                <span class="family-chg pos">30d: +4.8%</span>
+            </div>
+            <p class="family-narrative">Pyroxeres (High-Sec) currently offers a negative margin of -9.2% ROI. Mexallon is the dominant value driver, contributing 53% of batch revenue. Mexallon has fallen 6.4% over the past 30 days, compressing margins. Secondary contributors: Pyerite (47% of value, falling 5.6%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Pyerite</td><td class='num'>90</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>1.3K</td><td class='num'>46.6%</td><td class='num neg'>-79</td></tr><tr><td>Mexallon</td><td class='num'>30</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>1.5K</td><td class='num'>53.4%</td><td class='num neg'>-105</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Pyroxeres</td><td>Base</td><td class='num neg'>-9.2%</td><td class='num'>33</td><td class='num'>31</td></tr><tr class='row-red'><td>Compressed Pyroxeres II-Grade</td><td>II-Grade</td><td class='num neg'>-0.6%</td><td class='num'>32</td><td class='num'>30</td></tr><tr class='row-red'><td>Compressed Pyroxeres III-Grade</td><td>III-Grade</td><td class='num neg'>-5.6%</td><td class='num'>38</td><td class='num'>33</td></tr><tr class='row-red'><td>Compressed Pyroxeres IV-Grade</td><td>IV-Grade</td><td class='num neg'>-15.1%</td><td class='num'>81</td><td class='num'>39</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62524_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62524_36' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62524_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62524_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="High-Sec">
+            <div class="family-header">
+                <span class="family-name">Plagioclase</span>
+                <span class="family-sec badge-highsec">High-Sec</span>
+                <span class="family-margin pos">11.8%</span>
+                <span class="family-chg pos">30d: +7.9%</span>
+            </div>
+            <p class="family-narrative">Plagioclase (High-Sec) currently offers a solid margin of 11.8% ROI. Mexallon is the dominant value driver, contributing 86% of batch revenue. Mexallon has fallen 6.4% over the past 30 days, compressing margins. Secondary contributors: Tritanium (14% of value, falling 5.8%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>175</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-5.8%</td><td class='num'>585</td><td class='num'>14.0%</td><td class='num neg'>-36</td></tr><tr><td>Mexallon</td><td class='num'>70</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>3.6K</td><td class='num'>86.0%</td><td class='num neg'>-245</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Plagioclase</td><td>Base</td><td class='num pos'>11.8%</td><td class='num'>40</td><td class='num'>37</td></tr><tr class='row-green'><td>Compressed Plagioclase II-Grade</td><td>II-Grade</td><td class='num pos'>10.7%</td><td class='num'>41</td><td class='num'>39</td></tr><tr class='row-green'><td>Compressed Plagioclase III-Grade</td><td>III-Grade</td><td class='num pos'>21.0%</td><td class='num'>42</td><td class='num'>37</td></tr><tr class='row-yellow'><td>Compressed Plagioclase IV-Grade</td><td>IV-Grade</td><td class='num pos'>4.3%</td><td class='num'>N/A</td><td class='num'>45</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tritanium</div><canvas id='spark_62528_34' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62528_36' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62528_34');
+                if (!ctx) return;
+                var data = [4.04, 4.04, 4.01, 3.93, 3.91, 3.96, 3.91, 3.9, 3.89, 3.88, 3.87, 3.83, 3.68, 3.72, 3.88, 3.75, 3.88, 3.91, 3.85, 3.81, 3.81, 3.84, 3.84, 3.75, 3.84, 3.75, 3.72, 3.64, 3.7, 3.69, 3.8];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62528_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="High-Sec">
+            <div class="family-header">
+                <span class="family-name">Omber</span>
+                <span class="family-sec badge-highsec">High-Sec</span>
+                <span class="family-margin pos">6.8%</span>
+                <span class="family-chg neg">30d: -9.8%</span>
+            </div>
+            <p class="family-narrative">Omber (High-Sec) currently offers a modest margin of 6.8% ROI. Isogen is the dominant value driver, contributing 89% of batch revenue. Isogen has fallen 9.7% over the past 30 days, compressing margins. Secondary contributors: Pyerite (11% of value, falling 5.6%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Pyerite</td><td class='num'>90</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>1.3K</td><td class='num'>10.9%</td><td class='num neg'>-79</td></tr><tr><td>Isogen</td><td class='num'>75</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>10.9K</td><td class='num'>89.1%</td><td class='num neg'>-1.2K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Omber</td><td>Base</td><td class='num pos'>6.8%</td><td class='num'>115</td><td class='num'>113</td></tr><tr class='row-green'><td>Compressed Omber II-Grade</td><td>II-Grade</td><td class='num pos'>11.4%</td><td class='num'>119</td><td class='num'>114</td></tr><tr class='row-green'><td>Compressed Omber III-Grade</td><td>III-Grade</td><td class='num pos'>13.5%</td><td class='num'>126</td><td class='num'>118</td></tr><tr class='row-green'><td>Compressed Omber IV-Grade</td><td>IV-Grade</td><td class='num pos'>20.5%</td><td class='num'>150</td><td class='num'>115</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62532_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62532_37' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62532_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62532_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="High-Sec">
+            <div class="family-header">
+                <span class="family-name">Kernite</span>
+                <span class="family-sec badge-highsec">High-Sec</span>
+                <span class="family-margin pos">0.1%</span>
+                <span class="family-chg neg">30d: -8.1%</span>
+            </div>
+            <p class="family-narrative">Kernite (High-Sec) currently offers a thin margin of 0.1% ROI. Isogen is the dominant value driver, contributing 85% of batch revenue. Isogen has fallen 9.7% over the past 30 days, compressing margins. Secondary contributors: Mexallon (15% of value, falling 6.4%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Mexallon</td><td class='num'>60</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>3.1K</td><td class='num'>14.9%</td><td class='num neg'>-210</td></tr><tr><td>Isogen</td><td class='num'>120</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>17.5K</td><td class='num'>85.1%</td><td class='num neg'>-1.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-yellow'><td>Compressed Kernite</td><td>Base</td><td class='num pos'>0.1%</td><td class='num'>204</td><td class='num'>203</td></tr><tr class='row-yellow'><td>Compressed Kernite II-Grade</td><td>II-Grade</td><td class='num pos'>4.8%</td><td class='num'>203</td><td class='num'>203</td></tr><tr class='row-green'><td>Compressed Kernite III-Grade</td><td>III-Grade</td><td class='num pos'>15.4%</td><td class='num'>211</td><td class='num'>193</td></tr><tr class='row-green'><td>Compressed Kernite IV-Grade</td><td>IV-Grade</td><td class='num pos'>13.7%</td><td class='num'>289</td><td class='num'>205</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62536_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62536_37' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62536_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62536_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Low-Sec">
+            <div class="family-header">
+                <span class="family-name">Jaspet</span>
+                <span class="family-sec badge-lowsec">Low-Sec</span>
+                <span class="family-margin pos">2.0%</span>
+                <span class="family-chg pos">30d: +15.5%</span>
+            </div>
+            <p class="family-narrative">Jaspet (Low-Sec) currently offers a thin margin of 2.0% ROI. Nocxium is the dominant value driver, contributing 82% of batch revenue. Nocxium has risen 24.7% over the past 30 days, boosting returns. Secondary contributors: Mexallon (18% of value, falling 6.4%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Mexallon</td><td class='num'>150</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>7.7K</td><td class='num'>17.8%</td><td class='num neg'>-525</td></tr><tr><td>Nocxium</td><td class='num'>50</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num pos'>+11.9%</td><td class='num pos'>+24.7%</td><td class='num'>35.4K</td><td class='num'>82.2%</td><td class='num pos'>7.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-yellow'><td>Compressed Jaspet</td><td>Base</td><td class='num pos'>2.0%</td><td class='num'>471</td><td class='num'>416</td></tr><tr class='row-green'><td>Compressed Jaspet II-Grade</td><td>II-Grade</td><td class='num pos'>7.0%</td><td class='num'>490</td><td class='num'>420</td></tr><tr class='row-green'><td>Compressed Jaspet III-Grade</td><td>III-Grade</td><td class='num pos'>33.4%</td><td class='num'>524</td><td class='num'>350</td></tr><tr class='row-green'><td>Compressed Jaspet IV-Grade</td><td>IV-Grade</td><td class='num pos'>7.1%</td><td class='num'>799</td><td class='num'>459</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62540_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nocxium</div><canvas id='spark_62540_38' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62540_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62540_38');
+                if (!ctx) return;
+                var data = [639.48, 658.93, 660.6, 642.45, 655.57, 674.13, 681.27, 694.38, 687.93, 684.12, 669.76, 673.42, 686.69, 676.55, 691.87, 680.67, 712.83, 720.98, 726.34, 724.75, 722.66, 738.91, 732.5, 752.22, 758.46, 768.48, 783.25, 788.35, 796.02, 858.48, 797.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Low-Sec">
+            <div class="family-header">
+                <span class="family-name">Hemorphite</span>
+                <span class="family-sec badge-lowsec">Low-Sec</span>
+                <span class="family-margin pos">23.6%</span>
+                <span class="family-chg pos">30d: +10.2%</span>
+            </div>
+            <p class="family-narrative">Hemorphite (Low-Sec) currently offers a excellent margin of 23.6% ROI. Nocxium is the dominant value driver, contributing 65% of batch revenue. Nocxium has risen 24.7% over the past 30 days, boosting returns. Secondary contributors: Isogen (35% of value, falling 9.7%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Isogen</td><td class='num'>240</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>35.0K</td><td class='num'>35.5%</td><td class='num neg'>-3.8K</td></tr><tr><td>Nocxium</td><td class='num'>90</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num pos'>+11.9%</td><td class='num pos'>+24.7%</td><td class='num'>63.7K</td><td class='num'>64.5%</td><td class='num pos'>12.6K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Hemorphite</td><td>Base</td><td class='num pos'>23.6%</td><td class='num'>992</td><td class='num'>787</td></tr><tr class='row-green'><td>Compressed Hemorphite II-Grade</td><td>II-Grade</td><td class='num pos'>20.5%</td><td class='num'>1.0K</td><td class='num'>851</td></tr><tr class='row-green'><td>Compressed Hemorphite III-Grade</td><td>III-Grade</td><td class='num pos'>18.9%</td><td class='num'>1.2K</td><td class='num'>900</td></tr><tr class='row-green'><td>Compressed Hemorphite IV-Grade</td><td>IV-Grade</td><td class='num pos'>38.4%</td><td class='num'>1.5K</td><td class='num'>811</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62544_37' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nocxium</div><canvas id='spark_62544_38' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62544_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62544_38');
+                if (!ctx) return;
+                var data = [639.48, 658.93, 660.6, 642.45, 655.57, 674.13, 681.27, 694.38, 687.93, 684.12, 669.76, 673.42, 686.69, 676.55, 691.87, 680.67, 712.83, 720.98, 726.34, 724.75, 722.66, 738.91, 732.5, 752.22, 758.46, 768.48, 783.25, 788.35, 796.02, 858.48, 797.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Low-Sec">
+            <div class="family-header">
+                <span class="family-name">Hedbergite</span>
+                <span class="family-sec badge-lowsec">Low-Sec</span>
+                <span class="family-margin pos">21.2%</span>
+                <span class="family-chg pos">30d: +3.8%</span>
+            </div>
+            <p class="family-narrative">Hedbergite (Low-Sec) currently offers a excellent margin of 21.2% ROI. Nocxium is the dominant value driver, contributing 93% of batch revenue. Nocxium has risen 24.7% over the past 30 days, boosting returns. Secondary contributors: Pyerite (7% of value, falling 5.6%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Pyerite</td><td class='num'>450</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>6.7K</td><td class='num'>7.3%</td><td class='num neg'>-397</td></tr><tr><td>Nocxium</td><td class='num'>120</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num pos'>+11.9%</td><td class='num pos'>+24.7%</td><td class='num'>85.0K</td><td class='num'>92.7%</td><td class='num pos'>16.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Hedbergite</td><td>Base</td><td class='num pos'>21.2%</td><td class='num'>960</td><td class='num'>746</td></tr><tr class='row-green'><td>Compressed Hedbergite II-Grade</td><td>II-Grade</td><td class='num pos'>34.9%</td><td class='num'>972</td><td class='num'>703</td></tr><tr class='row-green'><td>Compressed Hedbergite III-Grade</td><td>III-Grade</td><td class='num pos'>45.3%</td><td class='num'>985</td><td class='num'>684</td></tr><tr class='row-green'><td>Compressed Hedbergite IV-Grade</td><td>IV-Grade</td><td class='num pos'>62.3%</td><td class='num'>990</td><td class='num'>640</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62548_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nocxium</div><canvas id='spark_62548_38' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62548_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62548_38');
+                if (!ctx) return;
+                var data = [639.48, 658.93, 660.6, 642.45, 655.57, 674.13, 681.27, 694.38, 687.93, 684.12, 669.76, 673.42, 686.69, 676.55, 691.87, 680.67, 712.83, 720.98, 726.34, 724.75, 722.66, 738.91, 732.5, 752.22, 758.46, 768.48, 783.25, 788.35, 796.02, 858.48, 797.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Null-Sec">
+            <div class="family-header">
+                <span class="family-name">Gneiss</span>
+                <span class="family-sec badge-nullsec">Null-Sec</span>
+                <span class="family-margin neg">-1.2%</span>
+                <span class="family-chg neg">30d: -7.9%</span>
+            </div>
+            <p class="family-narrative">Gneiss (Null-Sec) currently offers a negative margin of -1.2% ROI. Isogen is the dominant value driver, contributing 52% of batch revenue. Isogen has fallen 9.7% over the past 30 days, compressing margins. Secondary contributors: Mexallon (34% of value, falling 6.4%), Pyerite (13% of value, falling 5.6%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Pyerite</td><td class='num'>2000</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>29.8K</td><td class='num'>13.3%</td><td class='num neg'>-1.8K</td></tr><tr><td>Mexallon</td><td class='num'>1500</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>76.7K</td><td class='num'>34.4%</td><td class='num neg'>-5.3K</td></tr><tr><td>Isogen</td><td class='num'>800</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>116.7K</td><td class='num'>52.3%</td><td class='num neg'>-12.6K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Gneiss</td><td>Base</td><td class='num neg'>-1.2%</td><td class='num'>2.3K</td><td class='num'>2.2K</td></tr><tr class='row-red'><td>Compressed Gneiss II-Grade</td><td>II-Grade</td><td class='num neg'>-3.8%</td><td class='num'>2.4K</td><td class='num'>2.4K</td></tr><tr class='row-red'><td>Compressed Gneiss III-Grade</td><td>III-Grade</td><td class='num neg'>-0.7%</td><td class='num'>2.7K</td><td class='num'>2.4K</td></tr><tr class='row-yellow'><td>Compressed Gneiss IV-Grade</td><td>IV-Grade</td><td class='num pos'>0.7%</td><td class='num'>5.4K</td><td class='num'>2.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62552_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62552_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62552_37' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62552_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62552_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62552_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Null-Sec">
+            <div class="family-header">
+                <span class="family-name">Dark Ochre</span>
+                <span class="family-sec badge-nullsec">Null-Sec</span>
+                <span class="family-margin pos">12.1%</span>
+                <span class="family-chg pos">30d: +1.8%</span>
+            </div>
+            <p class="family-narrative">Dark Ochre (Null-Sec) currently offers a solid margin of 12.1% ROI. Nocxium is the dominant value driver, contributing 48% of batch revenue. Nocxium has risen 24.7% over the past 30 days, boosting returns. Secondary contributors: Isogen (37% of value, falling 9.7%), Mexallon (15% of value, falling 6.4%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Mexallon</td><td class='num'>1360</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>69.5K</td><td class='num'>14.8%</td><td class='num neg'>-4.8K</td></tr><tr><td>Isogen</td><td class='num'>1200</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>175.1K</td><td class='num'>37.2%</td><td class='num neg'>-18.8K</td></tr><tr><td>Nocxium</td><td class='num'>320</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num pos'>+11.9%</td><td class='num pos'>+24.7%</td><td class='num'>226.7K</td><td class='num'>48.1%</td><td class='num pos'>44.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Dark Ochre</td><td>Base</td><td class='num pos'>12.1%</td><td class='num'>4.6K</td><td class='num'>4.1K</td></tr><tr class='row-green'><td>Compressed Dark Ochre II-Grade</td><td>II-Grade</td><td class='num pos'>12.2%</td><td class='num'>4.9K</td><td class='num'>4.3K</td></tr><tr class='row-green'><td>Compressed Dark Ochre III-Grade</td><td>III-Grade</td><td class='num pos'>10.7%</td><td class='num'>5.1K</td><td class='num'>4.6K</td></tr><tr class='row-green'><td>Compressed Dark Ochre IV-Grade</td><td>IV-Grade</td><td class='num pos'>14.6%</td><td class='num'>5.1K</td><td class='num'>4.7K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62556_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62556_37' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nocxium</div><canvas id='spark_62556_38' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62556_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62556_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62556_38');
+                if (!ctx) return;
+                var data = [639.48, 658.93, 660.6, 642.45, 655.57, 674.13, 681.27, 694.38, 687.93, 684.12, 669.76, 673.42, 686.69, 676.55, 691.87, 680.67, 712.83, 720.98, 726.34, 724.75, 722.66, 738.91, 732.5, 752.22, 758.46, 768.48, 783.25, 788.35, 796.02, 858.48, 797.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Null-Sec">
+            <div class="family-header">
+                <span class="family-name">Crokite</span>
+                <span class="family-sec badge-nullsec">Null-Sec</span>
+                <span class="family-margin pos">20.3%</span>
+                <span class="family-chg pos">30d: +4.6%</span>
+            </div>
+            <p class="family-narrative">Crokite (Null-Sec) currently offers a excellent margin of 20.3% ROI. Nocxium is the dominant value driver, contributing 83% of batch revenue. Nocxium has risen 24.7% over the past 30 days, boosting returns. Secondary contributors: Mexallon (15% of value, falling 6.4%), Pyerite (2% of value, falling 5.6%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Pyerite</td><td class='num'>800</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>11.9K</td><td class='num'>1.7%</td><td class='num neg'>-706</td></tr><tr><td>Mexallon</td><td class='num'>2000</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>102.3K</td><td class='num'>15.0%</td><td class='num neg'>-7.0K</td></tr><tr><td>Nocxium</td><td class='num'>800</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num pos'>+11.9%</td><td class='num pos'>+24.7%</td><td class='num'>566.7K</td><td class='num'>83.2%</td><td class='num pos'>112.3K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Crokite</td><td>Base</td><td class='num pos'>20.3%</td><td class='num'>6.1K</td><td class='num'>5.6K</td></tr><tr class='row-green'><td>Compressed Crokite II-Grade</td><td>II-Grade</td><td class='num pos'>30.9%</td><td class='num'>6.8K</td><td class='num'>5.4K</td></tr><tr class='row-green'><td>Compressed Crokite III-Grade</td><td>III-Grade</td><td class='num pos'>28.3%</td><td class='num'>7.8K</td><td class='num'>5.7K</td></tr><tr class='row-green'><td>Compressed  Crokite IV-Grade</td><td>IV-Grade</td><td class='num pos'>35.7%</td><td class='num'>7.9K</td><td class='num'>5.7K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62560_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62560_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nocxium</div><canvas id='spark_62560_38' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62560_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62560_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62560_38');
+                if (!ctx) return;
+                var data = [639.48, 658.93, 660.6, 642.45, 655.57, 674.13, 681.27, 694.38, 687.93, 684.12, 669.76, 673.42, 686.69, 676.55, 691.87, 680.67, 712.83, 720.98, 726.34, 724.75, 722.66, 738.91, 732.5, 752.22, 758.46, 768.48, 783.25, 788.35, 796.02, 858.48, 797.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Null-Sec">
+            <div class="family-header">
+                <span class="family-name">Bistot</span>
+                <span class="family-sec badge-nullsec">Null-Sec</span>
+                <span class="family-margin neg">-8.8%</span>
+                <span class="family-chg pos">30d: +18.4%</span>
+            </div>
+            <p class="family-narrative">Bistot (Null-Sec) currently offers a negative margin of -8.8% ROI. Zydrine is the dominant value driver, contributing 57% of batch revenue. Zydrine pricing has been stable over the past 30 days. Secondary contributors: Mexallon (24% of value, falling 6.4%), Pyerite (19% of value, falling 5.6%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Pyerite</td><td class='num'>3200</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>47.6K</td><td class='num'>19.0%</td><td class='num neg'>-2.8K</td></tr><tr><td>Mexallon</td><td class='num'>1200</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>61.4K</td><td class='num'>24.5%</td><td class='num neg'>-4.2K</td></tr><tr><td>Zydrine</td><td class='num'>160</td><td class='num'>996</td><td class='num pos'>+4.1%</td><td class='num pos'>+3.2%</td><td class='num pos'>+4.1%</td><td class='num'>141.6K</td><td class='num'>56.5%</td><td class='num pos'>5.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Bistot</td><td>Base</td><td class='num neg'>-8.8%</td><td class='num'>3.4K</td><td class='num'>2.7K</td></tr><tr class='row-red'><td>Compressed Bistot II-Grade</td><td>II-Grade</td><td class='num neg'>-28.3%</td><td class='num'>4.3K</td><td class='num'>3.6K</td></tr><tr class='row-red'><td>Compressed Bistot III-Grade</td><td>III-Grade</td><td class='num neg'>-22.5%</td><td class='num'>4.5K</td><td class='num'>3.5K</td></tr><tr class='row-red'><td>Compressed Bistot IV-Grade</td><td>IV-Grade</td><td class='num neg'>-11.3%</td><td class='num'>4.5K</td><td class='num'>3.2K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62564_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62564_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Zydrine</div><canvas id='spark_62564_39' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62564_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62564_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62564_39');
+                if (!ctx) return;
+                var data = [957.2, 949.62, 936.75, 934.86, 941.2, 956.82, 824.44, 828.92, 875.05, 916.09, 962.21, 939.48, 927.04, 899.6, 914.39, 945.77, 965.24, 910.97, 933.86, 945.59, 966.39, 946.96, 956.53, 956.93, 960.76, 955.37, 957.65, 964.23, 974.42, 1011.83, 996.23];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Null-Sec">
+            <div class="family-header">
+                <span class="family-name">Arkonor</span>
+                <span class="family-sec badge-nullsec">Null-Sec</span>
+                <span class="family-margin neg">-9.5%</span>
+                <span class="family-chg pos">30d: +5.6%</span>
+            </div>
+            <p class="family-narrative">Arkonor (Null-Sec) currently offers a negative margin of -9.5% ROI. Megacyte is the dominant value driver, contributing 64% of batch revenue. Megacyte has fallen 24.2% over the past 30 days, compressing margins. Secondary contributors: Mexallon (20% of value, falling 6.4%), Pyerite (16% of value, falling 5.6%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Pyerite</td><td class='num'>3200</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num neg'>-5.1%</td><td class='num neg'>-5.6%</td><td class='num'>47.6K</td><td class='num'>15.8%</td><td class='num neg'>-2.8K</td></tr><tr><td>Mexallon</td><td class='num'>1200</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num neg'>-16.0%</td><td class='num neg'>-6.4%</td><td class='num'>61.4K</td><td class='num'>20.4%</td><td class='num neg'>-4.2K</td></tr><tr><td>Megacyte</td><td class='num'>120</td><td class='num'>1.8K</td><td class='num neg'>-20.3%</td><td class='num neg'>-18.6%</td><td class='num neg'>-24.2%</td><td class='num'>192.2K</td><td class='num'>63.8%</td><td class='num neg'>-61.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Arkonor</td><td>Base</td><td class='num neg'>-9.5%</td><td class='num'>3.9K</td><td class='num'>3.3K</td></tr><tr class='row-red'><td>Compressed Arkonor II-Grade</td><td>II-Grade</td><td class='num neg'>-33.8%</td><td class='num'>5.1K</td><td class='num'>4.7K</td></tr><tr class='row-red'><td>Compressed Arkonor III-Grade</td><td>III-Grade</td><td class='num neg'>-33.4%</td><td class='num'>5.3K</td><td class='num'>4.9K</td></tr><tr class='row-red'><td>Compressed Arkonor IV-Grade</td><td>IV-Grade</td><td class='num neg'>-24.6%</td><td class='num'>5.7K</td><td class='num'>4.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Pyerite</div><canvas id='spark_62568_35' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Mexallon</div><canvas id='spark_62568_36' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Megacyte</div><canvas id='spark_62568_40' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62568_35');
+                if (!ctx) return;
+                var data = [17.75, 17.84, 17.42, 17.54, 17.65, 17.9, 18.07, 18.08, 17.42, 16.97, 17.11, 16.9, 17.14, 17.28, 17.39, 17.48, 17.66, 17.81, 17.84, 17.88, 17.75, 17.43, 17.14, 17.05, 17.34, 17.11, 16.65, 16.08, 16.6, 15.75, 16.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62568_36');
+                if (!ctx) return;
+                var data = [61.51, 64.93, 66.26, 66.63, 66.63, 69.55, 70.13, 70.65, 69.53, 69.07, 69.52, 68.21, 67.66, 67.81, 67.53, 67.56, 68.55, 67.41, 66.99, 65.33, 65.28, 65.36, 64.45, 64.88, 63.25, 60.8, 57.1, 56.57, 52.11, 54.64, 57.57];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62568_40');
+                if (!ctx) return;
+                var data = [2380.0, 2479.5, 2525.75, 2476.3, 2505.14, 2583.83, 2557.25, 2587.8, 2469.67, 2323.23, 2383.29, 2422.18, 2410.22, 2388.0, 2459.33, 2434.56, 2216.78, 2230.77, 2440.78, 2357.7, 2223.56, 2265.5, 2276.5, 2264.46, 2237.22, 2304.5, 2339.45, 2337.67, 2157.17, 2045.83, 1803.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Null-Sec">
+            <div class="family-header">
+                <span class="family-name">Spodumain</span>
+                <span class="family-sec badge-nullsec">Null-Sec</span>
+                <span class="family-margin neg">-51.8%</span>
+                <span class="family-chg neg">30d: -8.5%</span>
+            </div>
+            <p class="family-narrative">Spodumain (Null-Sec) currently offers a negative margin of -51.8% ROI. Tritanium is the dominant value driver, contributing 29% of batch revenue. Tritanium has fallen 5.8% over the past 30 days, compressing margins. Secondary contributors: Isogen (26% of value, falling 9.7%), Nocxium (20% of value, rising 24.7%), Megacyte (12% of value, falling 24.2%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>48000</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-5.8%</td><td class='num'>160.5K</td><td class='num'>28.9%</td><td class='num neg'>-9.9K</td></tr><tr><td>Isogen</td><td class='num'>1000</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>145.9K</td><td class='num'>26.3%</td><td class='num neg'>-15.7K</td></tr><tr><td>Nocxium</td><td class='num'>160</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num pos'>+11.9%</td><td class='num pos'>+24.7%</td><td class='num'>113.3K</td><td class='num'>20.4%</td><td class='num pos'>22.5K</td></tr><tr><td>Zydrine</td><td class='num'>80</td><td class='num'>996</td><td class='num pos'>+4.1%</td><td class='num pos'>+3.2%</td><td class='num pos'>+4.1%</td><td class='num'>70.8K</td><td class='num'>12.8%</td><td class='num pos'>2.8K</td></tr><tr><td>Megacyte</td><td class='num'>40</td><td class='num'>1.8K</td><td class='num neg'>-20.3%</td><td class='num neg'>-18.6%</td><td class='num neg'>-24.2%</td><td class='num'>64.1K</td><td class='num'>11.6%</td><td class='num neg'>-20.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Spodumain</td><td>Base</td><td class='num neg'>-51.8%</td><td class='num'>14.9K</td><td class='num'>11.3K</td></tr><tr class='row-red'><td>Compressed Spodumain II-Grade</td><td>II-Grade</td><td class='num neg'>-37.3%</td><td class='num'>16.6K</td><td class='num'>9.1K</td></tr><tr class='row-red'><td>Compressed Spodumain III-Grade</td><td>III-Grade</td><td class='num neg'>-50.0%</td><td class='num'>14.8K</td><td class='num'>12.0K</td></tr><tr class='row-red'><td>Compressed Spodumain IV-Grade</td><td>IV-Grade</td><td class='num neg'>-72.2%</td><td class='num'>62.0K</td><td class='num'>22.6K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tritanium</div><canvas id='spark_62572_34' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62572_37' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nocxium</div><canvas id='spark_62572_38' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Zydrine</div><canvas id='spark_62572_39' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Megacyte</div><canvas id='spark_62572_40' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62572_34');
+                if (!ctx) return;
+                var data = [4.04, 4.04, 4.01, 3.93, 3.91, 3.96, 3.91, 3.9, 3.89, 3.88, 3.87, 3.83, 3.68, 3.72, 3.88, 3.75, 3.88, 3.91, 3.85, 3.81, 3.81, 3.84, 3.84, 3.75, 3.84, 3.75, 3.72, 3.64, 3.7, 3.69, 3.8];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62572_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62572_38');
+                if (!ctx) return;
+                var data = [639.48, 658.93, 660.6, 642.45, 655.57, 674.13, 681.27, 694.38, 687.93, 684.12, 669.76, 673.42, 686.69, 676.55, 691.87, 680.67, 712.83, 720.98, 726.34, 724.75, 722.66, 738.91, 732.5, 752.22, 758.46, 768.48, 783.25, 788.35, 796.02, 858.48, 797.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62572_39');
+                if (!ctx) return;
+                var data = [957.2, 949.62, 936.75, 934.86, 941.2, 956.82, 824.44, 828.92, 875.05, 916.09, 962.21, 939.48, 927.04, 899.6, 914.39, 945.77, 965.24, 910.97, 933.86, 945.59, 966.39, 946.96, 956.53, 956.93, 960.76, 955.37, 957.65, 964.23, 974.42, 1011.83, 996.23];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62572_40');
+                if (!ctx) return;
+                var data = [2380.0, 2479.5, 2525.75, 2476.3, 2505.14, 2583.83, 2557.25, 2587.8, 2469.67, 2323.23, 2383.29, 2422.18, 2410.22, 2388.0, 2459.33, 2434.56, 2216.78, 2230.77, 2440.78, 2357.7, 2223.56, 2265.5, 2276.5, 2264.46, 2237.22, 2304.5, 2339.45, 2337.67, 2157.17, 2045.83, 1803.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Null-Sec">
+            <div class="family-header">
+                <span class="family-name">Mercoxit</span>
+                <span class="family-sec badge-nullsec">Null-Sec</span>
+                <span class="family-margin pos">9.2%</span>
+                <span class="family-chg pos">30d: +8.2%</span>
+            </div>
+            <p class="family-narrative">Mercoxit (Null-Sec) currently offers a modest margin of 9.2% ROI. Morphite is the dominant value driver, contributing 100% of batch revenue. Morphite pricing has been stable over the past 30 days.</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Morphite</td><td class='num'>140</td><td class='num'>19.0K</td><td class='num pos'>+0.0%</td><td class='num neg'>-4.4%</td><td class='num pos'>+1.5%</td><td class='num'>2.36M</td><td class='num'>100.0%</td><td class='num pos'>34.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Mercoxit</td><td>Base</td><td class='num pos'>9.2%</td><td class='num'>24.8K</td><td class='num'>21.3K</td></tr><tr class='row-green'><td>Compressed Mercoxit II-Grade</td><td>II-Grade</td><td class='num pos'>60.9%</td><td class='num'>26.1K</td><td class='num'>15.2K</td></tr><tr class='row-green'><td>Compressed Mercoxit III-Grade</td><td>III-Grade</td><td class='num pos'>13.5%</td><td class='num'>34.2K</td><td class='num'>22.6K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Morphite</div><canvas id='spark_62586_11399' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62586_11399');
+                if (!ctx) return;
+                var data = [18728.0, 19223.33, 19196.25, 18715.0, 19020.0, 18681.67, 18587.5, 19326.0, 19420.0, 19128.46, 19050.59, 19592.73, 19695.56, 19311.82, 19816.67, 19915.56, 19886.67, 19557.69, 19296.67, 19272.0, 18931.11, 19258.75, 19011.67, 18998.46, 19218.89, 19752.0, 19377.27, 19483.33, 18953.33, 18918.33, 19005.0];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Special">
+            <div class="family-header">
+                <span class="family-name">Bezdnacine</span>
+                <span class="family-sec badge-special">Special</span>
+                <span class="family-margin neg">-2.4%</span>
+                <span class="family-chg neg">30d: -7.9%</span>
+            </div>
+            <p class="family-narrative">Bezdnacine (Special) currently offers a negative margin of -2.4% ROI. Isogen is the dominant value driver, contributing 67% of batch revenue. Isogen has fallen 9.7% over the past 30 days, compressing margins. Secondary contributors: Megacyte (20% of value, falling 24.2%), Tritanium (13% of value, falling 5.8%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>40000</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-5.8%</td><td class='num'>133.7K</td><td class='num'>12.9%</td><td class='num neg'>-8.2K</td></tr><tr><td>Isogen</td><td class='num'>4800</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>700.3K</td><td class='num'>67.4%</td><td class='num neg'>-75.3K</td></tr><tr><td>Megacyte</td><td class='num'>128</td><td class='num'>1.8K</td><td class='num neg'>-20.3%</td><td class='num neg'>-18.6%</td><td class='num neg'>-24.2%</td><td class='num'>205.1K</td><td class='num'>19.7%</td><td class='num neg'>-65.5K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-red'><td>Compressed Bezdnacine</td><td>Base</td><td class='num neg'>-2.4%</td><td class='num'>24.3K</td><td class='num'>10.5K</td></tr><tr class='row-green'><td>Compressed Bezdnacine II-Grade</td><td>II-Grade</td><td class='num pos'>9.8%</td><td class='num'>11.5K</td><td class='num'>9.8K</td></tr><tr class='row-green'><td>Compressed Bezdnacine III-Grade</td><td>III-Grade</td><td class='num pos'>44.3%</td><td class='num'>13.9K</td><td class='num'>7.8K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tritanium</div><canvas id='spark_62576_34' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62576_37' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Megacyte</div><canvas id='spark_62576_40' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62576_34');
+                if (!ctx) return;
+                var data = [4.04, 4.04, 4.01, 3.93, 3.91, 3.96, 3.91, 3.9, 3.89, 3.88, 3.87, 3.83, 3.68, 3.72, 3.88, 3.75, 3.88, 3.91, 3.85, 3.81, 3.81, 3.84, 3.84, 3.75, 3.84, 3.75, 3.72, 3.64, 3.7, 3.69, 3.8];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62576_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62576_40');
+                if (!ctx) return;
+                var data = [2380.0, 2479.5, 2525.75, 2476.3, 2505.14, 2583.83, 2557.25, 2587.8, 2469.67, 2323.23, 2383.29, 2422.18, 2410.22, 2388.0, 2459.33, 2434.56, 2216.78, 2230.77, 2440.78, 2357.7, 2223.56, 2265.5, 2276.5, 2264.46, 2237.22, 2304.5, 2339.45, 2337.67, 2157.17, 2045.83, 1803.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Special">
+            <div class="family-header">
+                <span class="family-name">Rakovene</span>
+                <span class="family-sec badge-special">Special</span>
+                <span class="family-margin pos">16.7%</span>
+                <span class="family-chg neg">30d: -7.7%</span>
+            </div>
+            <p class="family-narrative">Rakovene (Special) currently offers a solid margin of 16.7% ROI. Isogen is the dominant value driver, contributing 60% of batch revenue. Isogen has fallen 9.7% over the past 30 days, compressing margins. Secondary contributors: Tritanium (17% of value, falling 5.8%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>40000</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-5.8%</td><td class='num'>133.7K</td><td class='num'>17.2%</td><td class='num neg'>-8.2K</td></tr><tr><td>Isogen</td><td class='num'>3200</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num neg'>-7.2%</td><td class='num neg'>-9.7%</td><td class='num'>466.9K</td><td class='num'>60.0%</td><td class='num neg'>-50.2K</td></tr><tr><td>Zydrine</td><td class='num'>200</td><td class='num'>996</td><td class='num pos'>+4.1%</td><td class='num pos'>+3.2%</td><td class='num pos'>+4.1%</td><td class='num'>177.0K</td><td class='num'>22.8%</td><td class='num pos'>6.9K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Rakovene</td><td>Base</td><td class='num pos'>16.7%</td><td class='num'>22.8K</td><td class='num'>6.6K</td></tr><tr class='row-green'><td>Compressed Rakovene II-Grade</td><td>II-Grade</td><td class='num pos'>39.6%</td><td class='num'>9.0K</td><td class='num'>5.8K</td></tr><tr class='row-green'><td>Compressed Rakovene III-Grade</td><td>III-Grade</td><td class='num pos'>5.3%</td><td class='num'>9.5K</td><td class='num'>8.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tritanium</div><canvas id='spark_62579_34' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Isogen</div><canvas id='spark_62579_37' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Zydrine</div><canvas id='spark_62579_39' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62579_34');
+                if (!ctx) return;
+                var data = [4.04, 4.04, 4.01, 3.93, 3.91, 3.96, 3.91, 3.9, 3.89, 3.88, 3.87, 3.83, 3.68, 3.72, 3.88, 3.75, 3.88, 3.91, 3.85, 3.81, 3.81, 3.84, 3.84, 3.75, 3.84, 3.75, 3.72, 3.64, 3.7, 3.69, 3.8];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62579_37');
+                if (!ctx) return;
+                var data = [181.94, 182.72, 184.82, 177.62, 181.47, 181.95, 176.36, 180.66, 181.82, 179.0, 183.07, 185.65, 184.09, 182.36, 182.64, 178.89, 177.1, 176.48, 172.26, 175.99, 179.03, 174.19, 172.45, 172.41, 172.96, 181.1, 187.05, 183.28, 160.53, 154.35, 164.28];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62579_39');
+                if (!ctx) return;
+                var data = [957.2, 949.62, 936.75, 934.86, 941.2, 956.82, 824.44, 828.92, 875.05, 916.09, 962.21, 939.48, 927.04, 899.6, 914.39, 945.77, 965.24, 910.97, 933.86, 945.59, 966.39, 946.96, 956.53, 956.93, 960.76, 955.37, 957.65, 964.23, 974.42, 1011.83, 996.23];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+
+        <div class="family-card" data-sec="Special">
+            <div class="family-header">
+                <span class="family-name">Talassonite</span>
+                <span class="family-sec badge-special">Special</span>
+                <span class="family-margin pos">16.0%</span>
+                <span class="family-chg pos">30d: +17.7%</span>
+            </div>
+            <p class="family-narrative">Talassonite (Special) currently offers a solid margin of 16.0% ROI. Nocxium is the dominant value driver, contributing 79% of batch revenue. Nocxium has risen 24.7% over the past 30 days, boosting returns. Secondary contributors: Tritanium (15% of value, falling 5.8%), Megacyte (6% of value, falling 24.2%).</p>
+
+            <h4 class="sub-heading">Product Breakdown (base ore per batch)</h4>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Product</th><th class="num">Qty/batch</th><th class="num">JBV now</th>
+                    <th class="num">7d %</th><th class="num">14d %</th><th class="num">30d %</th>
+                    <th class="num">ISK contrib</th><th class="num">% of value</th>
+                    <th class="num">30d ISK impact</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>40000</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num neg'>-2.0%</td><td class='num neg'>-5.8%</td><td class='num'>133.7K</td><td class='num'>15.5%</td><td class='num neg'>-8.2K</td></tr><tr><td>Nocxium</td><td class='num'>960</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num pos'>+11.9%</td><td class='num pos'>+24.7%</td><td class='num'>680.0K</td><td class='num'>78.6%</td><td class='num pos'>134.7K</td></tr><tr><td>Megacyte</td><td class='num'>32</td><td class='num'>1.8K</td><td class='num neg'>-20.3%</td><td class='num neg'>-18.6%</td><td class='num neg'>-24.2%</td><td class='num'>51.3K</td><td class='num'>5.9%</td><td class='num neg'>-16.4K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">Variant Comparison</h4>
+            <div class="table-scroll">
+            <table class="data-table variant-table">
+                <thead><tr>
+                    <th>Ore</th><th>Grade</th><th class="num">Margin</th>
+                    <th class="num">JSV</th><th class="num">JBV</th>
+                </tr></thead>
+                <tbody><tr class='row-green'><td>Compressed Talassonite</td><td>Base</td><td class='num pos'>16.0%</td><td class='num'>88.0K</td><td class='num'>7.3K</td></tr><tr class='row-green'><td>Compressed Talassonite II-Grade</td><td>II-Grade</td><td class='num pos'>7.1%</td><td class='num'>11.0K</td><td class='num'>8.4K</td></tr><tr class='row-yellow'><td>Compressed Talassonite III-Grade</td><td>III-Grade</td><td class='num pos'>4.1%</td><td class='num'>10.0K</td><td class='num'>9.0K</td></tr></tbody>
+            </table>
+            </div>
+
+            <h4 class="sub-heading">30-Day Price Sparklines (JBV)</h4>
+            <div class="sparkline-row">
+                <div class='spark-wrap'><div class='spark-label'>Tritanium</div><canvas id='spark_62582_34' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Nocxium</div><canvas id='spark_62582_38' height='60'></canvas></div><div class='spark-wrap'><div class='spark-label'>Megacyte</div><canvas id='spark_62582_40' height='60'></canvas></div>
+            </div>
+            <script>
+            (function() {
+                var ctx = document.getElementById('spark_62582_34');
+                if (!ctx) return;
+                var data = [4.04, 4.04, 4.01, 3.93, 3.91, 3.96, 3.91, 3.9, 3.89, 3.88, 3.87, 3.83, 3.68, 3.72, 3.88, 3.75, 3.88, 3.91, 3.85, 3.81, 3.81, 3.84, 3.84, 3.75, 3.84, 3.75, 3.72, 3.64, 3.7, 3.69, 3.8];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62582_38');
+                if (!ctx) return;
+                var data = [639.48, 658.93, 660.6, 642.45, 655.57, 674.13, 681.27, 694.38, 687.93, 684.12, 669.76, 673.42, 686.69, 676.55, 691.87, 680.67, 712.83, 720.98, 726.34, 724.75, 722.66, 738.91, 732.5, 752.22, 758.46, 768.48, 783.25, 788.35, 796.02, 858.48, 797.5];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+
+            (function() {
+                var ctx = document.getElementById('spark_62582_40');
+                if (!ctx) return;
+                var data = [2380.0, 2479.5, 2525.75, 2476.3, 2505.14, 2583.83, 2557.25, 2587.8, 2469.67, 2323.23, 2383.29, 2422.18, 2410.22, 2388.0, 2459.33, 2434.56, 2216.78, 2230.77, 2440.78, 2357.7, 2223.56, 2265.5, 2276.5, 2264.46, 2237.22, 2304.5, 2339.45, 2337.67, 2157.17, 2045.83, 1803.75];
+                if (!data.length) { ctx.parentElement.style.opacity='0.3'; return; }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(function(_,i){return i;}),
+                        datasets: [{
+                            data: data,
+                            borderColor: '#00d9ff',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        animation: false,
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            })();
+</script>
+        </div>
+
+  </div>
+
+  <!-- Section 4: Mineral Market Overview -->
+  <h2 class="section-title">Mineral Market Overview</h2>
+  
+        <div class="tier-section">
+            <p class="tier-summary">Mineral prices have been broadly stable over the past 30 days (avg -2.7%), providing predictable refining revenue.</p>
+            <div class="table-scroll">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Mineral</th>
+                    <th class="num">JBV now</th>
+                    <th class="num">7d %</th>
+                    <th class="num">14d %</th>
+                    <th class="num">30d %</th>
+                    <th>Trend</th>
+                </tr></thead>
+                <tbody><tr><td>Tritanium</td><td class='num'>4</td><td class='num pos'>+1.3%</td><td class='num'>N/A</td><td class='num neg'>-5.8%</td><td>▼ Falling</td></tr><tr><td>Pyerite</td><td class='num'>17</td><td class='num neg'>-1.8%</td><td class='num'>N/A</td><td class='num neg'>-5.6%</td><td>▼ Falling</td></tr><tr><td>Mexallon</td><td class='num'>58</td><td class='num neg'>-11.3%</td><td class='num'>N/A</td><td class='num neg'>-6.4%</td><td>▼ Falling</td></tr><tr><td>Isogen</td><td class='num'>164</td><td class='num neg'>-4.7%</td><td class='num'>N/A</td><td class='num neg'>-9.7%</td><td>▼ Falling</td></tr><tr><td>Nocxium</td><td class='num'>798</td><td class='num pos'>+6.0%</td><td class='num'>N/A</td><td class='num pos'>+24.7%</td><td>▲ Rising</td></tr><tr><td>Zydrine</td><td class='num'>996</td><td class='num pos'>+4.1%</td><td class='num'>N/A</td><td class='num pos'>+4.1%</td><td>→ Stable</td></tr><tr><td>Megacyte</td><td class='num'>1.8K</td><td class='num neg'>-20.3%</td><td class='num'>N/A</td><td class='num neg'>-24.2%</td><td>▼ Falling</td></tr><tr><td>Morphite</td><td class='num'>19.0K</td><td class='num pos'>+0.0%</td><td class='num'>N/A</td><td class='num pos'>+1.5%</td><td>→ Stable</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+
+
+</div><!-- /container -->
+
+<script>
+// Filter: Rankings Table
+function filterRankings(sec, btn) {
+  document.querySelectorAll('#rankings-filter-bar .filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  document.querySelectorAll('#rankings-tbody tr').forEach(function(r) {
+    if (sec === 'all' || r.dataset.sec === sec) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+
+// Filter: Family Cards
+function filterFamilies(sec, btn) {
+  document.querySelectorAll('#family-filter-bar .filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  document.querySelectorAll('#family-cards-container .family-card').forEach(function(card) {
+    if (sec === 'all' || card.dataset.sec === sec) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+
+</body>
+</html>
