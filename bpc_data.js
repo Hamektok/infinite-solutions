@@ -2153,6 +2153,16 @@ const BPC_DATA = [
     "subcategory": "Cruiser"
   },
   {
+    "typeId": 25323,
+    "name": "Standard Mindflood Booster Blueprint",
+    "me": 0,
+    "te": 0,
+    "runs": 50,
+    "quantity": 6,
+    "category": "Other",
+    "subcategory": "Booster Blueprints"
+  },
+  {
     "typeId": 45643,
     "name": "Standup L-Set Thukker Advanced Component Manufacturing Efficiency Blueprint",
     "me": 0,

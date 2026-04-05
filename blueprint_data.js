@@ -1633,6 +1633,13 @@ BLUEPRINT_DATA = [
     "subcategory": "Frequency Crystals"
   },
   {
+    "name": "Standard Mindflood Booster Reaction Formula",
+    "me": 0,
+    "te": 0,
+    "category": "Reactions",
+    "subcategory": "Reactions"
+  },
+  {
     "name": "Standup Cruise Missile Blueprint",
     "me": 10,
     "te": 20,
