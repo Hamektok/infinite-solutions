@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ore Haul Calculator &mdash; Infinite Solutions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+:root{
+  --accent:#ff8833;--accent2:#ffcc44;--bg:#09090d;--panel:#0d1018;
+  --panel2:#111520;--border:#1e2535;--border-o:rgba(255,140,50,0.2);
+  --text:#d8e0f0;--dim:#5a6880;--green:#33dd88;--red:#ff5555;
+  --gold:#ffd700;--blue:#44aaff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;
+  padding:20px 14px 48px;display:flex;justify-content:center;}
+.page{width:100%;max-width:1120px;}
+.hdr{text-align:center;margin-bottom:18px;}
+.hdr h1{font-family:'Orbitron',sans-serif;font-size:1.5em;font-weight:900;letter-spacing:4px;
+  background:linear-gradient(135deg,#ff9944,#ffcc44);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;}
+.hdr .sub{color:var(--dim);font-size:.85em;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+.snap-pill{display:inline-block;margin-top:6px;background:rgba(255,140,50,.1);border:1px solid var(--border-o);
+  border-radius:4px;padding:2px 12px;font-size:.78em;color:var(--accent);letter-spacing:1px;}
+.back-link{display:inline-block;margin-bottom:12px;color:var(--dim);font-size:.85em;text-decoration:none;letter-spacing:1px;}
+.back-link:hover{color:var(--text);}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:12px;}
+.panel-title{font-family:'Orbitron',sans-serif;font-size:.67em;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--accent);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border-o);}
+.form-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.form-row:last-child{margin-bottom:0;}
+label{color:var(--dim);font-size:.9em;font-weight:600;letter-spacing:.5px;min-width:170px;flex-shrink:0;}
+select,input[type="number"]{background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;
+  padding:5px 9px;outline:none;transition:border-color .15s;}
+select:focus,input[type="number"]:focus{border-color:var(--accent);}
+.unit{color:var(--dim);font-size:.87em;}
+.iv{color:var(--accent2);font-weight:700;font-size:.93em;}
+.collapse-btn{background:rgba(255,140,50,.08);border:1px solid var(--border-o);border-radius:4px;
+  color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:.88em;font-weight:700;
+  padding:6px 14px;cursor:pointer;transition:all .12s;letter-spacing:1px;display:block;width:100%;}
+.collapse-btn:hover{background:rgba(255,140,50,.18);}
+.mat-panel{margin-top:10px;display:none;}
+.mat-panel.open{display:block;}
+.mat-group-title{grid-column:1/-1;font-family:'Orbitron',sans-serif;font-size:.62em;letter-spacing:2px;text-transform:uppercase;
+  color:var(--accent);margin:14px 0 5px;padding:6px 10px 6px;
+  background:rgba(255,140,50,.07);border:1px solid var(--border-o);border-radius:3px;}
+.mat-group-title:first-child{margin-top:4px;}
+.mat-rows-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:3px 20px;}
+.mat-row{display:flex;align-items:center;gap:8px;padding:3px 0;}
+.mat-name{color:var(--dim);font-size:.87em;min-width:165px;}
+.mat-price{color:var(--dim);font-size:.76em;margin-left:4px;}
+.qb{background:rgba(255,140,50,.1);border:1px solid var(--border-o);border-radius:4px;color:var(--dim);
+  font-family:'Rajdhani',sans-serif;font-size:.83em;font-weight:700;padding:3px 8px;cursor:pointer;transition:all .12s;}
+.qb:hover{background:rgba(255,140,50,.2);color:var(--text);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.88em;min-width:760px;}
+thead th{background:var(--panel2);color:var(--dim);font-size:.72em;letter-spacing:1px;text-transform:uppercase;
+  padding:8px 9px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody td{padding:6px 9px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.02);}
+.td-ore select{min-width:210px;font-size:.86em;padding:4px 6px;}
+.td-num input{width:88px;font-size:.86em;padding:4px 6px;}
+.td-c{font-family:'Orbitron',sans-serif;font-size:.8em;font-weight:700;white-space:nowrap;}
+.td-dim{color:var(--dim);font-size:.8em;font-family:'Rajdhani',sans-serif;font-weight:600;white-space:nowrap;}
+.del-btn{background:rgba(255,60,60,.12);border:1px solid rgba(255,60,60,.25);border-radius:4px;
+  color:#ff7777;cursor:pointer;font-size:.82em;font-weight:700;padding:2px 7px;transition:all .12s;}
+.del-btn:hover{background:rgba(255,60,60,.28);}
+.add-row-btn{background:rgba(255,140,50,.07);border:1px dashed var(--border-o);border-radius:4px;
+  color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:.88em;font-weight:700;
+  padding:8px 0;cursor:pointer;width:100%;margin-top:7px;transition:all .12s;}
+.add-row-btn:hover{background:rgba(255,140,50,.15);}
+.sum-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-top:12px;}
+.sb{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;text-align:center;}
+.sb.profit{border-color:var(--border-o);background:rgba(255,140,50,.06);}
+.sb-lbl{font-size:.7em;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.sb-val{font-family:'Orbitron',sans-serif;font-size:.95em;font-weight:700;}
+.sb-val.green{color:var(--green);}.sb-val.red{color:var(--red);}
+.sb-val.gold{color:var(--gold);}.sb-val.lg{font-size:1.2em;}
+.sb-sub{font-size:.78em;color:var(--dim);margin-top:2px;}
+.be-card{background:rgba(68,170,255,.04);border:1px solid rgba(68,170,255,.2);
+  border-radius:6px;padding:12px 16px;margin-top:10px;}
+.be-title{font-family:'Orbitron',sans-serif;font-size:.65em;letter-spacing:2px;
+  text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
+.be-row{display:flex;justify-content:space-between;align-items:center;font-size:.9em;margin-bottom:3px;}
+.be-lbl{color:var(--dim);}.be-val{font-family:'Orbitron',sans-serif;font-size:.85em;font-weight:700;}
+.be-val.hi{color:var(--blue);}
+hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
+.footer{text-align:center;color:var(--dim);font-size:.76em;margin-top:20px;
+  padding-top:12px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="page">
+<a class="back-link" href="index.html">&#8592; Industrial Market</a>
+<div class="hdr">
+  <h1>ORE HAUL CALCULATOR</h1>
+  <div class="sub">Jump Freight &middot; Compressed Ore &middot; Refine Value</div>
+  <div class="snap-pill">Jita prices: 03 Apr 2026 &nbsp;&middot;&nbsp; All entries are compressed variants</div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">Trip &amp; Refine Parameters</div>
+
+  <div class="form-row">
+    <label>Isotope Type</label>
+    <select id="iso_type" onchange="recalcAll()" style="min-width:240px">
+      <option value="642.30" selected>Nitrogen Isotopes &mdash; 642 ISK/unit</option>
+      <option value="512.90">Hydrogen Isotopes &mdash; 513 ISK/unit</option>
+      <option value="705.20">Oxygen Isotopes &mdash; 705 ISK/unit</option>
+      <option value="725.30">Helium Isotopes &mdash; 725 ISK/unit</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label>Isotopes (round trip)</label>
+    <input type="number" id="iso_qty" value="200000" min="0" step="10000" oninput="recalcAll()" style="width:120px">
+    <span class="unit">units</span>
+    <span class="iv" id="ship_tag">&mdash;</span>
+  </div>
+
+  <hr class="div">
+
+  <div class="form-row">
+    <label>Buy % (pay miners)</label>
+    <input type="number" id="buy_pct" min="0" max="100" step="0.01" value="90.00" oninput="recalcAll()" style="width:90px">
+    <span class="unit">% of theoretical refine value</span>
+  </div>
+  <div class="form-row">
+    <label>Refine Efficiency</label>
+    <input type="number" id="eff_pct" min="0" max="100" step="0.01" value="87.50" oninput="recalcAll()" style="width:90px">
+    <span class="unit">%</span>
+  </div>
+  <div class="form-row">
+    <label>Refine Tax</label>
+    <input type="number" id="tax_pct" min="0" max="20"  step="0.01" value="5.00"  oninput="recalcAll()" style="width:90px">
+    <span class="unit">% of ore Jita value &nbsp; <span class="iv" id="eff_note">&mdash;</span></span>
+  </div>
+
+  <hr class="div">
+
+  <button class="collapse-btn" onclick="toggleMat()" id="mat_btn">&#9658;&nbsp; Mineral &amp; Material Sell % &nbsp;&mdash;&nbsp; click to expand</button>
+  <div class="mat-panel" id="mat_panel">
+    <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
+      <button class="qb" onclick="setAllMat(100)">Set All 100%</button>
+      <button class="qb" onclick="setAllMat(95)">Set All 95%</button>
+      <button class="qb" onclick="setAllMat(90)">Set All 90%</button>
+    </div>
+    <div class="mat-rows-grid">
+<div class="mat-group-title">Minerals</div>
+<div class="mat-row"><span class="mat-name">Tritanium</span><input type="number" id="mp_34" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">3.83 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Pyerite</span><input type="number" id="mp_35" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">18.08 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Mexallon</span><input type="number" id="mp_36" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">61.23 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Isogen</span><input type="number" id="mp_37" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">182.80 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Nocxium</span><input type="number" id="mp_38" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">825.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Zydrine</span><input type="number" id="mp_39" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">1,215.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Megacyte</span><input type="number" id="mp_40" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">2,210.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Morphite</span><input type="number" id="mp_11399" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">19,000.00 ISK JBV</span></div>
+<div class="mat-group-title">R4 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Hydrocarbons</span><input type="number" id="mp_16633" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">528.70 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Atmospheric Gases</span><input type="number" id="mp_16634" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">217.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Evaporite Deposits</span><input type="number" id="mp_16635" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">208.50 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Silicates</span><input type="number" id="mp_16636" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">340.50 ISK JBV</span></div>
+<div class="mat-group-title">R8 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Scandium</span><input type="number" id="mp_16639" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">430.10 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Cobalt</span><input type="number" id="mp_16640" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">600.70 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Tungsten</span><input type="number" id="mp_16637" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">1,185.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Titanium</span><input type="number" id="mp_16638" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">658.80 ISK JBV</span></div>
+<div class="mat-group-title">R16 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Chromium</span><input type="number" id="mp_16641" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">5,837.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Vanadium</span><input type="number" id="mp_16642" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">2,155.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Cadmium</span><input type="number" id="mp_16643" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">4,431.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Platinum</span><input type="number" id="mp_16644" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">6,815.00 ISK JBV</span></div>
+<div class="mat-group-title">R32 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Mercury</span><input type="number" id="mp_16646" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">3,359.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Caesium</span><input type="number" id="mp_16647" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">5,051.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Hafnium</span><input type="number" id="mp_16648" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">7,822.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Technetium</span><input type="number" id="mp_16649" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">20,650.00 ISK JBV</span></div>
+<div class="mat-group-title">R64 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Dysprosium</span><input type="number" id="mp_16650" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">54,000.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Neodymium</span><input type="number" id="mp_16651" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">61,110.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Promethium</span><input type="number" id="mp_16652" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">57,110.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Thulium</span><input type="number" id="mp_16653" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">29,030.00 ISK JBV</span></div>
+<div class="mat-group-title">Ice Products</div>
+<div class="mat-row"><span class="mat-name">Heavy Water</span><input type="number" id="mp_16272" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">100.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Liquid Ozone</span><input type="number" id="mp_16273" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">55.17 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Helium Isotopes</span><input type="number" id="mp_16274" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">842.30 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Oxygen Isotopes</span><input type="number" id="mp_17887" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">747.30 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Nitrogen Isotopes</span><input type="number" id="mp_17888" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">659.70 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Hydrogen Isotopes</span><input type="number" id="mp_17889" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">620.10 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Strontium Clathrates</span><input type="number" id="mp_16275" value="100" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">3,578.00 ISK JBV</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">Load Builder &mdash; Mixed Compressed Ore (all grades)</div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr>
+      <th style="min-width:215px">Ore (Compressed)</th>
+      <th>Volume (m&#179;)</th>
+      <th>Refine Val/m&#179;<br><span style="font-size:.85em;opacity:.6">after efficiency</span></th>
+      <th>Mkt JBV/m&#179;</th>
+      <th>Load Ref. Value<br><span style="font-size:.85em;opacity:.6">pricing basis</span></th>
+      <th>You Pay</th>
+      <th>Net Contrib.</th>
+      <th></th>
+    </tr></thead>
+    <tbody id="load_body"></tbody>
+  </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow()">+ Add Ore</button>
+
+  <div class="sum-bar">
+    <div class="sb"><div class="sb-lbl">Total Volume</div><div class="sb-val" id="s_vol">&mdash;</div></div>
+    <div class="sb"><div class="sb-lbl">Load Ref. Value</div><div class="sb-val gold" id="s_load">&mdash;</div></div>
+    <div class="sb"><div class="sb-lbl">You Pay Miners</div><div class="sb-val" id="s_pay">&mdash;</div></div>
+    <div class="sb"><div class="sb-lbl">Refine Tax (ISK)</div><div class="sb-val red" id="s_tax">&mdash;</div><div class="sb-sub">% of ore Jita value</div></div>
+    <div class="sb"><div class="sb-lbl">Shipping Cost</div><div class="sb-val" id="s_ship">&mdash;</div></div>
+    <div class="sb"><div class="sb-lbl">Mineral Revenue<br><span style="font-size:.75em;color:var(--dim)">at efficiency %</span></div><div class="sb-val" id="s_rev">&mdash;</div></div>
+    <div class="sb profit"><div class="sb-lbl">Net Profit</div><div class="sb-val lg" id="s_profit">&mdash;</div><div class="sb-sub" id="s_psub"></div></div>
+  </div>
+
+  <div class="be-card">
+    <div class="be-title">Break-Even Analysis</div>
+    <div id="be_rows"><div class="be-row"><span class="be-lbl">Add ore rows above to see break-even</span></div></div>
+  </div>
+</div>
+
+<div class="footer">
+  Prices: Jita 4-4 buy orders &middot; 03 Apr 2026 &middot; Infinite Solutions &middot; Hamektok Hakaari
+</div>
+</div>
+<script>
+const ORES = [{"id":28433,"name":"Blue Ice","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":69,"16273":35,"16275":1,"17887":414},"mkt":235900.0,"sg":"Ice"},{"id":28443,"name":"Blue Ice IV-Grade","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":104,"16273":55,"16275":1,"17887":483},"mkt":298000.0,"sg":"Ice"},{"id":28434,"name":"Clear Icicle","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":69,"16273":35,"16274":414,"16275":1},"mkt":258200.0,"sg":"Ice"},{"id":28436,"name":"Clear Icicle IV-Grade","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":104,"16273":55,"16274":483,"16275":1},"mkt":325000.0,"sg":"Ice"},{"id":28435,"name":"Dark Glitter","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":691,"16273":1381,"16275":69},"mkt":339500.0,"sg":"Ice"},{"id":28437,"name":"Gelidus","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":345,"16273":691,"16275":104},"mkt":293000.0,"sg":"Ice"},{"id":28438,"name":"Glacial Mass","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":69,"16273":35,"16275":1,"17889":414},"mkt":194600.0,"sg":"Ice"},{"id":28442,"name":"Glacial Mass IV-Grade","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":104,"16273":55,"16275":1,"17889":483},"mkt":244400.0,"sg":"Ice"},{"id":28439,"name":"Glare Crust","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":1381,"16273":691,"16275":35},"mkt":240000.0,"sg":"Ice"},{"id":28440,"name":"Krystallos","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":173,"16273":691,"16275":173},"mkt":493000.0,"sg":"Ice"},{"id":28444,"name":"White Glaze","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":69,"16273":35,"16275":1,"17888":414},"mkt":219300.0,"sg":"Ice"},{"id":28441,"name":"White Glaze IV-Grade","cat":"ice_ore","vol":100.0,"ps":1,"mats":{"16272":104,"16273":55,"16275":1,"17888":483},"mkt":278600.0,"sg":"Ice"},{"id":62454,"name":"Bitumens","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":6000,"36":400,"16633":65},"mkt":1303.0,"sg":"R4"},{"id":62457,"name":"Coesite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":2000,"36":400,"16636":65},"mkt":673.8,"sg":"R4"},{"id":62455,"name":"Brimful Bitumens","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":6900,"36":460,"16633":75},"mkt":1512.0,"sg":"R4"},{"id":62458,"name":"Brimful Coesite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":2300,"36":460,"16636":75},"mkt":744.3,"sg":"R4"},{"id":62461,"name":"Brimful Sylvite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":4600,"36":460,"16635":75},"mkt":962.3,"sg":"R4"},{"id":62464,"name":"Brimful Zeolites","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":9200,"36":460,"16634":75},"mkt":1634.0,"sg":"R4"},{"id":62456,"name":"Glistening Bitumens","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":12000,"36":800,"16633":130},"mkt":2532.0,"sg":"R4"},{"id":62459,"name":"Glistening Coesite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":4000,"36":800,"16636":130},"mkt":1320.0,"sg":"R4"},{"id":62466,"name":"Glistening Sylvite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":8000,"36":800,"16635":130},"mkt":1647.0,"sg":"R4"},{"id":62467,"name":"Glistening Zeolites","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":16000,"36":800,"16634":130},"mkt":3101.0,"sg":"R4"},{"id":62460,"name":"Sylvite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":4000,"36":400,"16635":65},"mkt":836.2,"sg":"R4"},{"id":62463,"name":"Zeolites","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"35":8000,"36":400,"16634":65},"mkt":1553.0,"sg":"R4"},{"id":62474,"name":"Cobaltite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16640":40},"mkt":239.5,"sg":"R8"},{"id":62471,"name":"Euxenite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16639":40},"mkt":0.01,"sg":"R8"},{"id":62468,"name":"Scheelite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16637":40},"mkt":100.2,"sg":"R8"},{"id":62477,"name":"Titanite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16638":40},"mkt":177.2,"sg":"R8"},{"id":62475,"name":"Copious Cobaltite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16640":46},"mkt":100.4,"sg":"R8"},{"id":62472,"name":"Copious Euxenite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16639":46},"mkt":229.8,"sg":"R8"},{"id":62469,"name":"Copious Scheelite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16637":46},"mkt":406.8,"sg":"R8"},{"id":62478,"name":"Copious Titanite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16638":46},"mkt":0.01,"sg":"R8"},{"id":62476,"name":"Twinkling Cobaltite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16640":80},"mkt":150.5,"sg":"R8"},{"id":62473,"name":"Twinkling Euxenite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16639":80},"mkt":0.01,"sg":"R8"},{"id":62470,"name":"Twinkling Scheelite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16637":80},"mkt":0.01,"sg":"R8"},{"id":62479,"name":"Twinkling Titanite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16638":80},"mkt":391.3,"sg":"R8"},{"id":62480,"name":"Chromite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":10,"16641":40},"mkt":2033.0,"sg":"R16"},{"id":62483,"name":"Otavite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":10,"16643":40},"mkt":1412.0,"sg":"R16"},{"id":62486,"name":"Sperrylite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":10,"16644":40},"mkt":2542.0,"sg":"R16"},{"id":62489,"name":"Vanadinite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":10,"16642":40},"mkt":624.4,"sg":"R16"},{"id":62481,"name":"Lavish Chromite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":12,"16641":46},"mkt":1959.0,"sg":"R16"},{"id":62484,"name":"Lavish Otavite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":12,"16643":46},"mkt":1507.0,"sg":"R16"},{"id":62487,"name":"Lavish Sperrylite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":12,"16644":46},"mkt":2600.0,"sg":"R16"},{"id":62490,"name":"Lavish Vanadinite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":12,"16642":46},"mkt":945.2,"sg":"R16"},{"id":62482,"name":"Shimmering Chromite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":20,"16641":80},"mkt":3510.0,"sg":"R16"},{"id":62485,"name":"Shimmering Otavite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":20,"16643":80},"mkt":2727.0,"sg":"R16"},{"id":62488,"name":"Shimmering Sperrylite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":20,"16644":80},"mkt":1349.0,"sg":"R16"},{"id":62491,"name":"Shimmering Vanadinite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":20,"16642":80},"mkt":1125.0,"sg":"R16"},{"id":62492,"name":"Carnotite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":15,"16640":10,"16649":50},"mkt":5002.0,"sg":"R32"},{"id":62501,"name":"Zircon","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":15,"16638":10,"16648":50},"mkt":3202.0,"sg":"R32"},{"id":62498,"name":"Pollucite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":15,"16639":10,"16647":50},"mkt":1537.0,"sg":"R32"},{"id":62495,"name":"Cinnabar","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":15,"16637":10,"16646":50},"mkt":1538.0,"sg":"R32"},{"id":62493,"name":"Replete Carnotite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":17,"16640":12,"16649":58},"mkt":5006.0,"sg":"R32"},{"id":62502,"name":"Replete Zircon","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":17,"16638":12,"16648":58},"mkt":4016.0,"sg":"R32"},{"id":62499,"name":"Replete Pollucite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":17,"16639":12,"16647":58},"mkt":1512.0,"sg":"R32"},{"id":62496,"name":"Replete Cinnabar","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":17,"16637":12,"16646":58},"mkt":1227.0,"sg":"R32"},{"id":62494,"name":"Glowing Carnotite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":30,"16640":20,"16649":100},"mkt":6004.0,"sg":"R32"},{"id":62503,"name":"Glowing Zircon","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":30,"16638":20,"16648":100},"mkt":3500.0,"sg":"R32"},{"id":62500,"name":"Glowing Pollucite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":30,"16639":20,"16647":100},"mkt":450.5,"sg":"R32"},{"id":62497,"name":"Glowing Cinnabar","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":30,"16637":20,"16646":100},"mkt":1528.0,"sg":"R32"},{"id":62504,"name":"Loparite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":20,"16639":20,"16644":10,"16652":22},"mkt":10230.0,"sg":"R64"},{"id":62510,"name":"Xenotime","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":20,"16640":20,"16642":10,"16650":22},"mkt":8047.0,"sg":"R64"},{"id":62507,"name":"Monazite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":20,"16637":20,"16641":10,"16651":22},"mkt":8612.0,"sg":"R64"},{"id":62513,"name":"Ytterbite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":20,"16638":20,"16643":10,"16653":22},"mkt":4528.0,"sg":"R64"},{"id":62505,"name":"Bountiful Loparite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":23,"16639":23,"16644":12,"16652":25},"mkt":11420.0,"sg":"R64"},{"id":62511,"name":"Bountiful Xenotime","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":23,"16640":23,"16642":12,"16650":25},"mkt":9003.0,"sg":"R64"},{"id":62508,"name":"Bountiful Monazite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":23,"16637":23,"16641":12,"16651":25},"mkt":10320.0,"sg":"R64"},{"id":62514,"name":"Bountiful Ytterbite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":23,"16638":23,"16643":12,"16653":25},"mkt":5526.0,"sg":"R64"},{"id":62506,"name":"Shining Loparite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16633":40,"16639":40,"16644":20,"16652":44},"mkt":15000.0,"sg":"R64"},{"id":62512,"name":"Shining Xenotime","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16634":40,"16640":40,"16642":20,"16650":44},"mkt":12220.0,"sg":"R64"},{"id":62509,"name":"Shining Monazite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16635":40,"16637":40,"16641":20,"16651":44},"mkt":10220.0,"sg":"R64"},{"id":62515,"name":"Shining Ytterbite","cat":"moon_ore","vol":0.1,"ps":100,"mats":{"16636":40,"16638":40,"16643":20,"16653":44},"mkt":8507.0,"sg":"R64"},{"id":62516,"name":"Veldspar","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"34":400},"mkt":12.36,"sg":"Common"},{"id":62517,"name":"Veldspar II-Grade","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"34":420},"mkt":12.51,"sg":"Common"},{"id":62518,"name":"Veldspar III-Grade","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"34":440},"mkt":13.41,"sg":"Common"},{"id":62519,"name":"Veldspar IV-Grade","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"34":460},"mkt":30.02,"sg":"Common"},{"id":62520,"name":"Scordite","cat":"standard_ore","vol":0.0015,"ps":100,"mats":{"34":150,"35":110},"mkt":22.0,"sg":"Common"},{"id":62521,"name":"Scordite II-Grade","cat":"standard_ore","vol":0.0015,"ps":100,"mats":{"34":158,"35":114},"mkt":22.66,"sg":"Common"},{"id":62522,"name":"Scordite III-Grade","cat":"standard_ore","vol":0.0015,"ps":100,"mats":{"34":165,"35":119},"mkt":23.27,"sg":"Common"},{"id":62523,"name":"Scordite IV-Grade","cat":"standard_ore","vol":0.0015,"ps":100,"mats":{"34":173,"35":125},"mkt":30.0,"sg":"Common"},{"id":62524,"name":"Pyroxeres","cat":"standard_ore","vol":0.003,"ps":100,"mats":{"35":90,"36":30},"mkt":32.04,"sg":"Common"},{"id":62525,"name":"Pyroxeres II-Grade","cat":"standard_ore","vol":0.003,"ps":100,"mats":{"35":95,"36":32},"mkt":31.06,"sg":"Common"},{"id":62526,"name":"Pyroxeres III-Grade","cat":"standard_ore","vol":0.003,"ps":100,"mats":{"35":99,"36":33},"mkt":30.36,"sg":"Common"},{"id":62527,"name":"Pyroxeres IV-Grade","cat":"standard_ore","vol":0.003,"ps":100,"mats":{"35":104,"36":35},"mkt":38.85,"sg":"Common"},{"id":62528,"name":"Plagioclase","cat":"standard_ore","vol":0.0035,"ps":100,"mats":{"34":175,"36":70},"mkt":39.27,"sg":"Common"},{"id":62529,"name":"Plagioclase II-Grade","cat":"standard_ore","vol":0.0035,"ps":100,"mats":{"34":184,"36":74},"mkt":40.58,"sg":"Common"},{"id":62530,"name":"Plagioclase III-Grade","cat":"standard_ore","vol":0.0035,"ps":100,"mats":{"34":193,"36":77},"mkt":42.75,"sg":"Common"},{"id":62531,"name":"Plagioclase IV-Grade","cat":"standard_ore","vol":0.0035,"ps":100,"mats":{"34":201,"36":81},"mkt":45.16,"sg":"Common"},{"id":62532,"name":"Omber","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"35":90,"37":75},"mkt":117.4,"sg":"Common"},{"id":62533,"name":"Omber II-Grade","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"35":95,"37":79},"mkt":120.4,"sg":"Common"},{"id":62534,"name":"Omber III-Grade","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"35":99,"37":83},"mkt":130.1,"sg":"Common"},{"id":62535,"name":"Omber IV-Grade","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"35":104,"37":86},"mkt":127.3,"sg":"Common"},{"id":62536,"name":"Kernite","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"36":60,"37":120},"mkt":206.7,"sg":"Uncommon"},{"id":62537,"name":"Kernite II-Grade","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"36":63,"37":126},"mkt":184.6,"sg":"Uncommon"},{"id":62538,"name":"Kernite III-Grade","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"36":66,"37":132},"mkt":196.0,"sg":"Uncommon"},{"id":62539,"name":"Kernite IV-Grade","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"36":69,"37":138},"mkt":200.0,"sg":"Uncommon"},{"id":62540,"name":"Jaspet","cat":"standard_ore","vol":0.02,"ps":100,"mats":{"36":150,"38":50},"mkt":419.3,"sg":"Uncommon"},{"id":62541,"name":"Jaspet II-Grade","cat":"standard_ore","vol":0.02,"ps":100,"mats":{"36":158,"38":53},"mkt":425.0,"sg":"Uncommon"},{"id":62542,"name":"Jaspet III-Grade","cat":"standard_ore","vol":0.02,"ps":100,"mats":{"36":165,"38":55},"mkt":370.0,"sg":"Uncommon"},{"id":62543,"name":"Jaspet IV-Grade","cat":"standard_ore","vol":0.02,"ps":100,"mats":{"36":173,"38":58},"mkt":459.1,"sg":"Uncommon"},{"id":62544,"name":"Hemorphite","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"37":240,"38":90},"mkt":830.2,"sg":"Uncommon"},{"id":62545,"name":"Hemorphite II-Grade","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"37":252,"38":95},"mkt":861.4,"sg":"Uncommon"},{"id":62546,"name":"Hemorphite III-Grade","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"37":264,"38":99},"mkt":900.8,"sg":"Uncommon"},{"id":62547,"name":"Hemorphite IV-Grade","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"37":276,"38":104},"mkt":811.5,"sg":"Uncommon"},{"id":62548,"name":"Hedbergite","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"35":450,"38":120},"mkt":760.7,"sg":"Uncommon"},{"id":62549,"name":"Hedbergite II-Grade","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"35":473,"38":126},"mkt":783.1,"sg":"Uncommon"},{"id":62550,"name":"Hedbergite III-Grade","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"35":495,"38":132},"mkt":813.3,"sg":"Uncommon"},{"id":62551,"name":"Hedbergite IV-Grade","cat":"standard_ore","vol":0.03,"ps":100,"mats":{"35":518,"38":138},"mkt":812.0,"sg":"Uncommon"},{"id":62552,"name":"Gneiss","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"35":2000,"36":1500,"37":800},"mkt":2328.0,"sg":"Nullsec"},{"id":62553,"name":"Gneiss II-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"35":2100,"36":1575,"37":840},"mkt":2327.0,"sg":"Nullsec"},{"id":62554,"name":"Gneiss III-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"35":2200,"36":1650,"37":880},"mkt":2382.0,"sg":"Nullsec"},{"id":62555,"name":"Gneiss IV-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"35":2300,"36":1725,"37":920},"mkt":2516.0,"sg":"Nullsec"},{"id":62556,"name":"Dark Ochre","cat":"standard_ore","vol":0.08,"ps":100,"mats":{"36":1360,"37":1200,"38":320},"mkt":4305.0,"sg":"Nullsec"},{"id":62557,"name":"Dark Ochre II-Grade","cat":"standard_ore","vol":0.08,"ps":100,"mats":{"36":1428,"37":1260,"38":336},"mkt":4472.0,"sg":"Nullsec"},{"id":62558,"name":"Dark Ochre III-Grade","cat":"standard_ore","vol":0.08,"ps":100,"mats":{"36":1496,"37":1320,"38":352},"mkt":4707.0,"sg":"Nullsec"},{"id":62559,"name":"Dark Ochre IV-Grade","cat":"standard_ore","vol":0.08,"ps":100,"mats":{"36":1564,"37":1380,"38":368},"mkt":4836.0,"sg":"Nullsec"},{"id":62560,"name":"Crokite","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":800,"36":2000,"38":800},"mkt":5790.0,"sg":"Nullsec"},{"id":62561,"name":"Crokite II-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":840,"36":2100,"38":840},"mkt":5768.0,"sg":"Nullsec"},{"id":62562,"name":"Crokite III-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":880,"36":2200,"38":880},"mkt":6518.0,"sg":"Nullsec"},{"id":62563,"name":"Crokite IV-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":920,"36":2300,"38":920},"mkt":6117.0,"sg":"Nullsec"},{"id":62564,"name":"Bistot","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3200,"36":1200,"39":160},"mkt":2568.0,"sg":"Nullsec"},{"id":62565,"name":"Bistot II-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3360,"36":1260,"39":168},"mkt":3600.0,"sg":"Nullsec"},{"id":62566,"name":"Bistot III-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3520,"36":1320,"39":176},"mkt":3651.0,"sg":"Nullsec"},{"id":62567,"name":"Bistot IV-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3680,"36":1380,"39":184},"mkt":3201.0,"sg":"Nullsec"},{"id":62568,"name":"Arkonor","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3200,"36":1200,"40":120},"mkt":3314.0,"sg":"Nullsec"},{"id":62569,"name":"Arkonor II-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3360,"36":1260,"40":126},"mkt":4800.0,"sg":"Nullsec"},{"id":62570,"name":"Arkonor III-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3520,"36":1320,"40":132},"mkt":4908.0,"sg":"Nullsec"},{"id":62571,"name":"Arkonor IV-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"35":3680,"36":1380,"40":138},"mkt":4507.0,"sg":"Nullsec"},{"id":62572,"name":"Spodumain","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"34":48000,"37":1000,"38":160,"39":80,"40":40},"mkt":10150.0,"sg":"Nullsec"},{"id":62573,"name":"Spodumain II-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"34":50400,"37":1050,"38":168,"39":84,"40":42},"mkt":10010.0,"sg":"Nullsec"},{"id":62574,"name":"Spodumain III-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"34":52800,"37":1100,"38":176,"39":88,"40":44},"mkt":13000.0,"sg":"Nullsec"},{"id":62575,"name":"Spodumain IV-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"34":55200,"37":1150,"38":184,"39":92,"40":46},"mkt":22530.0,"sg":"Nullsec"},{"id":62586,"name":"Mercoxit","cat":"standard_ore","vol":0.4,"ps":100,"mats":{"11399":140},"mkt":20830.0,"sg":"Nullsec"},{"id":62587,"name":"Mercoxit II-Grade","cat":"standard_ore","vol":0.4,"ps":100,"mats":{"11399":147},"mkt":21130.0,"sg":"Nullsec"},{"id":62588,"name":"Mercoxit III-Grade","cat":"standard_ore","vol":0.4,"ps":100,"mats":{"11399":154},"mkt":23200.0,"sg":"Nullsec"},{"id":82300,"name":"Kylixium","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"34":300,"35":200,"36":550},"mkt":266.0,"sg":"Pochven"},{"id":82301,"name":"Kylixium II-Grade","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"34":315,"35":210,"36":578},"mkt":273.8,"sg":"Pochven"},{"id":82302,"name":"Kylixium III-Grade","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"34":330,"35":220,"36":605},"mkt":341.2,"sg":"Pochven"},{"id":82303,"name":"Kylixium IV-Grade","cat":"standard_ore","vol":0.012,"ps":100,"mats":{"34":345,"35":230,"36":633},"mkt":339.0,"sg":"Pochven"},{"id":82304,"name":"Nocxite","cat":"standard_ore","vol":0.04,"ps":100,"mats":{"34":900,"35":150,"38":105},"mkt":650.2,"sg":"Pochven"},{"id":82305,"name":"Nocxite II-Grade","cat":"standard_ore","vol":0.04,"ps":100,"mats":{"34":945,"35":158,"38":111},"mkt":671.5,"sg":"Pochven"},{"id":82306,"name":"Nocxite III-Grade","cat":"standard_ore","vol":0.04,"ps":100,"mats":{"34":990,"35":165,"38":116},"mkt":671.8,"sg":"Pochven"},{"id":82307,"name":"Nocxite IV-Grade","cat":"standard_ore","vol":0.04,"ps":100,"mats":{"34":1035,"35":173,"38":121},"mkt":600.7,"sg":"Pochven"},{"id":82308,"name":"Ueganite","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":800,"40":40},"mkt":634.6,"sg":"Pochven"},{"id":82309,"name":"Ueganite II-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":840,"40":42},"mkt":586.9,"sg":"Pochven"},{"id":82310,"name":"Ueganite III-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":880,"40":44},"mkt":680.0,"sg":"Pochven"},{"id":82311,"name":"Ueganite IV-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":920,"40":46},"mkt":603.5,"sg":"Pochven"},{"id":82312,"name":"Hezorime","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":2000,"37":120,"39":60},"mkt":653.8,"sg":"Pochven"},{"id":82313,"name":"Hezorime II-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":2100,"37":126,"39":63},"mkt":567.7,"sg":"Pochven"},{"id":82314,"name":"Hezorime III-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":2200,"37":132,"39":66},"mkt":649.8,"sg":"Pochven"},{"id":82315,"name":"Hezorime IV-Grade","cat":"standard_ore","vol":0.05,"ps":100,"mats":{"34":2300,"37":138,"39":69},"mkt":664.5,"sg":"Pochven"},{"id":82316,"name":"Griemeer","cat":"standard_ore","vol":0.008,"ps":100,"mats":{"34":250,"37":80},"mkt":95.89,"sg":"Pochven"},{"id":82317,"name":"Griemeer II-Grade","cat":"standard_ore","vol":0.008,"ps":100,"mats":{"34":263,"37":84},"mkt":104.7,"sg":"Pochven"},{"id":82318,"name":"Griemeer III-Grade","cat":"standard_ore","vol":0.008,"ps":100,"mats":{"34":275,"37":88},"mkt":121.5,"sg":"Pochven"},{"id":82319,"name":"Griemeer IV-Grade","cat":"standard_ore","vol":0.008,"ps":100,"mats":{"34":288,"37":92},"mkt":128.2,"sg":"Pochven"},{"id":75275,"name":"Mordunium","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"35":97},"mkt":17.37,"sg":"Pochven"},{"id":75276,"name":"Mordunium II-Grade","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"35":101},"mkt":16.94,"sg":"Pochven"},{"id":75277,"name":"Mordunium III-Grade","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"35":107},"mkt":18.29,"sg":"Pochven"},{"id":75278,"name":"Mordunium IV-Grade","cat":"standard_ore","vol":0.001,"ps":100,"mats":{"35":112},"mkt":17.53,"sg":"Pochven"},{"id":75279,"name":"Ytirium","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"37":240},"mkt":361.1,"sg":"Pochven"},{"id":75280,"name":"Ytirium II-Grade","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"37":252},"mkt":251.4,"sg":"Pochven"},{"id":75281,"name":"Ytirium III-Grade","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"37":264},"mkt":268.5,"sg":"Pochven"},{"id":75282,"name":"Ytirium IV-Grade","cat":"standard_ore","vol":0.006,"ps":100,"mats":{"37":276},"mkt":421.3,"sg":"Pochven"},{"id":75283,"name":"Eifyrium","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"39":266},"mkt":2183.0,"sg":"Pochven"},{"id":75284,"name":"Eifyrium II-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"39":279},"mkt":2554.0,"sg":"Pochven"},{"id":75285,"name":"Eifyrium III-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"39":293},"mkt":3000.0,"sg":"Pochven"},{"id":75286,"name":"Eifyrium IV-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"39":306},"mkt":3016.0,"sg":"Pochven"},{"id":75287,"name":"Ducinium","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"40":170},"mkt":2804.0,"sg":"Pochven"},{"id":75288,"name":"Ducinium II-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"40":179},"mkt":3970.0,"sg":"Pochven"},{"id":75289,"name":"Ducinium III-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"40":187},"mkt":4100.0,"sg":"Pochven"},{"id":75290,"name":"Ducinium IV-Grade","cat":"standard_ore","vol":0.16,"ps":100,"mats":{"40":196},"mkt":4210.0,"sg":"Pochven"}];
+const MATERIALS = {"34":{"name":"Tritanium","jbv":3.83},"35":{"name":"Pyerite","jbv":18.08},"36":{"name":"Mexallon","jbv":61.23},"37":{"name":"Isogen","jbv":182.8},"38":{"name":"Nocxium","jbv":825.0},"39":{"name":"Zydrine","jbv":1215.0},"40":{"name":"Megacyte","jbv":2210.0},"11399":{"name":"Morphite","jbv":19000.0},"16272":{"name":"Heavy Water","jbv":100.0},"16273":{"name":"Liquid Ozone","jbv":55.17},"16274":{"name":"Helium Isotopes","jbv":842.3},"16275":{"name":"Strontium Clathrates","jbv":3578.0},"16633":{"name":"Hydrocarbons","jbv":528.7},"16634":{"name":"Atmospheric Gases","jbv":217.0},"16635":{"name":"Evaporite Deposits","jbv":208.5},"16636":{"name":"Silicates","jbv":340.5},"16637":{"name":"Tungsten","jbv":1185.0},"16638":{"name":"Titanium","jbv":658.8},"16639":{"name":"Scandium","jbv":430.1},"16640":{"name":"Cobalt","jbv":600.7},"16641":{"name":"Chromium","jbv":5837.0},"16642":{"name":"Vanadium","jbv":2155.0},"16643":{"name":"Cadmium","jbv":4431.0},"16644":{"name":"Platinum","jbv":6815.0},"16646":{"name":"Mercury","jbv":3359.0},"16647":{"name":"Caesium","jbv":5051.0},"16648":{"name":"Hafnium","jbv":7822.0},"16649":{"name":"Technetium","jbv":20650.0},"16650":{"name":"Dysprosium","jbv":54000.0},"16651":{"name":"Neodymium","jbv":61110.0},"16652":{"name":"Promethium","jbv":57110.0},"16653":{"name":"Thulium","jbv":29030.0},"17887":{"name":"Oxygen Isotopes","jbv":747.3},"17888":{"name":"Nitrogen Isotopes","jbv":659.7},"17889":{"name":"Hydrogen Isotopes","jbv":620.1}};
+
+// ── Build ore dropdown with clean sub-group optgroups ──────────────────────
+const STD_SG  = ['Common','Uncommon','Nullsec','Pochven'];
+const MOON_SG = ['R4','R8','R16','R32','R64'];
+
+function buildOreOptions(selIdx) {
+  var groups = {};
+  ORES.forEach(function(o,i) {
+    var key = o.cat + '_' + o.sg;
+    if (!groups[key]) groups[key] = {label: groupLabel(o.cat, o.sg), items:[]};
+    groups[key].items.push({i:i, name:o.name});
+  });
+  // Ordered group keys
+  var order = [];
+  STD_SG.forEach(function(sg){ order.push('standard_ore_'+sg); });
+  MOON_SG.forEach(function(sg){ order.push('moon_ore_'+sg); });
+  order.push('ice_ore_Ice');
+
+  var html = '';
+  order.forEach(function(key) {
+    var g = groups[key]; if (!g || g.items.length===0) return;
+    html += '<optgroup label="' + g.label + '">';
+    g.items.forEach(function(it){
+      html += '<option value="'+it.i+'"'+(it.i===selIdx?' selected':'')+'>' + it.name + '</option>';
+    });
+    html += '</optgroup>';
+  });
+  return html;
+}
+
+function groupLabel(cat, sg) {
+  if (cat === 'standard_ore') return 'Standard Ore — ' + sg;
+  if (cat === 'moon_ore')     return 'Moon Ore — ' + sg;
+  return 'Ice';
+}
+
+// ── Material sell % ────────────────────────────────────────────────────────
+function matPct(mid) { var e=document.getElementById('mp_'+mid); return e?(parseFloat(e.value)||100):100; }
+function setAllMat(v) { document.querySelectorAll('[id^="mp_"]').forEach(function(e){e.value=v;}); recalcAll(); }
+function toggleMat() {
+  var p=document.getElementById('mat_panel'), b=document.getElementById('mat_btn');
+  p.classList.toggle('open');
+  b.innerHTML=(p.classList.contains('open')?'&#9660;':'&#9658;')+'&nbsp; Mineral &amp; Material Sell % &nbsp;&mdash;&nbsp; click to '+(p.classList.contains('open')?'collapse':'expand');
+  saveState();
+}
+
+// ── Persistence ────────────────────────────────────────────────────────────
+var MAT_IDS=[34,35,36,37,38,39,40,11399,16633,16634,16635,16636,16639,16640,16637,16638,16641,16642,16643,16644,16646,16647,16648,16649,16650,16651,16652,16653,16272,16273,16274,17887,17888,17889,16275];
+function saveState() {
+  var s={};
+  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct'].forEach(function(id){
+    var el=document.getElementById(id); if(el) s[id]=el.value;
+  });
+  MAT_IDS.forEach(function(mid){
+    var el=document.getElementById('mp_'+mid); if(el) s['mp_'+mid]=el.value;
+  });
+  s.mat_open=document.getElementById('mat_panel').classList.contains('open');
+  var rows=[];
+  document.querySelectorAll('#load_body tr').forEach(function(tr){
+    var sel=tr.querySelector('select'), inp=tr.querySelector('input');
+    if(sel&&inp) rows.push({o:sel.value, v:inp.value});
+  });
+  s.rows=rows;
+  try{ localStorage.setItem('ore_calc_state', JSON.stringify(s)); }catch(e){}
+}
+function loadState() {
+  var raw; try{ raw=localStorage.getItem('ore_calc_state'); }catch(e){}
+  if(!raw){ addRow(0,400000); return; }
+  var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,400000); return; }
+  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct'].forEach(function(id){
+    var el=document.getElementById(id); if(el&&s[id]!=null) el.value=s[id];
+  });
+  MAT_IDS.forEach(function(mid){
+    var el=document.getElementById('mp_'+mid); if(el&&s['mp_'+mid]!=null) el.value=s['mp_'+mid];
+  });
+  if(s.mat_open){
+    var p=document.getElementById('mat_panel'), b=document.getElementById('mat_btn');
+    p.classList.add('open');
+    b.innerHTML='&#9660;&nbsp; Mineral &amp; Material Sell % &nbsp;&mdash;&nbsp; click to collapse';
+  }
+  var rows=s.rows&&s.rows.length?s.rows:[{o:0,v:400000}];
+  rows.forEach(function(r){ addRow(parseInt(r.o), parseFloat(r.v)); });
+}
+
+// ── Refine value calculations ──────────────────────────────────────────────
+function refineVal100(ore) {
+  // theoretical value at 100% efficiency, using current mat JBV and sell%
+  var val=0;
+  for (var mid in ore.mats) {
+    var mat=MATERIALS[mid]; if(!mat) continue;
+    val += (ore.mats[mid]/ore.ps)*mat.jbv*(matPct(parseInt(mid))/100);
+  }
+  return val; // per unit
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function fmt(n,d){ d=d||0; return isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}):'--'; }
+function fmtB(n) {
+  var a=Math.abs(n),s=n<0?'-':'';
+  if(a>=1e9) return s+(a/1e9).toFixed(3)+'B';
+  if(a>=1e6) return s+(a/1e6).toFixed(1)+'M';
+  if(a>=1e3) return s+(a/1e3).toFixed(0)+'k';
+  return s+fmt(a);
+}
+function getShip(){ return (parseFloat(document.getElementById('iso_qty').value)||0)*(parseFloat(document.getElementById('iso_type').value)||0); }
+function getEff() { return parseFloat(document.getElementById('eff_pct').value)||87.5; }
+function getTax() { return parseFloat(document.getElementById('tax_pct').value)||0; }
+function getBuy() { return parseFloat(document.getElementById('buy_pct').value)||90; }
+
+// ── Load Builder ───────────────────────────────────────────────────────────
+var rowId=0;
+function addRow(oreIdx,vol) {
+  oreIdx=oreIdx||0; vol=vol!=null?vol:100000;
+  var id=++rowId;
+  var tr=document.createElement('tr'); tr.id='r'+id;
+  tr.innerHTML=
+    '<td class="td-ore"><select onchange="recalcAll()">'+buildOreOptions(oreIdx)+'</select></td>'+
+    '<td style="white-space:nowrap"><input type="number" class="td-num-in" value="'+vol+'" min="0" step="10000" oninput="recalcAll()" style="width:88px"> m&#179;</td>'+
+    '<td class="td-dim" id="rv_'+id+'">--</td>'+
+    '<td class="td-dim" id="mkt_'+id+'">--</td>'+
+    '<td class="td-c"   id="lv_'+id+'">--</td>'+
+    '<td class="td-c"   id="pay_'+id+'">--</td>'+
+    '<td class="td-c"   id="con_'+id+'">--</td>'+
+    '<td><button class="del-btn" onclick="delRow('+id+')">&#x2715;</button></td>';
+  document.getElementById('load_body').appendChild(tr);
+  recalcAll();
+}
+function delRow(id){ var e=document.getElementById('r'+id); if(e)e.remove(); recalcAll(); saveState(); }
+
+function recalcAll() {
+  var ship=getShip(), eff=getEff(), tax=getTax(), buy=getBuy();
+  document.getElementById('ship_tag').textContent=fmtB(ship)+' ISK';
+  document.getElementById('eff_note').textContent='Efficiency: '+eff.toFixed(2)+'%  ·  Tax on Jita value: '+tax.toFixed(2)+'%';
+
+  var totVol=0, totLoad=0, totPay=0, totRev=0, totTax=0, totMkt=0;
+  document.querySelectorAll('#load_body tr').forEach(function(tr){
+    var id=tr.id.replace('r','');
+    var sel=tr.querySelector('select');
+    var inp=tr.querySelector('input');
+    if(!sel||!inp) return;
+    var ore=ORES[parseInt(sel.value)];
+    var vol=parseFloat(inp.value)||0;
+    if(!ore||vol<=0) return;
+
+    var rv100   = refineVal100(ore);          // theoretical refine value per unit (pricing basis)
+    var rvEff   = rv100 * eff/100;            // mineral proceeds per unit (after efficiency, no tax deduction)
+    var rv100_m3 = rv100  / ore.vol;
+    var rvEff_m3 = rvEff  / ore.vol;
+    var mkt_m3   = ore.mkt / ore.vol;         // Jita buy price per m³ (tax basis)
+
+    var loadRef = vol * rv100_m3;             // pricing basis total
+    var pay     = loadRef * buy/100;          // ISK paid to miners
+    var revenue = vol * rvEff_m3;             // mineral proceeds after efficiency
+    var taxIsk  = vol * mkt_m3 * tax/100;     // ISK tax charged against ore Jita value
+    var contrib = revenue - pay - taxIsk;     // net row contribution (before shipping)
+
+    document.getElementById('rv_' +id).textContent=fmt(rvEff_m3)+' ISK';
+    document.getElementById('mkt_'+id).textContent=fmt(mkt_m3)+' ISK';
+    document.getElementById('lv_' +id).textContent=fmtB(loadRef);
+    document.getElementById('pay_'+id).textContent=fmtB(pay);
+    var cEl=document.getElementById('con_'+id);
+    cEl.textContent=(contrib>=0?'+':'')+fmtB(contrib);
+    cEl.style.color=contrib>=0?'var(--green)':'var(--red)';
+
+    totVol  += vol;
+    totLoad += loadRef;
+    totPay  += pay;
+    totRev  += revenue;
+    totTax  += taxIsk;
+    totMkt  += vol * mkt_m3;
+  });
+
+  var profit = totRev - totPay - totTax - ship;
+  var totalCost = totPay + totTax + ship;
+  var roc = totalCost > 0 ? profit/totalCost*100 : 0;
+
+  document.getElementById('s_vol').textContent  = fmt(totVol)+' m³';
+  document.getElementById('s_load').textContent = fmtB(totLoad);
+  document.getElementById('s_pay').textContent  = fmtB(totPay);
+  document.getElementById('s_tax').textContent  = '−'+fmtB(totTax);
+  document.getElementById('s_ship').textContent = fmtB(ship);
+  document.getElementById('s_rev').textContent  = fmtB(totRev);
+  var pEl=document.getElementById('s_profit');
+  pEl.textContent=(profit>=0?'+':'')+fmtB(profit);
+  pEl.className='sb-val lg '+(profit>=0?'green':'red');
+  document.getElementById('s_psub').textContent=
+    profit>=0 ? roc.toFixed(1)+'% ROC  ·  '+fmt(profit/Math.max(totVol,1))+' ISK/m³'
+              : 'Loss at these parameters';
+
+  // Break-even
+  var beEl=document.getElementById('be_rows');
+  if(totLoad>0){
+    var blendBuy   = totPay/totLoad*100;
+    var taxPctLoad = totMkt>0 ? (totTax/totLoad*100) : 0;  // effective tax as % of load value
+    var effPct     = eff;                                   // mineral revenue as % of load value
+    var marginPct  = effPct - blendBuy - taxPctLoad;
+    var h='';
+    h+='<div class="be-row"><span class="be-lbl">Blended buy % (value-weighted)</span><span class="be-val hi">'+blendBuy.toFixed(2)+'%</span></div>';
+    h+='<div class="be-row"><span class="be-lbl">Mineral revenue as % of load value (eff)</span><span class="be-val">'+effPct.toFixed(2)+'%</span></div>';
+    h+='<div class="be-row"><span class="be-lbl">Tax cost as % of load value</span><span class="be-val">'+taxPctLoad.toFixed(2)+'%</span></div>';
+    if(marginPct>0){
+      var beLoad=ship/(marginPct/100);
+      h+='<div class="be-row"><span class="be-lbl">Net margin (eff − buy − tax%)</span><span class="be-val">'+marginPct.toFixed(2)+'%</span></div>';
+      h+='<div class="be-row"><span class="be-lbl">Min load value to cover shipping</span><span class="be-val hi">'+fmtB(beLoad)+' ISK</span></div>';
+      h+='<div class="be-row"><span class="be-lbl">Shipping as % of current load value</span><span class="be-val">'+(ship/totLoad*100).toFixed(2)+'%</span></div>';
+    } else {
+      h+='<div class="be-row"><span class="be-lbl" style="color:var(--red)">No margin after buy % + tax — cannot cover shipping</span></div>';
+    }
+    beEl.innerHTML=h;
+  } else {
+    beEl.innerHTML='<div class="be-row"><span class="be-lbl">Add ore rows above to see break-even</span></div>';
+  }
+  saveState();
+}
+
+loadState();
+</script>
+</body>
+</html>
