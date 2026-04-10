@@ -23,18 +23,41 @@ rows = cur.execute("""
 """).fetchall()
 
 all_mat_ids = set()
-ores = []
+ore_rows_raw = []
 for type_id, name, cat, disp, vol, ps, mats_json, buy in rows:
     mats = {}
     if mats_json:
         for m in json.loads(mats_json):
             mats[m['materialTypeID']] = m['quantity']
             all_mat_ids.add(m['materialTypeID'])
-    short = name.replace('Compressed ', '')
-    ores.append({'id': type_id, 'name': short, 'cat': cat,
-                 'vol': vol, 'ps': ps, 'mats': mats, 'mkt': buy or 0})
+    ore_rows_raw.append((type_id, name, cat, disp, vol, ps, mats, buy or 0))
 
 mat_ids_str = ','.join(str(x) for x in sorted(all_mat_ids))
+
+# ── N-day averages for all ores and materials ─────────────────────────────
+all_type_ids = set(r[0] for r in ore_rows_raw) | all_mat_ids
+all_ids_str  = ','.join(str(x) for x in sorted(all_type_ids))
+avg_rows = cur.execute(f"""
+    SELECT type_id,
+        AVG(CASE WHEN timestamp >= datetime('now','-7 days')  THEN best_buy END),
+        AVG(CASE WHEN timestamp >= datetime('now','-14 days') THEN best_buy END),
+        AVG(CASE WHEN timestamp >= datetime('now','-30 days') THEN best_buy END),
+        AVG(CASE WHEN timestamp >= datetime('now','-60 days') THEN best_buy END)
+    FROM market_price_snapshots
+    WHERE type_id IN ({all_ids_str})
+    GROUP BY type_id
+""").fetchall()
+avg_map = {r[0]: {'a7': r[1] or 0, 'a14': r[2] or 0, 'a30': r[3] or 0, 'a60': r[4] or 0} for r in avg_rows}
+
+ores = []
+for type_id, name, cat, disp, vol, ps, mats, buy in ore_rows_raw:
+    short = name.replace('Compressed ', '')
+    av = avg_map.get(type_id, {})
+    ores.append({'id': type_id, 'name': short, 'cat': cat, 'vol': vol, 'ps': ps,
+                 'mats': mats, 'mkt': buy,
+                 'a7': av.get('a7',0), 'a14': av.get('a14',0),
+                 'a30': av.get('a30',0), 'a60': av.get('a60',0)})
+
 mat_rows = cur.execute(f"""
     WITH latest_mps AS (
         SELECT type_id, best_buy
@@ -50,7 +73,12 @@ mat_rows = cur.execute(f"""
     LEFT JOIN latest_mps ms ON ms.type_id = it.type_id
     WHERE it.type_id IN ({mat_ids_str})
 """).fetchall()
-materials = {r[0]: {'name': r[1], 'jbv': r[2] or 0} for r in mat_rows}
+materials = {}
+for r in mat_rows:
+    av = avg_map.get(r[0], {})
+    materials[r[0]] = {'name': r[1], 'jbv': r[2] or 0,
+                       'a7': av.get('a7',0), 'a14': av.get('a14',0),
+                       'a30': av.get('a30',0), 'a60': av.get('a60',0)}
 
 snap_row = conn.execute("""
     SELECT MAX(timestamp) FROM market_price_snapshots ms
@@ -247,7 +275,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 <div class="hdr">
   <h1>ORE HAUL CALCULATOR</h1>
   <div class="sub">Jump Freight &middot; Compressed Ore &middot; Refine Value</div>
-  <div class="snap-pill">Jita prices: SNAP_DATE_PLACEHOLDER &nbsp;&middot;&nbsp; All entries are compressed variants</div>
+  <div class="snap-pill" id="snap_pill">Jita prices: SNAP_DATE_PLACEHOLDER &nbsp;&middot;&nbsp; All entries are compressed variants</div>
 </div>
 
 <div class="panel">
@@ -267,6 +295,17 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
     <input type="number" id="iso_qty" value="200000" min="0" step="10000" oninput="recalcAll()" style="width:120px">
     <span class="unit">units</span>
     <span class="iv" id="ship_tag">&mdash;</span>
+  </div>
+  <div class="form-row">
+    <label>Price Basis</label>
+    <select id="price_basis" onchange="recalcAll()" style="min-width:180px">
+      <option value="latest">Latest Snapshot</option>
+      <option value="avg7">7-Day Avg</option>
+      <option value="avg14" selected>14-Day Avg</option>
+      <option value="avg30">30-Day Avg</option>
+      <option value="avg60">60-Day Avg</option>
+    </select>
+    <span class="unit" id="basis_note">&mdash;</span>
   </div>
 
   <hr class="div">
@@ -310,7 +349,7 @@ MAT_HTML_PLACEHOLDER
       <th style="min-width:215px">Ore (Compressed)</th>
       <th>Volume (m&#179;)</th>
       <th>Refine Val/m&#179;<br><span style="font-size:.85em;opacity:.6">after efficiency</span></th>
-      <th>Mkt JBV/m&#179;</th>
+      <th id="mkt_col_hdr">Mkt JBV/m&#179;</th>
       <th>Load Ref. Value<br><span style="font-size:.85em;opacity:.6">pricing basis</span></th>
       <th>You Pay</th>
       <th>Net Contrib.</th>
@@ -394,7 +433,7 @@ function toggleMat() {
 var MAT_IDS=[34,35,36,37,38,39,40,11399,16633,16634,16635,16636,16639,16640,16637,16638,16641,16642,16643,16644,16646,16647,16648,16649,16650,16651,16652,16653,16272,16273,16274,17887,17888,17889,16275];
 function saveState() {
   var s={};
-  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct'].forEach(function(id){
+  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct','price_basis'].forEach(function(id){
     var el=document.getElementById(id); if(el) s[id]=el.value;
   });
   MAT_IDS.forEach(function(mid){
@@ -413,7 +452,7 @@ function loadState() {
   var raw; try{ raw=localStorage.getItem('ore_calc_state'); }catch(e){}
   if(!raw){ addRow(0,400000); return; }
   var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,400000); return; }
-  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct'].forEach(function(id){
+  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct','price_basis'].forEach(function(id){
     var el=document.getElementById(id); if(el&&s[id]!=null) el.value=s[id];
   });
   MAT_IDS.forEach(function(mid){
@@ -428,13 +467,49 @@ function loadState() {
   rows.forEach(function(r){ addRow(parseInt(r.o), parseFloat(r.v)); });
 }
 
+// ── Price basis helpers ────────────────────────────────────────────────────
+var SNAP_DATE = 'SNAP_DATE_PLACEHOLDER';
+var BASIS_LABELS = {
+  latest: 'Latest snapshot: '+SNAP_DATE,
+  avg7:   '7-day avg',
+  avg14:  '14-day avg',
+  avg30:  '30-day avg',
+  avg60:  '60-day avg'
+};
+function getBasis() { return document.getElementById('price_basis').value; }
+function orePrice(ore) {
+  var b=getBasis();
+  if(b==='avg7')  return ore.a7  || ore.mkt;
+  if(b==='avg14') return ore.a14 || ore.mkt;
+  if(b==='avg30') return ore.a30 || ore.mkt;
+  if(b==='avg60') return ore.a60 || ore.mkt;
+  return ore.mkt;
+}
+function matPrice(mat) {
+  var b=getBasis();
+  if(b==='avg7')  return mat.a7  || mat.jbv;
+  if(b==='avg14') return mat.a14 || mat.jbv;
+  if(b==='avg30') return mat.a30 || mat.jbv;
+  if(b==='avg60') return mat.a60 || mat.jbv;
+  return mat.jbv;
+}
+function updateBasisLabels() {
+  var b=getBasis();
+  var lbl=BASIS_LABELS[b]||b;
+  var hdr=b==='latest'?'Mkt JBV/m\u00B3':(lbl+'/m\u00B3');
+  var hdrEl=document.getElementById('mkt_col_hdr'); if(hdrEl) hdrEl.textContent=hdr;
+  var pillEl=document.getElementById('snap_pill');
+  if(pillEl) pillEl.innerHTML='Jita prices: '+lbl+' &nbsp;&middot;&nbsp; All entries are compressed variants';
+  var noteEl=document.getElementById('basis_note'); if(noteEl) noteEl.textContent=lbl;
+}
+
 // ── Refine value calculations ──────────────────────────────────────────────
 function refineVal100(ore) {
-  // theoretical value at 100% efficiency, using current mat JBV and sell%
+  // theoretical value at 100% efficiency, using selected price basis and sell%
   var val=0;
   for (var mid in ore.mats) {
     var mat=MATERIALS[mid]; if(!mat) continue;
-    val += (ore.mats[mid]/ore.ps)*mat.jbv*(matPct(parseInt(mid))/100);
+    val += (ore.mats[mid]/ore.ps)*matPrice(mat)*(matPct(parseInt(mid))/100);
   }
   return val; // per unit
 }
@@ -477,6 +552,7 @@ function recalcAll() {
   var ship=getShip(), eff=getEff(), tax=getTax(), buy=getBuy();
   document.getElementById('ship_tag').textContent=fmtB(ship)+' ISK';
   document.getElementById('eff_note').textContent='Efficiency: '+eff.toFixed(2)+'%  \u00B7  Tax on Jita value: '+tax.toFixed(2)+'%';
+  updateBasisLabels();
 
   var totVol=0, totLoad=0, totPay=0, totRev=0, totTax=0, totMkt=0;
   document.querySelectorAll('#load_body tr').forEach(function(tr){
@@ -488,16 +564,16 @@ function recalcAll() {
     var vol=parseFloat(inp.value)||0;
     if(!ore||vol<=0) return;
 
-    var rv100   = refineVal100(ore);          // theoretical refine value per unit (pricing basis)
-    var rvEff   = rv100 * eff/100;            // mineral proceeds per unit (after efficiency, no tax deduction)
+    var rv100    = refineVal100(ore);          // theoretical refine value per unit (selected basis)
+    var rvEff    = rv100 * eff/100;            // mineral proceeds per unit (after efficiency, no tax deduction)
     var rv100_m3 = rv100  / ore.vol;
     var rvEff_m3 = rvEff  / ore.vol;
-    var mkt_m3   = ore.mkt / ore.vol;         // Jita buy price per m³ (tax basis)
+    var mkt_m3   = orePrice(ore) / ore.vol;   // selected basis price per m³
 
     var loadRef = vol * rv100_m3;             // pricing basis total
     var pay     = loadRef * buy/100;          // ISK paid to miners
     var revenue = vol * rvEff_m3;             // mineral proceeds after efficiency
-    var taxIsk  = vol * mkt_m3 * tax/100;     // ISK tax charged against ore Jita value
+    var taxIsk  = vol * mkt_m3 * tax/100;     // ISK tax charged against ore price
     var contrib = revenue - pay - taxIsk;     // net row contribution (before shipping)
 
     document.getElementById('rv_' +id).textContent=fmt(rvEff_m3)+' ISK';
