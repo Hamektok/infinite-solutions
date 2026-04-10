@@ -347,7 +347,7 @@ MAT_HTML_PLACEHOLDER
   <table>
     <thead><tr>
       <th style="min-width:215px">Ore (Compressed)</th>
-      <th>Volume (m&#179;)</th>
+      <th>Quantity (units)</th>
       <th>Refine Val/m&#179;<br><span style="font-size:.85em;opacity:.6">after efficiency</span></th>
       <th id="mkt_col_hdr">Mkt JBV/m&#179;</th>
       <th>Load Ref. Value<br><span style="font-size:.85em;opacity:.6">pricing basis</span></th>
@@ -463,7 +463,7 @@ function loadState() {
     p.classList.add('open');
     b.innerHTML='&#9660;&nbsp; Mineral &amp; Material Sell % &nbsp;&mdash;&nbsp; click to collapse';
   }
-  var rows=s.rows&&s.rows.length?s.rows:[{o:0,v:400000}];
+  var rows=s.rows&&s.rows.length?s.rows:[{o:0,v:100000}];
   rows.forEach(function(r){ addRow(parseInt(r.o), parseFloat(r.v)); });
 }
 
@@ -530,13 +530,13 @@ function getBuy() { return parseFloat(document.getElementById('buy_pct').value)|
 
 // ── Load Builder ───────────────────────────────────────────────────────────
 var rowId=0;
-function addRow(oreIdx,vol) {
-  oreIdx=oreIdx||0; vol=vol!=null?vol:100000;
+function addRow(oreIdx,qty) {
+  oreIdx=oreIdx||0; qty=qty!=null?qty:100000;
   var id=++rowId;
   var tr=document.createElement('tr'); tr.id='r'+id;
   tr.innerHTML=
     '<td class="td-ore"><select onchange="recalcAll()">'+buildOreOptions(oreIdx)+'</select></td>'+
-    '<td style="white-space:nowrap"><input type="number" class="td-num-in" value="'+vol+'" min="0" step="10000" oninput="recalcAll()" style="width:88px"> m&#179;</td>'+
+    '<td style="white-space:nowrap"><input type="number" class="td-num-in" value="'+qty+'" min="0" step="1000" oninput="recalcAll()" style="width:100px"> <span class="td-dim" id="vol_'+id+'" style="font-size:.82em"></span></td>'+
     '<td class="td-dim" id="rv_'+id+'">--</td>'+
     '<td class="td-dim" id="mkt_'+id+'">--</td>'+
     '<td class="td-c"   id="lv_'+id+'">--</td>'+
@@ -561,8 +561,12 @@ function recalcAll() {
     var inp=tr.querySelector('input');
     if(!sel||!inp) return;
     var ore=ORES[parseInt(sel.value)];
-    var vol=parseFloat(inp.value)||0;
-    if(!ore||vol<=0) return;
+    var qty=parseFloat(inp.value)||0;
+    if(!ore||qty<=0) return;
+    var vol = qty * ore.vol;                   // m³ derived from units × vol/unit
+
+    var volEl=document.getElementById('vol_'+id);
+    if(volEl) volEl.textContent=fmt(vol,0)+' m\u00B3';
 
     var rv100    = refineVal100(ore);          // theoretical refine value per unit (selected basis)
     var rvEff    = rv100 * eff/100;            // mineral proceeds per unit (after efficiency, no tax deduction)
