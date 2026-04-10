@@ -133,12 +133,6 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 
   <hr class="div">
 
-  <div class="form-row">
-    <label>Buy % (pay miners)</label>
-    <input type="number" id="buy_pct" min="0" max="100" step="0.01" value="90.00" oninput="syncBuyPct()" style="width:90px">
-    <span class="unit">% of theoretical refine value &nbsp;<span class="iv" id="buy_mode_note"></span></span>
-  </div>
-
   <button class="collapse-btn" onclick="toggleBuy()" id="buy_btn" style="margin-top:6px">&#9658;&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to expand</button>
   <div class="mat-panel" id="buy_panel">
     <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
@@ -351,31 +345,18 @@ function toggleMat() {
 function matBuyPct(mid) { var e=document.getElementById('bp_'+mid); return e?(parseFloat(e.value)||90):90; }
 function setAllBuy(v) {
   document.querySelectorAll('[id^="bp_"]').forEach(function(e){e.value=v;});
-  document.getElementById('buy_pct').value=v;
-  recalcAll();
-}
-function syncBuyPct() {
-  // When the global buy % is edited, push it to all per-material fields too
-  var v=parseFloat(document.getElementById('buy_pct').value)||90;
-  document.querySelectorAll('[id^="bp_"]').forEach(function(e){e.value=v;});
   recalcAll();
 }
 function toggleBuy() {
   var p=document.getElementById('buy_panel'), b=document.getElementById('buy_btn');
   p.classList.toggle('open');
   b.innerHTML=(p.classList.contains('open')?'&#9660;':'&#9658;')+'&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to '+(p.classList.contains('open')?'collapse':'expand');
-  updateBuyModeNote();
   saveState();
-}
-function updateBuyModeNote() {
-  var open=document.getElementById('buy_panel').classList.contains('open');
-  var el=document.getElementById('buy_mode_note');
-  if(el) el.textContent=open?'(per-material rates active)':'(uniform — expand to set per-material)';
 }
 // Per-ore weighted buy % — sum of (mat_contribution_pct × mat_buy_pct) across all mats
 function refinePay(ore) {
   var totalRef=refineVal100(ore);
-  if(totalRef<=0) return parseFloat(document.getElementById('buy_pct').value)||90;
+  if(totalRef<=0) return 90;
   var weightedPay=0;
   for(var mid in ore.mats){
     var mat=MATERIALS[mid]; if(!mat) continue;
@@ -389,7 +370,7 @@ function refinePay(ore) {
 var MAT_IDS=[34,35,36,37,38,39,40,11399,16633,16634,16635,16636,16639,16640,16637,16638,16641,16642,16643,16644,16646,16647,16648,16649,16650,16651,16652,16653,16272,16273,16274,17887,17888,17889,16275];
 function saveState() {
   var s={};
-  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct','price_basis'].forEach(function(id){
+  ['iso_type','iso_qty','eff_pct','tax_pct','price_basis'].forEach(function(id){
     var el=document.getElementById(id); if(el) s[id]=el.value;
   });
   MAT_IDS.forEach(function(mid){
@@ -410,7 +391,7 @@ function loadState() {
   var raw; try{ raw=localStorage.getItem('ore_calc_state'); }catch(e){}
   if(!raw){ addRow(0,100000); return; }
   var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,100000); return; }
-  ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct','price_basis'].forEach(function(id){
+  ['iso_type','iso_qty','eff_pct','tax_pct','price_basis'].forEach(function(id){
     var el=document.getElementById(id); if(el&&s[id]!=null) el.value=s[id];
   });
   MAT_IDS.forEach(function(mid){
@@ -490,7 +471,6 @@ function fmtB(n) {
 function getShip(){ return (parseFloat(document.getElementById('iso_qty').value)||0)*(parseFloat(document.getElementById('iso_type').value)||0); }
 function getEff() { return parseFloat(document.getElementById('eff_pct').value)||87.5; }
 function getTax() { return parseFloat(document.getElementById('tax_pct').value)||0; }
-function getBuy() { return parseFloat(document.getElementById('buy_pct').value)||90; }
 
 // ── Load Builder ───────────────────────────────────────────────────────────
 var rowId=0;
@@ -517,7 +497,6 @@ function recalcAll() {
   document.getElementById('ship_tag').textContent=fmtB(ship)+' ISK';
   document.getElementById('eff_note').textContent='Efficiency: '+eff.toFixed(2)+'%  ·  Tax on Jita value: '+tax.toFixed(2)+'%';
   updateBasisLabels();
-  updateBuyModeNote();
 
   var totVol=0, totLoad=0, totPay=0, totRev=0, totTax=0, totMkt=0;
   document.querySelectorAll('#load_body tr').forEach(function(tr){
