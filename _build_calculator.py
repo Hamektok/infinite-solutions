@@ -51,6 +51,17 @@ mat_rows = cur.execute(f"""
     WHERE it.type_id IN ({mat_ids_str})
 """).fetchall()
 materials = {r[0]: {'name': r[1], 'jbv': r[2] or 0} for r in mat_rows}
+
+snap_row = conn.execute("""
+    SELECT MAX(timestamp) FROM market_price_snapshots ms
+    JOIN tracked_market_items tmi ON tmi.type_id = ms.type_id
+    WHERE tmi.category IN ('standard_ore','moon_ore','ice_ore')
+      AND tmi.type_name LIKE 'Compressed %'
+""").fetchone()
+from datetime import datetime, timezone
+snap_dt = datetime.fromisoformat(snap_row[0].replace('Z','+00:00')) if snap_row[0] else datetime.now(timezone.utc)
+snap_label = snap_dt.strftime('%d %b %Y')
+
 conn.close()
 
 # ── Ore sub-group classification ─────────────────────────────────────────────
@@ -236,7 +247,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 <div class="hdr">
   <h1>ORE HAUL CALCULATOR</h1>
   <div class="sub">Jump Freight &middot; Compressed Ore &middot; Refine Value</div>
-  <div class="snap-pill">Jita prices: 03 Apr 2026 &nbsp;&middot;&nbsp; All entries are compressed variants</div>
+  <div class="snap-pill">Jita prices: SNAP_DATE_PLACEHOLDER &nbsp;&middot;&nbsp; All entries are compressed variants</div>
 </div>
 
 <div class="panel">
@@ -327,7 +338,7 @@ MAT_HTML_PLACEHOLDER
 </div>
 
 <div class="footer">
-  Prices: Jita 4-4 buy orders &middot; 03 Apr 2026 &middot; Infinite Solutions &middot; Hamektok Hakaari
+  Prices: Jita 4-4 buy orders &middot; SNAP_DATE_PLACEHOLDER &middot; Infinite Solutions &middot; Hamektok Hakaari
 </div>
 </div>
 <script>
@@ -556,6 +567,7 @@ loadState();
 html = html.replace('MAT_HTML_PLACEHOLDER', mat_html)
 html = html.replace('ORES_DATA_PLACEHOLDER', ores_js)
 html = html.replace('MATS_DATA_PLACEHOLDER', mats_js)
+html = html.replace('SNAP_DATE_PLACEHOLDER', snap_label)
 
 with open('ore_haul_calculator.html', 'w', encoding='utf-8') as f:
     f.write(html)
