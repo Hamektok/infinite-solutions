@@ -141,7 +141,7 @@ MAT_GROUPS = [
     ('Ice Products', [16272,16273,16274,17887,17888,17889,16275]),
 ]
 
-def mat_rows_html():
+def mat_rows_html(id_prefix, default_val, oninput_fn):
     lines = []
     for grp, ids in MAT_GROUPS:
         lines.append(f'<div class="mat-group-title">{grp}</div>')
@@ -153,16 +153,17 @@ def mat_rows_html():
             lines.append(
                 f'<div class="mat-row">'
                 f'<span class="mat-name">{mname}</span>'
-                f'<input type="number" id="mp_{mid}" value="100" min="0" max="200" step="0.01" '
-                f'oninput="recalcAll()" style="width:72px"> %'
+                f'<input type="number" id="{id_prefix}{mid}" value="{default_val}" min="0" max="200" step="0.01" '
+                f'oninput="{oninput_fn}" style="width:72px"> %'
                 f'<span class="mat-price">{price:,.2f} ISK JBV</span>'
                 f'</div>'
             )
     return '\n'.join(lines)
 
-ores_js  = json.dumps(ores,  separators=(',',':'))
-mats_js  = json.dumps({str(k): v for k, v in materials.items()}, separators=(',',':'))
-mat_html = mat_rows_html()
+ores_js      = json.dumps(ores,  separators=(',',':'))
+mats_js      = json.dumps({str(k): v for k, v in materials.items()}, separators=(',',':'))
+mat_html     = mat_rows_html('mp_', 100, 'recalcAll()')
+buy_mat_html = mat_rows_html('bp_', 90,  'recalcAll()')
 
 # ── Build JS ore-options function body ──────────────────────────────────────
 # We embed sub-group labels so the JS can build clean optgroups.
@@ -312,8 +313,21 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 
   <div class="form-row">
     <label>Buy % (pay miners)</label>
-    <input type="number" id="buy_pct" min="0" max="100" step="0.01" value="90.00" oninput="recalcAll()" style="width:90px">
-    <span class="unit">% of theoretical refine value</span>
+    <input type="number" id="buy_pct" min="0" max="100" step="0.01" value="90.00" oninput="syncBuyPct()" style="width:90px">
+    <span class="unit">% of theoretical refine value &nbsp;<span class="iv" id="buy_mode_note"></span></span>
+  </div>
+
+  <button class="collapse-btn" onclick="toggleBuy()" id="buy_btn" style="margin-top:6px">&#9658;&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to expand</button>
+  <div class="mat-panel" id="buy_panel">
+    <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
+      <button class="qb" onclick="setAllBuy(100)">Set All 100%</button>
+      <button class="qb" onclick="setAllBuy(95)">Set All 95%</button>
+      <button class="qb" onclick="setAllBuy(90)">Set All 90%</button>
+      <button class="qb" onclick="setAllBuy(85)">Set All 85%</button>
+    </div>
+    <div class="mat-rows-grid">
+BUY_PCT_HTML_PLACEHOLDER
+    </div>
   </div>
   <div class="form-row">
     <label>Refine Efficiency</label>
@@ -429,6 +443,44 @@ function toggleMat() {
   saveState();
 }
 
+// ── Per-material buy % ─────────────────────────────────────────────────────
+function matBuyPct(mid) { var e=document.getElementById('bp_'+mid); return e?(parseFloat(e.value)||90):90; }
+function setAllBuy(v) {
+  document.querySelectorAll('[id^="bp_"]').forEach(function(e){e.value=v;});
+  document.getElementById('buy_pct').value=v;
+  recalcAll();
+}
+function syncBuyPct() {
+  // When the global buy % is edited, push it to all per-material fields too
+  var v=parseFloat(document.getElementById('buy_pct').value)||90;
+  document.querySelectorAll('[id^="bp_"]').forEach(function(e){e.value=v;});
+  recalcAll();
+}
+function toggleBuy() {
+  var p=document.getElementById('buy_panel'), b=document.getElementById('buy_btn');
+  p.classList.toggle('open');
+  b.innerHTML=(p.classList.contains('open')?'&#9660;':'&#9658;')+'&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to '+(p.classList.contains('open')?'collapse':'expand');
+  updateBuyModeNote();
+  saveState();
+}
+function updateBuyModeNote() {
+  var open=document.getElementById('buy_panel').classList.contains('open');
+  var el=document.getElementById('buy_mode_note');
+  if(el) el.textContent=open?'(per-material rates active)':'(uniform — expand to set per-material)';
+}
+// Per-ore weighted buy % — sum of (mat_contribution_pct × mat_buy_pct) across all mats
+function refinePay(ore) {
+  var totalRef=refineVal100(ore);
+  if(totalRef<=0) return parseFloat(document.getElementById('buy_pct').value)||90;
+  var weightedPay=0;
+  for(var mid in ore.mats){
+    var mat=MATERIALS[mid]; if(!mat) continue;
+    var matContrib=(ore.mats[mid]/ore.ps)*matPrice(mat)*(matPct(parseInt(mid))/100);
+    weightedPay += matContrib * (matBuyPct(parseInt(mid))/100);
+  }
+  return (weightedPay/totalRef)*100; // effective buy % for this ore
+}
+
 // ── Persistence ────────────────────────────────────────────────────────────
 var MAT_IDS=[34,35,36,37,38,39,40,11399,16633,16634,16635,16636,16639,16640,16637,16638,16641,16642,16643,16644,16646,16647,16648,16649,16650,16651,16652,16653,16272,16273,16274,17887,17888,17889,16275];
 function saveState() {
@@ -438,8 +490,10 @@ function saveState() {
   });
   MAT_IDS.forEach(function(mid){
     var el=document.getElementById('mp_'+mid); if(el) s['mp_'+mid]=el.value;
+    var eb=document.getElementById('bp_'+mid); if(eb) s['bp_'+mid]=eb.value;
   });
   s.mat_open=document.getElementById('mat_panel').classList.contains('open');
+  s.buy_open=document.getElementById('buy_panel').classList.contains('open');
   var rows=[];
   document.querySelectorAll('#load_body tr').forEach(function(tr){
     var sel=tr.querySelector('select'), inp=tr.querySelector('input');
@@ -450,18 +504,24 @@ function saveState() {
 }
 function loadState() {
   var raw; try{ raw=localStorage.getItem('ore_calc_state'); }catch(e){}
-  if(!raw){ addRow(0,400000); return; }
-  var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,400000); return; }
+  if(!raw){ addRow(0,100000); return; }
+  var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,100000); return; }
   ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct','price_basis'].forEach(function(id){
     var el=document.getElementById(id); if(el&&s[id]!=null) el.value=s[id];
   });
   MAT_IDS.forEach(function(mid){
     var el=document.getElementById('mp_'+mid); if(el&&s['mp_'+mid]!=null) el.value=s['mp_'+mid];
+    var eb=document.getElementById('bp_'+mid); if(eb&&s['bp_'+mid]!=null) eb.value=s['bp_'+mid];
   });
   if(s.mat_open){
     var p=document.getElementById('mat_panel'), b=document.getElementById('mat_btn');
     p.classList.add('open');
     b.innerHTML='&#9660;&nbsp; Mineral &amp; Material Sell % &nbsp;&mdash;&nbsp; click to collapse';
+  }
+  if(s.buy_open){
+    var p=document.getElementById('buy_panel'), b=document.getElementById('buy_btn');
+    p.classList.add('open');
+    b.innerHTML='&#9660;&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to collapse';
   }
   var rows=s.rows&&s.rows.length?s.rows:[{o:0,v:100000}];
   rows.forEach(function(r){ addRow(parseInt(r.o), parseFloat(r.v)); });
@@ -549,10 +609,11 @@ function addRow(oreIdx,qty) {
 function delRow(id){ var e=document.getElementById('r'+id); if(e)e.remove(); recalcAll(); saveState(); }
 
 function recalcAll() {
-  var ship=getShip(), eff=getEff(), tax=getTax(), buy=getBuy();
+  var ship=getShip(), eff=getEff(), tax=getTax();
   document.getElementById('ship_tag').textContent=fmtB(ship)+' ISK';
   document.getElementById('eff_note').textContent='Efficiency: '+eff.toFixed(2)+'%  \u00B7  Tax on Jita value: '+tax.toFixed(2)+'%';
   updateBasisLabels();
+  updateBuyModeNote();
 
   var totVol=0, totLoad=0, totPay=0, totRev=0, totTax=0, totMkt=0;
   document.querySelectorAll('#load_body tr').forEach(function(tr){
@@ -573,9 +634,10 @@ function recalcAll() {
     var rv100_m3 = rv100  / ore.vol;
     var rvEff_m3 = rvEff  / ore.vol;
     var mkt_m3   = orePrice(ore) / ore.vol;   // selected basis price per m³
+    var effBuy   = refinePay(ore);            // effective buy % (weighted per-material)
 
     var loadRef = vol * rv100_m3;             // pricing basis total
-    var pay     = loadRef * buy/100;          // ISK paid to miners
+    var pay     = loadRef * effBuy/100;       // ISK paid to miners (per-material weighted)
     var revenue = vol * rvEff_m3;             // mineral proceeds after efficiency
     var taxIsk  = vol * mkt_m3 * tax/100;     // ISK tax charged against ore price
     var contrib = revenue - pay - taxIsk;     // net row contribution (before shipping)
@@ -644,10 +706,11 @@ loadState();
 </body>
 </html>"""
 
-html = html.replace('MAT_HTML_PLACEHOLDER', mat_html)
-html = html.replace('ORES_DATA_PLACEHOLDER', ores_js)
-html = html.replace('MATS_DATA_PLACEHOLDER', mats_js)
-html = html.replace('SNAP_DATE_PLACEHOLDER', snap_label)
+html = html.replace('MAT_HTML_PLACEHOLDER',     mat_html)
+html = html.replace('BUY_PCT_HTML_PLACEHOLDER', buy_mat_html)
+html = html.replace('ORES_DATA_PLACEHOLDER',    ores_js)
+html = html.replace('MATS_DATA_PLACEHOLDER',    mats_js)
+html = html.replace('SNAP_DATE_PLACEHOLDER',    snap_label)
 
 with open('ore_haul_calculator.html', 'w', encoding='utf-8') as f:
     f.write(html)

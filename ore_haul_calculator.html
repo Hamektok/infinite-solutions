@@ -135,8 +135,62 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 
   <div class="form-row">
     <label>Buy % (pay miners)</label>
-    <input type="number" id="buy_pct" min="0" max="100" step="0.01" value="90.00" oninput="recalcAll()" style="width:90px">
-    <span class="unit">% of theoretical refine value</span>
+    <input type="number" id="buy_pct" min="0" max="100" step="0.01" value="90.00" oninput="syncBuyPct()" style="width:90px">
+    <span class="unit">% of theoretical refine value &nbsp;<span class="iv" id="buy_mode_note"></span></span>
+  </div>
+
+  <button class="collapse-btn" onclick="toggleBuy()" id="buy_btn" style="margin-top:6px">&#9658;&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to expand</button>
+  <div class="mat-panel" id="buy_panel">
+    <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">
+      <button class="qb" onclick="setAllBuy(100)">Set All 100%</button>
+      <button class="qb" onclick="setAllBuy(95)">Set All 95%</button>
+      <button class="qb" onclick="setAllBuy(90)">Set All 90%</button>
+      <button class="qb" onclick="setAllBuy(85)">Set All 85%</button>
+    </div>
+    <div class="mat-rows-grid">
+<div class="mat-group-title">Minerals</div>
+<div class="mat-row"><span class="mat-name">Tritanium</span><input type="number" id="bp_34" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">3.87 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Pyerite</span><input type="number" id="bp_35" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">18.40 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Mexallon</span><input type="number" id="bp_36" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">61.20 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Isogen</span><input type="number" id="bp_37" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">183.10 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Nocxium</span><input type="number" id="bp_38" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">826.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Zydrine</span><input type="number" id="bp_39" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">1,232.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Megacyte</span><input type="number" id="bp_40" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">2,211.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Morphite</span><input type="number" id="bp_11399" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">19,600.00 ISK JBV</span></div>
+<div class="mat-group-title">R4 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Hydrocarbons</span><input type="number" id="bp_16633" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">516.40 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Atmospheric Gases</span><input type="number" id="bp_16634" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">220.40 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Evaporite Deposits</span><input type="number" id="bp_16635" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">206.30 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Silicates</span><input type="number" id="bp_16636" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">350.10 ISK JBV</span></div>
+<div class="mat-group-title">R8 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Scandium</span><input type="number" id="bp_16639" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">440.10 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Cobalt</span><input type="number" id="bp_16640" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">600.90 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Tungsten</span><input type="number" id="bp_16637" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">1,201.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Titanium</span><input type="number" id="bp_16638" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">658.80 ISK JBV</span></div>
+<div class="mat-group-title">R16 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Chromium</span><input type="number" id="bp_16641" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">5,844.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Vanadium</span><input type="number" id="bp_16642" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">2,103.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Cadmium</span><input type="number" id="bp_16643" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">4,434.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Platinum</span><input type="number" id="bp_16644" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">6,650.00 ISK JBV</span></div>
+<div class="mat-group-title">R32 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Mercury</span><input type="number" id="bp_16646" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">3,410.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Caesium</span><input type="number" id="bp_16647" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">5,055.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Hafnium</span><input type="number" id="bp_16648" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">7,835.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Technetium</span><input type="number" id="bp_16649" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">20,900.00 ISK JBV</span></div>
+<div class="mat-group-title">R64 Moon Mat</div>
+<div class="mat-row"><span class="mat-name">Dysprosium</span><input type="number" id="bp_16650" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">53,160.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Neodymium</span><input type="number" id="bp_16651" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">61,400.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Promethium</span><input type="number" id="bp_16652" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">54,580.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Thulium</span><input type="number" id="bp_16653" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">28,160.00 ISK JBV</span></div>
+<div class="mat-group-title">Ice Products</div>
+<div class="mat-row"><span class="mat-name">Heavy Water</span><input type="number" id="bp_16272" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">99.97 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Liquid Ozone</span><input type="number" id="bp_16273" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">80.20 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Helium Isotopes</span><input type="number" id="bp_16274" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">816.40 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Oxygen Isotopes</span><input type="number" id="bp_17887" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">747.60 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Nitrogen Isotopes</span><input type="number" id="bp_17888" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">652.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Hydrogen Isotopes</span><input type="number" id="bp_17889" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">560.00 ISK JBV</span></div>
+<div class="mat-row"><span class="mat-name">Strontium Clathrates</span><input type="number" id="bp_16275" value="90" min="0" max="200" step="0.01" oninput="recalcAll()" style="width:72px"> %<span class="mat-price">3,608.00 ISK JBV</span></div>
+    </div>
   </div>
   <div class="form-row">
     <label>Refine Efficiency</label>
@@ -293,6 +347,44 @@ function toggleMat() {
   saveState();
 }
 
+// ── Per-material buy % ─────────────────────────────────────────────────────
+function matBuyPct(mid) { var e=document.getElementById('bp_'+mid); return e?(parseFloat(e.value)||90):90; }
+function setAllBuy(v) {
+  document.querySelectorAll('[id^="bp_"]').forEach(function(e){e.value=v;});
+  document.getElementById('buy_pct').value=v;
+  recalcAll();
+}
+function syncBuyPct() {
+  // When the global buy % is edited, push it to all per-material fields too
+  var v=parseFloat(document.getElementById('buy_pct').value)||90;
+  document.querySelectorAll('[id^="bp_"]').forEach(function(e){e.value=v;});
+  recalcAll();
+}
+function toggleBuy() {
+  var p=document.getElementById('buy_panel'), b=document.getElementById('buy_btn');
+  p.classList.toggle('open');
+  b.innerHTML=(p.classList.contains('open')?'&#9660;':'&#9658;')+'&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to '+(p.classList.contains('open')?'collapse':'expand');
+  updateBuyModeNote();
+  saveState();
+}
+function updateBuyModeNote() {
+  var open=document.getElementById('buy_panel').classList.contains('open');
+  var el=document.getElementById('buy_mode_note');
+  if(el) el.textContent=open?'(per-material rates active)':'(uniform — expand to set per-material)';
+}
+// Per-ore weighted buy % — sum of (mat_contribution_pct × mat_buy_pct) across all mats
+function refinePay(ore) {
+  var totalRef=refineVal100(ore);
+  if(totalRef<=0) return parseFloat(document.getElementById('buy_pct').value)||90;
+  var weightedPay=0;
+  for(var mid in ore.mats){
+    var mat=MATERIALS[mid]; if(!mat) continue;
+    var matContrib=(ore.mats[mid]/ore.ps)*matPrice(mat)*(matPct(parseInt(mid))/100);
+    weightedPay += matContrib * (matBuyPct(parseInt(mid))/100);
+  }
+  return (weightedPay/totalRef)*100; // effective buy % for this ore
+}
+
 // ── Persistence ────────────────────────────────────────────────────────────
 var MAT_IDS=[34,35,36,37,38,39,40,11399,16633,16634,16635,16636,16639,16640,16637,16638,16641,16642,16643,16644,16646,16647,16648,16649,16650,16651,16652,16653,16272,16273,16274,17887,17888,17889,16275];
 function saveState() {
@@ -302,8 +394,10 @@ function saveState() {
   });
   MAT_IDS.forEach(function(mid){
     var el=document.getElementById('mp_'+mid); if(el) s['mp_'+mid]=el.value;
+    var eb=document.getElementById('bp_'+mid); if(eb) s['bp_'+mid]=eb.value;
   });
   s.mat_open=document.getElementById('mat_panel').classList.contains('open');
+  s.buy_open=document.getElementById('buy_panel').classList.contains('open');
   var rows=[];
   document.querySelectorAll('#load_body tr').forEach(function(tr){
     var sel=tr.querySelector('select'), inp=tr.querySelector('input');
@@ -314,18 +408,24 @@ function saveState() {
 }
 function loadState() {
   var raw; try{ raw=localStorage.getItem('ore_calc_state'); }catch(e){}
-  if(!raw){ addRow(0,400000); return; }
-  var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,400000); return; }
+  if(!raw){ addRow(0,100000); return; }
+  var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,100000); return; }
   ['iso_type','iso_qty','buy_pct','eff_pct','tax_pct','price_basis'].forEach(function(id){
     var el=document.getElementById(id); if(el&&s[id]!=null) el.value=s[id];
   });
   MAT_IDS.forEach(function(mid){
     var el=document.getElementById('mp_'+mid); if(el&&s['mp_'+mid]!=null) el.value=s['mp_'+mid];
+    var eb=document.getElementById('bp_'+mid); if(eb&&s['bp_'+mid]!=null) eb.value=s['bp_'+mid];
   });
   if(s.mat_open){
     var p=document.getElementById('mat_panel'), b=document.getElementById('mat_btn');
     p.classList.add('open');
     b.innerHTML='&#9660;&nbsp; Mineral &amp; Material Sell % &nbsp;&mdash;&nbsp; click to collapse';
+  }
+  if(s.buy_open){
+    var p=document.getElementById('buy_panel'), b=document.getElementById('buy_btn');
+    p.classList.add('open');
+    b.innerHTML='&#9660;&nbsp; Per-Material Buy % &nbsp;&mdash;&nbsp; click to collapse';
   }
   var rows=s.rows&&s.rows.length?s.rows:[{o:0,v:100000}];
   rows.forEach(function(r){ addRow(parseInt(r.o), parseFloat(r.v)); });
@@ -413,10 +513,11 @@ function addRow(oreIdx,qty) {
 function delRow(id){ var e=document.getElementById('r'+id); if(e)e.remove(); recalcAll(); saveState(); }
 
 function recalcAll() {
-  var ship=getShip(), eff=getEff(), tax=getTax(), buy=getBuy();
+  var ship=getShip(), eff=getEff(), tax=getTax();
   document.getElementById('ship_tag').textContent=fmtB(ship)+' ISK';
   document.getElementById('eff_note').textContent='Efficiency: '+eff.toFixed(2)+'%  ·  Tax on Jita value: '+tax.toFixed(2)+'%';
   updateBasisLabels();
+  updateBuyModeNote();
 
   var totVol=0, totLoad=0, totPay=0, totRev=0, totTax=0, totMkt=0;
   document.querySelectorAll('#load_body tr').forEach(function(tr){
@@ -437,9 +538,10 @@ function recalcAll() {
     var rv100_m3 = rv100  / ore.vol;
     var rvEff_m3 = rvEff  / ore.vol;
     var mkt_m3   = orePrice(ore) / ore.vol;   // selected basis price per m³
+    var effBuy   = refinePay(ore);            // effective buy % (weighted per-material)
 
     var loadRef = vol * rv100_m3;             // pricing basis total
-    var pay     = loadRef * buy/100;          // ISK paid to miners
+    var pay     = loadRef * effBuy/100;       // ISK paid to miners (per-material weighted)
     var revenue = vol * rvEff_m3;             // mineral proceeds after efficiency
     var taxIsk  = vol * mkt_m3 * tax/100;     // ISK tax charged against ore price
     var contrib = revenue - pay - taxIsk;     // net row contribution (before shipping)
