@@ -35,6 +35,18 @@ SCRIPTS = [
         'file': 'update_bwf_market_orders.py',
         'description': 'Updates BWF-ZZ Market Orders (25-30 min)',
         'critical': False
+    },
+    {
+        'name': 'Buyback Data Regenerate',
+        'file': '../generate_buyback_data.py',
+        'description': 'Regenerates buyback_data.js from current market prices (<1 min)',
+        'critical': False
+    },
+    {
+        'name': 'Site HTML Update',
+        'file': '../update_html_data.py',
+        'description': 'Embeds inventory + blueprints into index_final.html (<1 min)',
+        'critical': False
     }
 ]
 
@@ -163,7 +175,32 @@ def main():
         log_message("[ERROR] ALL UPDATES FAILED")
     
     log_separator('=', 70)
-    
+
+    # Auto-commit and push site files if buyback/html updates succeeded
+    buyback_ok = results.get('Buyback Data Regenerate', False)
+    html_ok    = results.get('Site HTML Update', False)
+    if buyback_ok or html_ok:
+        try:
+            import subprocess as _sp
+            project_dir = os.path.dirname(SCRIPT_DIR)
+            log_message("Committing updated site files to git...")
+            _sp.run(
+                ['git', 'add', 'buyback_data.js', 'index_final.html', 'index.html'],
+                cwd=project_dir, check=True
+            )
+            commit_msg = f"Auto-update market data - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+            ret = _sp.run(
+                ['git', 'commit', '-m', commit_msg],
+                cwd=project_dir, capture_output=True, text=True
+            )
+            if ret.returncode == 0:
+                _sp.run(['git', 'push'], cwd=project_dir, check=True)
+                log_message("[OK] Site files committed and pushed to GitHub Pages")
+            else:
+                log_message("[OK] No site file changes to commit")
+        except Exception as e:
+            log_message(f"[WARNING] Git commit/push failed: {e}")
+
     # Exit with appropriate code
     if not all(results.values()):
         sys.exit(1)
