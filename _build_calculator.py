@@ -727,7 +727,11 @@ function doImport(){
   var items=[];
   raw.split('\\n').forEach(function(line){
     line=line.trim(); if(!line) return;
-    var m=line.match(/^(.+?)[\\t ]+([0-9,]+)[\\s]*$/);
+    // Handle multi-column EVE format (Name\tQty\tCategory\t...) or simple "Name Qty"
+    var parts=line.split('\\t');
+    var m = parts.length>=2
+      ? [null, parts[0].trim(), parts[1].trim()]
+      : line.match(/^(.+?) +([0-9,]+)$/);
     if(m) items.push({name:m[1].trim(), qty:parseInt(m[2].replace(/,/g,''))||0});
   });
   if(!items.length){ setImportStatus('Could not parse any items. Use format: Item Name  Quantity (one per line).','err'); return; }
