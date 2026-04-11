@@ -153,24 +153,26 @@ def get_buyback_data():
     row = cursor.fetchone()
     refining_efficiency = float(row[0]) if row else DEFAULT_REFINING_EFFICIENCY
 
-    # Get all tracked items with buyback info
+    # Get all tracked items with buyback info (join inv_types for packaged volume)
     cursor.execute("""
-        SELECT type_id, type_name, category, display_order,
-               price_percentage, buyback_accepted, buyback_rate, buyback_quota,
-               COALESCE(alliance_discount, 0)
-        FROM tracked_market_items
-        ORDER BY category, display_order
+        SELECT tmi.type_id, tmi.type_name, tmi.category, tmi.display_order,
+               tmi.price_percentage, tmi.buyback_accepted, tmi.buyback_rate, tmi.buyback_quota,
+               COALESCE(tmi.alliance_discount, 0),
+               COALESCE(it.volume, 0)
+        FROM tracked_market_items tmi
+        LEFT JOIN inv_types it ON it.type_id = tmi.type_id
+        ORDER BY tmi.category, tmi.display_order
     """)
     items = cursor.fetchall()
 
-    # Get 7-day average Jita buy and sell prices from snapshots
-    seven_days_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    # Get latest Jita buy and sell prices from most recent snapshot per type
     cursor.execute("""
-        SELECT type_id, AVG(best_buy) as avg_buy, AVG(best_sell) as avg_sell
+        SELECT type_id, best_buy, best_sell
         FROM market_price_snapshots
-        WHERE timestamp >= ?
-        GROUP BY type_id
-    """, (seven_days_ago,))
+        WHERE (type_id, timestamp) IN (
+            SELECT type_id, MAX(timestamp) FROM market_price_snapshots GROUP BY type_id
+        )
+    """)
     avg_buy_prices = {}
     avg_sell_prices = {}
     avg_split_prices = {}
@@ -263,7 +265,7 @@ def get_buyback_data():
 
     # Build output data
     buyback_items = []
-    for type_id, type_name, category, display_order, price_pct, accepted, rate, quota, alliance_disc in items:
+    for type_id, type_name, category, display_order, price_pct, accepted, rate, quota, alliance_disc, volume in items:
         # Use buyback_rate if set, otherwise fall back to price_percentage
         effective_rate = rate if rate is not None else price_pct
 
@@ -294,6 +296,7 @@ def get_buyback_data():
             'accepted': bool(accepted),
             'quota': quota or 0,
             'avgJitaBuy': price,
+            'volume': round(volume, 4),
         }
 
         # Add tier for salvaged materials
