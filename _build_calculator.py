@@ -332,11 +332,6 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 .import-btn:hover{background:rgba(255,140,50,.25);}
 .import-status{font-size:.83em;margin-top:4px;min-height:1.2em;}
 .import-status.ok{color:var(--green);}.import-status.err{color:var(--red);}
-.apikey-row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;}
-.apikey-row input{background:var(--panel2);border:1px solid var(--border);border-radius:4px;
-  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.9em;padding:5px 9px;
-  outline:none;width:260px;}
-.apikey-row input:focus{border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -449,19 +444,15 @@ MAT_HTML_PLACEHOLDER
 </div>
 
 <div class="panel">
-  <div class="panel-title">Import from Janice or Paste List</div>
+  <div class="panel-title">Import Item List</div>
   <div class="import-row">
-    <textarea id="import_text" placeholder="Paste a Janice link (https://janice.e-351.com/a/...) or a plain item list:&#10;Compressed Hezorime 6000000&#10;Tritanium 500000"></textarea>
+    <textarea id="import_text" placeholder="Paste item list copied from EVE (one item per line):&#10;Compressed Hezorime	6000000&#10;Tritanium	500000"></textarea>
     <div style="display:flex;flex-direction:column;gap:6px">
       <button class="import-btn" onclick="doImport()">&#9654; Import</button>
       <button class="import-btn" style="background:rgba(255,60,60,.1);border-color:rgba(255,60,60,.3);color:#ff7777" onclick="clearLoad()">&#x2715; Clear Load</button>
     </div>
   </div>
   <div id="import_status" class="import-status"></div>
-  <div class="apikey-row">
-    <span class="unit">Janice API Key <span style="color:var(--dim);font-size:.85em">(optional)</span></span>
-    <input type="text" id="janice_api_key" placeholder="Leave blank to use shared key" oninput="saveApiKey()">
-  </div>
 </div>
 
 <div class="panel">
@@ -701,39 +692,27 @@ function getFeePerM3(rvEff_m3, shipPerM3) {
   return shipPerM3 + flat + extraPerM3;
 }
 
-// ── Janice / text import ───────────────────────────────────────────────────
-// Build name→index lookup (lowercase, strip 'compressed ' prefix for aliases)
+// ── Text import ────────────────────────────────────────────────────────────
+// Build name→index lookup (lowercase, with and without 'compressed ' prefix)
 var ORE_NAME_IDX = {};
 ORES.forEach(function(o,i){
-  ORE_NAME_IDX[o.name.toLowerCase()] = i;                  // e.g. "hezorime" → i
-  ORE_NAME_IDX[('compressed '+o.name).toLowerCase()] = i;  // e.g. "compressed hezorime" → i
+  ORE_NAME_IDX[o.name.toLowerCase()] = i;
+  ORE_NAME_IDX[('compressed '+o.name).toLowerCase()] = i;
 });
-
-function saveApiKey(){
-  var k=document.getElementById('janice_api_key').value.trim();
-  try{ localStorage.setItem('janice_api_key', k); }catch(e){}
-}
-function loadApiKey(){
-  var k; try{ k=localStorage.getItem('janice_api_key'); }catch(e){}
-  var el=document.getElementById('janice_api_key'); if(el&&k) el.value=k;
-}
 
 function setImportStatus(msg, cls){
   var el=document.getElementById('import_status');
-  if(!el) return;
-  el.textContent=msg; el.className='import-status '+(cls||'');
+  if(el){ el.textContent=msg; el.className='import-status '+(cls||''); }
 }
 
 function populateFromItems(items){
-  // items: [{name, qty}]
   var matched=[], skipped=[];
   items.forEach(function(it){
     var idx=ORE_NAME_IDX[it.name.toLowerCase()];
     if(idx!=null) matched.push({idx:idx, qty:it.qty});
     else skipped.push(it.name);
   });
-  if(!matched.length){ setImportStatus('No matching ores/minerals found. Check names.','err'); return; }
-  // Clear existing rows then add matched ones
+  if(!matched.length){ setImportStatus('No matching ores or minerals found — check item names.','err'); return; }
   document.getElementById('load_body').innerHTML='';
   rowId=0;
   matched.forEach(function(m){ addRow(m.idx, m.qty); });
@@ -742,51 +721,17 @@ function populateFromItems(items){
   setImportStatus(msg, skipped.length?'err':'ok');
 }
 
-function parseTextList(text){
+function doImport(){
+  var raw=document.getElementById('import_text').value.trim();
+  if(!raw){ setImportStatus('Paste an item list first.','err'); return; }
   var items=[];
-  text.split(/\n/).forEach(function(line){
+  raw.split(/\n/).forEach(function(line){
     line=line.trim(); if(!line) return;
-    // Format: "Item Name 12345" or "Item Name\t12345"
     var m=line.match(/^(.+?)[\t ]+([0-9,]+)\s*$/);
     if(m) items.push({name:m[1].trim(), qty:parseInt(m[2].replace(/,/g,''))||0});
   });
-  return items;
-}
-
-function doImport(){
-  var raw=document.getElementById('import_text').value.trim();
-  if(!raw){ setImportStatus('Paste a Janice link or item list first.','err'); return; }
-
-  // Check if it's a Janice URL
-  var codeMatch=raw.match(/janice\.e-351\.com\/a\/([A-Za-z0-9]+)/);
-  if(codeMatch){
-    var code=codeMatch[1];
-    var apiKey=document.getElementById('janice_api_key').value.trim()||'G9KwKq3465588VPd6747t95Zh94q3W2E';
-    var apiUrl='https://janice.e-351.com/api/rest/v2/appraisal/'+code;
-    var proxyUrl='https://corsproxy.io/?url='+encodeURIComponent(apiUrl);
-    setImportStatus('Fetching from Janice\u2026','');
-    fetch(proxyUrl, {headers:{'X-ApiKey': apiKey}})
-    .then(function(r){
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      return r.json();
-    })
-    .then(function(data){
-      // corsproxy wraps response; unwrap if needed
-      var payload = data.contents ? JSON.parse(data.contents) : data;
-      var items=(payload.items||[]).map(function(it){
-        return {name: it.itemType.name, qty: it.amount};
-      });
-      populateFromItems(items);
-    })
-    .catch(function(e){
-      setImportStatus('Could not fetch Janice link: '+e.message+'. Try pasting the item list as plain text instead.','err');
-    });
-  } else {
-    // Plain text
-    var items=parseTextList(raw);
-    if(!items.length){ setImportStatus('Could not parse any items. Use format: ItemName Quantity (one per line).','err'); return; }
-    populateFromItems(items);
-  }
+  if(!items.length){ setImportStatus('Could not parse any items. Use format: Item Name  Quantity (one per line).','err'); return; }
+  populateFromItems(items);
 }
 
 function clearLoad(){
@@ -943,7 +888,6 @@ function recalcAll() {
   saveState();
 }
 
-loadApiKey();
 loadState();
 </script>
 </body>
