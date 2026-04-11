@@ -463,46 +463,6 @@ const BPC_DATA = [
     "subcategory": "Capital Ship"
   },
   {
-    "typeId": 21036,
-    "name": "Capital Computer System Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 1,
-    "quantity": 1,
-    "category": "Components",
-    "subcategory": "Capital Ship"
-  },
-  {
-    "typeId": 21036,
-    "name": "Capital Computer System Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 5,
-    "quantity": 2,
-    "category": "Components",
-    "subcategory": "Capital Ship"
-  },
-  {
-    "typeId": 21036,
-    "name": "Capital Computer System Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 9,
-    "quantity": 1,
-    "category": "Components",
-    "subcategory": "Capital Ship"
-  },
-  {
-    "typeId": 21036,
-    "name": "Capital Computer System Blueprint",
-    "me": 10,
-    "te": 20,
-    "runs": 10,
-    "quantity": 1,
-    "category": "Components",
-    "subcategory": "Capital Ship"
-  },
-  {
     "typeId": 21038,
     "name": "Capital Construction Parts Blueprint",
     "me": 10,
