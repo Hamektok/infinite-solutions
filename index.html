@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202604101812"></script>
+    <script src="buyback_data.js?v=202604101552"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -2000,7 +2000,7 @@
             display: flex;
             gap: 20px;
             align-items: stretch;
-            margin-top: 35px;
+            margin-top: 20px;
             min-height: 520px;
         }
 
@@ -2138,6 +2138,107 @@
 
         .prices-freshness.stale { color: #8a6a20; }
 
+        /* ---- Program Details Bar ---- */
+        .buyback-program-bar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: linear-gradient(135deg, rgba(0,50,80,0.4), rgba(0,30,50,0.6));
+            border: 1px solid rgba(0,217,255,0.25);
+            border-radius: 8px;
+            padding: 12px 20px;
+            flex-wrap: wrap;
+            row-gap: 10px;
+        }
+        .program-bar-item {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 130px;
+            gap: 3px;
+        }
+        .program-bar-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 11px;
+            color: #4a8aa0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .program-bar-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #00ffff;
+        }
+        .program-bar-divider {
+            width: 1px;
+            height: 36px;
+            background: rgba(0,217,255,0.15);
+            margin: 0 16px;
+            align-self: center;
+            flex-shrink: 0;
+        }
+
+        /* ---- Location Selector ---- */
+        .buyback-location-selector {
+            margin-top: 20px;
+            margin-bottom: 4px;
+        }
+        .location-selector-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #4a8aa0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .location-btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .location-btn {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #6ab0c8;
+            background: rgba(0,30,50,0.5);
+            border: 1px solid rgba(0,217,255,0.2);
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-align: left;
+        }
+        .location-btn:hover {
+            border-color: rgba(0,217,255,0.5);
+            color: #a0d8f0;
+            background: rgba(0,50,80,0.5);
+        }
+        .location-btn.active {
+            border-color: rgba(0,217,255,0.8);
+            background: rgba(0,60,100,0.5);
+            color: #00ffff;
+            box-shadow: 0 0 12px rgba(0,217,255,0.15);
+        }
+        .location-btn-region {
+            font-size: 11px;
+            font-weight: 400;
+            color: #4a8aa0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .location-btn.active .location-btn-region { color: #5ab0c8; }
+        @media (max-width: 768px) {
+            .program-bar-divider { display: none; }
+            .buyback-program-bar { flex-direction: column; align-items: flex-start; }
+            .location-btn { width: 100%; }
+        }
+
         /* Per-item breakdown tooltip */
         .price-tooltip {
             display: none;
@@ -2210,7 +2311,7 @@
             <div class="main-tabs">
                 <button class="main-tab active" onclick="showMainTab('market')">Materials & Resources Market</button>
                 <button class="main-tab" onclick="window.open('https://1337servers.com/blueprints/','_blank')" title="Created by Aldent Rendrag">Infinite Directive Blueprint Registry ↗</button>
-                <!-- <button class="main-tab" onclick="showMainTab('buyback')">Buyback Program</button> -->
+                <button class="main-tab" onclick="showMainTab('buyback')">Buyback Program</button>
                 <!-- <button class="main-tab" onclick="window.location='sig_store.html'" style="color:#ff8855;border-bottom-color:#ff4444;">⚔ Corp SIG Store</button> -->
             </div>
 
@@ -2496,21 +2597,33 @@
         <div id="buyback-tab" class="tab-content">
             <div class="content">
 
-                <!-- What We're Buying - Rates -->
-                <div class="buyback-section-header">What We're Buying</div>
-
-                <div class="rate-grid" id="buybackRateGrid">
-                    <!-- Program Info card -->
-                    <div class="buyback-info-card">
-                        <div class="rate-card-title">Program Details</div>
-                        <div class="buyback-info-text">
-                            Sell your <strong>minerals, ice products, and reaction materials</strong> directly to Infinite Solutions.<br><br>
-                            Rates based on <strong>7-day average Jita buy value</strong> — stable and resistant to market manipulation.<br><br>
-                            Contract to <strong>Rax Hakaari</strong> at the <strong>LX-ZOJ Tatara</strong>.<br><br>
-                            Payouts within <strong>24 hours</strong>.
-                        </div>
+                <!-- Program Details Bar (compact horizontal) -->
+                <div class="buyback-program-bar">
+                    <div class="program-bar-item">
+                        <span class="program-bar-label">Buying</span>
+                        <span class="program-bar-value">Minerals, Ice, Reaction Materials &amp; more</span>
                     </div>
-                    <!-- Category cards rendered dynamically by JS -->
+                    <div class="program-bar-divider"></div>
+                    <div class="program-bar-item">
+                        <span class="program-bar-label">Pricing</span>
+                        <span class="program-bar-value">Latest Jita buy snapshot</span>
+                    </div>
+                    <div class="program-bar-divider"></div>
+                    <div class="program-bar-item">
+                        <span class="program-bar-label">Contract To</span>
+                        <span class="program-bar-value" id="programBarRecipient">Rax Hakaari</span>
+                    </div>
+                    <div class="program-bar-divider"></div>
+                    <div class="program-bar-item">
+                        <span class="program-bar-label">Payout</span>
+                        <span class="program-bar-value">Within 24 hours</span>
+                    </div>
+                </div>
+
+                <!-- Location Selector -->
+                <div class="buyback-location-selector">
+                    <div class="location-selector-label">Select Pickup Location</div>
+                    <div class="location-btn-group" id="locationBtnGroup"></div>
                 </div>
 
                 <!-- Three-column quote layout -->
@@ -2581,7 +2694,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                                 </div>
                                 <div class="contract-step">
                                     <span class="step-num">2</span>
-                                    <span>Set type to <strong>Item Exchange</strong>, availability to <strong>Private</strong>, and search for <strong style="color:#00ffff;">Rax Hakaari</strong>.</span>
+                                    <span>Set type to <strong>Item Exchange</strong>, availability to <strong>Private</strong>, and search for <strong style="color:#00ffff;" id="contractRecipientName">Rax Hakaari</strong>.</span>
                                 </div>
                                 <div class="contract-step">
                                     <span class="step-num">3</span>
@@ -2620,7 +2733,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 </div><!-- end buyback-quote-row -->
 
                 <div class="footer" style="text-align:center; margin-top:40px; padding-top:20px; border-top:1px solid rgba(0,217,255,0.1);">
-                    <div style="font-size:16px; color:#4a8aa0;">Contract items to <span style="color:#00d9ff; font-weight:600;">Rax Hakaari</span> at <span style="color:#00d9ff; font-weight:600;">LX-ZOJ Tatara</span> | Payouts within 24 hours</div>
+                    <div style="font-size:16px; color:#4a8aa0;">Contract items to <span style="color:#00d9ff; font-weight:600;" id="footerRecipientName">Rax Hakaari</span> at <span style="color:#00d9ff; font-weight:600;" id="footerStationName">G06-8Y Tenal Trade Tower</span> | Payouts within 24 hours</div>
                 </div>
             </div>
         </div>
@@ -3246,7 +3359,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 10, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 10, 2026 20:08 EVE"
+            "inventoryLastUpdated": "Apr 11, 2026 02:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -6884,6 +6997,56 @@ Tip: Copy directly from EVE inventory window"></textarea>
             });
         }
 
+        // ── Buyback Location System ───────────────────────────────────────────
+        const BUYBACK_LOCATIONS = [
+            {
+                id: 'tenal-trade-tower',
+                displayName: 'G06-8Y — Tenal Trade Tower',
+                region: 'Tenal',
+                recipient: 'Rax Hakaari',
+                stationName: 'G06-8Y Tenal Trade Tower',
+            },
+            // Add future locations here:
+            // { id: 'example', displayName: 'System — Station Name', region: 'Region', recipient: 'Character', stationName: 'Station Name' },
+        ];
+
+        let activeLocationId = BUYBACK_LOCATIONS[0].id;
+
+        function getActiveLocation() {
+            return BUYBACK_LOCATIONS.find(l => l.id === activeLocationId) || BUYBACK_LOCATIONS[0];
+        }
+
+        function renderLocationButtons() {
+            const group = document.getElementById('locationBtnGroup');
+            if (!group) return;
+            group.innerHTML = '';
+            BUYBACK_LOCATIONS.forEach(loc => {
+                const btn = document.createElement('button');
+                btn.className = 'location-btn' + (loc.id === activeLocationId ? ' active' : '');
+                btn.innerHTML = loc.displayName + '<span class="location-btn-region">' + loc.region + '</span>';
+                btn.onclick = () => selectLocation(loc.id);
+                group.appendChild(btn);
+            });
+        }
+
+        function selectLocation(locId) {
+            activeLocationId = locId;
+            renderLocationButtons();
+            updateLocationDependentUI();
+        }
+
+        function updateLocationDependentUI() {
+            const loc = getActiveLocation();
+            const pbr = document.getElementById('programBarRecipient');
+            if (pbr) pbr.textContent = loc.recipient;
+            const crn = document.getElementById('contractRecipientName');
+            if (crn) crn.textContent = loc.recipient;
+            const frn = document.getElementById('footerRecipientName');
+            if (frn) frn.textContent = loc.recipient;
+            const fsn = document.getElementById('footerStationName');
+            if (fsn) fsn.textContent = loc.stationName;
+        }
+
         function initPricesFreshness() {
             const el = document.getElementById('pricesFreshness');
             if (!el || typeof BUYBACK_DATA === 'undefined' || !BUYBACK_DATA.generated) return;
@@ -6949,7 +7112,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
             loadBPCData();  // Load BPC data for BPC tab
             loadResearchJobs();
             loadLastUpdated();
-            renderBuybackRateCards();
+            renderLocationButtons();
+            updateLocationDependentUI();
             initPricesFreshness();
             loadBuybackFromHash();
 

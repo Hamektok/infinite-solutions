@@ -490,9 +490,12 @@ def commit_and_push_to_github(snapshot_time):
 _stash_was_created = False
 
 
+STASH_MSG = 'inventory-script-autostash'
+
 def ensure_main_branch():
     """Switch to main branch before making any changes (GitHub Pages builds from main).
-    Stashes tracked changes first so checkout succeeds on a dirty dev branch.
+    Stashes only tracked modified files (not untracked) using a named message so
+    restore_branch() can find and pop exactly this stash by name.
     Returns the original branch name so the caller can restore it afterward."""
     import subprocess
     global _stash_was_created
@@ -500,60 +503,48 @@ def ensure_main_branch():
     try:
         current_branch = subprocess.run(
             ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-            cwd=PROJECT_DIR,
-            capture_output=True,
-            text=True
-        )
-        branch_name = current_branch.stdout.strip()
+            cwd=PROJECT_DIR, capture_output=True, text=True
+        ).stdout.strip()
 
-        if branch_name != 'main':
-            # Count stashes before so we know if we created a new one
-            before = subprocess.run(
-                ['git', 'stash', 'list'],
+        if current_branch != 'main':
+            # Check for tracked modified files only (ignore untracked)
+            dirty = subprocess.run(
+                ['git', 'status', '--porcelain'],
                 cwd=PROJECT_DIR, capture_output=True, text=True
-            ).stdout.strip()
-            before_count = len(before.splitlines()) if before else 0
+            ).stdout
+            tracked_dirty = [l for l in dirty.splitlines() if l[:2].strip() and not l.startswith('??')]
 
-            subprocess.run(
-                ['git', 'stash', '--quiet'],
-                cwd=PROJECT_DIR, capture_output=True, text=True
-            )
+            if tracked_dirty:
+                print(f"[!] On '{current_branch}' with {len(tracked_dirty)} modified tracked file(s) — stashing...")
+                subprocess.run(
+                    ['git', 'stash', 'push', '--message', STASH_MSG],
+                    cwd=PROJECT_DIR, check=True, capture_output=True
+                )
+                _stash_was_created = True
+                print("[OK] Changes stashed")
 
-            after = subprocess.run(
-                ['git', 'stash', 'list'],
-                cwd=PROJECT_DIR, capture_output=True, text=True
-            ).stdout.strip()
-            after_count = len(after.splitlines()) if after else 0
-            _stash_was_created = after_count > before_count
-
-            print(f"[!] Currently on '{branch_name}' branch, switching to main...")
+            print(f"[!] Switching from '{current_branch}' to main...")
             subprocess.run(
                 ['git', 'checkout', 'main'],
-                cwd=PROJECT_DIR,
-                check=True,
-                capture_output=True
+                cwd=PROJECT_DIR, check=True, capture_output=True
             )
             print("[OK] Switched to main branch")
         else:
             print("[OK] Already on main branch")
-        return branch_name
+        return current_branch
     except Exception as e:
         print(f"[ERROR] Could not switch to main branch: {e}")
         return 'main'
 
 
 def restore_branch(original_branch):
-    """Switch back to the branch that was active before ensure_main_branch()
-    and pop the stash if one was created."""
+    """Switch back to the branch active before ensure_main_branch() and pop the named stash."""
     import subprocess
-    global _stash_was_created
     if original_branch and original_branch != 'main':
         try:
             subprocess.run(
                 ['git', 'checkout', original_branch],
-                cwd=PROJECT_DIR,
-                check=True,
-                capture_output=True
+                cwd=PROJECT_DIR, check=True, capture_output=True
             )
             print(f"[OK] Restored to '{original_branch}' branch")
         except Exception as e:
@@ -561,14 +552,24 @@ def restore_branch(original_branch):
 
     if _stash_was_created:
         try:
-            subprocess.run(
-                ['git', 'stash', 'pop'],
-                cwd=PROJECT_DIR,
-                check=True,
-                capture_output=True
-            )
-            print("[OK] Stash popped (dev changes restored)")
-            _stash_was_created = False
+            # Find our specific stash by message so we never pop the wrong one
+            stash_list = subprocess.run(
+                ['git', 'stash', 'list'],
+                cwd=PROJECT_DIR, capture_output=True, text=True
+            ).stdout
+            stash_ref = None
+            for line in stash_list.splitlines():
+                if STASH_MSG in line:
+                    stash_ref = line.split(':')[0]  # e.g. "stash@{0}"
+                    break
+            if stash_ref:
+                subprocess.run(
+                    ['git', 'stash', 'pop', stash_ref],
+                    cwd=PROJECT_DIR, check=True, capture_output=True
+                )
+                print("[OK] Stash popped — dev changes restored")
+            else:
+                print("[WARN] Named stash not found — may have already been popped")
         except Exception as e:
             print(f"[WARN] Could not pop stash: {e}")
 
