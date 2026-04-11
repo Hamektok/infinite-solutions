@@ -680,10 +680,9 @@ function doImport(){
   var raw=document.getElementById('import_text').value.trim();
   if(!raw){ setImportStatus('Paste an item list first.','err'); return; }
   var items=[];
-  raw.split(/
-/).forEach(function(line){
+  raw.split('\n').forEach(function(line){
     line=line.trim(); if(!line) return;
-    var m=line.match(/^(.+?)[	 ]+([0-9,]+)\s*$/);
+    var m=line.match(/^(.+?)[\t ]+([0-9,]+)[\s]*$/);
     if(m) items.push({name:m[1].trim(), qty:parseInt(m[2].replace(/,/g,''))||0});
   });
   if(!items.length){ setImportStatus('Could not parse any items. Use format: Item Name  Quantity (one per line).','err'); return; }
