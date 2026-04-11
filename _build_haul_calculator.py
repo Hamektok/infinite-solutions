@@ -1,12 +1,11 @@
 """
-Build haul_calculator.html — standalone jump-freight hauling fee calculator.
-Same visual design as ore_haul_calculator.html.
-No DB queries required: only needs the Vale systems list and isotope prices.
+Build haul_calculator.html — jump-freight admin fee calculator.
+Admin sets trip parameters; inputs are volume (m³) and collateral (ISK).
+Fee = (fuel recovery/m³ + flat markup/m³) × volume + collateral% × collateral
 """
 import json
 from datetime import datetime, timezone
 
-# ── Vale of the Silent systems with LY distance from 4-HWWF ─────────────────
 VALE_SYSTEMS = [
     ('4-HWWF', 0),     ('PM-DWE', 0.893), ('4GYV-Q', 0.937), ('EIDI-N', 1.023),
     ('YMJG-4', 1.136), ('DAYP-G', 1.356), ('WBR5-R', 1.443), ('8TPX-N', 1.491),
@@ -62,13 +61,13 @@ html = f"""<!DOCTYPE html>
 *{{box-sizing:border-box;margin:0;padding:0;}}
 body{{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;
   padding:20px 14px 48px;display:flex;justify-content:center;}}
-.page{{width:100%;max-width:900px;}}
+.page{{width:100%;max-width:780px;}}
 .hdr{{text-align:center;margin-bottom:18px;}}
 .hdr h1{{font-family:'Orbitron',sans-serif;font-size:1.5em;font-weight:900;letter-spacing:4px;
   background:linear-gradient(135deg,#ff9944,#ffcc44);-webkit-background-clip:text;
   -webkit-text-fill-color:transparent;background-clip:text;}}
 .hdr .sub{{color:var(--dim);font-size:.85em;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}}
-.back-link{{display:inline-block;margin-bottom:12px;color:var(--dim);font-size:.85em;text-decoration:none;letter-spacing:1px;}}
+.back-link{{display:inline-block;color:var(--dim);font-size:.85em;text-decoration:none;letter-spacing:1px;}}
 .back-link:hover{{color:var(--text);}}
 .panel{{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:12px;}}
 .panel-title{{font-family:'Orbitron',sans-serif;font-size:.67em;font-weight:700;letter-spacing:2px;
@@ -82,55 +81,32 @@ select,input[type="number"]{{background:var(--panel2);border:1px solid var(--bor
 select:focus,input[type="number"]:focus{{border-color:var(--accent);}}
 .unit{{color:var(--dim);font-size:.87em;}}
 .iv{{color:var(--accent2);font-weight:700;font-size:.93em;}}
-hr.div{{border:none;border-top:1px solid var(--border);margin:10px 0;}}
-.tbl-wrap{{overflow-x:auto;}}
-table{{width:100%;border-collapse:collapse;font-size:.88em;}}
-thead th{{background:var(--panel2);color:var(--dim);font-size:.72em;letter-spacing:1px;text-transform:uppercase;
-  padding:8px 9px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}}
-tbody td{{padding:6px 9px;border-bottom:1px solid var(--border);vertical-align:middle;}}
-tbody tr:last-child td{{border-bottom:none;}}
-tbody tr:hover{{background:rgba(255,255,255,.02);}}
-.td-num input{{width:100px;font-size:.86em;padding:4px 6px;}}
-.td-name input{{min-width:200px;font-size:.86em;padding:4px 6px;background:var(--panel2);
-  border:1px solid var(--border);border-radius:4px;color:var(--text);
-  font-family:'Rajdhani',sans-serif;font-weight:600;outline:none;}}
-.td-name input:focus{{border-color:var(--accent);}}
-.td-c{{font-family:'Orbitron',sans-serif;font-size:.8em;font-weight:700;white-space:nowrap;}}
-.td-dim{{color:var(--dim);font-size:.8em;font-family:'Rajdhani',sans-serif;font-weight:600;white-space:nowrap;}}
-.del-btn{{background:rgba(255,60,60,.12);border:1px solid rgba(255,60,60,.25);border-radius:4px;
-  color:#ff7777;cursor:pointer;font-size:.82em;font-weight:700;padding:2px 7px;transition:all .12s;}}
-.del-btn:hover{{background:rgba(255,60,60,.28);}}
-.add-row-btn{{background:rgba(255,140,50,.07);border:1px dashed var(--border-o);border-radius:4px;
-  color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:.88em;font-weight:700;
-  padding:8px 0;cursor:pointer;width:100%;margin-top:7px;transition:all .12s;}}
-.add-row-btn:hover{{background:rgba(255,140,50,.15);}}
-.sum-bar{{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px;}}
-.sb{{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:8px 6px;text-align:center;}}
-.sb.profit{{border-color:var(--border-o);background:rgba(255,140,50,.06);}}
-.sb-lbl{{font-size:.65em;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}}
+hr.div{{border:none;border-top:1px solid var(--border);margin:12px 0;}}
+.sum-bar{{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px;}}
+.sb{{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 8px;text-align:center;}}
+.sb.hi{{border-color:var(--border-o);background:rgba(255,140,50,.06);}}
+.sb-lbl{{font-size:.65em;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}}
 .sb-val{{font-family:'Orbitron',sans-serif;font-size:.88em;font-weight:700;}}
-.sb-val.green{{color:var(--green);}}.sb-val.gold{{color:var(--gold);}}.sb-val.lg{{font-size:1.2em;}}
-.sb-sub{{font-size:.78em;color:var(--dim);margin-top:2px;}}
+.sb-val.green{{color:var(--green);}}.sb-val.gold{{color:var(--gold);}}.sb-val.lg{{font-size:1.15em;}}
+.sb-sub{{font-size:.78em;color:var(--dim);margin-top:3px;}}
+.be-card{{background:rgba(68,170,255,.04);border:1px solid rgba(68,170,255,.18);
+  border-radius:6px;padding:12px 16px;margin-top:10px;}}
+.be-title{{font-family:'Orbitron',sans-serif;font-size:.63em;letter-spacing:2px;
+  text-transform:uppercase;color:var(--blue);margin-bottom:8px;}}
+.be-row{{display:flex;justify-content:space-between;align-items:center;font-size:.9em;margin-bottom:4px;}}
+.be-row:last-child{{margin-bottom:0;}}
+.be-lbl{{color:var(--dim);}}
+.be-val{{font-family:'Orbitron',sans-serif;font-size:.85em;font-weight:700;color:var(--text);}}
+.be-val.hi{{color:var(--blue);}}.be-val.green{{color:var(--green);}}.be-val.gold{{color:var(--gold);}}
 .footer{{text-align:center;color:var(--dim);font-size:.76em;margin-top:20px;
   padding-top:12px;border-top:1px solid var(--border);}}
-.import-row{{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px;}}
-.import-row textarea{{flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--border);
-  border-radius:4px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.93em;
-  padding:7px 10px;resize:vertical;min-height:60px;outline:none;}}
-.import-row textarea:focus{{border-color:var(--accent);}}
-.import-btn{{background:rgba(255,140,50,.12);border:1px solid var(--border-o);border-radius:4px;
-  color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:.9em;font-weight:700;
-  padding:8px 18px;cursor:pointer;white-space:nowrap;transition:all .12s;align-self:flex-start;}}
-.import-btn:hover{{background:rgba(255,140,50,.25);}}
-.import-status{{font-size:.83em;margin-top:4px;min-height:1.2em;}}
-.import-status.ok{{color:var(--green);}}.import-status.err{{color:var(--red);}}
 </style>
 </head>
 <body>
 <div class="page">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-  <a class="back-link" style="margin-bottom:0" href="index.html">&#8592; Industrial Market</a>
-  <a class="back-link" style="margin-bottom:0" href="ore_haul_calculator.html">Ore Haul Calculator &#8594;</a>
+  <a class="back-link" href="index.html">&#8592; Industrial Market</a>
+  <a class="back-link" href="ore_haul_calculator.html">Ore Haul Calculator &#8594;</a>
 </div>
 <div class="hdr">
   <h1>HAUL CALCULATOR</h1>
@@ -139,13 +115,12 @@ tbody tr:hover{{background:rgba(255,255,255,.02);}}
 
 <div class="panel">
   <div class="panel-title">Trip Parameters</div>
-
   <div class="form-row">
     <label>Pickup System</label>
     <select id="sys_sel" onchange="recalc()" style="min-width:200px">
 {systems_options}
     </select>
-    <span class="unit" id="sys_dist_note">&mdash;</span>
+    <span class="iv" id="sys_dist_note">&mdash;</span>
   </div>
   <div class="form-row">
     <label>Trip</label>
@@ -166,7 +141,7 @@ tbody tr:hover{{background:rgba(255,255,255,.02);}}
   <div class="form-row">
     <label>Fuel per LY</label>
     <input type="number" id="fuel_per_ly" value="0" min="0" step="100" oninput="recalc()" style="width:110px">
-    <span class="unit">isotopes/LY</span>
+    <span class="unit">isotopes / LY &nbsp;&nbsp;</span>
     <span class="iv" id="iso_calc_note">&mdash;</span>
   </div>
 
@@ -175,49 +150,67 @@ tbody tr:hover{{background:rgba(255,255,255,.02);}}
   <div class="form-row">
     <label>Flat Markup</label>
     <input type="number" id="fee_flat" min="0" step="1" value="0" oninput="recalc()" style="width:110px">
-    <span class="unit">ISK/m&#179; &nbsp;<span style="font-size:.8em">(added on top of fuel recovery)</span></span>
+    <span class="unit">ISK / m&#179; &nbsp;<span style="font-size:.82em">(on top of fuel recovery)</span></span>
   </div>
-
+  <div class="form-row">
+    <label>Collateral Fee</label>
+    <input type="number" id="coll_pct" min="0" max="10" step="0.01" value="0" oninput="recalc()" style="width:90px">
+    <span class="unit">% of collateral</span>
+  </div>
   <div class="form-row">
     <label>Ship Capacity</label>
     <input type="number" id="ship_cap" min="0" step="1000" value="0" oninput="recalc()" style="width:120px">
-    <span class="unit">m&#179; &nbsp;<span style="font-size:.8em">(optional — used to show trips needed)</span></span>
+    <span class="unit">m&#179; &nbsp;<span style="font-size:.82em">(optional &mdash; shows trips needed)</span></span>
   </div>
 </div>
 
 <div class="panel">
-  <div class="panel-title">Import Cargo List</div>
-  <div class="import-row">
-    <textarea id="import_text" placeholder="Paste item list from EVE (one item per line):&#10;Compressed Hezorime&#9;6000000&#10;Veldspar&#9;1000000&#10;Or just a total volume in m&#179;"></textarea>
-    <div style="display:flex;flex-direction:column;gap:6px">
-      <button class="import-btn" onclick="doImport()">&#9654; Import</button>
-      <button class="import-btn" style="background:rgba(255,60,60,.1);border-color:rgba(255,60,60,.3);color:#ff7777" onclick="clearLoad()">&#x2715; Clear</button>
-    </div>
+  <div class="panel-title">Cargo</div>
+  <div class="form-row">
+    <label>Volume</label>
+    <input type="number" id="cargo_vol" min="0" step="1" value="0" oninput="recalc()" style="width:150px">
+    <span class="unit">m&#179;</span>
   </div>
-  <div id="import_status" class="import-status"></div>
-</div>
+  <div class="form-row">
+    <label>Collateral</label>
+    <input type="number" id="cargo_coll" min="0" step="1000000" value="0" oninput="recalc()" style="width:180px">
+    <span class="unit">ISK</span>
+  </div>
 
-<div class="panel">
-  <div class="panel-title">Cargo &mdash; Enter Items &amp; Volumes</div>
-  <div class="tbl-wrap">
-  <table>
-    <thead><tr>
-      <th style="min-width:220px">Item / Description</th>
-      <th style="min-width:120px">Volume (m&#179;)</th>
-      <th style="min-width:130px">Fuel Cost</th>
-      <th style="min-width:110px">Fee (incl. markup)</th>
-      <th></th>
-    </tr></thead>
-    <tbody id="load_body"></tbody>
-  </table>
-  </div>
-  <button class="add-row-btn" onclick="addRow()">+ Add Cargo</button>
+  <hr class="div">
 
   <div class="sum-bar">
-    <div class="sb"><div class="sb-lbl">Total Volume</div><div class="sb-val gold" id="s_vol">&mdash;</div><div class="sb-sub" id="s_trips">&nbsp;</div></div>
-    <div class="sb"><div class="sb-lbl">Isotopes Used</div><div class="sb-val" id="s_iso">&mdash;</div><div class="sb-sub" id="s_iso_sub">&nbsp;</div></div>
-    <div class="sb"><div class="sb-lbl">Fuel Cost (ISK)</div><div class="sb-val" id="s_fuel">&mdash;</div><div class="sb-sub" id="s_rate_sub">&nbsp;</div></div>
-    <div class="sb profit"><div class="sb-lbl">Total Fee to Charge</div><div class="sb-val lg green" id="s_fee">&mdash;</div><div class="sb-sub" id="s_fee_sub">&nbsp;</div></div>
+    <div class="sb">
+      <div class="sb-lbl">Isotopes Used</div>
+      <div class="sb-val" id="s_iso">&mdash;</div>
+      <div class="sb-sub" id="s_iso_sub">&nbsp;</div>
+    </div>
+    <div class="sb">
+      <div class="sb-lbl">Fuel Cost</div>
+      <div class="sb-val gold" id="s_fuel">&mdash;</div>
+      <div class="sb-sub" id="s_fuel_sub">&nbsp;</div>
+    </div>
+    <div class="sb">
+      <div class="sb-lbl">Trips Needed</div>
+      <div class="sb-val" id="s_trips">&mdash;</div>
+      <div class="sb-sub" id="s_trips_sub">&nbsp;</div>
+    </div>
+    <div class="sb hi">
+      <div class="sb-lbl">Total Fee</div>
+      <div class="sb-val lg green" id="s_fee">&mdash;</div>
+      <div class="sb-sub" id="s_fee_sub">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="be-card" id="breakdown_card" style="display:none">
+    <div class="be-title">Fee Breakdown</div>
+    <div class="be-row"><span class="be-lbl">Fuel recovery</span><span class="be-val" id="b_fuel">&mdash;</span></div>
+    <div class="be-row"><span class="be-lbl">Flat markup</span><span class="be-val" id="b_flat">&mdash;</span></div>
+    <div class="be-row"><span class="be-lbl">Collateral fee</span><span class="be-val" id="b_coll">&mdash;</span></div>
+    <div class="be-row" style="border-top:1px solid rgba(68,170,255,.15);margin-top:6px;padding-top:6px">
+      <span class="be-lbl">Total fee</span><span class="be-val hi" id="b_total">&mdash;</span>
+    </div>
+    <div class="be-row"><span class="be-lbl">Effective ISK / m&#179;</span><span class="be-val gold" id="b_rate">&mdash;</span></div>
   </div>
 </div>
 
@@ -228,51 +221,13 @@ tbody tr:hover{{background:rgba(255,255,255,.02);}}
 <script>
 const SYSTEMS = {systems_js};
 
-var rowId = 0;
-
-function addRow(name, vol) {{
-  name = name || '';
-  vol  = vol  != null ? vol : 0;
-  var id = ++rowId;
-  var tr = document.createElement('tr');
-  tr.id = 'row_'+id;
-  tr.innerHTML =
-    '<td class="td-name"><input type="text" id="rn_'+id+'" value="'+escHtml(name)+'" placeholder="Item name (optional)" oninput="recalc();saveState()"></td>' +
-    '<td class="td-num"><input type="number" id="rv_'+id+'" value="'+vol+'" min="0" step="1" oninput="recalc();saveState()"></td>' +
-    '<td class="td-c" id="rc_'+id+'">&mdash;</td>' +
-    '<td class="td-c" id="rf_'+id+'">&mdash;</td>' +
-    '<td><button class="del-btn" onclick="delRow('+id+')">&#x2715;</button></td>';
-  document.getElementById('load_body').appendChild(tr);
-  recalc();
-  saveState();
-}}
-
-function delRow(id) {{
-  var tr = document.getElementById('row_'+id);
-  if (tr) tr.remove();
-  recalc();
-  saveState();
-}}
-
-function clearLoad() {{
-  document.getElementById('load_body').innerHTML = '';
-  rowId = 0;
-  addRow();
-  document.getElementById('import_status').textContent = '';
-  saveState();
-}}
-
-function escHtml(s) {{
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}}
-
 function fmt(n,d) {{ d=d||0; return isFinite(n)?n.toLocaleString(undefined,{{minimumFractionDigits:d,maximumFractionDigits:d}}):'\u2014'; }}
 function fmtB(n) {{
-  var a=Math.abs(n),s=n<0?'-':'';
+  var a=Math.abs(n), s=n<0?'-':'';
   if(a>=1e9) return s+(a/1e9).toFixed(3)+'B';
-  if(a>=1e6) return s+(a/1e6).toFixed(1)+'M';
+  if(a>=1e6) return s+(a/1e6).toFixed(2)+'M';
   if(a>=1e3) return s+(a/1e3).toFixed(0)+'k';
-  return s+fmt(a);
+  return s+fmt(a,0);
 }}
 
 function getSysLy() {{
@@ -282,139 +237,83 @@ function getSysLy() {{
 function getIsoQty() {{
   var ly   = getSysLy();
   var fpl  = parseFloat(document.getElementById('fuel_per_ly').value)||0;
-  var mult = document.getElementById('trip_type').value === 'round' ? 2 : 1;
+  var mult = document.getElementById('trip_type').value==='round' ? 2 : 1;
   return ly * fpl * mult;
-}}
-function getTotalFuelCost() {{
-  return getIsoQty() * (parseFloat(document.getElementById('iso_type').value)||0);
 }}
 
 function recalc() {{
-  var isoQty    = getIsoQty();
-  var fuelCost  = getTotalFuelCost();
+  var isoQty   = getIsoQty();
+  var isoPrice = parseFloat(document.getElementById('iso_type').value)||0;
+  var fuelCost = isoQty * isoPrice;
+
+  var vol      = parseFloat(document.getElementById('cargo_vol').value)||0;
+  var coll     = parseFloat(document.getElementById('cargo_coll').value)||0;
   var flatPerM3 = parseFloat(document.getElementById('fee_flat').value)||0;
+  var collPct   = parseFloat(document.getElementById('coll_pct').value)||0;
   var shipCap   = parseFloat(document.getElementById('ship_cap').value)||0;
 
-  // Collect rows
-  var rows = [];
-  document.querySelectorAll('#load_body tr').forEach(function(tr) {{
-    var id  = tr.id.replace('row_','');
-    var vol = parseFloat(document.getElementById('rv_'+id).value)||0;
-    rows.push({{id:id, vol:vol}});
-  }});
-
-  var totalVol = rows.reduce(function(s,r){{return s+r.vol;}},0);
-
-  // Fuel cost per m³ based on total load
-  var fuelPerM3 = totalVol > 0 ? fuelCost / totalVol : 0;
-  var feePerM3  = fuelPerM3 + flatPerM3;
-
-  // Update each row
-  rows.forEach(function(r) {{
-    var rowFuel = fuelPerM3 * r.vol;
-    var rowFee  = feePerM3  * r.vol;
-    var cel = document.getElementById('rc_'+r.id);
-    var fel = document.getElementById('rf_'+r.id);
-    if(cel) cel.textContent = r.vol > 0 ? fmtB(rowFuel)+' ISK' : '\u2014';
-    if(fel) fel.textContent = r.vol > 0 ? fmtB(rowFee)+' ISK'  : '\u2014';
-  }});
-
-  // System distance note
   var ly = getSysLy();
-  var distNote = document.getElementById('sys_dist_note');
-  if(distNote) distNote.textContent = ly > 0 ? ly.toFixed(3)+' ly from 4-HWWF' : '4-HWWF (hub)';
+  var distEl = document.getElementById('sys_dist_note');
+  distEl.textContent = ly > 0 ? ly.toFixed(3)+' ly from 4-HWWF' : '4-HWWF (hub)';
 
-  // Isotope calc note
-  var isoNote = document.getElementById('iso_calc_note');
-  if(isoNote) isoNote.textContent = isoQty > 0 ? fmt(Math.round(isoQty))+' isotopes' : '\u2014';
+  var isoEl = document.getElementById('iso_calc_note');
+  isoEl.textContent = isoQty > 0 ? fmt(Math.round(isoQty))+' isotopes' : '\u2014';
+
+  // Fee components
+  var fuelPerM3  = vol > 0 ? fuelCost / vol : 0;
+  var fuelFee    = fuelPerM3 * vol;           // = fuelCost when vol > 0
+  var flatFee    = flatPerM3 * vol;
+  var collFee    = coll * collPct / 100;
+  var totalFee   = fuelFee + flatFee + collFee;
+  var effPerM3   = vol > 0 ? totalFee / vol : 0;
+
+  var trips = (shipCap > 0 && vol > 0) ? Math.ceil(vol / shipCap) : 0;
 
   // Summary bar
-  var totalFee = feePerM3 * totalVol;
+  var isoSumEl = document.getElementById('s_iso');
+  isoSumEl.textContent = isoQty > 0 ? fmt(Math.round(isoQty)) : '\u2014';
+  document.getElementById('s_iso_sub').textContent = isoQty > 0 ? fmtB(fuelCost)+' ISK' : '';
 
-  var trips = (shipCap > 0 && totalVol > 0) ? Math.ceil(totalVol / shipCap) : 0;
-  var tripsEl = document.getElementById('s_trips');
-  if(tripsEl) tripsEl.textContent = trips > 0 ? trips+' trip'+(trips>1?'s':'')+' @ '+fmt(shipCap)+' m\u00B3' : '';
+  document.getElementById('s_fuel').textContent = vol > 0 ? fmtB(fuelCost)+' ISK' : '\u2014';
+  document.getElementById('s_fuel_sub').textContent = fuelPerM3 > 0 ? fmt(fuelPerM3,2)+' ISK/m\u00B3' : '';
 
-  document.getElementById('s_vol').textContent  = fmt(Math.round(totalVol))+' m\u00B3';
-  document.getElementById('s_iso').textContent  = isoQty > 0 ? fmt(Math.round(isoQty)) : '\u2014';
-  document.getElementById('s_iso_sub').textContent = isoQty > 0 ? fmtB(fuelCost)+' ISK total' : '';
-  document.getElementById('s_fuel').textContent = totalVol > 0 ? fmtB(fuelCost)+' ISK' : '\u2014';
-  document.getElementById('s_rate_sub').textContent = fuelPerM3 > 0 ? fmtB(fuelPerM3)+' ISK/m\u00B3' : '';
-  document.getElementById('s_fee').textContent  = totalVol > 0 ? fmtB(totalFee)+' ISK' : '\u2014';
-  document.getElementById('s_fee_sub').textContent  = feePerM3 > 0 ? fmt(feePerM3,2)+' ISK/m\u00B3' : '';
+  document.getElementById('s_trips').textContent = trips > 0 ? trips : (vol > 0 && shipCap === 0 ? '\u2014' : '\u2014');
+  document.getElementById('s_trips_sub').textContent = trips > 0 ? '@ '+fmt(shipCap)+' m\u00B3 cap' : '';
+
+  document.getElementById('s_fee').textContent = vol > 0 || coll > 0 ? fmtB(totalFee)+' ISK' : '\u2014';
+  document.getElementById('s_fee_sub').textContent = effPerM3 > 0 ? fmt(effPerM3,2)+' ISK/m\u00B3 eff.' : '';
+
+  // Breakdown card
+  var card = document.getElementById('breakdown_card');
+  if (vol > 0 || coll > 0) {{
+    card.style.display = 'block';
+    document.getElementById('b_fuel').textContent  = fmtB(fuelFee)+' ISK';
+    document.getElementById('b_flat').textContent  = fmtB(flatFee)+' ISK';
+    document.getElementById('b_coll').textContent  = fmtB(collFee)+' ISK';
+    document.getElementById('b_total').textContent = fmtB(totalFee)+' ISK';
+    document.getElementById('b_rate').textContent  = effPerM3 > 0 ? fmt(effPerM3,2)+' ISK/m\u00B3' : '\u2014';
+  }} else {{
+    card.style.display = 'none';
+  }}
 
   saveState();
 }}
 
-// ── Import parser ─────────────────────────────────────────────────────────
-function doImport() {{
-  var raw = document.getElementById('import_text').value.trim();
-  var statusEl = document.getElementById('import_status');
-  if (!raw) {{ statusEl.className='import-status err'; statusEl.textContent='Nothing to import.'; return; }}
-
-  var items = [];
-  raw.split('\\n').forEach(function(line) {{
-    line = line.trim();
-    if (!line) return;
-    // Tab-separated EVE format: Name<TAB>Qty<TAB>...
-    var parts = line.split('\\t');
-    if (parts.length >= 2) {{
-      var name = parts[0].trim();
-      var qty  = parts[1].replace(/,/g,'').trim();
-      if (name) items.push({{name: name, qty: qty}});
-    }} else {{
-      // Free-form: just a name or name + number
-      var m = line.match(/^(.+?)\\s+([0-9,]+)$/);
-      if (m) items.push({{name: m[1].trim(), qty: m[2].replace(/,/g,'')}});
-      else items.push({{name: line, qty: '0'}});
-    }}
-  }});
-
-  if (!items.length) {{
-    statusEl.className='import-status err';
-    statusEl.textContent='Could not parse any items.';
-    return;
-  }}
-
-  // Clear existing rows
-  document.getElementById('load_body').innerHTML = '';
-  rowId = 0;
-  items.forEach(function(it) {{
-    addRow(it.name, parseFloat(it.qty)||0);
-  }});
-
-  statusEl.className='import-status ok';
-  statusEl.textContent='Imported '+items.length+' item'+(items.length>1?'s':'')+'. Enter volumes in m\u00B3 for each row.';
-  document.getElementById('import_text').value = '';
-  recalc();
-}}
-
-// ── Persistence ──────────────────────────────────────────────────────────
 function saveState() {{
   var s = {{}};
-  ['sys_sel','trip_type','iso_type','fuel_per_ly','fee_flat','ship_cap'].forEach(function(id) {{
+  ['sys_sel','trip_type','iso_type','fuel_per_ly','fee_flat','coll_pct','ship_cap','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el) s[id] = el.value;
   }});
-  var rows = [];
-  document.querySelectorAll('#load_body tr').forEach(function(tr) {{
-    var id  = tr.id.replace('row_','');
-    var nel = document.getElementById('rn_'+id);
-    var vel = document.getElementById('rv_'+id);
-    if(vel) rows.push({{n: nel?nel.value:'', v: vel.value}});
-  }});
-  s.rows = rows;
   try{{ localStorage.setItem('haul_calc_state', JSON.stringify(s)); }}catch(e){{}}
 }}
 
 function loadState() {{
   var raw; try{{ raw = localStorage.getItem('haul_calc_state'); }}catch(e){{}}
-  if (!raw) {{ addRow('',0); return; }}
-  var s; try{{ s = JSON.parse(raw); }}catch(e){{ addRow('',0); return; }}
-  ['sys_sel','trip_type','iso_type','fuel_per_ly','fee_flat','ship_cap'].forEach(function(id) {{
+  if (!raw) {{ recalc(); return; }}
+  var s; try{{ s = JSON.parse(raw); }}catch(e){{ recalc(); return; }}
+  ['sys_sel','trip_type','iso_type','fuel_per_ly','fee_flat','coll_pct','ship_cap','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   }});
-  var rows = s.rows && s.rows.length ? s.rows : [{{n:'',v:0}}];
-  rows.forEach(function(r) {{ addRow(r.n, parseFloat(r.v)||0); }});
   recalc();
 }}
 
@@ -423,9 +322,7 @@ window.onload = loadState;
 </body>
 </html>"""
 
-out_path = 'haul_calculator.html'
-with open(out_path, 'w', encoding='utf-8') as f:
+with open('haul_calculator.html', 'w', encoding='utf-8') as f:
     f.write(html)
 
-print(f"Done. Written to {out_path}")
-print(f"  Systems: {len(VALE_SYSTEMS)}")
+print(f"Done. Written to haul_calculator.html  ({len(VALE_SYSTEMS)} systems)")
