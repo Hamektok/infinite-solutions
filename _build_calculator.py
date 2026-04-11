@@ -336,7 +336,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 </head>
 <body>
 <div class="page">
-<a class="back-link" href="index.html">&#8592; Industrial Market</a>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+  <a class="back-link" style="margin-bottom:0" href="index.html">&#8592; Industrial Market</a>
+  <a class="back-link" style="margin-bottom:0" href="haul_calculator.html">Haul Calculator &#8594;</a>
+</div>
 <div class="hdr">
   <h1>ORE HAUL CALCULATOR</h1>
   <div class="sub">Jump Freight &middot; Compressed Ore &middot; Refine Value</div>
