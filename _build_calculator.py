@@ -68,7 +68,7 @@ mat_rows = cur.execute(f"""
               WHERE type_id IN ({mat_ids_str}) GROUP BY type_id
           )
     )
-    SELECT it.type_id, it.type_name, ms.best_buy
+    SELECT it.type_id, it.type_name, ms.best_buy, it.volume
     FROM inv_types it
     LEFT JOIN latest_mps ms ON ms.type_id = it.type_id
     WHERE it.type_id IN ({mat_ids_str})
@@ -76,9 +76,24 @@ mat_rows = cur.execute(f"""
 materials = {}
 for r in mat_rows:
     av = avg_map.get(r[0], {})
-    materials[r[0]] = {'name': r[1], 'jbv': r[2] or 0,
+    materials[r[0]] = {'name': r[1], 'jbv': r[2] or 0, 'vol': r[3] or 0.01,
                        'a7': av.get('a7',0), 'a14': av.get('a14',0),
                        'a30': av.get('a30',0), 'a60': av.get('a60',0)}
+
+# ── Add minerals as direct-buy rows (no refining, 100% efficiency) ──────────
+MINERAL_IDS = [34, 35, 36, 37, 38, 39, 40, 11399]
+for mid in MINERAL_IDS:
+    if mid not in materials:
+        continue
+    mat = materials[mid]
+    av  = avg_map.get(mid, {})
+    ores.append({
+        'id': mid, 'name': mat['name'], 'cat': 'mineral', 'vol': mat['vol'], 'ps': 1,
+        'mats': {mid: 1}, 'mkt': mat['jbv'],
+        'a7': av.get('a7', 0), 'a14': av.get('a14', 0),
+        'a30': av.get('a30', 0), 'a60': av.get('a60', 0),
+        'sg': 'Mineral', 'isMat': True
+    })
 
 snap_row = conn.execute("""
     SELECT MAX(timestamp) FROM market_price_snapshots ms
@@ -127,6 +142,8 @@ for ore in ores:
         ore['sg'] = std_subgroup(ore['name'])
     elif ore['cat'] == 'moon_ore':
         ore['sg'] = moon_tier(ore)
+    elif ore['cat'] == 'mineral':
+        pass  # sg already set to 'Mineral' when appended
     else:
         ore['sg'] = 'Ice'
 
@@ -164,6 +181,42 @@ ores_js      = json.dumps(ores,  separators=(',',':'))
 mats_js      = json.dumps({str(k): v for k, v in materials.items()}, separators=(',',':'))
 mat_html     = mat_rows_html('mp_', 100, 'recalcAll()')
 buy_mat_html = mat_rows_html('bp_', 90,  'recalcAll()')
+
+# ── Vale of the Silent systems with LY distance from 4-HWWF ─────────────────
+VALE_SYSTEMS = [
+    ('4-HWWF', 0),     ('PM-DWE', 0.893), ('4GYV-Q', 0.937), ('EIDI-N', 1.023),
+    ('YMJG-4', 1.136), ('DAYP-G', 1.356), ('WBR5-R', 1.443), ('8TPX-N', 1.491),
+    ('KRUN-N', 1.499), ('TVN-FM', 1.502), ('IPAY-2', 1.577), ('K8X-6B', 1.72),
+    ('0MV-4W', 1.927), ('AZBR-2', 2.03),  ('Q-L07F', 2.198), ('U54-1L', 2.247),
+    ('P3EN-E', 2.278), ('T-GCGL', 2.44),  ('V-OJEN', 2.469), ('X445-5', 2.533),
+    ('05R-7A', 2.559), ('FS-RFL', 2.619), ('NCGR-Q', 2.658), ('Z-8Q65', 2.7),
+    ('IFJ-EL', 2.748), ('9OO-LH', 2.759), ('MC6O-F', 2.774), ('X97D-W', 2.799),
+    ('49-0LI', 2.815), ('0-R5TS', 2.844), ('669-IX', 2.888), ('0R-F2F', 3.002),
+    ('47L-J4', 3.07),  ('N-HSK0', 3.163), ('HE-V4V', 3.182), ('V-NL3K', 3.223),
+    ('0J3L-V', 3.232), ('S-NJBB', 3.307), ('XF-PWO', 3.361), ('R-P7KL', 3.37),
+    ('A8A-JN', 3.386), ('NFM-0V', 3.389), ('E-D0VZ', 3.401), ('6WW-28', 3.432),
+    ('UH-9ZG', 3.448), ('YXIB-I', 3.497), ('LZ-6SU', 3.503), ('Y0-BVN', 3.631),
+    ('7-UH4Z', 3.631), ('1N-FJ8', 3.718), ('2DWM-2', 3.732), ('H-UCD1', 3.802),
+    ('G-LOIT', 3.828), ('1-GBBP', 3.837), ('B-588R', 3.905), ('5ZO-NZ', 4.132),
+    ('H-NOU5', 4.337), ('97-M96', 4.356), ('T-ZWA1', 4.379), ('3HX-DL', 4.409),
+    ('7-K5EL', 4.429), ('KX-2UI', 4.579), ('GEKJ-9', 4.62),  ('MY-T2P', 4.817),
+    ('Y-ZXIO', 4.827), ('C-FP70', 4.899), ('G96R-F', 5.079), ('Q-R3GP', 5.081),
+    ('ZA0L-U', 5.118), ('FA-DMO', 5.257), ('XV-8JQ', 5.341), ('N-5QPW', 5.528),
+    ('MO-FIF', 5.566), ('MA-XAP', 5.716), ('H-5GUI', 5.717), ('C-J7CR', 5.852),
+    ('Q-EHMJ', 5.941), ('XSQ-TF', 6.193), ('H-1EOH', 6.423), ('FMBR-8', 6.451),
+    ('FH-TTC', 6.633), ('VI2K-J', 6.669), ('6Y-WRK', 6.755), ('5T-KM3', 6.789),
+    ('IR-DYY', 6.818), ('MQ-O27', 7.129), ('ZLZ-1Z', 7.348), ('F-D49D', 7.382),
+    ('RVCZ-C', 7.422), ('B-E3KQ', 7.87),  ('Y5J-EU', 7.899), ('H-EY0P', 8.008),
+    ('O-LR1H', 8.088), ('LS9B-9', 8.17),  ('C-DHON', 8.317), ('G5ED-Y', 8.656),
+    ('UNAG-6', 8.692), ('A-QRQT', 8.849), ('8-TFDX', 9.072), ('BR-6XP', 9.092),
+    ('E-SCTX', 9.276), ('7-PO3P', 9.281), ('WMBZ-U', 9.319), ('UL-4ZW', 9.656),
+    ('VORM-W', 9.73),
+]
+systems_js      = json.dumps([{'name': s[0], 'ly': s[1]} for s in VALE_SYSTEMS], separators=(',',':'))
+systems_options = '\n'.join(
+    f'      <option value="{i}">{s[0]} &mdash; {s[1]:.3f} ly</option>'
+    for i, s in enumerate(VALE_SYSTEMS)
+)
 
 # ── Build JS ore-options function body ──────────────────────────────────────
 # We embed sub-group labels so the JS can build clean optgroups.
@@ -250,11 +303,11 @@ tbody tr:hover{background:rgba(255,255,255,.02);}
   color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:.88em;font-weight:700;
   padding:8px 0;cursor:pointer;width:100%;margin-top:7px;transition:all .12s;}
 .add-row-btn:hover{background:rgba(255,140,50,.15);}
-.sum-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-top:12px;}
-.sb{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;text-align:center;}
+.sum-bar{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:12px;}
+.sb{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:8px 6px;text-align:center;}
 .sb.profit{border-color:var(--border-o);background:rgba(255,140,50,.06);}
-.sb-lbl{font-size:.7em;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-.sb-val{font-family:'Orbitron',sans-serif;font-size:.95em;font-weight:700;}
+.sb-lbl{font-size:.65em;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.sb-val{font-family:'Orbitron',sans-serif;font-size:.88em;font-weight:700;}
 .sb-val.green{color:var(--green);}.sb-val.red{color:var(--red);}
 .sb-val.gold{color:var(--gold);}.sb-val.lg{font-size:1.2em;}
 .sb-sub{font-size:.78em;color:var(--dim);margin-top:2px;}
@@ -268,6 +321,22 @@ tbody tr:hover{background:rgba(255,255,255,.02);}
 hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
 .footer{text-align:center;color:var(--dim);font-size:.76em;margin-top:20px;
   padding-top:12px;border-top:1px solid var(--border);}
+.import-row{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px;}
+.import-row textarea{flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--border);
+  border-radius:4px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.93em;
+  padding:7px 10px;resize:vertical;min-height:60px;outline:none;}
+.import-row textarea:focus{border-color:var(--accent);}
+.import-btn{background:rgba(255,140,50,.12);border:1px solid var(--border-o);border-radius:4px;
+  color:var(--accent);font-family:'Rajdhani',sans-serif;font-size:.9em;font-weight:700;
+  padding:8px 18px;cursor:pointer;white-space:nowrap;transition:all .12s;align-self:flex-start;}
+.import-btn:hover{background:rgba(255,140,50,.25);}
+.import-status{font-size:.83em;margin-top:4px;min-height:1.2em;}
+.import-status.ok{color:var(--green);}.import-status.err{color:var(--red);}
+.apikey-row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;}
+.apikey-row input{background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.9em;padding:5px 9px;
+  outline:none;width:260px;}
+.apikey-row input:focus{border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -283,6 +352,26 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
   <div class="panel-title">Trip &amp; Refine Parameters</div>
 
   <div class="form-row">
+    <label>Pickup System</label>
+    <select id="sys_sel" onchange="recalcAll()" style="min-width:200px">
+SYSTEMS_OPTIONS_PLACEHOLDER
+    </select>
+    <span class="unit" id="sys_dist_note">&mdash;</span>
+  </div>
+  <div class="form-row">
+    <label>Fuel per LY</label>
+    <input type="number" id="fuel_per_ly" value="0" min="0" step="100" oninput="recalcAll()" style="width:110px">
+    <span class="unit">isotopes/LY</span>
+    <span class="iv" id="iso_calc_note">&mdash;</span>
+  </div>
+  <div class="form-row">
+    <label>Trip</label>
+    <select id="trip_type" onchange="recalcAll()" style="min-width:140px">
+      <option value="one">One-way</option>
+      <option value="round" selected>Round-trip</option>
+    </select>
+  </div>
+  <div class="form-row">
     <label>Isotope Type</label>
     <select id="iso_type" onchange="recalcAll()" style="min-width:240px">
       <option value="642.30" selected>Nitrogen Isotopes &mdash; 642 ISK/unit</option>
@@ -290,11 +379,6 @@ hr.div{border:none;border-top:1px solid var(--border);margin:10px 0;}
       <option value="705.20">Oxygen Isotopes &mdash; 705 ISK/unit</option>
       <option value="725.30">Helium Isotopes &mdash; 725 ISK/unit</option>
     </select>
-  </div>
-  <div class="form-row">
-    <label>Isotopes (round trip)</label>
-    <input type="number" id="iso_qty" value="200000" min="0" step="10000" oninput="recalcAll()" style="width:120px">
-    <span class="unit">units</span>
     <span class="iv" id="ship_tag">&mdash;</span>
   </div>
   <div class="form-row">
@@ -324,6 +408,21 @@ BUY_PCT_HTML_PLACEHOLDER
     </div>
   </div>
   <div class="form-row">
+    <label>Pickup Fee</label>
+    <span class="unit">Fuel recovery: <span class="iv" id="fuel_recovery_note">&mdash;</span></span>
+    <span class="unit" style="margin:0 6px">+</span>
+    <input type="number" id="fee_flat" min="0" step="1" value="0" oninput="recalcAll()" style="width:85px">
+    <span class="unit">ISK/m&#179;</span>
+    <span class="unit" style="margin:0 6px">+</span>
+    <input type="number" id="fee_amt" min="0" step="0.01" value="0" oninput="recalcAll()" style="width:85px">
+    <select id="fee_mode" onchange="recalcAll()" style="min-width:90px">
+      <option value="flat">ISK/m&#179;</option>
+      <option value="pct">% JBV</option>
+    </select>
+    <span class="iv" id="fee_note">&mdash;</span>
+  </div>
+
+  <div class="form-row">
     <label>Refine Efficiency</label>
     <input type="number" id="eff_pct" min="0" max="100" step="0.01" value="87.50" oninput="recalcAll()" style="width:90px">
     <span class="unit">%</span>
@@ -350,6 +449,22 @@ MAT_HTML_PLACEHOLDER
 </div>
 
 <div class="panel">
+  <div class="panel-title">Import from Janice or Paste List</div>
+  <div class="import-row">
+    <textarea id="import_text" placeholder="Paste a Janice link (https://janice.e-351.com/a/...) or a plain item list:&#10;Compressed Hezorime 6000000&#10;Tritanium 500000"></textarea>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <button class="import-btn" onclick="doImport()">&#9654; Import</button>
+      <button class="import-btn" style="background:rgba(255,60,60,.1);border-color:rgba(255,60,60,.3);color:#ff7777" onclick="clearLoad()">&#x2715; Clear Load</button>
+    </div>
+  </div>
+  <div id="import_status" class="import-status"></div>
+  <div class="apikey-row">
+    <span class="unit">Janice API Key <span style="color:var(--dim);font-size:.85em">(optional)</span></span>
+    <input type="text" id="janice_api_key" placeholder="Leave blank to use shared key" oninput="saveApiKey()">
+  </div>
+</div>
+
+<div class="panel">
   <div class="panel-title">Load Builder &mdash; Mixed Compressed Ore (all grades)</div>
   <div class="tbl-wrap">
   <table>
@@ -358,7 +473,7 @@ MAT_HTML_PLACEHOLDER
       <th>Quantity (units)</th>
       <th>Refine Val/m&#179;<br><span style="font-size:.85em;opacity:.6">after efficiency</span></th>
       <th id="mkt_col_hdr">Mkt JBV/m&#179;</th>
-      <th>Load Ref. Value<br><span style="font-size:.85em;opacity:.6">pricing basis</span></th>
+      <th>Refine Value<br><span style="font-size:.85em;opacity:.6">at efficiency</span></th>
       <th>You Pay</th>
       <th>Net Contrib.</th>
       <th></th>
@@ -370,8 +485,9 @@ MAT_HTML_PLACEHOLDER
 
   <div class="sum-bar">
     <div class="sb"><div class="sb-lbl">Total Volume</div><div class="sb-val" id="s_vol">&mdash;</div></div>
-    <div class="sb"><div class="sb-lbl">Load Ref. Value</div><div class="sb-val gold" id="s_load">&mdash;</div></div>
-    <div class="sb"><div class="sb-lbl">You Pay Miners</div><div class="sb-val" id="s_pay">&mdash;</div></div>
+    <div class="sb"><div class="sb-lbl">Refine Value</div><div class="sb-val gold" id="s_load">&mdash;</div></div>
+    <div class="sb"><div class="sb-lbl">You Pay Miners</div><div class="sb-val" id="s_pay">&mdash;</div><div class="sb-sub">net of pickup fee</div></div>
+    <div class="sb"><div class="sb-lbl">Pickup Fee</div><div class="sb-val green" id="s_fee">&mdash;</div><div class="sb-sub">offsets fuel cost</div></div>
     <div class="sb"><div class="sb-lbl">Refine Tax (ISK)</div><div class="sb-val red" id="s_tax">&mdash;</div><div class="sb-sub">% of ore Jita value</div></div>
     <div class="sb"><div class="sb-lbl">Shipping Cost</div><div class="sb-val" id="s_ship">&mdash;</div></div>
     <div class="sb"><div class="sb-lbl">Mineral Revenue<br><span style="font-size:.75em;color:var(--dim)">at efficiency %</span></div><div class="sb-val" id="s_rev">&mdash;</div></div>
@@ -391,6 +507,7 @@ MAT_HTML_PLACEHOLDER
 <script>
 const ORES = ORES_DATA_PLACEHOLDER;
 const MATERIALS = MATS_DATA_PLACEHOLDER;
+const SYSTEMS = SYSTEMS_DATA_PLACEHOLDER;
 
 // ── Build ore dropdown with clean sub-group optgroups ──────────────────────
 const STD_SG  = ['Common','Uncommon','Nullsec','Pochven'];
@@ -408,6 +525,7 @@ function buildOreOptions(selIdx) {
   STD_SG.forEach(function(sg){ order.push('standard_ore_'+sg); });
   MOON_SG.forEach(function(sg){ order.push('moon_ore_'+sg); });
   order.push('ice_ore_Ice');
+  order.push('mineral_Mineral');
 
   var html = '';
   order.forEach(function(key) {
@@ -424,6 +542,7 @@ function buildOreOptions(selIdx) {
 function groupLabel(cat, sg) {
   if (cat === 'standard_ore') return 'Standard Ore \u2014 ' + sg;
   if (cat === 'moon_ore')     return 'Moon Ore \u2014 ' + sg;
+  if (cat === 'mineral')      return 'Minerals (direct buy)';
   return 'Ice';
 }
 
@@ -466,7 +585,7 @@ function refinePay(ore) {
 var MAT_IDS=[34,35,36,37,38,39,40,11399,16633,16634,16635,16636,16639,16640,16637,16638,16641,16642,16643,16644,16646,16647,16648,16649,16650,16651,16652,16653,16272,16273,16274,17887,17888,17889,16275];
 function saveState() {
   var s={};
-  ['iso_type','iso_qty','eff_pct','tax_pct','price_basis'].forEach(function(id){
+  ['iso_type','sys_sel','fuel_per_ly','trip_type','eff_pct','tax_pct','price_basis','fee_flat','fee_amt','fee_mode'].forEach(function(id){
     var el=document.getElementById(id); if(el) s[id]=el.value;
   });
   MAT_IDS.forEach(function(mid){
@@ -487,7 +606,7 @@ function loadState() {
   var raw; try{ raw=localStorage.getItem('ore_calc_state'); }catch(e){}
   if(!raw){ addRow(0,100000); return; }
   var s; try{ s=JSON.parse(raw); }catch(e){ addRow(0,100000); return; }
-  ['iso_type','iso_qty','eff_pct','tax_pct','price_basis'].forEach(function(id){
+  ['iso_type','sys_sel','fuel_per_ly','trip_type','eff_pct','tax_pct','price_basis','fee_flat','fee_amt','fee_mode'].forEach(function(id){
     var el=document.getElementById(id); if(el&&s[id]!=null) el.value=s[id];
   });
   MAT_IDS.forEach(function(mid){
@@ -564,9 +683,119 @@ function fmtB(n) {
   if(a>=1e3) return s+(a/1e3).toFixed(0)+'k';
   return s+fmt(a);
 }
-function getShip(){ return (parseFloat(document.getElementById('iso_qty').value)||0)*(parseFloat(document.getElementById('iso_type').value)||0); }
+function getIsoQty() {
+  var idx = parseInt(document.getElementById('sys_sel').value)||0;
+  var ly  = SYSTEMS[idx] ? SYSTEMS[idx].ly : 0;
+  var fpl = parseFloat(document.getElementById('fuel_per_ly').value)||0;
+  var mult = document.getElementById('trip_type').value === 'round' ? 2 : 1;
+  return ly * fpl * mult;
+}
+function getShip(){ return getIsoQty() * (parseFloat(document.getElementById('iso_type').value)||0); }
 function getEff() { return parseFloat(document.getElementById('eff_pct').value)||87.5; }
 function getTax() { return parseFloat(document.getElementById('tax_pct').value)||0; }
+function getFeePerM3(rvEff_m3, shipPerM3) {
+  var flat = parseFloat(document.getElementById('fee_flat').value)||0;
+  var amt  = parseFloat(document.getElementById('fee_amt').value)||0;
+  var mode = document.getElementById('fee_mode').value;
+  var extraPerM3 = mode==='pct' ? rvEff_m3*amt/100 : amt;
+  return shipPerM3 + flat + extraPerM3;
+}
+
+// ── Janice / text import ───────────────────────────────────────────────────
+// Build name→index lookup (lowercase, strip 'compressed ' prefix for aliases)
+var ORE_NAME_IDX = {};
+ORES.forEach(function(o,i){
+  ORE_NAME_IDX[o.name.toLowerCase()] = i;                  // e.g. "hezorime" → i
+  ORE_NAME_IDX[('compressed '+o.name).toLowerCase()] = i;  // e.g. "compressed hezorime" → i
+});
+
+function saveApiKey(){
+  var k=document.getElementById('janice_api_key').value.trim();
+  try{ localStorage.setItem('janice_api_key', k); }catch(e){}
+}
+function loadApiKey(){
+  var k; try{ k=localStorage.getItem('janice_api_key'); }catch(e){}
+  var el=document.getElementById('janice_api_key'); if(el&&k) el.value=k;
+}
+
+function setImportStatus(msg, cls){
+  var el=document.getElementById('import_status');
+  if(!el) return;
+  el.textContent=msg; el.className='import-status '+(cls||'');
+}
+
+function populateFromItems(items){
+  // items: [{name, qty}]
+  var matched=[], skipped=[];
+  items.forEach(function(it){
+    var idx=ORE_NAME_IDX[it.name.toLowerCase()];
+    if(idx!=null) matched.push({idx:idx, qty:it.qty});
+    else skipped.push(it.name);
+  });
+  if(!matched.length){ setImportStatus('No matching ores/minerals found. Check names.','err'); return; }
+  // Clear existing rows then add matched ones
+  document.getElementById('load_body').innerHTML='';
+  rowId=0;
+  matched.forEach(function(m){ addRow(m.idx, m.qty); });
+  var msg='Imported '+matched.length+' item'+(matched.length!==1?'s':'');
+  if(skipped.length) msg+=' \u00B7 Skipped (not in calculator): '+skipped.join(', ');
+  setImportStatus(msg, skipped.length?'err':'ok');
+}
+
+function parseTextList(text){
+  var items=[];
+  text.split(/\n/).forEach(function(line){
+    line=line.trim(); if(!line) return;
+    // Format: "Item Name 12345" or "Item Name\t12345"
+    var m=line.match(/^(.+?)[\t ]+([0-9,]+)\s*$/);
+    if(m) items.push({name:m[1].trim(), qty:parseInt(m[2].replace(/,/g,''))||0});
+  });
+  return items;
+}
+
+function doImport(){
+  var raw=document.getElementById('import_text').value.trim();
+  if(!raw){ setImportStatus('Paste a Janice link or item list first.','err'); return; }
+
+  // Check if it's a Janice URL
+  var codeMatch=raw.match(/janice\.e-351\.com\/a\/([A-Za-z0-9]+)/);
+  if(codeMatch){
+    var code=codeMatch[1];
+    var apiKey=document.getElementById('janice_api_key').value.trim()||'G9KwKq3465588VPd6747t95Zh94q3W2E';
+    var apiUrl='https://janice.e-351.com/api/rest/v2/appraisal/'+code;
+    var proxyUrl='https://corsproxy.io/?url='+encodeURIComponent(apiUrl);
+    setImportStatus('Fetching from Janice\u2026','');
+    fetch(proxyUrl, {headers:{'X-ApiKey': apiKey}})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    })
+    .then(function(data){
+      // corsproxy wraps response; unwrap if needed
+      var payload = data.contents ? JSON.parse(data.contents) : data;
+      var items=(payload.items||[]).map(function(it){
+        return {name: it.itemType.name, qty: it.amount};
+      });
+      populateFromItems(items);
+    })
+    .catch(function(e){
+      setImportStatus('Could not fetch Janice link: '+e.message+'. Try pasting the item list as plain text instead.','err');
+    });
+  } else {
+    // Plain text
+    var items=parseTextList(raw);
+    if(!items.length){ setImportStatus('Could not parse any items. Use format: ItemName Quantity (one per line).','err'); return; }
+    populateFromItems(items);
+  }
+}
+
+function clearLoad(){
+  document.getElementById('load_body').innerHTML='';
+  rowId=0;
+  addRow(0,0);
+  setImportStatus('','');
+  saveState();
+}
 
 // ── Load Builder ───────────────────────────────────────────────────────────
 var rowId=0;
@@ -590,11 +819,35 @@ function delRow(id){ var e=document.getElementById('r'+id); if(e)e.remove(); rec
 
 function recalcAll() {
   var ship=getShip(), eff=getEff(), tax=getTax();
+  var isoQty=getIsoQty();
+  var sysIdx=parseInt(document.getElementById('sys_sel').value)||0;
+  var sys=SYSTEMS[sysIdx]||SYSTEMS[0];
+  var tripLbl=document.getElementById('trip_type').value==='round'?'round-trip':'one-way';
+  document.getElementById('sys_dist_note').textContent=sys.ly.toFixed(3)+' ly from 4-HWWF';
+  document.getElementById('iso_calc_note').textContent=fmt(Math.round(isoQty))+' isotopes ('+tripLbl+')';
   document.getElementById('ship_tag').textContent=fmtB(ship)+' ISK';
+
+  // First pass: total volume for fuel-cost-per-m³ distribution
+  var totVol0=0;
+  document.querySelectorAll('#load_body tr').forEach(function(tr){
+    var sel=tr.querySelector('select'), inp=tr.querySelector('input');
+    if(!sel||!inp) return;
+    var ore=ORES[parseInt(sel.value)]; var qty=parseFloat(inp.value)||0;
+    if(ore&&qty>0) totVol0 += qty*ore.vol;
+  });
+  var shipPerM3 = totVol0>0 ? ship/totVol0 : 0;
+
+  // Update fuel recovery display
+  var fuelNoteEl=document.getElementById('fuel_recovery_note');
+  if(fuelNoteEl) fuelNoteEl.textContent = ship>0 ? fmtB(ship)+' ISK ('+fmt(Math.round(shipPerM3))+' ISK/m\u00B3)' : '—';
+  var feeAmt=parseFloat(document.getElementById('fee_amt').value)||0;
+  var feeMode=document.getElementById('fee_mode').value;
+  var feeNoteEl=document.getElementById('fee_note');
+  if(feeNoteEl) feeNoteEl.textContent = feeAmt>0 ? '+ '+(feeMode==='pct'?feeAmt.toFixed(2)+'% JBV':fmtB(feeAmt)+' ISK/m\u00B3') : '';
   document.getElementById('eff_note').textContent='Efficiency: '+eff.toFixed(2)+'%  \u00B7  Tax on Jita value: '+tax.toFixed(2)+'%';
   updateBasisLabels();
 
-  var totVol=0, totLoad=0, totPay=0, totRev=0, totTax=0, totMkt=0;
+  var totVol=0, totLoad=0, totPay=0, totRev=0, totTax=0, totMkt=0, totFee=0;
   document.querySelectorAll('#load_body tr').forEach(function(tr){
     var id=tr.id.replace('r','');
     var sel=tr.querySelector('select');
@@ -608,18 +861,21 @@ function recalcAll() {
     var volEl=document.getElementById('vol_'+id);
     if(volEl) volEl.textContent=fmt(vol,0)+' m\u00B3';
 
+    var isMat    = ore.isMat || false;
     var rv100    = refineVal100(ore);          // theoretical refine value per unit (selected basis)
-    var rvEff    = rv100 * eff/100;            // mineral proceeds per unit (after efficiency, no tax deduction)
+    var rvEff    = rv100 * (isMat ? 1.0 : eff/100); // minerals: no efficiency loss
     var rv100_m3 = rv100  / ore.vol;
     var rvEff_m3 = rvEff  / ore.vol;
     var mkt_m3   = orePrice(ore) / ore.vol;   // selected basis price per m³
     var effBuy   = refinePay(ore);            // effective buy % (weighted per-material)
 
-    var loadRef = vol * rv100_m3;             // pricing basis total
-    var pay     = loadRef * effBuy/100;       // ISK paid to miners (per-material weighted)
-    var revenue = vol * rvEff_m3;             // mineral proceeds after efficiency
-    var taxIsk  = vol * mkt_m3 * tax/100;     // ISK tax charged against ore price
-    var contrib = revenue - pay - taxIsk;     // net row contribution (before shipping)
+    var loadRef  = vol * rvEff_m3;                        // pricing basis = refine value at actual efficiency
+    var feePerM3 = getFeePerM3(rvEff_m3, shipPerM3);      // fuel recovery + optional markup per m³
+    var feeIsk   = vol * feePerM3;                        // total fee for this row
+    var pay      = loadRef * effBuy/100 - feeIsk;        // net ISK paid to miners (buy% of rvEff, fee deducted)
+    var revenue  = vol * rvEff_m3;                        // mineral proceeds (eff applied or 100% for minerals)
+    var taxIsk   = isMat ? 0 : (vol * mkt_m3 * tax/100); // minerals: no refine tax
+    var contrib  = revenue - pay - taxIsk;                // net row contribution (before shipping; pay already nets fee)
 
     document.getElementById('rv_' +id).textContent=fmt(rvEff_m3)+' ISK';
     document.getElementById('mkt_'+id).textContent=fmt(mkt_m3)+' ISK';
@@ -632,18 +888,21 @@ function recalcAll() {
     totVol  += vol;
     totLoad += loadRef;
     totPay  += pay;
+    totFee  += feeIsk;
     totRev  += revenue;
     totTax  += taxIsk;
     totMkt  += vol * mkt_m3;
   });
 
-  var profit = totRev - totPay - totTax - ship;
-  var totalCost = totPay + totTax + ship;
+  var profit = totRev - totPay - totTax - ship;  // totPay already nets fee; fee collected offsets ship
+  var totalCost = totPay + totFee + totTax + ship;
   var roc = totalCost > 0 ? profit/totalCost*100 : 0;
+
 
   document.getElementById('s_vol').textContent  = fmt(totVol)+' m\u00B3';
   document.getElementById('s_load').textContent = fmtB(totLoad);
   document.getElementById('s_pay').textContent  = fmtB(totPay);
+  document.getElementById('s_fee').textContent  = totFee>0 ? '+'+fmtB(totFee) : '\u2014';
   document.getElementById('s_tax').textContent  = '\u2212'+fmtB(totTax);
   document.getElementById('s_ship').textContent = fmtB(ship);
   document.getElementById('s_rev').textContent  = fmtB(totRev);
@@ -657,21 +916,25 @@ function recalcAll() {
   // Break-even
   var beEl=document.getElementById('be_rows');
   if(totLoad>0){
-    var blendBuy   = totPay/totLoad*100;
-    var taxPctLoad = totMkt>0 ? (totTax/totLoad*100) : 0;  // effective tax as % of load value
-    var effPct     = eff;                                   // mineral revenue as % of load value
-    var marginPct  = effPct - blendBuy - taxPctLoad;
+    var blendBuy   = totPay/totLoad*100;                         // already nets fee
+    var taxPctLoad = totMkt>0 ? (totTax/totLoad*100) : 0;       // effective tax as % of load value
+    var feePctLoad = totFee>0 ? (totFee/totLoad*100) : 0;       // fee as % of load value (beneficial to corp)
+    var shipPctLoad = ship>0 ? (ship/totLoad*100) : 0;          // shipping as % of load value
+    var effPct     = (totRev/totLoad*100);                       // blended actual revenue % (correct for mixed ore+minerals)
+    var grossMargin = effPct - blendBuy - taxPctLoad;            // gross margin before shipping
+    var marginPct   = grossMargin - shipPctLoad;                 // net margin after all costs inc. shipping
     var h='';
-    h+='<div class="be-row"><span class="be-lbl">Blended buy % (value-weighted)</span><span class="be-val hi">'+blendBuy.toFixed(2)+'%</span></div>';
-    h+='<div class="be-row"><span class="be-lbl">Mineral revenue as % of load value (eff)</span><span class="be-val">'+effPct.toFixed(2)+'%</span></div>';
+    h+='<div class="be-row"><span class="be-lbl">Blended buy % (value-weighted, net of fee)</span><span class="be-val hi">'+blendBuy.toFixed(2)+'%</span></div>';
+    h+='<div class="be-row"><span class="be-lbl">Blended revenue % (eff + sell%)</span><span class="be-val">'+effPct.toFixed(2)+'%</span></div>';
     h+='<div class="be-row"><span class="be-lbl">Tax cost as % of load value</span><span class="be-val">'+taxPctLoad.toFixed(2)+'%</span></div>';
-    if(marginPct>0){
-      var beLoad=ship/(marginPct/100);
-      h+='<div class="be-row"><span class="be-lbl">Net margin (eff \u2212 buy \u2212 tax%)</span><span class="be-val">'+marginPct.toFixed(2)+'%</span></div>';
+    if(feePctLoad>0) h+='<div class="be-row"><span class="be-lbl">Pickup fee recovered (% of load value)</span><span class="be-val" style="color:var(--green)">+'+feePctLoad.toFixed(2)+'%</span></div>';
+    h+='<div class="be-row"><span class="be-lbl">Shipping as % of load value</span><span class="be-val">\u2212'+shipPctLoad.toFixed(2)+'%</span></div>';
+    h+='<div class="be-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px"><span class="be-lbl">Net margin (revenue \u2212 buy \u2212 tax \u2212 shipping)</span><span class="be-val '+(marginPct>=0?'hi':'') +'" style="'+(marginPct<0?'color:var(--red)':'')+'">'+marginPct.toFixed(2)+'%</span></div>';
+    if(grossMargin>0){
+      var beLoad=ship/(grossMargin/100);
       h+='<div class="be-row"><span class="be-lbl">Min load value to cover shipping</span><span class="be-val hi">'+fmtB(beLoad)+' ISK</span></div>';
-      h+='<div class="be-row"><span class="be-lbl">Shipping as % of current load value</span><span class="be-val">'+(ship/totLoad*100).toFixed(2)+'%</span></div>';
     } else {
-      h+='<div class="be-row"><span class="be-lbl" style="color:var(--red)">No margin after buy % + tax \u2014 cannot cover shipping</span></div>';
+      h+='<div class="be-row"><span class="be-lbl" style="color:var(--red)">No gross margin after buy % + tax</span></div>';
     }
     beEl.innerHTML=h;
   } else {
@@ -680,6 +943,7 @@ function recalcAll() {
   saveState();
 }
 
+loadApiKey();
 loadState();
 </script>
 </body>
@@ -689,6 +953,8 @@ html = html.replace('MAT_HTML_PLACEHOLDER',     mat_html)
 html = html.replace('BUY_PCT_HTML_PLACEHOLDER', buy_mat_html)
 html = html.replace('ORES_DATA_PLACEHOLDER',    ores_js)
 html = html.replace('MATS_DATA_PLACEHOLDER',    mats_js)
+html = html.replace('SYSTEMS_DATA_PLACEHOLDER', systems_js)
+html = html.replace('SYSTEMS_OPTIONS_PLACEHOLDER', systems_options)
 html = html.replace('SNAP_DATE_PLACEHOLDER',    snap_label)
 
 with open('ore_haul_calculator.html', 'w', encoding='utf-8') as f:
