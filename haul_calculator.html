@@ -279,6 +279,19 @@ tbody tr td.td-dim{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size:
   <hr class="div">
 
   <div class="form-row">
+    <label>Pricing Model</label>
+    <select id="pricing_mode" onchange="onPricingModeChange()" style="min-width:200px">
+      <option value="per_ly" selected>Per LY Rate</option>
+      <option value="flat">Flat Markup</option>
+    </select>
+  </div>
+  <div class="form-row" id="row_per_ly">
+    <label>Rate per LY</label>
+    <input type="number" id="fee_per_ly" min="0" step="0.5" value="12" oninput="recalc()" style="width:100px">
+    <span class="unit">ISK / m&#179; / LY &nbsp;</span>
+    <span class="iv" id="per_ly_note">&mdash;</span>
+  </div>
+  <div class="form-row" id="row_flat" style="display:none">
     <label>Flat Markup</label>
     <input type="number" id="fee_flat" min="0" step="1" value="0" oninput="recalc()" style="width:110px">
     <span class="unit">ISK / m&#179;</span>
@@ -387,6 +400,23 @@ function fmtB(n) {
   return s+fmt(a,0);
 }
 
+function onPricingModeChange() {
+  var mode = document.getElementById('pricing_mode').value;
+  document.getElementById('row_per_ly').style.display = mode === 'per_ly' ? '' : 'none';
+  document.getElementById('row_flat').style.display   = mode === 'flat'   ? '' : 'none';
+  recalc();
+}
+
+function getMarkupPerM3(ly) {
+  var mode = document.getElementById('pricing_mode').value;
+  if (mode === 'per_ly') {
+    var rate = parseFloat(document.getElementById('fee_per_ly').value)||0;
+    return rate * ly;
+  } else {
+    return parseFloat(document.getElementById('fee_flat').value)||0;
+  }
+}
+
 function getSysLy() {
   var name = (document.getElementById('sys_input').value||'').trim().toUpperCase();
   if (!name) return 0;
@@ -441,8 +471,8 @@ function recalc() {
   var isoPrice  = parseFloat(document.getElementById('iso_type').value)||0;
   var vol       = parseFloat(document.getElementById('cargo_vol').value)||0;
   var coll      = parseFloat(document.getElementById('cargo_coll').value)||0;
-  var flatPerM3 = parseFloat(document.getElementById('fee_flat').value)||0;
   var collPct   = parseFloat(document.getElementById('coll_pct').value)||0;
+  var markupPerM3 = getMarkupPerM3(ly);
 
   var ship    = getShip();
   var adjBase = getAdjustedBase();
@@ -472,16 +502,23 @@ function recalc() {
     distEl.style.color = '';
   }
 
+  // Per-LY note
+  var perLyNoteEl = document.getElementById('per_ly_note');
+  if (perLyNoteEl) {
+    var rpl = parseFloat(document.getElementById('fee_per_ly').value)||0;
+    perLyNoteEl.textContent = ly > 0 ? fmt(rpl * ly, 2)+' ISK/m³ on this route' : '—';
+  }
+
   var configs = getConfigs(adjBase, baseCargo);
   var collFee = coll * collPct / 100;
-  var flatFee = flatPerM3 * vol;
+  var markupFee = markupPerM3 * vol;
 
   // Compute totals for each config
   var results = configs.map(function(c) {
     var trips     = vol > 0 ? Math.ceil(vol / c.effectiveCargo) : 0;
     var isoUsed   = trips * ly * mult * c.fuelPerLY;
     var fuelCost  = isoUsed * isoPrice;
-    var totalFee  = fuelCost + flatFee + collFee;
+    var totalFee  = fuelCost + markupFee + collFee;
     return {
       econ:          c.econ,
       exp:           c.exp,
@@ -551,7 +588,7 @@ function recalc() {
 function saveState() {
   var s = {};
   ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
-   'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
+   'econ_type','exp_type','pricing_mode','fee_per_ly','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if(el) s[id] = el.value;
   });
   var si = document.getElementById('sys_input'); if(si) s['sys_input'] = si.value;
@@ -563,10 +600,11 @@ function loadState() {
   if (!raw) { recalc(); return; }
   var s; try{ s = JSON.parse(raw); }catch(e){ recalc(); return; }
   ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
-   'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
+   'econ_type','exp_type','pricing_mode','fee_per_ly','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   });
   var si = document.getElementById('sys_input'); if(si && s['sys_input'] != null) si.value = s['sys_input'];
+  onPricingModeChange();
   recalc();
 }
 
