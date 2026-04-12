@@ -193,8 +193,8 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
   <div class="form-row">
     <label>Economizer Module</label>
     <select id="econ_type" onchange="recalc()" style="min-width:340px">
-      <option value="0.07" selected>Experimental Jump Drive Economizer I &mdash; 7%</option>
-      <option value="0.10">Prototype Jump Drive Economizer I &mdash; 10%</option>
+      <option value="0.07" selected>Experimental Jump Drive Economizer &mdash; 7%</option>
+      <option value="0.10">Prototype Jump Drive Economizer &mdash; 10%</option>
     </select>
   </div>
   <div class="form-row">
