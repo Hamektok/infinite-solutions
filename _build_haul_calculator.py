@@ -276,10 +276,19 @@ var SHIPS = {{
 
 var LOW_SLOTS = 3;
 
-// Fixed fittings always carried (reduce available cargo in every config)
-// 3× Expanded Cargohold II (5 m³ each) + 3× Reinforced Bulkheads II (5 m³ each)
-// + 3× Experimental Jump Drive Economizer (3500 m³ each)
-var FITTING_OVERHEAD = (3 * 5) + (3 * 5) + (3 * 3500);  // 10,530 m³
+// Always carries all 9 modules; 3 are fitted (0 m³), 6 are in cargo.
+// Which are fitted vs in cargo depends on the config.
+// Module volumes: Exp=5 m³, Bulkhead=5 m³, Econ=3500 m³
+// Bulkheads are never fitted in these configs (not econ or exp) — always in cargo.
+var MOD_VOL = {{ exp: 5, econ: 3500, bulkhead: 5 }};
+var BULKHEAD_CARRY = 3;  // always in cargo regardless of config
+
+// Overhead for a given config: unfitted econ + unfitted exp + bulkheads
+function fittingOverhead(econFitted, expFitted) {{
+  var econInCargo = 3 - econFitted;
+  var expInCargo  = 3 - expFitted;
+  return econInCargo * MOD_VOL.econ + expInCargo * MOD_VOL.exp + BULKHEAD_CARRY * MOD_VOL.bulkhead;
+}}
 var STACK_C    = 2.67;   // EVE stacking penalty constant
 
 // EVE stacking penalty: e^(-((rank-1)/2.67)^2), rank is 1-based
@@ -333,12 +342,14 @@ function getConfigs(adjustedBase, baseCargo) {{
     var exp = LOW_SLOTS - econ;
     var fuelPerLY = econFuel(adjustedBase, econ);
     var cargo     = baseCargo * Math.pow(expBonus, exp);
-    var effectiveCargo = Math.max(0, cargo - FITTING_OVERHEAD);
+    var overhead = fittingOverhead(econ, exp);
+    var effectiveCargo = Math.max(0, cargo - overhead);
     configs.push({{
       econ:          econ,
       exp:           exp,
       fuelPerLY:     fuelPerLY,
       cargo:         cargo,
+      overhead:      overhead,
       effectiveCargo: effectiveCargo,
       label:    econ===0 ? '3 Exp' :
                 exp===0  ? '3 Econ' :
@@ -384,6 +395,7 @@ function recalc() {{
       exp:           c.exp,
       label:         c.label,
       cargo:         c.cargo,
+      overhead:      c.overhead,
       effectiveCargo: c.effectiveCargo,
       fuelPerLY:     c.fuelPerLY,
       trips:         trips,
@@ -416,7 +428,7 @@ function recalc() {{
 
     tr.innerHTML =
       '<td>'+fitLabel+badge+'</td>' +
-      '<td class="td-dim">'+fmt(Math.round(r.effectiveCargo))+' m\u00B3<br><span style="font-size:.8em;opacity:.55">'+fmt(Math.round(r.cargo))+' \u2212 10,530</span></td>' +
+      '<td class="td-dim">'+fmt(Math.round(r.effectiveCargo))+' m\u00B3<br><span style="font-size:.8em;opacity:.55">'+fmt(Math.round(r.cargo))+' \u2212 '+fmt(r.overhead)+'</span></td>' +
       '<td class="td-dim">'+fmt(Math.round(r.fuelPerLY))+'</td>' +
       '<td>'+(r.trips > 0 ? r.trips : '\u2014')+'</td>' +
       '<td>'+(r.isoUsed > 0 ? fmt(Math.round(r.isoUsed)) : '\u2014')+'</td>' +
