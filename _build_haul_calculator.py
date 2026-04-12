@@ -239,7 +239,7 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
     <thead>
       <tr>
         <th style="min-width:180px;text-align:left">Fit</th>
-        <th>Cargo Cap</th>
+        <th>Available Cargo<br><span style="font-size:.8em;opacity:.6">after fittings</span></th>
         <th>Fuel / LY</th>
         <th>Trips</th>
         <th>Isotopes</th>
@@ -275,6 +275,11 @@ var SHIPS = {{
 }};
 
 var LOW_SLOTS = 3;
+
+// Fixed fittings always carried (reduce available cargo in every config)
+// 3× Expanded Cargohold II (5 m³ each) + 3× Reinforced Bulkheads II (5 m³ each)
+// + 3× Experimental Jump Drive Economizer (3500 m³ each)
+var FITTING_OVERHEAD = (3 * 5) + (3 * 5) + (3 * 3500);  // 10,530 m³
 var STACK_C    = 2.67;   // EVE stacking penalty constant
 
 // EVE stacking penalty: e^(-((rank-1)/2.67)^2), rank is 1-based
@@ -328,11 +333,13 @@ function getConfigs(adjustedBase, baseCargo) {{
     var exp = LOW_SLOTS - econ;
     var fuelPerLY = econFuel(adjustedBase, econ);
     var cargo     = baseCargo * Math.pow(expBonus, exp);
+    var effectiveCargo = Math.max(0, cargo - FITTING_OVERHEAD);
     configs.push({{
-      econ:     econ,
-      exp:      exp,
-      fuelPerLY: fuelPerLY,
-      cargo:     cargo,
+      econ:          econ,
+      exp:           exp,
+      fuelPerLY:     fuelPerLY,
+      cargo:         cargo,
+      effectiveCargo: effectiveCargo,
       label:    econ===0 ? '3 Exp' :
                 exp===0  ? '3 Econ' :
                 econ+'E / '+exp+'X'
@@ -368,20 +375,21 @@ function recalc() {{
 
   // Compute totals for each config
   var results = configs.map(function(c) {{
-    var trips     = vol > 0 ? Math.ceil(vol / c.cargo) : 0;
+    var trips     = vol > 0 ? Math.ceil(vol / c.effectiveCargo) : 0;
     var isoUsed   = trips * ly * mult * c.fuelPerLY;
     var fuelCost  = isoUsed * isoPrice;
     var totalFee  = fuelCost + flatFee + collFee;
     return {{
-      econ:     c.econ,
-      exp:      c.exp,
-      label:    c.label,
-      cargo:    c.cargo,
-      fuelPerLY: c.fuelPerLY,
-      trips:    trips,
-      isoUsed:  isoUsed,
-      fuelCost: fuelCost,
-      totalFee: totalFee
+      econ:          c.econ,
+      exp:           c.exp,
+      label:         c.label,
+      cargo:         c.cargo,
+      effectiveCargo: c.effectiveCargo,
+      fuelPerLY:     c.fuelPerLY,
+      trips:         trips,
+      isoUsed:       isoUsed,
+      fuelCost:      fuelCost,
+      totalFee:      totalFee
     }};
   }});
 
@@ -408,7 +416,7 @@ function recalc() {{
 
     tr.innerHTML =
       '<td>'+fitLabel+badge+'</td>' +
-      '<td class="td-dim">'+fmt(Math.round(r.cargo))+' m\u00B3</td>' +
+      '<td class="td-dim">'+fmt(Math.round(r.effectiveCargo))+' m\u00B3<br><span style="font-size:.8em;opacity:.55">'+fmt(Math.round(r.cargo))+' \u2212 10,530</span></td>' +
       '<td class="td-dim">'+fmt(Math.round(r.fuelPerLY))+'</td>' +
       '<td>'+(r.trips > 0 ? r.trips : '\u2014')+'</td>' +
       '<td>'+(r.isoUsed > 0 ? fmt(Math.round(r.isoUsed)) : '\u2014')+'</td>' +
