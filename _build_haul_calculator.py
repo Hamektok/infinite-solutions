@@ -167,9 +167,11 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
   <hr class="div">
 
   <div class="form-row">
-    <label>Ship Base Fuel / LY</label>
-    <input type="number" id="base_fuel" value="10000" min="1" step="100" oninput="recalc()" style="width:110px">
-    <span class="unit">isotopes / LY &nbsp;<span class="note">(unadjusted ship stat)</span></span>
+    <label>Ship</label>
+    <select id="ship_sel" onchange="recalc()" style="min-width:260px">
+      <option value="rhea">Rhea &mdash; 10,000 fuel/LY &mdash; 180,000 m&#179;</option>
+    </select>
+    <span class="unit" id="ship_note">&mdash;</span>
   </div>
   <div class="form-row">
     <label>Jump Freighters Skill</label>
@@ -185,19 +187,20 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
     </select>
     <span class="unit" id="jfc_note">&mdash;</span>
   </div>
-  <div class="form-row">
-    <label>Base Cargo Capacity</label>
-    <input type="number" id="base_cargo" value="180000" min="1" step="1000" oninput="recalc()" style="width:130px">
-    <span class="unit">m&#179; &nbsp;<span class="note">(no low mods fitted)</span></span>
-  </div>
 
   <hr class="div">
 
   <div class="form-row">
-    <label>Economizer Type</label>
+    <label>Economizer Module</label>
     <select id="econ_type" onchange="recalc()" style="min-width:340px">
       <option value="0.07" selected>Experimental Jump Drive Economizer I &mdash; 7%</option>
       <option value="0.10">Prototype Jump Drive Economizer I &mdash; 10%</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label>Cargo Expander Module</label>
+    <select id="exp_type" onchange="recalc()" style="min-width:340px">
+      <option value="1.275" selected>Expanded Cargohold II &mdash; 27.5%</option>
     </select>
   </div>
 
@@ -266,9 +269,12 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
 <script>
 const SYSTEMS = {systems_js};
 
-// Module constants — ECON_BONUS read dynamically from dropdown
-var EXP_BONUS  = 1.275;  // 27.5% cargo increase per expander (no stacking penalty)
-var LOW_SLOTS  = 3;
+// Ship definitions — add more ships here as needed
+var SHIPS = {{
+  rhea: {{ name: 'Rhea', baseFuel: 10000, baseCargo: 180000 }}
+}};
+
+var LOW_SLOTS = 3;
 var STACK_C    = 2.67;   // EVE stacking penalty constant
 
 // EVE stacking penalty: e^(-((rank-1)/2.67)^2), rank is 1-based
@@ -300,21 +306,28 @@ function getSysLy() {{
   return SYSTEMS[idx] ? SYSTEMS[idx].ly : 0;
 }}
 
+// Get selected ship data
+function getShip() {{
+  var key = document.getElementById('ship_sel').value;
+  return SHIPS[key] || SHIPS.rhea;
+}}
+
 // Compute adjusted base fuel/LY from skills (before mods)
 function getAdjustedBase() {{
-  var base = parseFloat(document.getElementById('base_fuel').value)||10000;
+  var ship = getShip();
   var jf   = parseInt(document.getElementById('jf_skill').value)||4;
   var jfc  = parseInt(document.getElementById('jfc_skill').value)||4;
-  return base * (1 - 0.1*jf) * (1 - 0.1*jfc);
+  return ship.baseFuel * (1 - 0.1*jf) * (1 - 0.1*jfc);
 }}
 
 // Returns array of config objects for all valid econ/exp combos across LOW_SLOTS slots
 function getConfigs(adjustedBase, baseCargo) {{
+  var expBonus = parseFloat(document.getElementById('exp_type').value)||1.275;
   var configs = [];
   for (var econ = 0; econ <= LOW_SLOTS; econ++) {{
     var exp = LOW_SLOTS - econ;
-    var fuelPerLY = econFuel(adjustedBase, econ);   // stacking penalties applied
-    var cargo     = baseCargo * Math.pow(EXP_BONUS, exp);  // no penalty
+    var fuelPerLY = econFuel(adjustedBase, econ);
+    var cargo     = baseCargo * Math.pow(expBonus, exp);
     configs.push({{
       econ:     econ,
       exp:      exp,
@@ -336,18 +349,17 @@ function recalc() {{
   var coll      = parseFloat(document.getElementById('cargo_coll').value)||0;
   var flatPerM3 = parseFloat(document.getElementById('fee_flat').value)||0;
   var collPct   = parseFloat(document.getElementById('coll_pct').value)||0;
-  var baseCargo = parseFloat(document.getElementById('base_cargo').value)||180000;
 
+  var ship    = getShip();
   var adjBase = getAdjustedBase();
-  var jf  = parseInt(document.getElementById('jf_skill').value)||4;
-  var jfc = parseInt(document.getElementById('jfc_skill').value)||4;
+  var jf      = parseInt(document.getElementById('jf_skill').value)||4;
+  var jfc     = parseInt(document.getElementById('jfc_skill').value)||4;
+  var baseCargo = ship.baseCargo;
 
-  // Update skill notes
-  var base = parseFloat(document.getElementById('base_fuel').value)||10000;
-  document.getElementById('jf_note').textContent  = '\u2212'+(jf*10)+'% \u2192 \u00D7'+(1-0.1*jf).toFixed(1);
-  document.getElementById('jfc_note').textContent = '\u2212'+(jfc*10)+'% \u2192 \u00D7'+(1-0.1*jfc).toFixed(1);
-
-  // System note
+  // Update notes
+  document.getElementById('ship_note').textContent   = fmt(ship.baseFuel)+' fuel/LY base \u00B7 '+fmt(ship.baseCargo)+' m\u00B3 base \u2192 '+fmt(Math.round(adjBase))+' fuel/LY at skill';
+  document.getElementById('jf_note').textContent     = '\u2212'+(jf*10)+'% \u2192 \u00D7'+(1-0.1*jf).toFixed(1);
+  document.getElementById('jfc_note').textContent    = '\u2212'+(jfc*10)+'% \u2192 \u00D7'+(1-0.1*jfc).toFixed(1);
   document.getElementById('sys_dist_note').textContent = ly > 0 ? ly.toFixed(3)+' ly from 4-HWWF' : '4-HWWF (hub)';
 
   var configs = getConfigs(adjBase, baseCargo);
@@ -426,8 +438,8 @@ function recalc() {{
 
 function saveState() {{
   var s = {{}};
-  ['sys_sel','trip_type','iso_type','econ_type','base_fuel','jf_skill','jfc_skill',
-   'base_cargo','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
+  ['sys_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+   'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el) s[id] = el.value;
   }});
   try{{ localStorage.setItem('haul_calc_state', JSON.stringify(s)); }}catch(e){{}}
@@ -437,8 +449,8 @@ function loadState() {{
   var raw; try{{ raw = localStorage.getItem('haul_calc_state'); }}catch(e){{}}
   if (!raw) {{ recalc(); return; }}
   var s; try{{ s = JSON.parse(raw); }}catch(e){{ recalc(); return; }}
-  ['sys_sel','trip_type','iso_type','econ_type','base_fuel','jf_skill','jfc_skill',
-   'base_cargo','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
+  ['sys_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+   'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   }});
   recalc();
