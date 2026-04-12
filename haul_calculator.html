@@ -220,12 +220,18 @@ tbody tr td.td-dim{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size:
   </div>
   <div class="form-row">
     <label>Isotope Type</label>
-    <select id="iso_type" onchange="recalc()" style="min-width:260px">
-      <option value="642.30" selected>Nitrogen Isotopes &mdash; 642 ISK/unit</option>
-      <option value="512.90">Hydrogen Isotopes &mdash; 513 ISK/unit</option>
-      <option value="705.20">Oxygen Isotopes &mdash; 705 ISK/unit</option>
-      <option value="725.30">Helium Isotopes &mdash; 725 ISK/unit</option>
+    <select id="iso_type" onchange="recalc()" style="min-width:300px">
+      <option value="669.0" data-jbv="669.0" selected>Nitrogen Isotopes &mdash; 669.00 ISK/unit</option>
+      <option value="579.5" data-jbv="579.5">Hydrogen Isotopes &mdash; 579.50 ISK/unit</option>
+      <option value="735.6" data-jbv="735.6">Oxygen Isotopes &mdash; 735.60 ISK/unit</option>
+      <option value="824.6" data-jbv="824.6">Helium Isotopes &mdash; 824.60 ISK/unit</option>
     </select>
+    <span class="note" style="font-size:.78em">&nbsp;Jita snapshot: 12 Apr 2026 02:11 UTC</span>
+  </div>
+  <div class="form-row">
+    <label>Isotope Cost Basis</label>
+    <input type="number" id="iso_jbv_pct" min="0" max="120" step="0.5" value="100" oninput="recalc()" style="width:90px">
+    <span class="unit">% of JBV &nbsp;<span class="iv" id="iso_eff_price">&mdash;</span></span>
   </div>
 
   <hr class="div">
@@ -407,6 +413,12 @@ function onPricingModeChange() {
   recalc();
 }
 
+function getIsoPrice() {
+  var base = parseFloat(document.getElementById('iso_type').value)||0;
+  var pct  = parseFloat(document.getElementById('iso_jbv_pct').value)||100;
+  return base * pct / 100;
+}
+
 function getMarkupPerM3(ly) {
   var mode = document.getElementById('pricing_mode').value;
   if (mode === 'per_ly') {
@@ -468,7 +480,7 @@ function getConfigs(adjustedBase, baseCargo) {
 function recalc() {
   var ly        = getSysLy() || 0;
   var mult      = document.getElementById('trip_type').value==='round' ? 2 : 1;
-  var isoPrice  = parseFloat(document.getElementById('iso_type').value)||0;
+  var isoPrice  = getIsoPrice();
   var vol       = parseFloat(document.getElementById('cargo_vol').value)||0;
   var coll      = parseFloat(document.getElementById('cargo_coll').value)||0;
   var collPct   = parseFloat(document.getElementById('coll_pct').value)||0;
@@ -485,6 +497,16 @@ function recalc() {
   document.getElementById('ship_note').textContent = fmt(ship.baseFuel)+' fuel/LY base · '+fmt(ship.baseCargo)+' m³ base → '+fmt(Math.round(adjBase))+' fuel/LY at skill';
   document.getElementById('jf_note').textContent   = '−'+(jf*10)+'% → ×'+(1-0.1*jf).toFixed(1);
   document.getElementById('jfc_note').textContent  = '−'+(jfc*10)+'% → ×'+(1-0.1*jfc).toFixed(1);
+
+  // Show effective isotope price after JBV%
+  var isoEffEl = document.getElementById('iso_eff_price');
+  if (isoEffEl) {
+    var isoPct = parseFloat(document.getElementById('iso_jbv_pct').value)||100;
+    var isoBase = parseFloat(document.getElementById('iso_type').value)||0;
+    isoEffEl.textContent = isoPct === 100
+      ? '— at JBV'
+      : fmt(isoBase * isoPct / 100, 2)+' ISK/unit ('+isoPct+'% of JBV)';
+  }
 
   var distEl = document.getElementById('sys_dist_note');
   var sysInput = (document.getElementById('sys_input').value||'').trim();
@@ -587,7 +609,7 @@ function recalc() {
 
 function saveState() {
   var s = {};
-  ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+  ['origin_sel','trip_type','iso_type','iso_jbv_pct','ship_sel','jf_skill','jfc_skill',
    'econ_type','exp_type','pricing_mode','fee_per_ly','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if(el) s[id] = el.value;
   });
@@ -599,7 +621,7 @@ function loadState() {
   var raw; try{ raw = localStorage.getItem('haul_calc_state'); }catch(e){}
   if (!raw) { recalc(); return; }
   var s; try{ s = JSON.parse(raw); }catch(e){ recalc(); return; }
-  ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+  ['origin_sel','trip_type','iso_type','iso_jbv_pct','ship_sel','jf_skill','jfc_skill',
    'econ_type','exp_type','pricing_mode','fee_per_ly','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   });
