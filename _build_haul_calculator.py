@@ -194,6 +194,16 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
   <hr class="div">
 
   <div class="form-row">
+    <label>Economizer Type</label>
+    <select id="econ_type" onchange="recalc()" style="min-width:340px">
+      <option value="0.07" selected>Experimental Jump Drive Economizer I &mdash; 7%</option>
+      <option value="0.10">Prototype Jump Drive Economizer I &mdash; 10%</option>
+    </select>
+  </div>
+
+  <hr class="div">
+
+  <div class="form-row">
     <label>Flat Markup</label>
     <input type="number" id="fee_flat" min="0" step="1" value="0" oninput="recalc()" style="width:110px">
     <span class="unit">ISK / m&#179;</span>
@@ -256,8 +266,7 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
 <script>
 const SYSTEMS = {systems_js};
 
-// Module constants
-var ECON_BONUS = 0.07;   // 7% fuel reduction per economizer (subject to stacking penalty)
+// Module constants — ECON_BONUS read dynamically from dropdown
 var EXP_BONUS  = 1.275;  // 27.5% cargo increase per expander (no stacking penalty)
 var LOW_SLOTS  = 3;
 var STACK_C    = 2.67;   // EVE stacking penalty constant
@@ -269,9 +278,10 @@ function stackEff(rank) {{
 
 // Fuel/LY after applying n economizers with stacking penalties
 function econFuel(adjustedBase, n) {{
+  var econBonus = parseFloat(document.getElementById('econ_type').value)||0.07;
   var fuel = adjustedBase;
   for (var i = 1; i <= n; i++) {{
-    fuel *= (1 - ECON_BONUS * stackEff(i));
+    fuel *= (1 - econBonus * stackEff(i));
   }}
   return fuel;
 }}
@@ -416,7 +426,7 @@ function recalc() {{
 
 function saveState() {{
   var s = {{}};
-  ['sys_sel','trip_type','iso_type','base_fuel','jf_skill','jfc_skill',
+  ['sys_sel','trip_type','iso_type','econ_type','base_fuel','jf_skill','jfc_skill',
    'base_cargo','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el) s[id] = el.value;
   }});
@@ -427,7 +437,7 @@ function loadState() {{
   var raw; try{{ raw = localStorage.getItem('haul_calc_state'); }}catch(e){{}}
   if (!raw) {{ recalc(); return; }}
   var s; try{{ s = JSON.parse(raw); }}catch(e){{ recalc(); return; }}
-  ['sys_sel','trip_type','iso_type','base_fuel','jf_skill','jfc_skill',
+  ['sys_sel','trip_type','iso_type','econ_type','base_fuel','jf_skill','jfc_skill',
    'base_cargo','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   }});
