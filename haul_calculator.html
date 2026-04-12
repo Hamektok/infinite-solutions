@@ -90,114 +90,125 @@ tbody tr td.td-dim{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size:
 <div class="panel">
   <div class="panel-title">Trip Parameters</div>
   <div class="form-row">
-    <label>Pickup System</label>
-    <select id="sys_sel" onchange="recalc()" style="min-width:200px">
-      <option value="0">4-HWWF &mdash; 0.000 ly</option>
-      <option value="1">PM-DWE &mdash; 0.893 ly</option>
-      <option value="2">4GYV-Q &mdash; 0.937 ly</option>
-      <option value="3">EIDI-N &mdash; 1.023 ly</option>
-      <option value="4">YMJG-4 &mdash; 1.136 ly</option>
-      <option value="5">DAYP-G &mdash; 1.356 ly</option>
-      <option value="6">WBR5-R &mdash; 1.443 ly</option>
-      <option value="7">8TPX-N &mdash; 1.491 ly</option>
-      <option value="8">KRUN-N &mdash; 1.499 ly</option>
-      <option value="9">TVN-FM &mdash; 1.502 ly</option>
-      <option value="10">IPAY-2 &mdash; 1.577 ly</option>
-      <option value="11">K8X-6B &mdash; 1.720 ly</option>
-      <option value="12">0MV-4W &mdash; 1.927 ly</option>
-      <option value="13">AZBR-2 &mdash; 2.030 ly</option>
-      <option value="14">Q-L07F &mdash; 2.198 ly</option>
-      <option value="15">U54-1L &mdash; 2.247 ly</option>
-      <option value="16">P3EN-E &mdash; 2.278 ly</option>
-      <option value="17">T-GCGL &mdash; 2.440 ly</option>
-      <option value="18">V-OJEN &mdash; 2.469 ly</option>
-      <option value="19">X445-5 &mdash; 2.533 ly</option>
-      <option value="20">05R-7A &mdash; 2.559 ly</option>
-      <option value="21">FS-RFL &mdash; 2.619 ly</option>
-      <option value="22">NCGR-Q &mdash; 2.658 ly</option>
-      <option value="23">Z-8Q65 &mdash; 2.700 ly</option>
-      <option value="24">IFJ-EL &mdash; 2.748 ly</option>
-      <option value="25">9OO-LH &mdash; 2.759 ly</option>
-      <option value="26">MC6O-F &mdash; 2.774 ly</option>
-      <option value="27">X97D-W &mdash; 2.799 ly</option>
-      <option value="28">49-0LI &mdash; 2.815 ly</option>
-      <option value="29">0-R5TS &mdash; 2.844 ly</option>
-      <option value="30">669-IX &mdash; 2.888 ly</option>
-      <option value="31">0R-F2F &mdash; 3.002 ly</option>
-      <option value="32">47L-J4 &mdash; 3.070 ly</option>
-      <option value="33">N-HSK0 &mdash; 3.163 ly</option>
-      <option value="34">HE-V4V &mdash; 3.182 ly</option>
-      <option value="35">V-NL3K &mdash; 3.223 ly</option>
-      <option value="36">0J3L-V &mdash; 3.232 ly</option>
-      <option value="37">S-NJBB &mdash; 3.307 ly</option>
-      <option value="38">XF-PWO &mdash; 3.361 ly</option>
-      <option value="39">R-P7KL &mdash; 3.370 ly</option>
-      <option value="40">A8A-JN &mdash; 3.386 ly</option>
-      <option value="41">NFM-0V &mdash; 3.389 ly</option>
-      <option value="42">E-D0VZ &mdash; 3.401 ly</option>
-      <option value="43">6WW-28 &mdash; 3.432 ly</option>
-      <option value="44">UH-9ZG &mdash; 3.448 ly</option>
-      <option value="45">YXIB-I &mdash; 3.497 ly</option>
-      <option value="46">LZ-6SU &mdash; 3.503 ly</option>
-      <option value="47">Y0-BVN &mdash; 3.631 ly</option>
-      <option value="48">7-UH4Z &mdash; 3.631 ly</option>
-      <option value="49">1N-FJ8 &mdash; 3.718 ly</option>
-      <option value="50">2DWM-2 &mdash; 3.732 ly</option>
-      <option value="51">H-UCD1 &mdash; 3.802 ly</option>
-      <option value="52">G-LOIT &mdash; 3.828 ly</option>
-      <option value="53">1-GBBP &mdash; 3.837 ly</option>
-      <option value="54">B-588R &mdash; 3.905 ly</option>
-      <option value="55">5ZO-NZ &mdash; 4.132 ly</option>
-      <option value="56">H-NOU5 &mdash; 4.337 ly</option>
-      <option value="57">97-M96 &mdash; 4.356 ly</option>
-      <option value="58">T-ZWA1 &mdash; 4.379 ly</option>
-      <option value="59">3HX-DL &mdash; 4.409 ly</option>
-      <option value="60">7-K5EL &mdash; 4.429 ly</option>
-      <option value="61">KX-2UI &mdash; 4.579 ly</option>
-      <option value="62">GEKJ-9 &mdash; 4.620 ly</option>
-      <option value="63">MY-T2P &mdash; 4.817 ly</option>
-      <option value="64">Y-ZXIO &mdash; 4.827 ly</option>
-      <option value="65">C-FP70 &mdash; 4.899 ly</option>
-      <option value="66">G96R-F &mdash; 5.079 ly</option>
-      <option value="67">Q-R3GP &mdash; 5.081 ly</option>
-      <option value="68">ZA0L-U &mdash; 5.118 ly</option>
-      <option value="69">FA-DMO &mdash; 5.257 ly</option>
-      <option value="70">XV-8JQ &mdash; 5.341 ly</option>
-      <option value="71">N-5QPW &mdash; 5.528 ly</option>
-      <option value="72">MO-FIF &mdash; 5.566 ly</option>
-      <option value="73">MA-XAP &mdash; 5.716 ly</option>
-      <option value="74">H-5GUI &mdash; 5.717 ly</option>
-      <option value="75">C-J7CR &mdash; 5.852 ly</option>
-      <option value="76">Q-EHMJ &mdash; 5.941 ly</option>
-      <option value="77">XSQ-TF &mdash; 6.193 ly</option>
-      <option value="78">H-1EOH &mdash; 6.423 ly</option>
-      <option value="79">FMBR-8 &mdash; 6.451 ly</option>
-      <option value="80">FH-TTC &mdash; 6.633 ly</option>
-      <option value="81">VI2K-J &mdash; 6.669 ly</option>
-      <option value="82">6Y-WRK &mdash; 6.755 ly</option>
-      <option value="83">5T-KM3 &mdash; 6.789 ly</option>
-      <option value="84">IR-DYY &mdash; 6.818 ly</option>
-      <option value="85">MQ-O27 &mdash; 7.129 ly</option>
-      <option value="86">ZLZ-1Z &mdash; 7.348 ly</option>
-      <option value="87">F-D49D &mdash; 7.382 ly</option>
-      <option value="88">RVCZ-C &mdash; 7.422 ly</option>
-      <option value="89">B-E3KQ &mdash; 7.870 ly</option>
-      <option value="90">Y5J-EU &mdash; 7.899 ly</option>
-      <option value="91">H-EY0P &mdash; 8.008 ly</option>
-      <option value="92">O-LR1H &mdash; 8.088 ly</option>
-      <option value="93">LS9B-9 &mdash; 8.170 ly</option>
-      <option value="94">C-DHON &mdash; 8.317 ly</option>
-      <option value="95">G5ED-Y &mdash; 8.656 ly</option>
-      <option value="96">UNAG-6 &mdash; 8.692 ly</option>
-      <option value="97">A-QRQT &mdash; 8.849 ly</option>
-      <option value="98">8-TFDX &mdash; 9.072 ly</option>
-      <option value="99">BR-6XP &mdash; 9.092 ly</option>
-      <option value="100">E-SCTX &mdash; 9.276 ly</option>
-      <option value="101">7-PO3P &mdash; 9.281 ly</option>
-      <option value="102">WMBZ-U &mdash; 9.319 ly</option>
-      <option value="103">UL-4ZW &mdash; 9.656 ly</option>
-      <option value="104">VORM-W &mdash; 9.730 ly</option>
+    <label>Origin System</label>
+    <select id="origin_sel" onchange="recalc()" style="min-width:200px">
+      <option value="4-HWWF" selected>4-HWWF</option>
     </select>
+  </div>
+  <div class="form-row">
+    <label>Pickup System</label>
+    <input type="text" id="sys_input" list="sys_list" placeholder="Type system name&hellip;"
+      oninput="recalc()" autocomplete="off"
+      style="min-width:220px;background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+             color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;
+             padding:5px 9px;outline:none;transition:border-color .15s;">
+    <datalist id="sys_list">
+      <option value="4-HWWF">4-HWWF &mdash; 0.000 ly</option>
+      <option value="PM-DWE">PM-DWE &mdash; 0.893 ly</option>
+      <option value="4GYV-Q">4GYV-Q &mdash; 0.937 ly</option>
+      <option value="EIDI-N">EIDI-N &mdash; 1.023 ly</option>
+      <option value="YMJG-4">YMJG-4 &mdash; 1.136 ly</option>
+      <option value="DAYP-G">DAYP-G &mdash; 1.356 ly</option>
+      <option value="WBR5-R">WBR5-R &mdash; 1.443 ly</option>
+      <option value="8TPX-N">8TPX-N &mdash; 1.491 ly</option>
+      <option value="KRUN-N">KRUN-N &mdash; 1.499 ly</option>
+      <option value="TVN-FM">TVN-FM &mdash; 1.502 ly</option>
+      <option value="IPAY-2">IPAY-2 &mdash; 1.577 ly</option>
+      <option value="K8X-6B">K8X-6B &mdash; 1.720 ly</option>
+      <option value="0MV-4W">0MV-4W &mdash; 1.927 ly</option>
+      <option value="AZBR-2">AZBR-2 &mdash; 2.030 ly</option>
+      <option value="Q-L07F">Q-L07F &mdash; 2.198 ly</option>
+      <option value="U54-1L">U54-1L &mdash; 2.247 ly</option>
+      <option value="P3EN-E">P3EN-E &mdash; 2.278 ly</option>
+      <option value="T-GCGL">T-GCGL &mdash; 2.440 ly</option>
+      <option value="V-OJEN">V-OJEN &mdash; 2.469 ly</option>
+      <option value="X445-5">X445-5 &mdash; 2.533 ly</option>
+      <option value="05R-7A">05R-7A &mdash; 2.559 ly</option>
+      <option value="FS-RFL">FS-RFL &mdash; 2.619 ly</option>
+      <option value="NCGR-Q">NCGR-Q &mdash; 2.658 ly</option>
+      <option value="Z-8Q65">Z-8Q65 &mdash; 2.700 ly</option>
+      <option value="IFJ-EL">IFJ-EL &mdash; 2.748 ly</option>
+      <option value="9OO-LH">9OO-LH &mdash; 2.759 ly</option>
+      <option value="MC6O-F">MC6O-F &mdash; 2.774 ly</option>
+      <option value="X97D-W">X97D-W &mdash; 2.799 ly</option>
+      <option value="49-0LI">49-0LI &mdash; 2.815 ly</option>
+      <option value="0-R5TS">0-R5TS &mdash; 2.844 ly</option>
+      <option value="669-IX">669-IX &mdash; 2.888 ly</option>
+      <option value="0R-F2F">0R-F2F &mdash; 3.002 ly</option>
+      <option value="47L-J4">47L-J4 &mdash; 3.070 ly</option>
+      <option value="N-HSK0">N-HSK0 &mdash; 3.163 ly</option>
+      <option value="HE-V4V">HE-V4V &mdash; 3.182 ly</option>
+      <option value="V-NL3K">V-NL3K &mdash; 3.223 ly</option>
+      <option value="0J3L-V">0J3L-V &mdash; 3.232 ly</option>
+      <option value="S-NJBB">S-NJBB &mdash; 3.307 ly</option>
+      <option value="XF-PWO">XF-PWO &mdash; 3.361 ly</option>
+      <option value="R-P7KL">R-P7KL &mdash; 3.370 ly</option>
+      <option value="A8A-JN">A8A-JN &mdash; 3.386 ly</option>
+      <option value="NFM-0V">NFM-0V &mdash; 3.389 ly</option>
+      <option value="E-D0VZ">E-D0VZ &mdash; 3.401 ly</option>
+      <option value="6WW-28">6WW-28 &mdash; 3.432 ly</option>
+      <option value="UH-9ZG">UH-9ZG &mdash; 3.448 ly</option>
+      <option value="YXIB-I">YXIB-I &mdash; 3.497 ly</option>
+      <option value="LZ-6SU">LZ-6SU &mdash; 3.503 ly</option>
+      <option value="Y0-BVN">Y0-BVN &mdash; 3.631 ly</option>
+      <option value="7-UH4Z">7-UH4Z &mdash; 3.631 ly</option>
+      <option value="1N-FJ8">1N-FJ8 &mdash; 3.718 ly</option>
+      <option value="2DWM-2">2DWM-2 &mdash; 3.732 ly</option>
+      <option value="H-UCD1">H-UCD1 &mdash; 3.802 ly</option>
+      <option value="G-LOIT">G-LOIT &mdash; 3.828 ly</option>
+      <option value="1-GBBP">1-GBBP &mdash; 3.837 ly</option>
+      <option value="B-588R">B-588R &mdash; 3.905 ly</option>
+      <option value="5ZO-NZ">5ZO-NZ &mdash; 4.132 ly</option>
+      <option value="H-NOU5">H-NOU5 &mdash; 4.337 ly</option>
+      <option value="97-M96">97-M96 &mdash; 4.356 ly</option>
+      <option value="T-ZWA1">T-ZWA1 &mdash; 4.379 ly</option>
+      <option value="3HX-DL">3HX-DL &mdash; 4.409 ly</option>
+      <option value="7-K5EL">7-K5EL &mdash; 4.429 ly</option>
+      <option value="KX-2UI">KX-2UI &mdash; 4.579 ly</option>
+      <option value="GEKJ-9">GEKJ-9 &mdash; 4.620 ly</option>
+      <option value="MY-T2P">MY-T2P &mdash; 4.817 ly</option>
+      <option value="Y-ZXIO">Y-ZXIO &mdash; 4.827 ly</option>
+      <option value="C-FP70">C-FP70 &mdash; 4.899 ly</option>
+      <option value="G96R-F">G96R-F &mdash; 5.079 ly</option>
+      <option value="Q-R3GP">Q-R3GP &mdash; 5.081 ly</option>
+      <option value="ZA0L-U">ZA0L-U &mdash; 5.118 ly</option>
+      <option value="FA-DMO">FA-DMO &mdash; 5.257 ly</option>
+      <option value="XV-8JQ">XV-8JQ &mdash; 5.341 ly</option>
+      <option value="N-5QPW">N-5QPW &mdash; 5.528 ly</option>
+      <option value="MO-FIF">MO-FIF &mdash; 5.566 ly</option>
+      <option value="MA-XAP">MA-XAP &mdash; 5.716 ly</option>
+      <option value="H-5GUI">H-5GUI &mdash; 5.717 ly</option>
+      <option value="C-J7CR">C-J7CR &mdash; 5.852 ly</option>
+      <option value="Q-EHMJ">Q-EHMJ &mdash; 5.941 ly</option>
+      <option value="XSQ-TF">XSQ-TF &mdash; 6.193 ly</option>
+      <option value="H-1EOH">H-1EOH &mdash; 6.423 ly</option>
+      <option value="FMBR-8">FMBR-8 &mdash; 6.451 ly</option>
+      <option value="FH-TTC">FH-TTC &mdash; 6.633 ly</option>
+      <option value="VI2K-J">VI2K-J &mdash; 6.669 ly</option>
+      <option value="6Y-WRK">6Y-WRK &mdash; 6.755 ly</option>
+      <option value="5T-KM3">5T-KM3 &mdash; 6.789 ly</option>
+      <option value="IR-DYY">IR-DYY &mdash; 6.818 ly</option>
+      <option value="MQ-O27">MQ-O27 &mdash; 7.129 ly</option>
+      <option value="ZLZ-1Z">ZLZ-1Z &mdash; 7.348 ly</option>
+      <option value="F-D49D">F-D49D &mdash; 7.382 ly</option>
+      <option value="RVCZ-C">RVCZ-C &mdash; 7.422 ly</option>
+      <option value="B-E3KQ">B-E3KQ &mdash; 7.870 ly</option>
+      <option value="Y5J-EU">Y5J-EU &mdash; 7.899 ly</option>
+      <option value="H-EY0P">H-EY0P &mdash; 8.008 ly</option>
+      <option value="O-LR1H">O-LR1H &mdash; 8.088 ly</option>
+      <option value="LS9B-9">LS9B-9 &mdash; 8.170 ly</option>
+      <option value="C-DHON">C-DHON &mdash; 8.317 ly</option>
+      <option value="G5ED-Y">G5ED-Y &mdash; 8.656 ly</option>
+      <option value="UNAG-6">UNAG-6 &mdash; 8.692 ly</option>
+      <option value="A-QRQT">A-QRQT &mdash; 8.849 ly</option>
+      <option value="8-TFDX">8-TFDX &mdash; 9.072 ly</option>
+      <option value="BR-6XP">BR-6XP &mdash; 9.092 ly</option>
+      <option value="E-SCTX">E-SCTX &mdash; 9.276 ly</option>
+      <option value="7-PO3P">7-PO3P &mdash; 9.281 ly</option>
+      <option value="WMBZ-U">WMBZ-U &mdash; 9.319 ly</option>
+      <option value="UL-4ZW">UL-4ZW &mdash; 9.656 ly</option>
+      <option value="VORM-W">VORM-W &mdash; 9.730 ly</option>
+    </datalist>
     <span class="iv" id="sys_dist_note">&mdash;</span>
   </div>
   <div class="form-row">
@@ -377,8 +388,12 @@ function fmtB(n) {
 }
 
 function getSysLy() {
-  var idx = parseInt(document.getElementById('sys_sel').value)||0;
-  return SYSTEMS[idx] ? SYSTEMS[idx].ly : 0;
+  var name = (document.getElementById('sys_input').value||'').trim().toUpperCase();
+  if (!name) return 0;
+  for (var i = 0; i < SYSTEMS.length; i++) {
+    if (SYSTEMS[i].name.toUpperCase() === name) return SYSTEMS[i].ly;
+  }
+  return null;  // null = unrecognised input
 }
 
 // Get selected ship data
@@ -421,7 +436,7 @@ function getConfigs(adjustedBase, baseCargo) {
 }
 
 function recalc() {
-  var ly        = getSysLy();
+  var ly        = getSysLy() || 0;
   var mult      = document.getElementById('trip_type').value==='round' ? 2 : 1;
   var isoPrice  = parseFloat(document.getElementById('iso_type').value)||0;
   var vol       = parseFloat(document.getElementById('cargo_vol').value)||0;
@@ -434,12 +449,28 @@ function recalc() {
   var jf      = parseInt(document.getElementById('jf_skill').value)||4;
   var jfc     = parseInt(document.getElementById('jfc_skill').value)||4;
   var baseCargo = ship.baseCargo;
+  var origin  = document.getElementById('origin_sel').value;
 
   // Update notes
-  document.getElementById('ship_note').textContent   = fmt(ship.baseFuel)+' fuel/LY base · '+fmt(ship.baseCargo)+' m³ base → '+fmt(Math.round(adjBase))+' fuel/LY at skill';
-  document.getElementById('jf_note').textContent     = '−'+(jf*10)+'% → ×'+(1-0.1*jf).toFixed(1);
-  document.getElementById('jfc_note').textContent    = '−'+(jfc*10)+'% → ×'+(1-0.1*jfc).toFixed(1);
-  document.getElementById('sys_dist_note').textContent = ly > 0 ? ly.toFixed(3)+' ly from 4-HWWF' : '4-HWWF (hub)';
+  document.getElementById('ship_note').textContent = fmt(ship.baseFuel)+' fuel/LY base · '+fmt(ship.baseCargo)+' m³ base → '+fmt(Math.round(adjBase))+' fuel/LY at skill';
+  document.getElementById('jf_note').textContent   = '−'+(jf*10)+'% → ×'+(1-0.1*jf).toFixed(1);
+  document.getElementById('jfc_note').textContent  = '−'+(jfc*10)+'% → ×'+(1-0.1*jfc).toFixed(1);
+
+  var distEl = document.getElementById('sys_dist_note');
+  var sysInput = (document.getElementById('sys_input').value||'').trim();
+  if (!sysInput) {
+    distEl.textContent = '';
+    distEl.style.color = '';
+  } else if (ly === null) {
+    distEl.textContent = 'System not found';
+    distEl.style.color = 'var(--red)';
+  } else if (ly === 0) {
+    distEl.textContent = origin+' (origin)';
+    distEl.style.color = '';
+  } else {
+    distEl.textContent = ly.toFixed(3)+' ly from '+origin;
+    distEl.style.color = '';
+  }
 
   var configs = getConfigs(adjBase, baseCargo);
   var collFee = coll * collPct / 100;
@@ -519,10 +550,11 @@ function recalc() {
 
 function saveState() {
   var s = {};
-  ['sys_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+  ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
    'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if(el) s[id] = el.value;
   });
+  var si = document.getElementById('sys_input'); if(si) s['sys_input'] = si.value;
   try{ localStorage.setItem('haul_calc_state', JSON.stringify(s)); }catch(e){}
 }
 
@@ -530,10 +562,11 @@ function loadState() {
   var raw; try{ raw = localStorage.getItem('haul_calc_state'); }catch(e){}
   if (!raw) { recalc(); return; }
   var s; try{ s = JSON.parse(raw); }catch(e){ recalc(); return; }
-  ['sys_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+  ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
    'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   });
+  var si = document.getElementById('sys_input'); if(si && s['sys_input'] != null) si.value = s['sys_input'];
   recalc();
 }
 

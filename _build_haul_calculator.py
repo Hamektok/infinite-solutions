@@ -37,9 +37,14 @@ VALE_SYSTEMS = [
 ]
 
 systems_js = json.dumps([{'name': s[0], 'ly': s[1]} for s in VALE_SYSTEMS], separators=(',', ':'))
-systems_options = '\n'.join(
-    f'      <option value="{i}">{s[0]} &mdash; {s[1]:.3f} ly</option>'
-    for i, s in enumerate(VALE_SYSTEMS)
+systems_datalist = '\n'.join(
+    f'      <option value="{s[0]}">{s[0]} &mdash; {s[1]:.3f} ly</option>'
+    for s in VALE_SYSTEMS
+)
+
+origin_options = '\n'.join(
+    f'      <option value="{s[0]}"{" selected" if s[0]=="4-HWWF" else ""}>{s[0]}</option>'
+    for s in [('4-HWWF',)]
 )
 
 build_date = datetime.now(timezone.utc).strftime('%d %b %Y')
@@ -141,10 +146,21 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
 <div class="panel">
   <div class="panel-title">Trip Parameters</div>
   <div class="form-row">
-    <label>Pickup System</label>
-    <select id="sys_sel" onchange="recalc()" style="min-width:200px">
-{systems_options}
+    <label>Origin System</label>
+    <select id="origin_sel" onchange="recalc()" style="min-width:200px">
+{origin_options}
     </select>
+  </div>
+  <div class="form-row">
+    <label>Pickup System</label>
+    <input type="text" id="sys_input" list="sys_list" placeholder="Type system name&hellip;"
+      oninput="recalc()" autocomplete="off"
+      style="min-width:220px;background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+             color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;
+             padding:5px 9px;outline:none;transition:border-color .15s;">
+    <datalist id="sys_list">
+{systems_datalist}
+    </datalist>
     <span class="iv" id="sys_dist_note">&mdash;</span>
   </div>
   <div class="form-row">
@@ -316,8 +332,12 @@ function fmtB(n) {{
 }}
 
 function getSysLy() {{
-  var idx = parseInt(document.getElementById('sys_sel').value)||0;
-  return SYSTEMS[idx] ? SYSTEMS[idx].ly : 0;
+  var name = (document.getElementById('sys_input').value||'').trim().toUpperCase();
+  if (!name) return 0;
+  for (var i = 0; i < SYSTEMS.length; i++) {{
+    if (SYSTEMS[i].name.toUpperCase() === name) return SYSTEMS[i].ly;
+  }}
+  return null;  // null = unrecognised input
 }}
 
 // Get selected ship data
@@ -360,7 +380,7 @@ function getConfigs(adjustedBase, baseCargo) {{
 }}
 
 function recalc() {{
-  var ly        = getSysLy();
+  var ly        = getSysLy() || 0;
   var mult      = document.getElementById('trip_type').value==='round' ? 2 : 1;
   var isoPrice  = parseFloat(document.getElementById('iso_type').value)||0;
   var vol       = parseFloat(document.getElementById('cargo_vol').value)||0;
@@ -373,12 +393,28 @@ function recalc() {{
   var jf      = parseInt(document.getElementById('jf_skill').value)||4;
   var jfc     = parseInt(document.getElementById('jfc_skill').value)||4;
   var baseCargo = ship.baseCargo;
+  var origin  = document.getElementById('origin_sel').value;
 
   // Update notes
-  document.getElementById('ship_note').textContent   = fmt(ship.baseFuel)+' fuel/LY base \u00B7 '+fmt(ship.baseCargo)+' m\u00B3 base \u2192 '+fmt(Math.round(adjBase))+' fuel/LY at skill';
-  document.getElementById('jf_note').textContent     = '\u2212'+(jf*10)+'% \u2192 \u00D7'+(1-0.1*jf).toFixed(1);
-  document.getElementById('jfc_note').textContent    = '\u2212'+(jfc*10)+'% \u2192 \u00D7'+(1-0.1*jfc).toFixed(1);
-  document.getElementById('sys_dist_note').textContent = ly > 0 ? ly.toFixed(3)+' ly from 4-HWWF' : '4-HWWF (hub)';
+  document.getElementById('ship_note').textContent = fmt(ship.baseFuel)+' fuel/LY base \u00B7 '+fmt(ship.baseCargo)+' m\u00B3 base \u2192 '+fmt(Math.round(adjBase))+' fuel/LY at skill';
+  document.getElementById('jf_note').textContent   = '\u2212'+(jf*10)+'% \u2192 \u00D7'+(1-0.1*jf).toFixed(1);
+  document.getElementById('jfc_note').textContent  = '\u2212'+(jfc*10)+'% \u2192 \u00D7'+(1-0.1*jfc).toFixed(1);
+
+  var distEl = document.getElementById('sys_dist_note');
+  var sysInput = (document.getElementById('sys_input').value||'').trim();
+  if (!sysInput) {{
+    distEl.textContent = '';
+    distEl.style.color = '';
+  }} else if (ly === null) {{
+    distEl.textContent = 'System not found';
+    distEl.style.color = 'var(--red)';
+  }} else if (ly === 0) {{
+    distEl.textContent = origin+' (origin)';
+    distEl.style.color = '';
+  }} else {{
+    distEl.textContent = ly.toFixed(3)+' ly from '+origin;
+    distEl.style.color = '';
+  }}
 
   var configs = getConfigs(adjBase, baseCargo);
   var collFee = coll * collPct / 100;
@@ -458,10 +494,11 @@ function recalc() {{
 
 function saveState() {{
   var s = {{}};
-  ['sys_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+  ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
    'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el) s[id] = el.value;
   }});
+  var si = document.getElementById('sys_input'); if(si) s['sys_input'] = si.value;
   try{{ localStorage.setItem('haul_calc_state', JSON.stringify(s)); }}catch(e){{}}
 }}
 
@@ -469,10 +506,11 @@ function loadState() {{
   var raw; try{{ raw = localStorage.getItem('haul_calc_state'); }}catch(e){{}}
   if (!raw) {{ recalc(); return; }}
   var s; try{{ s = JSON.parse(raw); }}catch(e){{ recalc(); return; }}
-  ['sys_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
+  ['origin_sel','trip_type','iso_type','ship_sel','jf_skill','jfc_skill',
    'econ_type','exp_type','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   }});
+  var si = document.getElementById('sys_input'); if(si && s['sys_input'] != null) si.value = s['sys_input'];
   recalc();
 }}
 
