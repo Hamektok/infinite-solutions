@@ -1,7 +1,7 @@
 """
 Build haul_calculator.html — jump-freight admin fee calculator.
-Admin sets trip parameters; inputs are volume (m³) and collateral (ISK).
-Fee = (fuel recovery/m³ + flat markup/m³) × volume + collateral% × collateral
+Compares all 4 low-slot configurations (economizers vs cargo expanders)
+and highlights the cheapest setup for the given cargo volume.
 """
 import json
 from datetime import datetime, timezone
@@ -44,6 +44,11 @@ systems_options = '\n'.join(
 
 build_date = datetime.now(timezone.utc).strftime('%d %b %Y')
 
+skill_options = '\n'.join(
+    f'      <option value="{i}"{" selected" if i==4 else ""}>{i}</option>'
+    for i in range(1, 6)
+)
+
 html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,7 +66,7 @@ html = f"""<!DOCTYPE html>
 *{{box-sizing:border-box;margin:0;padding:0;}}
 body{{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;
   padding:20px 14px 48px;display:flex;justify-content:center;}}
-.page{{width:100%;max-width:780px;}}
+.page{{width:100%;max-width:900px;}}
 .hdr{{text-align:center;margin-bottom:18px;}}
 .hdr h1{{font-family:'Orbitron',sans-serif;font-size:1.5em;font-weight:900;letter-spacing:4px;
   background:linear-gradient(135deg,#ff9944,#ffcc44);-webkit-background-clip:text;
@@ -74,30 +79,50 @@ body{{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;
   text-transform:uppercase;color:var(--accent);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border-o);}}
 .form-row{{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}}
 .form-row:last-child{{margin-bottom:0;}}
-label{{color:var(--dim);font-size:.9em;font-weight:600;letter-spacing:.5px;min-width:170px;flex-shrink:0;}}
+label{{color:var(--dim);font-size:.9em;font-weight:600;letter-spacing:.5px;min-width:190px;flex-shrink:0;}}
 select,input[type="number"]{{background:var(--panel2);border:1px solid var(--border);border-radius:4px;
   color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;
   padding:5px 9px;outline:none;transition:border-color .15s;}}
 select:focus,input[type="number"]:focus{{border-color:var(--accent);}}
 .unit{{color:var(--dim);font-size:.87em;}}
 .iv{{color:var(--accent2);font-weight:700;font-size:.93em;}}
+.note{{color:var(--dim);font-size:.82em;font-style:italic;}}
 hr.div{{border:none;border-top:1px solid var(--border);margin:12px 0;}}
 .sum-bar{{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px;}}
 .sb{{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 8px;text-align:center;}}
 .sb.hi{{border-color:var(--border-o);background:rgba(255,140,50,.06);}}
 .sb-lbl{{font-size:.65em;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}}
 .sb-val{{font-family:'Orbitron',sans-serif;font-size:.88em;font-weight:700;}}
-.sb-val.green{{color:var(--green);}}.sb-val.gold{{color:var(--gold);}}.sb-val.lg{{font-size:1.15em;}}
+.sb-val.green{{color:var(--green);}}.sb-val.gold{{color:var(--gold);}}.sb-val.lg{{font-size:1.1em;}}
 .sb-sub{{font-size:.78em;color:var(--dim);margin-top:3px;}}
-.be-card{{background:rgba(68,170,255,.04);border:1px solid rgba(68,170,255,.18);
-  border-radius:6px;padding:12px 16px;margin-top:10px;}}
-.be-title{{font-family:'Orbitron',sans-serif;font-size:.63em;letter-spacing:2px;
-  text-transform:uppercase;color:var(--blue);margin-bottom:8px;}}
-.be-row{{display:flex;justify-content:space-between;align-items:center;font-size:.9em;margin-bottom:4px;}}
-.be-row:last-child{{margin-bottom:0;}}
-.be-lbl{{color:var(--dim);}}
-.be-val{{font-family:'Orbitron',sans-serif;font-size:.85em;font-weight:700;color:var(--text);}}
-.be-val.hi{{color:var(--blue);}}.be-val.green{{color:var(--green);}}.be-val.gold{{color:var(--gold);}}
+/* Comparison table */
+.tbl-wrap{{overflow-x:auto;margin-top:4px;}}
+table{{width:100%;border-collapse:collapse;font-size:.88em;}}
+thead th{{background:var(--panel2);color:var(--dim);font-size:.7em;letter-spacing:1px;
+  text-transform:uppercase;padding:8px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;}}
+thead th:first-child{{text-align:left;}}
+tbody td{{padding:7px 10px;border-bottom:1px solid var(--border);text-align:right;
+  font-family:'Orbitron',sans-serif;font-size:.78em;font-weight:700;white-space:nowrap;}}
+tbody td:first-child{{text-align:left;font-family:'Rajdhani',sans-serif;font-size:.9em;font-weight:600;}}
+tbody tr:last-child td{{border-bottom:none;}}
+tbody tr.winner{{background:rgba(51,221,136,.06);}}
+tbody tr.winner td{{color:var(--green);}}
+tbody tr.winner td:first-child{{color:var(--text);}}
+.winner-badge{{display:inline-block;background:rgba(51,221,136,.15);border:1px solid rgba(51,221,136,.4);
+  border-radius:3px;color:var(--green);font-family:'Orbitron',sans-serif;font-size:.6em;
+  font-weight:700;letter-spacing:1px;padding:1px 6px;margin-left:8px;vertical-align:middle;}}
+tbody tr td.td-fee{{color:var(--gold);}}
+tbody tr.winner td.td-fee{{color:var(--green);}}
+tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size:.85em;font-weight:600;}}
+.callout{{background:rgba(51,221,136,.05);border:1px solid rgba(51,221,136,.25);
+  border-radius:6px;padding:12px 16px;margin-top:10px;display:none;}}
+.callout-title{{font-family:'Orbitron',sans-serif;font-size:.63em;letter-spacing:2px;
+  text-transform:uppercase;color:var(--green);margin-bottom:8px;}}
+.callout-row{{display:flex;justify-content:space-between;align-items:center;font-size:.9em;margin-bottom:4px;}}
+.callout-row:last-child{{margin-bottom:0;}}
+.callout-lbl{{color:var(--dim);}}
+.callout-val{{font-family:'Orbitron',sans-serif;font-size:.85em;font-weight:700;}}
+.callout-val.green{{color:var(--green);}}.callout-val.gold{{color:var(--gold);}}
 .footer{{text-align:center;color:var(--dim);font-size:.76em;margin-top:20px;
   padding-top:12px;border-top:1px solid var(--border);}}
 </style>
@@ -138,11 +163,32 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:12px 0;}}
       <option value="725.30">Helium Isotopes &mdash; 725 ISK/unit</option>
     </select>
   </div>
+
+  <hr class="div">
+
   <div class="form-row">
-    <label>Fuel per LY</label>
-    <input type="number" id="fuel_per_ly" value="0" min="0" step="100" oninput="recalc()" style="width:110px">
-    <span class="unit">isotopes / LY &nbsp;&nbsp;</span>
-    <span class="iv" id="iso_calc_note">&mdash;</span>
+    <label>Ship Base Fuel / LY</label>
+    <input type="number" id="base_fuel" value="10000" min="1" step="100" oninput="recalc()" style="width:110px">
+    <span class="unit">isotopes / LY &nbsp;<span class="note">(unadjusted ship stat)</span></span>
+  </div>
+  <div class="form-row">
+    <label>Jump Freighters Skill</label>
+    <select id="jf_skill" onchange="recalc()" style="min-width:80px">
+{skill_options}
+    </select>
+    <span class="unit" id="jf_note">&mdash;</span>
+  </div>
+  <div class="form-row">
+    <label>Jump Fuel Conservation</label>
+    <select id="jfc_skill" onchange="recalc()" style="min-width:80px">
+{skill_options}
+    </select>
+    <span class="unit" id="jfc_note">&mdash;</span>
+  </div>
+  <div class="form-row">
+    <label>Base Cargo Capacity</label>
+    <input type="number" id="base_cargo" value="180000" min="1" step="1000" oninput="recalc()" style="width:130px">
+    <span class="unit">m&#179; &nbsp;<span class="note">(no low mods fitted)</span></span>
   </div>
 
   <hr class="div">
@@ -150,17 +196,12 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:12px 0;}}
   <div class="form-row">
     <label>Flat Markup</label>
     <input type="number" id="fee_flat" min="0" step="1" value="0" oninput="recalc()" style="width:110px">
-    <span class="unit">ISK / m&#179; &nbsp;<span style="font-size:.82em">(on top of fuel recovery)</span></span>
+    <span class="unit">ISK / m&#179;</span>
   </div>
   <div class="form-row">
     <label>Collateral Fee</label>
     <input type="number" id="coll_pct" min="0" max="10" step="0.01" value="0" oninput="recalc()" style="width:90px">
     <span class="unit">% of collateral</span>
-  </div>
-  <div class="form-row">
-    <label>Ship Capacity</label>
-    <input type="number" id="ship_cap" min="0" step="1000" value="0" oninput="recalc()" style="width:120px">
-    <span class="unit">m&#179; &nbsp;<span style="font-size:.82em">(optional &mdash; shows trips needed)</span></span>
   </div>
 </div>
 
@@ -168,7 +209,7 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:12px 0;}}
   <div class="panel-title">Cargo</div>
   <div class="form-row">
     <label>Volume</label>
-    <input type="number" id="cargo_vol" min="0" step="1" value="0" oninput="recalc()" style="width:150px">
+    <input type="number" id="cargo_vol" min="0" step="1" value="0" oninput="recalc()" style="width:160px">
     <span class="unit">m&#179;</span>
   </div>
   <div class="form-row">
@@ -176,41 +217,35 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:12px 0;}}
     <input type="number" id="cargo_coll" min="0" step="1000000" value="0" oninput="recalc()" style="width:180px">
     <span class="unit">ISK</span>
   </div>
+</div>
 
-  <hr class="div">
-
-  <div class="sum-bar">
-    <div class="sb">
-      <div class="sb-lbl">Isotopes Used</div>
-      <div class="sb-val" id="s_iso">&mdash;</div>
-      <div class="sb-sub" id="s_iso_sub">&nbsp;</div>
-    </div>
-    <div class="sb">
-      <div class="sb-lbl">Fuel Cost</div>
-      <div class="sb-val gold" id="s_fuel">&mdash;</div>
-      <div class="sb-sub" id="s_fuel_sub">&nbsp;</div>
-    </div>
-    <div class="sb">
-      <div class="sb-lbl">Trips Needed</div>
-      <div class="sb-val" id="s_trips">&mdash;</div>
-      <div class="sb-sub" id="s_trips_sub">&nbsp;</div>
-    </div>
-    <div class="sb hi">
-      <div class="sb-lbl">Total Fee</div>
-      <div class="sb-val lg green" id="s_fee">&mdash;</div>
-      <div class="sb-sub" id="s_fee_sub">&nbsp;</div>
-    </div>
+<div class="panel">
+  <div class="panel-title">Configuration Comparison &mdash; 3 Low Slots</div>
+  <div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="min-width:180px;text-align:left">Fit</th>
+        <th>Cargo Cap</th>
+        <th>Fuel / LY</th>
+        <th>Trips</th>
+        <th>Isotopes</th>
+        <th>Fuel Cost</th>
+        <th>Total Fee</th>
+      </tr>
+    </thead>
+    <tbody id="cfg_body"></tbody>
+  </table>
   </div>
 
-  <div class="be-card" id="breakdown_card" style="display:none">
-    <div class="be-title">Fee Breakdown</div>
-    <div class="be-row"><span class="be-lbl">Fuel recovery</span><span class="be-val" id="b_fuel">&mdash;</span></div>
-    <div class="be-row"><span class="be-lbl">Flat markup</span><span class="be-val" id="b_flat">&mdash;</span></div>
-    <div class="be-row"><span class="be-lbl">Collateral fee</span><span class="be-val" id="b_coll">&mdash;</span></div>
-    <div class="be-row" style="border-top:1px solid rgba(68,170,255,.15);margin-top:6px;padding-top:6px">
-      <span class="be-lbl">Total fee</span><span class="be-val hi" id="b_total">&mdash;</span>
-    </div>
-    <div class="be-row"><span class="be-lbl">Effective ISK / m&#179;</span><span class="be-val gold" id="b_rate">&mdash;</span></div>
+  <div class="callout" id="winner_callout">
+    <div class="callout-title">&#9733; Recommended Fit</div>
+    <div class="callout-row"><span class="callout-lbl">Configuration</span><span class="callout-val" id="w_fit">&mdash;</span></div>
+    <div class="callout-row"><span class="callout-lbl">Trips needed</span><span class="callout-val" id="w_trips">&mdash;</span></div>
+    <div class="callout-row"><span class="callout-lbl">Total isotopes</span><span class="callout-val" id="w_iso">&mdash;</span></div>
+    <div class="callout-row"><span class="callout-lbl">Fuel cost</span><span class="callout-val gold" id="w_fuel">&mdash;</span></div>
+    <div class="callout-row"><span class="callout-lbl">Total fee to charge</span><span class="callout-val green" id="w_fee">&mdash;</span></div>
+    <div class="callout-row"><span class="callout-lbl">Savings vs worst fit</span><span class="callout-val green" id="w_save">&mdash;</span></div>
   </div>
 </div>
 
@@ -220,6 +255,26 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:12px 0;}}
 </div>
 <script>
 const SYSTEMS = {systems_js};
+
+// Module constants
+var ECON_BONUS = 0.07;   // 7% fuel reduction per economizer (subject to stacking penalty)
+var EXP_BONUS  = 1.275;  // 27.5% cargo increase per expander (no stacking penalty)
+var LOW_SLOTS  = 3;
+var STACK_C    = 2.67;   // EVE stacking penalty constant
+
+// EVE stacking penalty: e^(-((rank-1)/2.67)^2), rank is 1-based
+function stackEff(rank) {{
+  return Math.exp(-Math.pow((rank - 1) / STACK_C, 2));
+}}
+
+// Fuel/LY after applying n economizers with stacking penalties
+function econFuel(adjustedBase, n) {{
+  var fuel = adjustedBase;
+  for (var i = 1; i <= n; i++) {{
+    fuel *= (1 - ECON_BONUS * stackEff(i));
+  }}
+  return fuel;
+}}
 
 function fmt(n,d) {{ d=d||0; return isFinite(n)?n.toLocaleString(undefined,{{minimumFractionDigits:d,maximumFractionDigits:d}}):'\u2014'; }}
 function fmtB(n) {{
@@ -234,66 +289,126 @@ function getSysLy() {{
   var idx = parseInt(document.getElementById('sys_sel').value)||0;
   return SYSTEMS[idx] ? SYSTEMS[idx].ly : 0;
 }}
-function getIsoQty() {{
-  var ly   = getSysLy();
-  var fpl  = parseFloat(document.getElementById('fuel_per_ly').value)||0;
-  var mult = document.getElementById('trip_type').value==='round' ? 2 : 1;
-  return ly * fpl * mult;
+
+// Compute adjusted base fuel/LY from skills (before mods)
+function getAdjustedBase() {{
+  var base = parseFloat(document.getElementById('base_fuel').value)||10000;
+  var jf   = parseInt(document.getElementById('jf_skill').value)||4;
+  var jfc  = parseInt(document.getElementById('jfc_skill').value)||4;
+  return base * (1 - 0.1*jf) * (1 - 0.1*jfc);
+}}
+
+// Returns array of config objects for all valid econ/exp combos across LOW_SLOTS slots
+function getConfigs(adjustedBase, baseCargo) {{
+  var configs = [];
+  for (var econ = 0; econ <= LOW_SLOTS; econ++) {{
+    var exp = LOW_SLOTS - econ;
+    var fuelPerLY = econFuel(adjustedBase, econ);   // stacking penalties applied
+    var cargo     = baseCargo * Math.pow(EXP_BONUS, exp);  // no penalty
+    configs.push({{
+      econ:     econ,
+      exp:      exp,
+      fuelPerLY: fuelPerLY,
+      cargo:     cargo,
+      label:    econ===0 ? '3 Exp' :
+                exp===0  ? '3 Econ' :
+                econ+'E / '+exp+'X'
+    }});
+  }}
+  return configs;
 }}
 
 function recalc() {{
-  var isoQty   = getIsoQty();
-  var isoPrice = parseFloat(document.getElementById('iso_type').value)||0;
-  var fuelCost = isoQty * isoPrice;
-
-  var vol      = parseFloat(document.getElementById('cargo_vol').value)||0;
-  var coll     = parseFloat(document.getElementById('cargo_coll').value)||0;
+  var ly        = getSysLy();
+  var mult      = document.getElementById('trip_type').value==='round' ? 2 : 1;
+  var isoPrice  = parseFloat(document.getElementById('iso_type').value)||0;
+  var vol       = parseFloat(document.getElementById('cargo_vol').value)||0;
+  var coll      = parseFloat(document.getElementById('cargo_coll').value)||0;
   var flatPerM3 = parseFloat(document.getElementById('fee_flat').value)||0;
   var collPct   = parseFloat(document.getElementById('coll_pct').value)||0;
-  var shipCap   = parseFloat(document.getElementById('ship_cap').value)||0;
+  var baseCargo = parseFloat(document.getElementById('base_cargo').value)||180000;
 
-  var ly = getSysLy();
-  var distEl = document.getElementById('sys_dist_note');
-  distEl.textContent = ly > 0 ? ly.toFixed(3)+' ly from 4-HWWF' : '4-HWWF (hub)';
+  var adjBase = getAdjustedBase();
+  var jf  = parseInt(document.getElementById('jf_skill').value)||4;
+  var jfc = parseInt(document.getElementById('jfc_skill').value)||4;
 
-  var isoEl = document.getElementById('iso_calc_note');
-  isoEl.textContent = isoQty > 0 ? fmt(Math.round(isoQty))+' isotopes' : '\u2014';
+  // Update skill notes
+  var base = parseFloat(document.getElementById('base_fuel').value)||10000;
+  document.getElementById('jf_note').textContent  = '\u2212'+(jf*10)+'% \u2192 \u00D7'+(1-0.1*jf).toFixed(1);
+  document.getElementById('jfc_note').textContent = '\u2212'+(jfc*10)+'% \u2192 \u00D7'+(1-0.1*jfc).toFixed(1);
 
-  // Fee components
-  var fuelPerM3  = vol > 0 ? fuelCost / vol : 0;
-  var fuelFee    = fuelPerM3 * vol;           // = fuelCost when vol > 0
-  var flatFee    = flatPerM3 * vol;
-  var collFee    = coll * collPct / 100;
-  var totalFee   = fuelFee + flatFee + collFee;
-  var effPerM3   = vol > 0 ? totalFee / vol : 0;
+  // System note
+  document.getElementById('sys_dist_note').textContent = ly > 0 ? ly.toFixed(3)+' ly from 4-HWWF' : '4-HWWF (hub)';
 
-  var trips = (shipCap > 0 && vol > 0) ? Math.ceil(vol / shipCap) : 0;
+  var configs = getConfigs(adjBase, baseCargo);
+  var collFee = coll * collPct / 100;
+  var flatFee = flatPerM3 * vol;
 
-  // Summary bar
-  var isoSumEl = document.getElementById('s_iso');
-  isoSumEl.textContent = isoQty > 0 ? fmt(Math.round(isoQty)) : '\u2014';
-  document.getElementById('s_iso_sub').textContent = isoQty > 0 ? fmtB(fuelCost)+' ISK' : '';
+  // Compute totals for each config
+  var results = configs.map(function(c) {{
+    var trips     = vol > 0 ? Math.ceil(vol / c.cargo) : 0;
+    var isoUsed   = trips * ly * mult * c.fuelPerLY;
+    var fuelCost  = isoUsed * isoPrice;
+    var totalFee  = fuelCost + flatFee + collFee;
+    return {{
+      econ:     c.econ,
+      exp:      c.exp,
+      label:    c.label,
+      cargo:    c.cargo,
+      fuelPerLY: c.fuelPerLY,
+      trips:    trips,
+      isoUsed:  isoUsed,
+      fuelCost: fuelCost,
+      totalFee: totalFee
+    }};
+  }});
 
-  document.getElementById('s_fuel').textContent = vol > 0 ? fmtB(fuelCost)+' ISK' : '\u2014';
-  document.getElementById('s_fuel_sub').textContent = fuelPerM3 > 0 ? fmt(fuelPerM3,2)+' ISK/m\u00B3' : '';
+  // Find winner (minimum totalFee; if all zero, no winner)
+  var hasData = vol > 0 || coll > 0;
+  var winIdx = -1;
+  if (hasData) {{
+    var minFee = Infinity;
+    results.forEach(function(r,i) {{ if(r.totalFee < minFee) {{ minFee=r.totalFee; winIdx=i; }} }});
+  }}
+  var maxFee = hasData ? Math.max.apply(null, results.map(function(r){{return r.totalFee;}})) : 0;
 
-  document.getElementById('s_trips').textContent = trips > 0 ? trips : (vol > 0 && shipCap === 0 ? '\u2014' : '\u2014');
-  document.getElementById('s_trips_sub').textContent = trips > 0 ? '@ '+fmt(shipCap)+' m\u00B3 cap' : '';
+  // Build table rows
+  var tbody = document.getElementById('cfg_body');
+  tbody.innerHTML = '';
+  results.forEach(function(r, i) {{
+    var isWin = (i === winIdx);
+    var tr = document.createElement('tr');
+    if (isWin) tr.className = 'winner';
 
-  document.getElementById('s_fee').textContent = vol > 0 || coll > 0 ? fmtB(totalFee)+' ISK' : '\u2014';
-  document.getElementById('s_fee_sub').textContent = effPerM3 > 0 ? fmt(effPerM3,2)+' ISK/m\u00B3 eff.' : '';
+    var fitLabel = (r.econ===0 ? '0 Econ' : r.econ+' Econ') + ' + ' +
+                   (r.exp===0  ? '0 Exp'  : r.exp+' Exp');
+    var badge = isWin ? '<span class="winner-badge">BEST</span>' : '';
 
-  // Breakdown card
-  var card = document.getElementById('breakdown_card');
-  if (vol > 0 || coll > 0) {{
-    card.style.display = 'block';
-    document.getElementById('b_fuel').textContent  = fmtB(fuelFee)+' ISK';
-    document.getElementById('b_flat').textContent  = fmtB(flatFee)+' ISK';
-    document.getElementById('b_coll').textContent  = fmtB(collFee)+' ISK';
-    document.getElementById('b_total').textContent = fmtB(totalFee)+' ISK';
-    document.getElementById('b_rate').textContent  = effPerM3 > 0 ? fmt(effPerM3,2)+' ISK/m\u00B3' : '\u2014';
+    tr.innerHTML =
+      '<td>'+fitLabel+badge+'</td>' +
+      '<td class="td-dim">'+fmt(Math.round(r.cargo))+' m\u00B3</td>' +
+      '<td class="td-dim">'+fmt(Math.round(r.fuelPerLY))+'</td>' +
+      '<td>'+(r.trips > 0 ? r.trips : '\u2014')+'</td>' +
+      '<td>'+(r.isoUsed > 0 ? fmt(Math.round(r.isoUsed)) : '\u2014')+'</td>' +
+      '<td>'+(r.fuelCost > 0 ? fmtB(r.fuelCost)+' ISK' : '\u2014')+'</td>' +
+      '<td class="td-fee">'+(hasData ? fmtB(r.totalFee)+' ISK' : '\u2014')+'</td>';
+    tbody.appendChild(tr);
+  }});
+
+  // Winner callout
+  var callout = document.getElementById('winner_callout');
+  if (hasData && winIdx >= 0) {{
+    var w = results[winIdx];
+    callout.style.display = 'block';
+    document.getElementById('w_fit').textContent   = (w.econ===0?'0 Econ':w.econ+' Econ')+' + '+(w.exp===0?'0 Exp':w.exp+' Exp');
+    document.getElementById('w_trips').textContent = w.trips > 0 ? w.trips+' trip'+(w.trips>1?'s':'') : '\u2014';
+    document.getElementById('w_iso').textContent   = w.isoUsed > 0 ? fmt(Math.round(w.isoUsed)) : '\u2014';
+    document.getElementById('w_fuel').textContent  = fmtB(w.fuelCost)+' ISK';
+    document.getElementById('w_fee').textContent   = fmtB(w.totalFee)+' ISK';
+    var savings = maxFee - w.totalFee;
+    document.getElementById('w_save').textContent  = savings > 0 ? fmtB(savings)+' ISK vs worst fit' : 'Tied \u2014 all fits equal';
   }} else {{
-    card.style.display = 'none';
+    callout.style.display = 'none';
   }}
 
   saveState();
@@ -301,7 +416,8 @@ function recalc() {{
 
 function saveState() {{
   var s = {{}};
-  ['sys_sel','trip_type','iso_type','fuel_per_ly','fee_flat','coll_pct','ship_cap','cargo_vol','cargo_coll'].forEach(function(id) {{
+  ['sys_sel','trip_type','iso_type','base_fuel','jf_skill','jfc_skill',
+   'base_cargo','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el) s[id] = el.value;
   }});
   try{{ localStorage.setItem('haul_calc_state', JSON.stringify(s)); }}catch(e){{}}
@@ -311,7 +427,8 @@ function loadState() {{
   var raw; try{{ raw = localStorage.getItem('haul_calc_state'); }}catch(e){{}}
   if (!raw) {{ recalc(); return; }}
   var s; try{{ s = JSON.parse(raw); }}catch(e){{ recalc(); return; }}
-  ['sys_sel','trip_type','iso_type','fuel_per_ly','fee_flat','coll_pct','ship_cap','cargo_vol','cargo_coll'].forEach(function(id) {{
+  ['sys_sel','trip_type','iso_type','base_fuel','jf_skill','jfc_skill',
+   'base_cargo','fee_flat','coll_pct','cargo_vol','cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if(el && s[id] != null) el.value = s[id];
   }});
   recalc();
