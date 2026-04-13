@@ -616,6 +616,16 @@ function loadState() {
   recalc();
 }
 
+// Poll pickup field — catches datalist selections that don't fire oninput/onchange
+var _lastPickup = '';
+setInterval(function() {
+  var cur = document.getElementById('sys_input').value || '';
+  if (cur !== _lastPickup) {
+    _lastPickup = cur;
+    onPickupChange();
+  }
+}, 200);
+
 window.onload = loadState;
 </script>
 </body>
