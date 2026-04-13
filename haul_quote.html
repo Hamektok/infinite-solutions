@@ -243,9 +243,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
 
   <div class="form-row">
     <label>Destination</label>
-    <input type="text" id="dest_input" list="sys_list" placeholder="Auto-filled or type system&hellip;"
-      oninput="recalc()" autocomplete="off"
-      style="min-width:220px;flex:1;">
+    <input type="text" id="dest_input" placeholder="Auto-filled&hellip;"
+      oninput="recalc()" autocomplete="off" disabled
+      style="min-width:220px;flex:1;opacity:0.6;">
     <span class="iv" id="dest_note"></span>
   </div>
 
@@ -382,28 +382,28 @@ function onPickupChange() {
   var distEl = document.getElementById('sys_dist_note');
 
   if (pickup === HUB) {
-    // Outbound: let customer pick destination freely
-    destEl.readOnly = false;
+    // Outbound: enable dest field so customer can pick freely
+    destEl.disabled = false;
     destEl.setAttribute('list', 'sys_list');
-    destEl.style.color = '';
     destEl.style.opacity = '1';
     destEl.placeholder = 'Type destination system…';
     if (destEl.value.toUpperCase() === HUB) destEl.value = '';
     distEl.textContent = 'Hub — choose destination below';
     distEl.style.color = 'var(--dim)';
   } else if (pickup === '') {
-    destEl.readOnly = false;
-    destEl.setAttribute('list', 'sys_list');
+    // No pickup: keep dest disabled and blank
+    destEl.disabled = true;
+    destEl.removeAttribute('list');
     destEl.value = '';
-    destEl.style.color = '';
-    destEl.placeholder = 'Auto-filled or type system…';
+    destEl.style.opacity = '0.6';
+    destEl.placeholder = 'Auto-filled…';
     distEl.textContent = '';
   } else {
-    // Inbound: destination locked to HUB — remove list so datalist can't override
-    destEl.readOnly = true;
-    destEl.setAttribute('list', '');
+    // Inbound: disable dest entirely, set value to HUB
+    destEl.disabled = true;
+    destEl.removeAttribute('list');
     destEl.value = HUB;
-    destEl.style.color = 'var(--dim)';
+    destEl.style.opacity = '0.6';
     var ly = lookupLy(pickup);
     if (ly === undefined) {
       distEl.textContent = 'System not found';
