@@ -328,18 +328,16 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
     <span class="iv" id="sys_dist_note"></span>
   </div>
 
-  <!-- Inbound: destination is always 4-HWWF (static, no input) -->
-  <div class="form-row" id="dest_row_fixed">
+  <div class="form-row">
     <label>Destination</label>
-    <input type="text" value="4-HWWF" disabled
-      style="min-width:220px;flex:1;opacity:0.6;">
-  </div>
-  <!-- Outbound (pickup = 4-HWWF): destination is free choice, excludes 4-HWWF -->
-  <div class="form-row" id="dest_row_free" hidden>
-    <label>Destination</label>
+    <!-- Inbound: static display, not interactive -->
+    <span id="dest_fixed" style="min-width:220px;flex:1;padding:6px 10px;
+      background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+      color:var(--dim);font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;">4-HWWF</span>
+    <!-- Outbound: free-choice input, starts hidden, 4-HWWF excluded from list -->
     <input type="text" id="dest_input" list="sys_list_dest" placeholder="Type destination system&hellip;"
       oninput="recalc()" autocomplete="off"
-      style="min-width:220px;flex:1;">
+      style="min-width:220px;flex:1;display:none;">
     <datalist id="sys_list_dest">
 {systems_datalist_dest}
     </datalist>
@@ -473,23 +471,23 @@ function lookupLy(name) {{
 }}
 
 function onPickupChange() {{
-  var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
-  var distEl = document.getElementById('sys_dist_note');
-  var fixedRow = document.getElementById('dest_row_fixed');
-  var freeRow  = document.getElementById('dest_row_free');
+  var pickup  = (document.getElementById('sys_input').value || '').trim().toUpperCase();
+  var distEl  = document.getElementById('sys_dist_note');
+  var fixed   = document.getElementById('dest_fixed');
+  var free    = document.getElementById('dest_input');
 
   if (pickup === HUB) {{
-    // Outbound: show free-choice destination input, hide fixed display
-    fixedRow.hidden = true;
-    freeRow.hidden  = false;
-    var destEl = document.getElementById('dest_input');
-    if (destEl.value.toUpperCase() === HUB) destEl.value = '';
+    // Outbound: show free input, hide static span
+    fixed.style.display = 'none';
+    free.style.display  = '';   // inline '' → input renders normally
+    if (free.value.toUpperCase() === HUB) free.value = '';
     distEl.textContent = 'Hub \u2014 choose destination below';
     distEl.style.color = 'var(--dim)';
   }} else {{
-    // Inbound (or empty): show fixed 4-HWWF display, hide free input
-    fixedRow.hidden = false;
-    freeRow.hidden  = true;
+    // Inbound (or empty): show static 4-HWWF span, hide free input
+    fixed.style.display = '';   // inline '' → span renders normally
+    free.style.display  = 'none';
+    free.value = '';            // clear any prior outbound value
     if (pickup === '') {{
       distEl.textContent = '';
     }} else {{
@@ -556,7 +554,7 @@ function recalc() {{
   var emptyEl = document.getElementById('quote_empty');
   var cardEl  = document.getElementById('quote_card');
 
-  if (!route || route.ly <= 0 || !vol) {{
+  if (!route || !vol) {{
     emptyEl.style.display = '';
     cardEl.classList.remove('show');
     saveState();
