@@ -321,6 +321,11 @@ class AdminDashboard:
         self.notebook.add(self.sig_store_frame, text='  SIG Store  ')
         self._build_sig_store_tab()
 
+        # Tab 14: Haul Rates
+        self.haul_rates_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.haul_rates_frame, text='  Haul Rates  ')
+        self._build_haul_rates_tab()
+
     def build_rates_tab(self):
         """Build the Market Rates management tab."""
         # Top controls
@@ -8482,6 +8487,133 @@ class AdminDashboard:
     def _sig_quick_price(self, pct):
         self._sig_edit_pct_var.set(pct)
         self._sig_apply_price()
+
+    # ── HAUL RATES TAB ────────────────────────────────────────────────────────
+
+    def _build_haul_rates_tab(self):
+        import json as _json
+        frame = self.haul_rates_frame
+        BG, FG, ENTRY_BG = '#0a1520', '#c8d8e8', '#0d1e30'
+        LABEL_W = 24
+
+        rates_path = os.path.join(PROJECT_DIR, 'haul_rates.json')
+        build_script = os.path.join(PROJECT_DIR, '_build_haul_quote.py')
+
+        # Load current values from haul_rates.json or defaults
+        defaults = dict(
+            pricing_mode='per_ly', rate_per_ly=12.0, rate_flat=0.0,
+            collateral_pct=0.0, jf_skill=4, jfc_skill=4,
+            econ_bonus=0.07, exp_bonus=1.275, iso_jbv_pct=100.0,
+        )
+        try:
+            with open(rates_path, encoding='utf-8') as _f:
+                saved = _json.load(_f)
+            defaults.update(saved)
+        except Exception:
+            pass
+
+        outer = tk.Frame(frame, bg=BG)
+        outer.pack(fill='both', expand=True, padx=20, pady=16)
+
+        tk.Label(outer, text='Jump Freight Rate Config', bg=BG, fg='#66aaff',
+                 font=('Segoe UI', 12, 'bold')).pack(anchor='w', pady=(0, 12))
+
+        form = tk.Frame(outer, bg=BG)
+        form.pack(anchor='w')
+
+        def row(label, var, col=0):
+            r = len(form.grid_slaves()) // 2
+            tk.Label(form, text=label, bg=BG, fg=FG,
+                     font=('Segoe UI', 9), width=LABEL_W, anchor='w'
+                     ).grid(row=r, column=col*2, padx=(0, 8), pady=4, sticky='w')
+            e = tk.Entry(form, textvariable=var, width=16, bg=ENTRY_BG, fg=FG,
+                         insertbackground=FG, font=('Segoe UI', 9))
+            e.grid(row=r, column=col*2+1, padx=(0, 24), pady=4, sticky='w')
+            return e
+
+        self._hr = {}
+
+        def mkvar(key, cast=float):
+            v = tk.StringVar(value=str(defaults.get(key, '')))
+            self._hr[key] = (v, cast)
+            return v
+
+        row('Rate per LY  (ISK/m³/LY)',    mkvar('rate_per_ly'))
+        row('Collateral fee  (%)',          mkvar('collateral_pct'))
+        row('JF Skill  (1–5)',              mkvar('jf_skill', int))
+        row('JFC Skill  (1–5)',             mkvar('jfc_skill', int))
+        row('Economizer bonus  (0.07=7%)',  mkvar('econ_bonus'))
+        row('Cargo expander bonus  (1.275)',mkvar('exp_bonus'))
+        row('Isotope price  (% of JBV)',    mkvar('iso_jbv_pct'))
+
+        # Pricing mode toggle
+        mode_var = tk.StringVar(value=defaults.get('pricing_mode', 'per_ly'))
+        self._hr['pricing_mode'] = (mode_var, str)
+        mf = tk.Frame(outer, bg=BG)
+        mf.pack(anchor='w', pady=(4, 12))
+        tk.Label(mf, text='Pricing mode:', bg=BG, fg=FG,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(0, 8))
+        tk.Radiobutton(mf, text='Per LY  (recommended)', variable=mode_var,
+                       value='per_ly', bg=BG, fg='#44dd88',
+                       selectcolor='#0d1e30', activebackground=BG,
+                       font=('Segoe UI', 9)).pack(side='left', padx=4)
+        tk.Radiobutton(mf, text='Flat markup', variable=mode_var,
+                       value='flat', bg=BG, fg=FG,
+                       selectcolor='#0d1e30', activebackground=BG,
+                       font=('Segoe UI', 9)).pack(side='left', padx=4)
+
+        # Status label
+        self._hr_status = tk.StringVar(value='')
+        tk.Label(outer, textvariable=self._hr_status, bg=BG, fg='#44dd88',
+                 font=('Segoe UI', 9)).pack(anchor='w', pady=(0, 8))
+
+        # Save & Rebuild button
+        tk.Button(
+            outer,
+            text='Save & Rebuild Customer Quote Page',
+            bg='#1a3020', fg='#44dd88',
+            font=('Segoe UI', 11, 'bold'),
+            relief='flat', padx=16, pady=8, cursor='hand2',
+            command=lambda: self._haul_save_and_rebuild(rates_path, build_script)
+        ).pack(anchor='w')
+
+    def _haul_save_and_rebuild(self, rates_path, build_script):
+        import json as _json, subprocess as _sp, threading as _th, datetime as _dt
+
+        data = {'published': _dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')}
+        try:
+            for key, (var, cast) in self._hr.items():
+                data[key] = cast(var.get())
+        except Exception as e:
+            self._hr_status.set(f'Error reading fields: {e}')
+            return
+
+        try:
+            with open(rates_path, 'w', encoding='utf-8') as f:
+                _json.dump(data, f, indent=2)
+        except Exception as e:
+            self._hr_status.set(f'Could not write haul_rates.json: {e}')
+            return
+
+        self._hr_status.set('Saved haul_rates.json — rebuilding…')
+        self.root.update_idletasks()
+
+        def run():
+            try:
+                result = _sp.run(
+                    [sys.executable, build_script],
+                    capture_output=True, text=True, cwd=PROJECT_DIR
+                )
+                if result.returncode == 0:
+                    self.root.after(0, lambda: self._hr_status.set(
+                        'Done — haul_quote.html rebuilt successfully.'))
+                else:
+                    err = result.stderr.strip().splitlines()[-1] if result.stderr.strip() else 'unknown error'
+                    self.root.after(0, lambda: self._hr_status.set(f'Build failed: {err}'))
+            except Exception as e:
+                self.root.after(0, lambda: self._hr_status.set(f'Build error: {e}'))
+
+        _th.Thread(target=run, daemon=True).start()
 
 
 def main():
