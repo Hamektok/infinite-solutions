@@ -663,7 +663,7 @@ function copyQuote() {{
     'Pickup: ' + d.from + '  |  Deliver to: ' + d.to,
   ]);
 
-  var text = lines.join('\n');
+  var text = lines.join('\\n');
   var onDone = function(ok) {{
     var btn = document.getElementById('copy_btn');
     btn.classList.add('copied');
