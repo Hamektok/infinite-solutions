@@ -241,11 +241,18 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
     <span class="iv" id="sys_dist_note"></span>
   </div>
 
-  <div class="form-row">
+  <!-- Inbound: destination is always 4-HWWF (static, no input) -->
+  <div class="form-row" id="dest_row_fixed">
     <label>Destination</label>
-    <input type="text" id="dest_input" placeholder="Auto-filled&hellip;"
-      oninput="recalc()" autocomplete="off" disabled
+    <input type="text" value="4-HWWF" disabled
       style="min-width:220px;flex:1;opacity:0.6;">
+  </div>
+  <!-- Outbound (pickup = 4-HWWF): destination is free choice -->
+  <div class="form-row" id="dest_row_free" style="display:none">
+    <label>Destination</label>
+    <input type="text" id="dest_input" list="sys_list" placeholder="Type destination system&hellip;"
+      oninput="recalc()" autocomplete="off"
+      style="min-width:220px;flex:1;">
     <span class="iv" id="dest_note"></span>
   </div>
 
@@ -375,42 +382,35 @@ function lookupLy(name) {
   return undefined; // not in list
 }
 
-// When pickup changes: auto-set destination to HUB unless pickup IS HUB
 function onPickupChange() {
   var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
-  var destEl = document.getElementById('dest_input');
   var distEl = document.getElementById('sys_dist_note');
+  var fixedRow = document.getElementById('dest_row_fixed');
+  var freeRow  = document.getElementById('dest_row_free');
 
   if (pickup === HUB) {
-    // Outbound: enable dest field so customer can pick freely
-    destEl.disabled = false;
-    destEl.setAttribute('list', 'sys_list');
-    destEl.style.opacity = '1';
-    destEl.placeholder = 'Type destination system…';
+    // Outbound: show free-choice destination input, hide fixed display
+    fixedRow.style.display = 'none';
+    freeRow.style.display  = '';
+    var destEl = document.getElementById('dest_input');
     if (destEl.value.toUpperCase() === HUB) destEl.value = '';
     distEl.textContent = 'Hub — choose destination below';
     distEl.style.color = 'var(--dim)';
-  } else if (pickup === '') {
-    // No pickup: keep dest disabled and blank
-    destEl.disabled = true;
-    destEl.removeAttribute('list');
-    destEl.value = '';
-    destEl.style.opacity = '0.6';
-    destEl.placeholder = 'Auto-filled…';
-    distEl.textContent = '';
   } else {
-    // Inbound: disable dest entirely, set value to HUB
-    destEl.disabled = true;
-    destEl.removeAttribute('list');
-    destEl.value = HUB;
-    destEl.style.opacity = '0.6';
-    var ly = lookupLy(pickup);
-    if (ly === undefined) {
-      distEl.textContent = 'System not found';
-      distEl.style.color = 'var(--red)';
+    // Inbound (or empty): show fixed 4-HWWF display, hide free input
+    fixedRow.style.display = '';
+    freeRow.style.display  = 'none';
+    if (pickup === '') {
+      distEl.textContent = '';
     } else {
-      distEl.textContent = ly.toFixed(3) + ' ly';
-      distEl.style.color = '';
+      var ly = lookupLy(pickup);
+      if (ly === undefined) {
+        distEl.textContent = 'System not found';
+        distEl.style.color = 'var(--red)';
+      } else {
+        distEl.textContent = ly.toFixed(3) + ' ly';
+        distEl.style.color = '';
+      }
     }
   }
   recalc();
