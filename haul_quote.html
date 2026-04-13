@@ -15,85 +15,72 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;
   padding:20px 14px 48px;display:flex;justify-content:center;}
-.page{width:100%;max-width:680px;}
+.page{width:100%;max-width:1100px;}
 .hdr{text-align:center;margin-bottom:18px;}
 .hdr h1{font-family:'Orbitron',sans-serif;font-size:1.5em;font-weight:900;letter-spacing:4px;
   background:linear-gradient(135deg,#ff9944,#ffcc44);-webkit-background-clip:text;
   -webkit-text-fill-color:transparent;background-clip:text;}
 .hdr .sub{color:var(--dim);font-size:.85em;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
-.back-link{display:inline-block;color:var(--dim);font-size:.85em;text-decoration:none;letter-spacing:1px;}
-.back-link:hover{color:var(--text);}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+@media(max-width:720px){.layout{grid-template-columns:1fr;}}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-bottom:12px;}
+.panel:last-child{margin-bottom:0;}
 .panel-title{font-family:'Orbitron',sans-serif;font-size:.67em;font-weight:700;letter-spacing:2px;
   text-transform:uppercase;color:var(--accent);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border-o);}
 .form-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
 .form-row:last-child{margin-bottom:0;}
-label{color:var(--dim);font-size:.9em;font-weight:600;letter-spacing:.5px;min-width:140px;flex-shrink:0;}
-select,input[type="number"],input[type="text"]{background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+label{color:var(--dim);font-size:.9em;font-weight:600;letter-spacing:.5px;min-width:120px;flex-shrink:0;}
+select,input[type="text"]{background:var(--panel2);border:1px solid var(--border);border-radius:4px;
   color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;
   padding:6px 10px;outline:none;transition:border-color .15s;}
 select:focus,input:focus{border-color:var(--accent);}
 .unit{color:var(--dim);font-size:.87em;}
 .iv{color:var(--accent2);font-weight:700;font-size:.93em;}
-hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
 
 /* Quote result card */
 .quote-card{background:rgba(51,221,136,.05);border:1px solid rgba(51,221,136,.3);
-  border-radius:8px;padding:20px 24px;margin-top:4px;display:none;}
+  border-radius:8px;padding:18px 20px;margin-top:4px;display:none;}
 .quote-card.show{display:block;}
-.quote-total-lbl{font-family:'Orbitron',sans-serif;font-size:.6em;letter-spacing:2px;
-  text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
-.quote-total{font-family:'Orbitron',sans-serif;font-size:1.7em;font-weight:900;color:var(--green);
-  letter-spacing:1px;line-height:1;margin-bottom:4px;}
-.quote-total-sub{color:var(--dim);font-size:.85em;margin-bottom:18px;}
 
-.quote-route{background:var(--panel2);border:1px solid var(--border);border-radius:6px;
-  padding:10px 14px;margin-bottom:14px;font-size:.9em;}
-.quote-route-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
-.quote-route-row:last-child{margin-bottom:0;}
-.qrl{color:var(--dim);}
-.qrv{font-family:'Orbitron',sans-serif;font-size:.82em;font-weight:700;color:var(--text);}
-.qrv.accent{color:var(--accent2);}
+/* Reward / total */
+.reward-wrap{margin-bottom:16px;}
+.reward-lbl{font-size:.85em;color:var(--dim);font-weight:600;letter-spacing:.5px;margin-bottom:4px;}
+.reward-copy{display:inline-flex;align-items:center;gap:12px;cursor:pointer;
+  background:rgba(51,221,136,.08);border:1px solid rgba(51,221,136,.35);
+  border-radius:6px;padding:10px 16px;transition:background .15s,border-color .15s;}
+.reward-copy:hover{background:rgba(51,221,136,.15);border-color:rgba(51,221,136,.6);}
+.reward-copy.copied{background:rgba(51,221,136,.18);border-color:rgba(51,221,136,.7);}
+.reward-num{font-size:1.5em;font-weight:700;color:var(--green);letter-spacing:.5px;font-family:'Rajdhani',sans-serif;}
+.reward-hint{font-size:.78em;color:var(--dim);letter-spacing:.5px;user-select:none;}
+.reward-copy.copied .reward-hint{color:var(--green);}
 
-.breakdown{border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;}
-.bd-row{display:flex;justify-content:space-between;align-items:center;
-  font-size:.9em;margin-bottom:7px;}
-.bd-row:last-child{margin-bottom:0;}
-.bd-lbl{color:var(--dim);}
-.bd-val{font-family:'Orbitron',sans-serif;font-size:.82em;font-weight:700;color:var(--gold);}
-.bd-total{border-top:1px solid var(--border);padding-top:10px;margin-top:10px;}
-.bd-total .bd-lbl{color:var(--text);font-weight:700;font-size:.95em;}
-.bd-total .bd-val{color:var(--green);font-size:.95em;}
+/* Route details */
+.qdetail{background:var(--panel2);border:1px solid var(--border);border-radius:6px;
+  padding:10px 14px;margin-bottom:12px;}
+.qd-row{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:5px;font-size:.93em;}
+.qd-row:last-child{margin-bottom:0;}
+.qd-lbl{color:var(--dim);font-weight:600;}
+.qd-val{color:var(--text);font-weight:700;font-size:.97em;}
+.qd-val.accent{color:var(--accent2);}
 
-.copy-btn{display:block;width:100%;padding:11px;
-  background:rgba(255,140,50,.1);border:1px solid rgba(255,140,50,.35);
-  border-radius:5px;color:var(--accent);font-family:'Orbitron',sans-serif;
-  font-size:.68em;letter-spacing:2px;font-weight:700;cursor:pointer;
-  transition:background .15s,border-color .15s;text-transform:uppercase;}
-.copy-btn:hover{background:rgba(255,140,50,.18);border-color:rgba(255,140,50,.6);}
-.copy-btn.copied{background:rgba(51,221,136,.1);border-color:rgba(51,221,136,.4);color:var(--green);}
+/* Collateral fee (conditional) */
+.coll-fee-row{border-top:1px solid var(--border);padding-top:8px;margin-top:8px;}
 
-.quote-empty{text-align:center;padding:28px 20px;color:var(--dim);font-size:.9em;
-  border:1px dashed var(--border);border-radius:8px;}
+.quote-empty{text-align:center;padding:28px 20px;color:var(--dim);font-size:.93em;
+  border:1px dashed var(--border);border-radius:8px;line-height:1.5;}
 .quote-empty .q-icon{font-size:2em;margin-bottom:8px;opacity:.4;}
 
 /* Contact card */
 .contact-card{background:var(--panel2);border:1px solid var(--border);
   border-radius:6px;padding:14px 18px;text-align:center;}
-.contact-card .ct{font-size:.85em;color:var(--dim);margin-bottom:6px;}
+.contact-card .ct{font-size:.88em;color:var(--dim);margin-bottom:6px;}
 .contact-card .cn{font-family:'Orbitron',sans-serif;font-size:.95em;font-weight:700;
   color:var(--accent2);letter-spacing:1px;}
-.contact-card .ci{font-size:.8em;color:var(--dim);margin-top:5px;}
+.contact-card .ci{font-size:.85em;color:var(--dim);margin-top:6px;line-height:1.55;}
 
-/* Service info pills */
-.service-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
-.pill{background:var(--panel2);border:1px solid var(--border);border-radius:20px;
-  padding:4px 12px;font-size:.78em;color:var(--dim);letter-spacing:.5px;}
-.pill span{color:var(--accent2);font-weight:700;}
-
-.footer{text-align:center;color:var(--dim);font-size:.76em;margin-top:20px;
+.footer{text-align:center;color:var(--dim);font-size:.76em;margin-top:16px;
   padding-top:12px;border-top:1px solid var(--border);}
-.snap-note{font-size:.75em;color:var(--dim);margin-top:4px;text-align:right;}
 </style>
 </head>
 <body>
@@ -104,34 +91,38 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
   <div class="sub">Freighting Service</div>
 </div>
 
-<!-- Service Info -->
-<div class="panel">
-  <div class="panel-title">How It Works</div>
-  <p style="font-size:.88em;color:var(--text);line-height:1.65;margin-bottom:10px;">
-    Enter your <strong style="color:var(--accent2);">pickup system</strong>, the
-    <strong style="color:var(--accent2);">volume</strong> of your cargo, and its
-    <strong style="color:var(--accent2);">declared collateral value</strong> to receive an instant quote.
-  </p>
-  <p style="font-size:.88em;color:var(--text);line-height:1.65;margin-bottom:10px;">
-    Once you have your quote, create a <strong style="color:var(--accent2);">courier contract</strong> in EVE
-    addressed to <strong style="color:var(--accent2);">Gromalok Hakaari</strong>.
-    Set the <strong style="color:var(--accent2);">reward</strong> to the quoted fee,
-    the <strong style="color:var(--accent2);">collateral</strong> to your declared value,
-    and the <strong style="color:var(--accent2);">pickup</strong> and
-    <strong style="color:var(--accent2);">destination</strong> to the systems shown in your quote.
-  </p>
-</div>
+<div class="layout">
 
-<!-- Inputs -->
-<div class="panel">
-  <div class="panel-title">Your Cargo</div>
+<!-- LEFT COLUMN -->
+<div>
+  <!-- How It Works -->
+  <div class="panel">
+    <div class="panel-title">How It Works</div>
+    <p style="font-size:.92em;color:var(--text);line-height:1.7;margin-bottom:10px;">
+      Enter your <strong style="color:var(--accent2);">pickup system</strong>, the
+      <strong style="color:var(--accent2);">volume</strong> of your cargo, and its
+      <strong style="color:var(--accent2);">declared collateral value</strong> to receive an instant quote.
+    </p>
+    <p style="font-size:.92em;color:var(--text);line-height:1.7;">
+      Once you have your quote, create a <strong style="color:var(--accent2);">courier contract</strong> in EVE
+      addressed to <strong style="color:var(--accent2);">Gromalok Hakaari</strong>.
+      Set the <strong style="color:var(--accent2);">reward</strong> to the quoted fee
+      (click the number to copy it), the <strong style="color:var(--accent2);">collateral</strong> to your
+      declared value, and the <strong style="color:var(--accent2);">pickup</strong> and
+      <strong style="color:var(--accent2);">destination</strong> to the systems shown in your quote.
+    </p>
+  </div>
 
-  <div class="form-row">
-    <label>Pickup System</label>
-    <input type="text" id="sys_input" list="sys_list" placeholder="Type system name&hellip;"
-      oninput="onPickupChange()" onchange="onPickupChange()" autocomplete="off"
-      style="min-width:220px;flex:1;">
-    <datalist id="sys_list">
+  <!-- Your Cargo -->
+  <div class="panel">
+    <div class="panel-title">Your Cargo</div>
+
+    <div class="form-row">
+      <label>Pickup System</label>
+      <input type="text" id="sys_input" list="sys_list" placeholder="Type system name&hellip;"
+        oninput="onPickupChange()" onchange="onPickupChange()" autocomplete="off"
+        style="min-width:180px;flex:1;">
+      <datalist id="sys_list">
         <option value="4-HWWF">4-HWWF &mdash; Hub</option>
         <option value="PM-DWE">PM-DWE &mdash; 0.893 ly</option>
         <option value="4GYV-Q">4GYV-Q &mdash; 0.937 ly</option>
@@ -237,21 +228,22 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
         <option value="WMBZ-U">WMBZ-U &mdash; 9.319 ly</option>
         <option value="UL-4ZW">UL-4ZW &mdash; 9.656 ly</option>
         <option value="VORM-W">VORM-W &mdash; 9.730 ly</option>
-    </datalist>
-    <span class="iv" id="sys_dist_note"></span>
-  </div>
+      </datalist>
+      <span class="iv" id="sys_dist_note"></span>
+    </div>
 
-  <div class="form-row">
-    <label>Destination</label>
-    <!-- Inbound: static display, not interactive -->
-    <span id="dest_fixed" style="min-width:220px;flex:1;padding:6px 10px;
-      background:var(--panel2);border:1px solid var(--border);border-radius:4px;
-      color:var(--dim);font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;">4-HWWF</span>
-    <!-- Outbound: free-choice input, starts hidden, 4-HWWF excluded from list -->
-    <input type="text" id="dest_input" list="sys_list_dest" placeholder="Type destination system&hellip;"
-      oninput="recalc()" autocomplete="off"
-      style="min-width:220px;flex:1;display:none;">
-    <datalist id="sys_list_dest">
+    <div class="form-row">
+      <label>Destination</label>
+      <!-- Inbound / empty: static display -->
+      <span id="dest_fixed" style="min-width:180px;flex:1;padding:6px 10px;
+        background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+        font-family:'Rajdhani',sans-serif;font-size:.97em;font-weight:600;
+        color:var(--dim);font-style:italic;">Select a pickup system first</span>
+      <!-- Outbound: free-choice, 4-HWWF excluded -->
+      <input type="text" id="dest_input" list="sys_list_dest" placeholder="Type destination system&hellip;"
+        oninput="recalc()" autocomplete="off"
+        style="min-width:180px;flex:1;display:none;">
+      <datalist id="sys_list_dest">
         <option value="PM-DWE">PM-DWE &mdash; 0.893 ly</option>
         <option value="4GYV-Q">4GYV-Q &mdash; 0.937 ly</option>
         <option value="EIDI-N">EIDI-N &mdash; 1.023 ly</option>
@@ -356,99 +348,86 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
         <option value="WMBZ-U">WMBZ-U &mdash; 9.319 ly</option>
         <option value="UL-4ZW">UL-4ZW &mdash; 9.656 ly</option>
         <option value="VORM-W">VORM-W &mdash; 9.730 ly</option>
-    </datalist>
-    <span class="iv" id="dest_note"></span>
-  </div>
-
-  <div class="form-row">
-    <label>Volume</label>
-    <input type="number" id="cargo_vol" min="0" step="1000" value="" oninput="recalc()"
-      placeholder="e.g. 150000" style="width:160px;">
-    <span class="unit">m&#179;</span>
-  </div>
-
-  <div class="form-row">
-    <label>Collateral</label>
-    <input type="number" id="cargo_coll" min="0" step="1000000" value="" oninput="recalc()"
-      placeholder="Declared value (ISK)" style="width:190px;">
-    <span class="unit">ISK</span>
-  </div>
-</div>
-
-<!-- Quote Output -->
-<div class="panel">
-  <div class="panel-title">Your Quote</div>
-
-  <div id="quote_empty" class="quote-empty">
-    <div class="q-icon">&#128230;</div>
-    Enter a pickup system and cargo volume above to get your quote.
-  </div>
-
-  <div id="quote_card" class="quote-card">
-    <div class="quote-total-lbl">Total Fee</div>
-    <div class="quote-total" id="q_total">&mdash;</div>
-    <div class="quote-total-sub" id="q_total_sub">&mdash;</div>
-
-    <div class="quote-route" id="q_route_box">
-      <div class="quote-route-row">
-        <span class="qrl">Route</span>
-        <span class="qrv accent" id="q_route">&mdash;</span>
-      </div>
-      <div class="quote-route-row">
-        <span class="qrl">Distance</span>
-        <span class="qrv" id="q_dist">&mdash;</span>
-      </div>
-      <div class="quote-route-row">
-        <span class="qrl">Cargo volume</span>
-        <span class="qrv" id="q_vol">&mdash;</span>
-      </div>
-      <div class="quote-route-row" id="q_coll_row">
-        <span class="qrl">Collateral</span>
-        <span class="qrv" id="q_coll">&mdash;</span>
-      </div>
-      <div class="quote-route-row">
-        <span class="qrl">Trips required</span>
-        <span class="qrv" id="q_trips">&mdash;</span>
-      </div>
+      </datalist>
+      <span class="iv" id="dest_note"></span>
     </div>
 
-    <div class="breakdown">
-      <div class="bd-row">
-        <span class="bd-lbl">Fuel recovery</span>
-        <span class="bd-val" id="q_fuel">&mdash;</span>
-      </div>
-      <div class="bd-row">
-        <span class="bd-lbl">Service fee (12 ISK/m&#179;/LY)</span>
-        <span class="bd-val" id="q_markup">&mdash;</span>
-      </div>
-      <div class="bd-row" id="q_coll_fee_row" style="display:none">
-        <span class="bd-lbl">Collateral fee (0%)</span>
-        <span class="bd-val" id="q_coll_fee">&mdash;</span>
-      </div>
-      <div class="bd-row bd-total">
-        <span class="bd-lbl">Total</span>
-        <span class="bd-val" id="q_total2">&mdash;</span>
-      </div>
+    <div class="form-row">
+      <label>Volume</label>
+      <input type="text" id="cargo_vol" placeholder="e.g. 150,000" oninput="fmtVolInput(this);recalc();"
+        autocomplete="off" style="width:150px;">
+      <span class="unit">m&#179;</span>
     </div>
 
-    <button class="copy-btn" id="copy_btn" onclick="copyQuote()">
-      &#128203; &nbsp;Copy Quote to Clipboard
-    </button>
-  </div>
-</div>
-
-<!-- Contact -->
-<div class="panel">
-  <div class="panel-title">Arrange Delivery</div>
-  <div class="contact-card">
-    <div class="ct">Create a courier contract in EVE Online addressed to:</div>
-    <div class="cn">Gromalok Hakaari</div>
-    <div class="ci" id="contract_instructions">
-      Set reward to quoted fee &middot; Set collateral to declared value &middot;
-      Pickup and destination as shown in your quote above
+    <div class="form-row">
+      <label>Collateral</label>
+      <input type="text" id="cargo_coll" placeholder="e.g. 1,000,000,000.00" oninput="fmtCollInput(this);recalc();"
+        autocomplete="off" style="width:190px;">
+      <span class="unit">ISK</span>
     </div>
   </div>
 </div>
+
+<!-- RIGHT COLUMN -->
+<div>
+  <!-- Your Quote -->
+  <div class="panel">
+    <div class="panel-title">Your Quote</div>
+
+    <div id="quote_empty" class="quote-empty">
+      <div class="q-icon">&#128230;</div>
+      Enter a pickup system and cargo volume to get your quote.
+    </div>
+
+    <div id="quote_card" class="quote-card">
+      <div class="reward-wrap">
+        <div class="reward-lbl">Contract Reward (ISK)</div>
+        <div class="reward-copy" onclick="copyTotal()" title="Click to copy">
+          <span class="reward-num" id="q_total">&mdash;</span>
+          <span class="reward-hint" id="copy_hint">click to copy</span>
+        </div>
+      </div>
+
+      <div class="qdetail">
+        <div class="qd-row">
+          <span class="qd-lbl">Route</span>
+          <span class="qd-val accent" id="q_route">&mdash;</span>
+        </div>
+        <div class="qd-row">
+          <span class="qd-lbl">Distance</span>
+          <span class="qd-val" id="q_dist">&mdash;</span>
+        </div>
+        <div class="qd-row">
+          <span class="qd-lbl">Cargo volume</span>
+          <span class="qd-val" id="q_vol">&mdash;</span>
+        </div>
+        <div class="qd-row" id="q_coll_row" style="display:none">
+          <span class="qd-lbl">Collateral</span>
+          <span class="qd-val" id="q_coll">&mdash;</span>
+        </div>
+        <div class="qd-row coll-fee-row" id="q_coll_fee_row" style="display:none">
+          <span class="qd-lbl">Collateral fee (0%)</span>
+          <span class="qd-val" id="q_coll_fee">&mdash;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrange Delivery -->
+  <div class="panel">
+    <div class="panel-title">Arrange Delivery</div>
+    <div class="contact-card">
+      <div class="ct">Create a courier contract in EVE Online addressed to:</div>
+      <div class="cn">Gromalok Hakaari</div>
+      <div class="ci" id="contract_instructions">
+        Set reward to quoted fee &middot; Set collateral to declared value &middot;
+        Pickup and destination as shown in your quote
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .layout -->
 
 <div class="footer">
   Infinite Solutions &middot; Hamektok Hakaari &middot; 13 Apr 2026
@@ -462,19 +441,38 @@ const RATE_PER_LY    = 12;
 const RATE_FLAT      = 0;
 const PRICING_MODE   = 'per_ly';
 const COLLATERAL_PCT = 0;
-const ISO_PRICE      = 676.0;  // baked at build time from DB snapshot
+const ISO_PRICE      = 676.0;
 const HUB            = '4-HWWF';
 
+// Format number with commas, optional decimal places
 function fmt(n, d) {
-  d = d || 0;
-  return isFinite(n) ? n.toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d}) : '—';
+  d = (d === undefined) ? 0 : d;
+  if (!isFinite(n)) return '—';
+  return n.toLocaleString('en-US', {minimumFractionDigits:d, maximumFractionDigits:d});
 }
-function fmtB(n) {
-  var a = Math.abs(n), s = n < 0 ? '-' : '';
-  if (a >= 1e9) return s + (a / 1e9).toFixed(3) + 'B';
-  if (a >= 1e6) return s + (a / 1e6).toFixed(2) + 'M';
-  if (a >= 1e3) return s + (a / 1e3).toFixed(1) + 'k';
-  return s + fmt(a, 0);
+
+// Format a text input as integer with commas (volume)
+function fmtVolInput(el) {
+  var raw = el.value.replace(/[^0-9]/g, '');
+  if (!raw) { el.value = ''; return; }
+  el.value = parseInt(raw, 10).toLocaleString('en-US');
+}
+
+// Format a text input as decimal with commas (collateral)
+function fmtCollInput(el) {
+  var raw = el.value.replace(/[^0-9.]/g, '');
+  // allow only one decimal point
+  var parts = raw.split('.');
+  var intPart = parts[0] ? parseInt(parts[0], 10).toLocaleString('en-US') : '';
+  if (parts.length > 1) {
+    el.value = intPart + '.' + parts[1].slice(0, 2);
+  } else {
+    el.value = intPart;
+  }
+}
+
+function parseNum(val) {
+  return parseFloat((val || '').replace(/,/g, '')) || 0;
 }
 
 function lookupLy(name) {
@@ -483,7 +481,7 @@ function lookupLy(name) {
   for (var i = 0; i < SYSTEMS.length; i++) {
     if (SYSTEMS[i].name.toUpperCase() === n) return SYSTEMS[i].ly;
   }
-  return undefined; // not in list
+  return undefined;
 }
 
 function onPickupChange() {
@@ -493,20 +491,24 @@ function onPickupChange() {
   var free    = document.getElementById('dest_input');
 
   if (pickup === HUB) {
-    // Outbound: show free input, hide static span
     fixed.style.display = 'none';
-    free.style.display  = '';   // inline '' → input renders normally
+    free.style.display  = '';
     if (free.value.toUpperCase() === HUB) free.value = '';
     distEl.textContent = 'Hub — choose destination below';
     distEl.style.color = 'var(--dim)';
   } else {
-    // Inbound (or empty): show static 4-HWWF span, hide free input
-    fixed.style.display = '';   // inline '' → span renders normally
+    fixed.style.display = '';
     free.style.display  = 'none';
-    free.value = '';            // clear any prior outbound value
+    free.value = '';
     if (pickup === '') {
+      fixed.textContent  = 'Select a pickup system first';
+      fixed.style.fontStyle = 'italic';
+      fixed.style.color  = 'var(--dim)';
       distEl.textContent = '';
     } else {
+      fixed.textContent  = HUB;
+      fixed.style.fontStyle = 'normal';
+      fixed.style.color  = 'var(--text)';
       var ly = lookupLy(pickup);
       if (ly === undefined) {
         distEl.textContent = 'System not found';
@@ -523,38 +525,30 @@ function onPickupChange() {
 function getRoute() {
   var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
   if (!pickup) return null;
-
   var ly, from, to;
   if (pickup === HUB) {
-    // Outbound: dest field is required
     var dest = (document.getElementById('dest_input').value || '').trim().toUpperCase();
     if (!dest) return null;
-    ly   = lookupLy(dest);
-    from = HUB;
-    to   = dest;
+    ly = lookupLy(dest); from = HUB; to = dest;
   } else {
-    // Inbound: destination is always HUB — don't read dest_input (cosmetic only)
-    ly   = lookupLy(pickup);
-    from = pickup;
-    to   = HUB;
+    ly = lookupLy(pickup); from = pickup; to = HUB;
   }
-
   if (ly == null || ly === undefined) return null;
   return { ly: ly, from: from, to: to };
 }
 
 function recalc() {
   var route = getRoute();
-  var vol   = parseFloat(document.getElementById('cargo_vol').value)  || 0;
-  var coll  = parseFloat(document.getElementById('cargo_coll').value) || 0;
+  var vol   = parseNum(document.getElementById('cargo_vol').value);
+  var coll  = parseNum(document.getElementById('cargo_coll').value);
 
-  // Update dest note
+  // Update dest note for outbound
   var destNoteEl = document.getElementById('dest_note');
   var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
   if (pickup === HUB) {
     var destVal = (document.getElementById('dest_input').value || '').trim().toUpperCase();
     var destLy  = lookupLy(destVal);
-    if (destVal === '') {
+    if (!destVal) {
       destNoteEl.textContent = '';
     } else if (destLy === undefined) {
       destNoteEl.textContent = 'System not found';
@@ -588,44 +582,38 @@ function recalc() {
     var fuelCost = isoUsed * ISO_PRICE;
     var total    = fuelCost + markupFee + collFee;
     if (bestResult === null || total < bestResult.total) {
-      bestResult = { trips: trips, isoUsed: isoUsed, fuelCost: fuelCost, total: total };
+      bestResult = { trips: trips, fuelCost: fuelCost, total: total };
     }
   });
 
   emptyEl.style.display = 'none';
   cardEl.classList.add('show');
 
-  var totalISK = bestResult.total;
-  document.getElementById('q_total').textContent   = fmtB(totalISK) + ' ISK';
-  document.getElementById('q_total2').textContent  = fmtB(totalISK) + ' ISK';
-  document.getElementById('q_total_sub').innerHTML = fmt(Math.round(totalISK)) + ' ISK &mdash; round trip, ' +
-    bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips');
+  var totalISK = Math.round(bestResult.total);
+  window._totalISK = totalISK;
 
+  document.getElementById('q_total').textContent = fmt(totalISK, 0) + ' ISK';
+  document.getElementById('copy_hint').textContent = 'click to copy';
   document.getElementById('q_route').textContent = route.from + ' → ' + route.to;
   document.getElementById('q_dist').textContent  = ly.toFixed(3) + ' ly (×2 round trip)';
-  document.getElementById('q_vol').textContent   = fmt(Math.round(vol)) + ' m³';
+  document.getElementById('q_vol').textContent   = fmt(Math.round(vol), 0) + ' m³';
 
   var collRow = document.getElementById('q_coll_row');
   if (coll > 0) {
-    document.getElementById('q_coll').textContent = fmtB(coll) + ' ISK';
+    document.getElementById('q_coll').textContent = fmt(coll, 2) + ' ISK';
     collRow.style.display = '';
   } else {
     collRow.style.display = 'none';
   }
 
-  document.getElementById('q_trips').textContent  = bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips') + ' (round trip each)';
-  document.getElementById('q_fuel').textContent   = fmtB(bestResult.fuelCost) + ' ISK';
-  document.getElementById('q_markup').textContent = fmtB(markupFee) + ' ISK';
-
   var collFeeRow = document.getElementById('q_coll_fee_row');
   if (COLLATERAL_PCT > 0 && coll > 0) {
-    document.getElementById('q_coll_fee').textContent = fmtB(collFee) + ' ISK';
+    document.getElementById('q_coll_fee').textContent = fmt(collFee, 2) + ' ISK';
     collFeeRow.style.display = '';
   } else {
     collFeeRow.style.display = 'none';
   }
 
-  // Update contract instructions with actual systems
   var ci = document.getElementById('contract_instructions');
   if (ci) {
     ci.innerHTML = 'Set reward to quoted fee &middot; Set collateral to declared value &middot; ' +
@@ -633,67 +621,28 @@ function recalc() {
       'Deliver to: <strong style="color:var(--accent2)">' + route.to + '</strong>';
   }
 
-  var btn = document.getElementById('copy_btn');
-  btn.classList.remove('copied');
-  btn.textContent = '📋  Copy Quote to Clipboard';
-
-  window._quoteData = {
-    from:     route.from,
-    to:       route.to,
-    ly:       ly,
-    vol:      vol,
-    coll:     coll,
-    trips:    bestResult.trips,
-    fuelCost: bestResult.fuelCost,
-    markup:   markupFee,
-    collFee:  collFee,
-    total:    totalISK,
-  };
-
   saveState();
 }
 
-function copyQuote() {
-  var d = window._quoteData;
-  if (!d) return;
-
-  var lines = [
-    'Freight Quote — Infinite Solutions',
-    '',
-    'Route:      ' + d.from + ' → ' + d.to + ' (' + d.ly.toFixed(3) + ' ly, round trip)',
-    'Volume:     ' + fmt(Math.round(d.vol)) + ' m³',
-    'Collateral: ' + (d.coll > 0 ? fmtB(d.coll) + ' ISK' : 'None declared'),
-    '',
-    '──────────────────────────────',
-    'Fuel recovery:  ' + fmtB(d.fuelCost) + ' ISK',
-    'Service fee:    ' + fmtB(d.markup) + ' ISK',
-  ];
-  if (COLLATERAL_PCT > 0 && d.coll > 0) {
-    lines.push('Collateral fee: ' + fmtB(d.collFee) + ' ISK  (' + COLLATERAL_PCT + '%)');
-  }
-  lines = lines.concat([
-    '──────────────────────────────',
-    'TOTAL FEE:      ' + fmt(Math.round(d.total)) + ' ISK',
-    '',
-    'Create courier contract to: Gromalok Hakaari',
-    'Pickup: ' + d.from + '  |  Deliver to: ' + d.to,
-  ]);
-
-  var text = lines.join('\n');
-  var onDone = function(ok) {
-    var btn = document.getElementById('copy_btn');
-    btn.classList.add('copied');
-    btn.textContent = '✓  Copied to Clipboard';
+function copyTotal() {
+  var n = window._totalISK;
+  if (!n) return;
+  var text = String(n);
+  var el = document.getElementById('copy_hint');
+  var wrap = document.querySelector('.reward-copy');
+  var done = function() {
+    if (el) el.textContent = '✓ Copied!';
+    if (wrap) wrap.classList.add('copied');
     setTimeout(function() {
-      btn.classList.remove('copied');
-      btn.textContent = '📋  Copy Quote to Clipboard';
-    }, 2500);
+      if (el) el.textContent = 'click to copy';
+      if (wrap) wrap.classList.remove('copied');
+    }, 2000);
   };
-  navigator.clipboard.writeText(text).then(onDone).catch(function() {
+  navigator.clipboard.writeText(text).then(done).catch(function() {
     var ta = document.createElement('textarea');
     ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta); onDone();
+    document.body.removeChild(ta); done();
   });
 }
 
@@ -702,7 +651,6 @@ function saveState() {
   ['cargo_vol', 'cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if (el) s[id] = el.value;
   });
-  // Note: pickup/destination not saved — always start fresh to avoid stale state
   try { localStorage.setItem('haul_quote_state', JSON.stringify(s)); } catch(e) {}
 }
 
@@ -716,7 +664,6 @@ function loadState() {
   recalc();
 }
 
-// Poll pickup field — catches datalist selections that don't fire oninput/onchange
 window.onload = function() {
   loadState();
   var _lastPickup = document.getElementById('sys_input').value || '';
