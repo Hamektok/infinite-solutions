@@ -287,7 +287,7 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
 
 <div class="hdr">
   <h1>INFINITE SOLUTIONS</h1>
-  <div class="sub">Jump Freight &middot; Freighting Service</div>
+  <div class="sub">Freighting Service</div>
 </div>
 
 <!-- Service Info -->
@@ -305,10 +305,6 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
     the <strong style="color:var(--accent2);">collateral</strong> to your declared value,
     and the <strong style="color:var(--accent2);">pickup</strong> and
     <strong style="color:var(--accent2);">destination</strong> to the systems shown in your quote.
-  </p>
-  <p style="font-size:.82em;color:var(--dim);line-height:1.5;">
-    The quoted fee covers all fuel costs plus the service markup &mdash; no hidden charges.
-    {"Collateral coverage is included at no extra charge." if COLLATERAL_PCT == 0 else f"A {COLLATERAL_PCT}% collateral fee applies."}
   </p>
 </div>
 
@@ -470,6 +466,7 @@ function onPickupChange() {{
   if (pickup === HUB) {{
     // Outbound: let customer pick destination freely
     destEl.readOnly = false;
+    destEl.setAttribute('list', 'sys_list');
     destEl.style.color = '';
     destEl.style.opacity = '1';
     destEl.placeholder = 'Type destination system\u2026';
@@ -478,13 +475,15 @@ function onPickupChange() {{
     distEl.style.color = 'var(--dim)';
   }} else if (pickup === '') {{
     destEl.readOnly = false;
+    destEl.setAttribute('list', 'sys_list');
     destEl.value = '';
     destEl.style.color = '';
     destEl.placeholder = 'Auto-filled or type system\u2026';
     distEl.textContent = '';
   }} else {{
-    // Inbound: destination locked to HUB
+    // Inbound: destination locked to HUB — remove list so datalist can't override
     destEl.readOnly = true;
+    destEl.setAttribute('list', '');
     destEl.value = HUB;
     destEl.style.color = 'var(--dim)';
     var ly = lookupLy(pickup);
