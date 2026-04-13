@@ -247,12 +247,118 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
     <input type="text" value="4-HWWF" disabled
       style="min-width:220px;flex:1;opacity:0.6;">
   </div>
-  <!-- Outbound (pickup = 4-HWWF): destination is free choice -->
+  <!-- Outbound (pickup = 4-HWWF): destination is free choice, excludes 4-HWWF -->
   <div class="form-row" id="dest_row_free" style="display:none">
     <label>Destination</label>
-    <input type="text" id="dest_input" list="sys_list" placeholder="Type destination system&hellip;"
+    <input type="text" id="dest_input" list="sys_list_dest" placeholder="Type destination system&hellip;"
       oninput="recalc()" autocomplete="off"
       style="min-width:220px;flex:1;">
+    <datalist id="sys_list_dest">
+        <option value="PM-DWE">PM-DWE &mdash; 0.893 ly</option>
+        <option value="4GYV-Q">4GYV-Q &mdash; 0.937 ly</option>
+        <option value="EIDI-N">EIDI-N &mdash; 1.023 ly</option>
+        <option value="YMJG-4">YMJG-4 &mdash; 1.136 ly</option>
+        <option value="DAYP-G">DAYP-G &mdash; 1.356 ly</option>
+        <option value="WBR5-R">WBR5-R &mdash; 1.443 ly</option>
+        <option value="8TPX-N">8TPX-N &mdash; 1.491 ly</option>
+        <option value="KRUN-N">KRUN-N &mdash; 1.499 ly</option>
+        <option value="TVN-FM">TVN-FM &mdash; 1.502 ly</option>
+        <option value="IPAY-2">IPAY-2 &mdash; 1.577 ly</option>
+        <option value="K8X-6B">K8X-6B &mdash; 1.720 ly</option>
+        <option value="0MV-4W">0MV-4W &mdash; 1.927 ly</option>
+        <option value="AZBR-2">AZBR-2 &mdash; 2.030 ly</option>
+        <option value="Q-L07F">Q-L07F &mdash; 2.198 ly</option>
+        <option value="U54-1L">U54-1L &mdash; 2.247 ly</option>
+        <option value="P3EN-E">P3EN-E &mdash; 2.278 ly</option>
+        <option value="T-GCGL">T-GCGL &mdash; 2.440 ly</option>
+        <option value="V-OJEN">V-OJEN &mdash; 2.469 ly</option>
+        <option value="X445-5">X445-5 &mdash; 2.533 ly</option>
+        <option value="05R-7A">05R-7A &mdash; 2.559 ly</option>
+        <option value="FS-RFL">FS-RFL &mdash; 2.619 ly</option>
+        <option value="NCGR-Q">NCGR-Q &mdash; 2.658 ly</option>
+        <option value="Z-8Q65">Z-8Q65 &mdash; 2.700 ly</option>
+        <option value="IFJ-EL">IFJ-EL &mdash; 2.748 ly</option>
+        <option value="9OO-LH">9OO-LH &mdash; 2.759 ly</option>
+        <option value="MC6O-F">MC6O-F &mdash; 2.774 ly</option>
+        <option value="X97D-W">X97D-W &mdash; 2.799 ly</option>
+        <option value="49-0LI">49-0LI &mdash; 2.815 ly</option>
+        <option value="0-R5TS">0-R5TS &mdash; 2.844 ly</option>
+        <option value="669-IX">669-IX &mdash; 2.888 ly</option>
+        <option value="0R-F2F">0R-F2F &mdash; 3.002 ly</option>
+        <option value="47L-J4">47L-J4 &mdash; 3.070 ly</option>
+        <option value="N-HSK0">N-HSK0 &mdash; 3.163 ly</option>
+        <option value="HE-V4V">HE-V4V &mdash; 3.182 ly</option>
+        <option value="V-NL3K">V-NL3K &mdash; 3.223 ly</option>
+        <option value="0J3L-V">0J3L-V &mdash; 3.232 ly</option>
+        <option value="S-NJBB">S-NJBB &mdash; 3.307 ly</option>
+        <option value="XF-PWO">XF-PWO &mdash; 3.361 ly</option>
+        <option value="R-P7KL">R-P7KL &mdash; 3.370 ly</option>
+        <option value="A8A-JN">A8A-JN &mdash; 3.386 ly</option>
+        <option value="NFM-0V">NFM-0V &mdash; 3.389 ly</option>
+        <option value="E-D0VZ">E-D0VZ &mdash; 3.401 ly</option>
+        <option value="6WW-28">6WW-28 &mdash; 3.432 ly</option>
+        <option value="UH-9ZG">UH-9ZG &mdash; 3.448 ly</option>
+        <option value="YXIB-I">YXIB-I &mdash; 3.497 ly</option>
+        <option value="LZ-6SU">LZ-6SU &mdash; 3.503 ly</option>
+        <option value="Y0-BVN">Y0-BVN &mdash; 3.631 ly</option>
+        <option value="7-UH4Z">7-UH4Z &mdash; 3.631 ly</option>
+        <option value="1N-FJ8">1N-FJ8 &mdash; 3.718 ly</option>
+        <option value="2DWM-2">2DWM-2 &mdash; 3.732 ly</option>
+        <option value="H-UCD1">H-UCD1 &mdash; 3.802 ly</option>
+        <option value="G-LOIT">G-LOIT &mdash; 3.828 ly</option>
+        <option value="1-GBBP">1-GBBP &mdash; 3.837 ly</option>
+        <option value="B-588R">B-588R &mdash; 3.905 ly</option>
+        <option value="5ZO-NZ">5ZO-NZ &mdash; 4.132 ly</option>
+        <option value="H-NOU5">H-NOU5 &mdash; 4.337 ly</option>
+        <option value="97-M96">97-M96 &mdash; 4.356 ly</option>
+        <option value="T-ZWA1">T-ZWA1 &mdash; 4.379 ly</option>
+        <option value="3HX-DL">3HX-DL &mdash; 4.409 ly</option>
+        <option value="7-K5EL">7-K5EL &mdash; 4.429 ly</option>
+        <option value="KX-2UI">KX-2UI &mdash; 4.579 ly</option>
+        <option value="GEKJ-9">GEKJ-9 &mdash; 4.620 ly</option>
+        <option value="MY-T2P">MY-T2P &mdash; 4.817 ly</option>
+        <option value="Y-ZXIO">Y-ZXIO &mdash; 4.827 ly</option>
+        <option value="C-FP70">C-FP70 &mdash; 4.899 ly</option>
+        <option value="G96R-F">G96R-F &mdash; 5.079 ly</option>
+        <option value="Q-R3GP">Q-R3GP &mdash; 5.081 ly</option>
+        <option value="ZA0L-U">ZA0L-U &mdash; 5.118 ly</option>
+        <option value="FA-DMO">FA-DMO &mdash; 5.257 ly</option>
+        <option value="XV-8JQ">XV-8JQ &mdash; 5.341 ly</option>
+        <option value="N-5QPW">N-5QPW &mdash; 5.528 ly</option>
+        <option value="MO-FIF">MO-FIF &mdash; 5.566 ly</option>
+        <option value="MA-XAP">MA-XAP &mdash; 5.716 ly</option>
+        <option value="H-5GUI">H-5GUI &mdash; 5.717 ly</option>
+        <option value="C-J7CR">C-J7CR &mdash; 5.852 ly</option>
+        <option value="Q-EHMJ">Q-EHMJ &mdash; 5.941 ly</option>
+        <option value="XSQ-TF">XSQ-TF &mdash; 6.193 ly</option>
+        <option value="H-1EOH">H-1EOH &mdash; 6.423 ly</option>
+        <option value="FMBR-8">FMBR-8 &mdash; 6.451 ly</option>
+        <option value="FH-TTC">FH-TTC &mdash; 6.633 ly</option>
+        <option value="VI2K-J">VI2K-J &mdash; 6.669 ly</option>
+        <option value="6Y-WRK">6Y-WRK &mdash; 6.755 ly</option>
+        <option value="5T-KM3">5T-KM3 &mdash; 6.789 ly</option>
+        <option value="IR-DYY">IR-DYY &mdash; 6.818 ly</option>
+        <option value="MQ-O27">MQ-O27 &mdash; 7.129 ly</option>
+        <option value="ZLZ-1Z">ZLZ-1Z &mdash; 7.348 ly</option>
+        <option value="F-D49D">F-D49D &mdash; 7.382 ly</option>
+        <option value="RVCZ-C">RVCZ-C &mdash; 7.422 ly</option>
+        <option value="B-E3KQ">B-E3KQ &mdash; 7.870 ly</option>
+        <option value="Y5J-EU">Y5J-EU &mdash; 7.899 ly</option>
+        <option value="H-EY0P">H-EY0P &mdash; 8.008 ly</option>
+        <option value="O-LR1H">O-LR1H &mdash; 8.088 ly</option>
+        <option value="LS9B-9">LS9B-9 &mdash; 8.170 ly</option>
+        <option value="C-DHON">C-DHON &mdash; 8.317 ly</option>
+        <option value="G5ED-Y">G5ED-Y &mdash; 8.656 ly</option>
+        <option value="UNAG-6">UNAG-6 &mdash; 8.692 ly</option>
+        <option value="A-QRQT">A-QRQT &mdash; 8.849 ly</option>
+        <option value="8-TFDX">8-TFDX &mdash; 9.072 ly</option>
+        <option value="BR-6XP">BR-6XP &mdash; 9.092 ly</option>
+        <option value="E-SCTX">E-SCTX &mdash; 9.276 ly</option>
+        <option value="7-PO3P">7-PO3P &mdash; 9.281 ly</option>
+        <option value="WMBZ-U">WMBZ-U &mdash; 9.319 ly</option>
+        <option value="UL-4ZW">UL-4ZW &mdash; 9.656 ly</option>
+        <option value="VORM-W">VORM-W &mdash; 9.730 ly</option>
+    </datalist>
     <span class="iv" id="dest_note"></span>
   </div>
 
@@ -358,7 +464,7 @@ const RATE_PER_LY    = 12;
 const RATE_FLAT      = 0;
 const PRICING_MODE   = 'per_ly';
 const COLLATERAL_PCT = 0;
-const ISO_PRICE      = 675.7;  // baked at build time from DB snapshot
+const ISO_PRICE      = 676.0;  // baked at build time from DB snapshot
 const HUB            = '4-HWWF';
 
 function fmt(n, d) {

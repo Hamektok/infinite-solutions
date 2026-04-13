@@ -173,10 +173,15 @@ VALE_SYSTEMS = [
 ]
 
 systems_js = json.dumps([{'name': s[0], 'ly': s[1]} for s in VALE_SYSTEMS], separators=(',', ':'))
-# Include all systems (including 4-HWWF) in datalist — outbound routes need it as pickup
+# Pickup datalist — all systems including 4-HWWF
 systems_datalist = '\n'.join(
     f'        <option value="{s[0]}">{s[0]}{f" &mdash; {s[1]:.3f} ly" if s[1] > 0 else " &mdash; Hub"}</option>'
     for s in VALE_SYSTEMS
+)
+# Destination datalist — all systems EXCEPT 4-HWWF (only used for outbound)
+systems_datalist_dest = '\n'.join(
+    f'        <option value="{s[0]}">{s[0]} &mdash; {s[1]:.3f} ly</option>'
+    for s in VALE_SYSTEMS if s[0] != '4-HWWF'
 )
 # Baked-in iso price (not shown to customer)
 ISO_PRICE_BAKED = round(DEFAULT_ISO_PRICE * ISO_JBV_PCT / 100, 4)
@@ -329,12 +334,15 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
     <input type="text" value="4-HWWF" disabled
       style="min-width:220px;flex:1;opacity:0.6;">
   </div>
-  <!-- Outbound (pickup = 4-HWWF): destination is free choice -->
+  <!-- Outbound (pickup = 4-HWWF): destination is free choice, excludes 4-HWWF -->
   <div class="form-row" id="dest_row_free" style="display:none">
     <label>Destination</label>
-    <input type="text" id="dest_input" list="sys_list" placeholder="Type destination system&hellip;"
+    <input type="text" id="dest_input" list="sys_list_dest" placeholder="Type destination system&hellip;"
       oninput="recalc()" autocomplete="off"
       style="min-width:220px;flex:1;">
+    <datalist id="sys_list_dest">
+{systems_datalist_dest}
+    </datalist>
     <span class="iv" id="dest_note"></span>
   </div>
 
