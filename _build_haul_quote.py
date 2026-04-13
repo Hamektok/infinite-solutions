@@ -335,7 +335,7 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
       style="min-width:220px;flex:1;opacity:0.6;">
   </div>
   <!-- Outbound (pickup = 4-HWWF): destination is free choice, excludes 4-HWWF -->
-  <div class="form-row" id="dest_row_free" style="display:none">
+  <div class="form-row" id="dest_row_free" hidden>
     <label>Destination</label>
     <input type="text" id="dest_input" list="sys_list_dest" placeholder="Type destination system&hellip;"
       oninput="recalc()" autocomplete="off"
@@ -480,16 +480,16 @@ function onPickupChange() {{
 
   if (pickup === HUB) {{
     // Outbound: show free-choice destination input, hide fixed display
-    fixedRow.style.display = 'none';
-    freeRow.style.display  = '';
+    fixedRow.hidden = true;
+    freeRow.hidden  = false;
     var destEl = document.getElementById('dest_input');
     if (destEl.value.toUpperCase() === HUB) destEl.value = '';
     distEl.textContent = 'Hub \u2014 choose destination below';
     distEl.style.color = 'var(--dim)';
   }} else {{
     // Inbound (or empty): show fixed 4-HWWF display, hide free input
-    fixedRow.style.display = '';
-    freeRow.style.display  = 'none';
+    fixedRow.hidden = false;
+    freeRow.hidden  = true;
     if (pickup === '') {{
       distEl.textContent = '';
     }} else {{
@@ -688,8 +688,7 @@ function saveState() {{
   ['cargo_vol', 'cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if (el) s[id] = el.value;
   }});
-  var si = document.getElementById('sys_input');   if (si) s['sys_input']   = si.value;
-  var di = document.getElementById('dest_input');  if (di) s['dest_input']  = di.value;
+  // Note: pickup/destination not saved — always start fresh to avoid stale state
   try {{ localStorage.setItem('haul_quote_state', JSON.stringify(s)); }} catch(e) {{}}
 }}
 
@@ -700,22 +699,21 @@ function loadState() {{
   ['cargo_vol', 'cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if (el && s[id] != null) el.value = s[id];
   }});
-  var si = document.getElementById('sys_input');
-  if (si && s['sys_input'] != null) {{ si.value = s['sys_input']; onPickupChange(); return; }}
   recalc();
 }}
 
 // Poll pickup field — catches datalist selections that don't fire oninput/onchange
-var _lastPickup = '';
-setInterval(function() {{
-  var cur = document.getElementById('sys_input').value || '';
-  if (cur !== _lastPickup) {{
-    _lastPickup = cur;
-    onPickupChange();
-  }}
-}}, 200);
-
-window.onload = loadState;
+window.onload = function() {{
+  loadState();
+  var _lastPickup = document.getElementById('sys_input').value || '';
+  setInterval(function() {{
+    var cur = document.getElementById('sys_input').value || '';
+    if (cur !== _lastPickup) {{
+      _lastPickup = cur;
+      onPickupChange();
+    }}
+  }}, 200);
+}};
 </script>
 </body>
 </html>"""
