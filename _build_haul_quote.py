@@ -2,15 +2,17 @@
 Build haul_quote.html — customer-facing jump freight quote tool.
 Customers enter pickup system, volume, and collateral to get an instant fee quote.
 
-Published rates are baked in at build time. To update rates or skills, change
-the constants below and re-run this script.
+Rate config is read from haul_rates.json (saved via the Publish button in haul_calculator.html).
+If haul_rates.json is absent, falls back to the constants below.
 """
 import json, sqlite3, os
 from datetime import datetime, timezone
 
-# ── Published rate config (update when changing pricing) ─────────────────────
-RATE_PER_LY   = 12      # ISK / m³ / LY  — per-LY service markup
-COLLATERAL_PCT = 0      # % of collateral added to fee (0 = free collateral coverage)
+# ── Default rate config (fallback if haul_rates.json not present) ────────────
+RATE_PER_LY    = 12      # ISK / m³ / LY  — per-LY service markup
+COLLATERAL_PCT = 0       # % of collateral added to fee (0 = free collateral coverage)
+PRICING_MODE   = 'per_ly'
+RATE_FLAT      = 0
 
 # ── Pilot config (update when skills or modules change) ──────────────────────
 SHIP_BASE_FUEL  = 10000    # Rhea base fuel/LY
@@ -20,6 +22,29 @@ JFC_SKILL       = 4        # Jump Fuel Conservation skill level
 ECON_BONUS      = 0.07     # Experimental Jump Drive Economizer (7%)
 EXP_BONUS       = 1.275    # Expanded Cargohold II (27.5% = ×1.275)
 LOW_SLOTS       = 3
+ISO_JBV_PCT     = 100      # % of JBV to pay for isotopes
+
+# ── Load published config from haul_rates.json if present ────────────────────
+_rates_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'haul_rates.json')
+_rates_source = 'defaults'
+if os.path.exists(_rates_path):
+    try:
+        with open(_rates_path, encoding='utf-8') as _rf:
+            _rc = json.load(_rf)
+        PRICING_MODE   = _rc.get('pricing_mode',   PRICING_MODE)
+        RATE_PER_LY    = float(_rc.get('rate_per_ly',    RATE_PER_LY))
+        RATE_FLAT      = float(_rc.get('rate_flat',      RATE_FLAT))
+        COLLATERAL_PCT = float(_rc.get('collateral_pct', COLLATERAL_PCT))
+        JF_SKILL       = int(_rc.get('jf_skill',   JF_SKILL))
+        JFC_SKILL      = int(_rc.get('jfc_skill',  JFC_SKILL))
+        ECON_BONUS     = float(_rc.get('econ_bonus', ECON_BONUS))
+        EXP_BONUS      = float(_rc.get('exp_bonus',  EXP_BONUS))
+        ISO_JBV_PCT    = float(_rc.get('iso_jbv_pct', ISO_JBV_PCT))
+        _pub = _rc.get('published', '')
+        _rates_source = f'haul_rates.json (published {_pub[:16].replace("T"," ")})'
+        print(f"  Loaded config from haul_rates.json")
+    except Exception as _e:
+        print(f"  Warning: could not read haul_rates.json: {_e} — using defaults")
 
 # Module volumes (m³) — always carries all 9, 3 fitted
 MOD_VOL_ECON     = 3500
@@ -403,8 +428,11 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
 const SYSTEMS = {systems_js};
 // Pre-computed module configs (server-side, matches pilot's actual setup)
 const CONFIGS = {configs_js};
-const RATE_PER_LY   = {RATE_PER_LY};
+const RATE_PER_LY    = {RATE_PER_LY};
+const RATE_FLAT      = {RATE_FLAT};
+const PRICING_MODE   = '{PRICING_MODE}';
 const COLLATERAL_PCT = {COLLATERAL_PCT};
+const ISO_JBV_PCT    = {ISO_JBV_PCT};
 
 function fmt(n, d) {{
   d = d || 0;
@@ -431,7 +459,7 @@ function recalc() {{
   var lyRaw   = getSysLy();
   var vol     = parseFloat(document.getElementById('cargo_vol').value)  || 0;
   var coll    = parseFloat(document.getElementById('cargo_coll').value) || 0;
-  var isoPrice = parseFloat(document.getElementById('iso_type').value)  || 0;
+  var isoPrice = (parseFloat(document.getElementById('iso_type').value) || 0) * ISO_JBV_PCT / 100;
   var sysName = (document.getElementById('sys_input').value || '').trim();
 
   var distEl = document.getElementById('sys_dist_note');
@@ -467,7 +495,7 @@ function recalc() {{
 
   // Find optimal config (min total fee)
   var collFee    = coll * COLLATERAL_PCT / 100;
-  var markupFee  = RATE_PER_LY * ly * vol;
+  var markupFee  = PRICING_MODE === 'per_ly' ? RATE_PER_LY * ly * vol : RATE_FLAT * vol;
   var bestResult = null;
 
   CONFIGS.forEach(function(c) {{
@@ -626,7 +654,8 @@ with open(out_path, 'w', encoding='utf-8') as f:
     f.write(html)
 
 print(f"Done. Written to haul_quote.html")
+print(f"  Config:  {_rates_source}")
 print(f"  Systems: {len(VALE_SYSTEMS)} Vale systems")
-print(f"  Rate:    {RATE_PER_LY} ISK/m³/LY  |  Collateral: {COLLATERAL_PCT}%")
+print(f"  Rate:    {RATE_PER_LY} ISK/m³/LY  |  Collateral: {COLLATERAL_PCT}%  |  Iso JBV: {ISO_JBV_PCT}%")
 print(f"  Skills:  JF {JF_SKILL} / JFC {JFC_SKILL}  |  Isotope default: {ISOTOPE_IDS[DEFAULT_ISO_ID]} @ {DEFAULT_ISO_PRICE:,.2f} ISK/unit")
 print(f"  Configs: {', '.join(str(c['econ'])+'E/'+str(c['exp'])+'X='+str(round(c['effectiveCargo']))+' m³' for c in configs_py)}")

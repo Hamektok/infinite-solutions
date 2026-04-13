@@ -342,6 +342,37 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
   </div>
 </div>
 
+<div class="panel" style="border-color:rgba(68,170,255,.25);">
+  <div class="panel-title" style="color:var(--blue);">Publish Rates &mdash; Customer Quote Page</div>
+  <p style="font-size:.83em;color:var(--dim);margin-bottom:12px;">
+    Saves current Trip Parameters settings as <code style="color:var(--accent2);background:var(--panel2);padding:1px 5px;border-radius:3px;">haul_rates.json</code>
+    in the project folder. Then run <code style="color:var(--accent2);background:var(--panel2);padding:1px 5px;border-radius:3px;">python _build_haul_quote.py</code> to rebuild the customer quote page.
+  </p>
+  <div id="publish_status" style="background:var(--panel2);border:1px solid var(--border);border-radius:6px;
+    padding:10px 14px;margin-bottom:12px;font-size:.85em;display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div style="color:var(--dim);">Currently publishing:</div>
+      <div id="pub_rate_display" style="font-family:'Orbitron',sans-serif;font-size:.85em;color:var(--accent2);"></div>
+    </div>
+    <div style="margin-top:6px;color:var(--dim);font-size:.9em;">
+      <span id="pub_skills_display"></span> &nbsp;&middot;&nbsp;
+      <span id="pub_coll_display"></span> &nbsp;&middot;&nbsp;
+      <span id="pub_iso_display"></span>
+    </div>
+  </div>
+  <button onclick="publishRates()" style="padding:10px 22px;background:rgba(68,170,255,.1);
+    border:1px solid rgba(68,170,255,.35);border-radius:5px;color:var(--blue);
+    font-family:'Orbitron',sans-serif;font-size:.65em;letter-spacing:2px;font-weight:700;
+    cursor:pointer;transition:background .15s;text-transform:uppercase;"
+    onmouseover="this.style.background='rgba(68,170,255,.2)'"
+    onmouseout="this.style.background='rgba(68,170,255,.1)'">
+    &#8659; &nbsp;Save haul_rates.json
+  </button>
+  <span id="pub_feedback" style="margin-left:14px;font-size:.85em;color:var(--green);display:none;">
+    &#10003; Saved — run _build_haul_quote.py to publish
+  </span>
+</div>
+
 <div class="footer">
   Infinite Solutions &middot; Hamektok Hakaari &middot; {build_date}
 </div>
@@ -593,6 +624,7 @@ function recalc() {{
     callout.style.display = 'none';
   }}
 
+  updatePublishStatus();
   saveState();
 }}
 
@@ -617,6 +649,80 @@ function loadState() {{
   var si = document.getElementById('sys_input'); if(si && s['sys_input'] != null) si.value = s['sys_input'];
   onPricingModeChange();
   recalc();
+}}
+
+function updatePublishStatus() {{
+  var mode    = document.getElementById('pricing_mode').value;
+  var ratePerLy = parseFloat(document.getElementById('fee_per_ly').value)||0;
+  var rateFlat  = parseFloat(document.getElementById('fee_flat').value)||0;
+  var jf   = parseInt(document.getElementById('jf_skill').value)||4;
+  var jfc  = parseInt(document.getElementById('jfc_skill').value)||4;
+  var coll = parseFloat(document.getElementById('coll_pct').value)||0;
+  var econBonus = parseFloat(document.getElementById('econ_type').value)||0.07;
+  var isoPct = parseFloat(document.getElementById('iso_jbv_pct').value)||100;
+
+  var rateStr = mode === 'per_ly'
+    ? fmt(ratePerLy, 1)+' ISK/m\u00B3/LY'
+    : fmt(rateFlat, 0)+' ISK/m\u00B3 flat';
+
+  var statusEl = document.getElementById('publish_status');
+  statusEl.style.display = 'block';
+  document.getElementById('pub_rate_display').textContent = rateStr;
+  document.getElementById('pub_skills_display').textContent = 'JF '+jf+' / JFC '+jfc;
+  document.getElementById('pub_coll_display').textContent = coll > 0 ? coll+'% collateral fee' : 'Collateral free';
+  document.getElementById('pub_iso_display').textContent = isoPct === 100 ? 'Isotope at JBV' : 'Isotope at '+isoPct+'% JBV';
+}}
+
+function publishRates() {{
+  var mode = document.getElementById('pricing_mode').value;
+  var config = {{
+    pricing_mode:   mode,
+    rate_per_ly:    parseFloat(document.getElementById('fee_per_ly').value)||0,
+    rate_flat:      parseFloat(document.getElementById('fee_flat').value)||0,
+    collateral_pct: parseFloat(document.getElementById('coll_pct').value)||0,
+    jf_skill:       parseInt(document.getElementById('jf_skill').value)||4,
+    jfc_skill:      parseInt(document.getElementById('jfc_skill').value)||4,
+    econ_bonus:     parseFloat(document.getElementById('econ_type').value)||0.07,
+    exp_bonus:      parseFloat(document.getElementById('exp_type').value)||1.275,
+    iso_jbv_pct:    parseFloat(document.getElementById('iso_jbv_pct').value)||100,
+    published:      new Date().toISOString(),
+  }};
+
+  var blob = new Blob([JSON.stringify(config, null, 2)], {{type: 'application/json'}});
+  var fname = 'haul_rates.json';
+
+  // Try File System Access API first (Chromium — saves in-place, no dialog)
+  if (window.showSaveFilePicker) {{
+    window.showSaveFilePicker({{
+      suggestedName: fname,
+      types: [{{description: 'JSON', accept: {{'application/json': ['.json']}}}}],
+    }}).then(function(fh) {{
+      return fh.createWritable().then(function(w) {{
+        return w.write(blob).then(function() {{ return w.close(); }});
+      }});
+    }}).then(function() {{
+      showPublishFeedback();
+    }}).catch(function(e) {{
+      if (e.name !== 'AbortError') fallbackDownload(blob, fname);
+    }});
+  }} else {{
+    fallbackDownload(blob, fname);
+  }}
+}}
+
+function fallbackDownload(blob, fname) {{
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showPublishFeedback();
+}}
+
+function showPublishFeedback() {{
+  var fb = document.getElementById('pub_feedback');
+  fb.style.display = 'inline';
+  setTimeout(function() {{ fb.style.display = 'none'; }}, 4000);
 }}
 
 window.onload = loadState;
