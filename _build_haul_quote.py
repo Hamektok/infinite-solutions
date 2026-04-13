@@ -315,7 +315,7 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
   <div class="form-row">
     <label>Pickup System</label>
     <input type="text" id="sys_input" list="sys_list" placeholder="Type system name&hellip;"
-      oninput="onPickupChange()" autocomplete="off"
+      oninput="onPickupChange()" onchange="onPickupChange()" autocomplete="off"
       style="min-width:220px;flex:1;">
     <datalist id="sys_list">
 {systems_datalist}
@@ -500,17 +500,18 @@ function onPickupChange() {{
 
 function getRoute() {{
   var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
-  var dest   = (document.getElementById('dest_input').value || '').trim().toUpperCase();
-  if (!pickup || !dest) return null;
+  if (!pickup) return null;
 
   var ly, from, to;
   if (pickup === HUB) {{
-    // Outbound: 4-HWWF → dest
+    // Outbound: dest field is required
+    var dest = (document.getElementById('dest_input').value || '').trim().toUpperCase();
+    if (!dest) return null;
     ly   = lookupLy(dest);
     from = HUB;
     to   = dest;
   }} else {{
-    // Inbound: pickup → 4-HWWF
+    // Inbound: destination is always HUB — don't read dest_input (cosmetic only)
     ly   = lookupLy(pickup);
     from = pickup;
     to   = HUB;
