@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Haul Quote &mdash; Infinite Solutions</title>
+<title>Infinite Solutions &mdash; Freighting Service</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 :root{
@@ -99,28 +99,30 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
 <body>
 <div class="page">
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-  <a class="back-link" href="index.html">&#8592; Industrial Market</a>
-</div>
-
 <div class="hdr">
-  <h1>HAUL QUOTE</h1>
-  <div class="sub">Jump Freight &middot; Vale of the Silent &middot; 4-HWWF</div>
+  <h1>INFINITE SOLUTIONS</h1>
+  <div class="sub">Jump Freight &middot; Freighting Service</div>
 </div>
 
 <!-- Service Info -->
 <div class="panel">
-  <div class="panel-title">Service Info</div>
-  <div class="service-pills">
-    <div class="pill">Origin: <span>4-HWWF</span></div>
-    <div class="pill">Region: <span>Vale of the Silent</span></div>
-    <div class="pill">Max range: <span>~10 LY</span></div>
-    <div class="pill">Rate: <span>12 ISK/m&#179;/LY</span></div>
-    <div class="pill">Collateral: <span>Free</span></div>
-  </div>
-  <p style="font-size:.82em;color:var(--dim);margin-top:10px;">
-    Enter your pickup system, cargo volume, and declared collateral below for an instant quote.
-    Fuel costs are recovered on top of the per-LY service fee &mdash; the quote below covers everything.
+  <div class="panel-title">How It Works</div>
+  <p style="font-size:.88em;color:var(--text);line-height:1.65;margin-bottom:10px;">
+    Enter your <strong style="color:var(--accent2);">pickup system</strong>, the
+    <strong style="color:var(--accent2);">volume</strong> of your cargo, and its
+    <strong style="color:var(--accent2);">declared collateral value</strong> to receive an instant quote.
+  </p>
+  <p style="font-size:.88em;color:var(--text);line-height:1.65;margin-bottom:10px;">
+    Once you have your quote, create a <strong style="color:var(--accent2);">courier contract</strong> in EVE
+    addressed to <strong style="color:var(--accent2);">Gromalok Hakaari</strong>.
+    Set the <strong style="color:var(--accent2);">reward</strong> to the quoted fee,
+    the <strong style="color:var(--accent2);">collateral</strong> to your declared value,
+    and the <strong style="color:var(--accent2);">pickup</strong> and
+    <strong style="color:var(--accent2);">destination</strong> to the systems shown in your quote.
+  </p>
+  <p style="font-size:.82em;color:var(--dim);line-height:1.5;">
+    The quoted fee covers all fuel costs plus the service markup &mdash; no hidden charges.
+    Collateral coverage is included at no extra charge.
   </p>
 </div>
 
@@ -131,9 +133,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
   <div class="form-row">
     <label>Pickup System</label>
     <input type="text" id="sys_input" list="sys_list" placeholder="Type system name&hellip;"
-      oninput="recalc()" autocomplete="off"
+      oninput="onPickupChange()" autocomplete="off"
       style="min-width:220px;flex:1;">
     <datalist id="sys_list">
+        <option value="4-HWWF">4-HWWF &mdash; Hub</option>
         <option value="PM-DWE">PM-DWE &mdash; 0.893 ly</option>
         <option value="4GYV-Q">4GYV-Q &mdash; 0.937 ly</option>
         <option value="EIDI-N">EIDI-N &mdash; 1.023 ly</option>
@@ -243,6 +246,14 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
   </div>
 
   <div class="form-row">
+    <label>Destination</label>
+    <input type="text" id="dest_input" list="sys_list" placeholder="Auto-filled or type system&hellip;"
+      oninput="recalc()" autocomplete="off"
+      style="min-width:220px;flex:1;">
+    <span class="iv" id="dest_note"></span>
+  </div>
+
+  <div class="form-row">
     <label>Volume</label>
     <input type="number" id="cargo_vol" min="0" step="1000" value="" oninput="recalc()"
       placeholder="e.g. 150000" style="width:160px;">
@@ -255,19 +266,6 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
       placeholder="Declared value (ISK)" style="width:190px;">
     <span class="unit">ISK</span>
   </div>
-
-  <hr class="div">
-
-  <div class="form-row">
-    <label>Isotope Type</label>
-    <select id="iso_type" onchange="recalc()" style="min-width:200px;">
-        <option value="675.7" selected>Nitrogen Isotopes</option>
-        <option value="602.2">Hydrogen Isotopes</option>
-        <option value="745.2">Oxygen Isotopes</option>
-        <option value="817.7">Helium Isotopes</option>
-    </select>
-  </div>
-  <p class="snap-note">Jita snapshot: 13 Apr 2026 14:11 UTC</p>
 </div>
 
 <!-- Quote Output -->
@@ -336,9 +334,12 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
 <div class="panel">
   <div class="panel-title">Arrange Delivery</div>
   <div class="contact-card">
-    <div class="ct">To book your haul, create a courier contract in EVE addressed to:</div>
-    <div class="cn">Hamektok Hakaari</div>
-    <div class="ci">Set the reward to the quoted fee &middot; Set collateral to your declared value &middot; Pickup from your system &middot; Deliver to 4-HWWF</div>
+    <div class="ct">Create a courier contract in EVE Online addressed to:</div>
+    <div class="cn">Gromalok Hakaari</div>
+    <div class="ci" id="contract_instructions">
+      Set reward to quoted fee &middot; Set collateral to declared value &middot;
+      Pickup and destination as shown in your quote above
+    </div>
   </div>
 </div>
 
@@ -348,14 +349,14 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
 
 </div>
 <script>
-const SYSTEMS = [{"name":"4-HWWF","ly":0},{"name":"PM-DWE","ly":0.893},{"name":"4GYV-Q","ly":0.937},{"name":"EIDI-N","ly":1.023},{"name":"YMJG-4","ly":1.136},{"name":"DAYP-G","ly":1.356},{"name":"WBR5-R","ly":1.443},{"name":"8TPX-N","ly":1.491},{"name":"KRUN-N","ly":1.499},{"name":"TVN-FM","ly":1.502},{"name":"IPAY-2","ly":1.577},{"name":"K8X-6B","ly":1.72},{"name":"0MV-4W","ly":1.927},{"name":"AZBR-2","ly":2.03},{"name":"Q-L07F","ly":2.198},{"name":"U54-1L","ly":2.247},{"name":"P3EN-E","ly":2.278},{"name":"T-GCGL","ly":2.44},{"name":"V-OJEN","ly":2.469},{"name":"X445-5","ly":2.533},{"name":"05R-7A","ly":2.559},{"name":"FS-RFL","ly":2.619},{"name":"NCGR-Q","ly":2.658},{"name":"Z-8Q65","ly":2.7},{"name":"IFJ-EL","ly":2.748},{"name":"9OO-LH","ly":2.759},{"name":"MC6O-F","ly":2.774},{"name":"X97D-W","ly":2.799},{"name":"49-0LI","ly":2.815},{"name":"0-R5TS","ly":2.844},{"name":"669-IX","ly":2.888},{"name":"0R-F2F","ly":3.002},{"name":"47L-J4","ly":3.07},{"name":"N-HSK0","ly":3.163},{"name":"HE-V4V","ly":3.182},{"name":"V-NL3K","ly":3.223},{"name":"0J3L-V","ly":3.232},{"name":"S-NJBB","ly":3.307},{"name":"XF-PWO","ly":3.361},{"name":"R-P7KL","ly":3.37},{"name":"A8A-JN","ly":3.386},{"name":"NFM-0V","ly":3.389},{"name":"E-D0VZ","ly":3.401},{"name":"6WW-28","ly":3.432},{"name":"UH-9ZG","ly":3.448},{"name":"YXIB-I","ly":3.497},{"name":"LZ-6SU","ly":3.503},{"name":"Y0-BVN","ly":3.631},{"name":"7-UH4Z","ly":3.631},{"name":"1N-FJ8","ly":3.718},{"name":"2DWM-2","ly":3.732},{"name":"H-UCD1","ly":3.802},{"name":"G-LOIT","ly":3.828},{"name":"1-GBBP","ly":3.837},{"name":"B-588R","ly":3.905},{"name":"5ZO-NZ","ly":4.132},{"name":"H-NOU5","ly":4.337},{"name":"97-M96","ly":4.356},{"name":"T-ZWA1","ly":4.379},{"name":"3HX-DL","ly":4.409},{"name":"7-K5EL","ly":4.429},{"name":"KX-2UI","ly":4.579},{"name":"GEKJ-9","ly":4.62},{"name":"MY-T2P","ly":4.817},{"name":"Y-ZXIO","ly":4.827},{"name":"C-FP70","ly":4.899},{"name":"G96R-F","ly":5.079},{"name":"Q-R3GP","ly":5.081},{"name":"ZA0L-U","ly":5.118},{"name":"FA-DMO","ly":5.257},{"name":"XV-8JQ","ly":5.341},{"name":"N-5QPW","ly":5.528},{"name":"MO-FIF","ly":5.566},{"name":"MA-XAP","ly":5.716},{"name":"H-5GUI","ly":5.717},{"name":"C-J7CR","ly":5.852},{"name":"Q-EHMJ","ly":5.941},{"name":"XSQ-TF","ly":6.193},{"name":"H-1EOH","ly":6.423},{"name":"FMBR-8","ly":6.451},{"name":"FH-TTC","ly":6.633},{"name":"VI2K-J","ly":6.669},{"name":"6Y-WRK","ly":6.755},{"name":"5T-KM3","ly":6.789},{"name":"IR-DYY","ly":6.818},{"name":"MQ-O27","ly":7.129},{"name":"ZLZ-1Z","ly":7.348},{"name":"F-D49D","ly":7.382},{"name":"RVCZ-C","ly":7.422},{"name":"B-E3KQ","ly":7.87},{"name":"Y5J-EU","ly":7.899},{"name":"H-EY0P","ly":8.008},{"name":"O-LR1H","ly":8.088},{"name":"LS9B-9","ly":8.17},{"name":"C-DHON","ly":8.317},{"name":"G5ED-Y","ly":8.656},{"name":"UNAG-6","ly":8.692},{"name":"A-QRQT","ly":8.849},{"name":"8-TFDX","ly":9.072},{"name":"BR-6XP","ly":9.092},{"name":"E-SCTX","ly":9.276},{"name":"7-PO3P","ly":9.281},{"name":"WMBZ-U","ly":9.319},{"name":"UL-4ZW","ly":9.656},{"name":"VORM-W","ly":9.73}];
-// Pre-computed module configs (server-side, matches pilot's actual setup)
-const CONFIGS = [{"econ":0,"exp":3,"fuelPerLY":3600.0,"effectiveCargo":362565.9375},{"econ":1,"exp":2,"fuelPerLY":3348.0,"effectiveCargo":285592.5},{"econ":2,"exp":1,"fuelPerLY":3144.313041,"effectiveCargo":225975.0},{"econ":3,"exp":0,"fuelPerLY":3018.7266,"effectiveCargo":179970.0}];
+const SYSTEMS        = [{"name":"4-HWWF","ly":0},{"name":"PM-DWE","ly":0.893},{"name":"4GYV-Q","ly":0.937},{"name":"EIDI-N","ly":1.023},{"name":"YMJG-4","ly":1.136},{"name":"DAYP-G","ly":1.356},{"name":"WBR5-R","ly":1.443},{"name":"8TPX-N","ly":1.491},{"name":"KRUN-N","ly":1.499},{"name":"TVN-FM","ly":1.502},{"name":"IPAY-2","ly":1.577},{"name":"K8X-6B","ly":1.72},{"name":"0MV-4W","ly":1.927},{"name":"AZBR-2","ly":2.03},{"name":"Q-L07F","ly":2.198},{"name":"U54-1L","ly":2.247},{"name":"P3EN-E","ly":2.278},{"name":"T-GCGL","ly":2.44},{"name":"V-OJEN","ly":2.469},{"name":"X445-5","ly":2.533},{"name":"05R-7A","ly":2.559},{"name":"FS-RFL","ly":2.619},{"name":"NCGR-Q","ly":2.658},{"name":"Z-8Q65","ly":2.7},{"name":"IFJ-EL","ly":2.748},{"name":"9OO-LH","ly":2.759},{"name":"MC6O-F","ly":2.774},{"name":"X97D-W","ly":2.799},{"name":"49-0LI","ly":2.815},{"name":"0-R5TS","ly":2.844},{"name":"669-IX","ly":2.888},{"name":"0R-F2F","ly":3.002},{"name":"47L-J4","ly":3.07},{"name":"N-HSK0","ly":3.163},{"name":"HE-V4V","ly":3.182},{"name":"V-NL3K","ly":3.223},{"name":"0J3L-V","ly":3.232},{"name":"S-NJBB","ly":3.307},{"name":"XF-PWO","ly":3.361},{"name":"R-P7KL","ly":3.37},{"name":"A8A-JN","ly":3.386},{"name":"NFM-0V","ly":3.389},{"name":"E-D0VZ","ly":3.401},{"name":"6WW-28","ly":3.432},{"name":"UH-9ZG","ly":3.448},{"name":"YXIB-I","ly":3.497},{"name":"LZ-6SU","ly":3.503},{"name":"Y0-BVN","ly":3.631},{"name":"7-UH4Z","ly":3.631},{"name":"1N-FJ8","ly":3.718},{"name":"2DWM-2","ly":3.732},{"name":"H-UCD1","ly":3.802},{"name":"G-LOIT","ly":3.828},{"name":"1-GBBP","ly":3.837},{"name":"B-588R","ly":3.905},{"name":"5ZO-NZ","ly":4.132},{"name":"H-NOU5","ly":4.337},{"name":"97-M96","ly":4.356},{"name":"T-ZWA1","ly":4.379},{"name":"3HX-DL","ly":4.409},{"name":"7-K5EL","ly":4.429},{"name":"KX-2UI","ly":4.579},{"name":"GEKJ-9","ly":4.62},{"name":"MY-T2P","ly":4.817},{"name":"Y-ZXIO","ly":4.827},{"name":"C-FP70","ly":4.899},{"name":"G96R-F","ly":5.079},{"name":"Q-R3GP","ly":5.081},{"name":"ZA0L-U","ly":5.118},{"name":"FA-DMO","ly":5.257},{"name":"XV-8JQ","ly":5.341},{"name":"N-5QPW","ly":5.528},{"name":"MO-FIF","ly":5.566},{"name":"MA-XAP","ly":5.716},{"name":"H-5GUI","ly":5.717},{"name":"C-J7CR","ly":5.852},{"name":"Q-EHMJ","ly":5.941},{"name":"XSQ-TF","ly":6.193},{"name":"H-1EOH","ly":6.423},{"name":"FMBR-8","ly":6.451},{"name":"FH-TTC","ly":6.633},{"name":"VI2K-J","ly":6.669},{"name":"6Y-WRK","ly":6.755},{"name":"5T-KM3","ly":6.789},{"name":"IR-DYY","ly":6.818},{"name":"MQ-O27","ly":7.129},{"name":"ZLZ-1Z","ly":7.348},{"name":"F-D49D","ly":7.382},{"name":"RVCZ-C","ly":7.422},{"name":"B-E3KQ","ly":7.87},{"name":"Y5J-EU","ly":7.899},{"name":"H-EY0P","ly":8.008},{"name":"O-LR1H","ly":8.088},{"name":"LS9B-9","ly":8.17},{"name":"C-DHON","ly":8.317},{"name":"G5ED-Y","ly":8.656},{"name":"UNAG-6","ly":8.692},{"name":"A-QRQT","ly":8.849},{"name":"8-TFDX","ly":9.072},{"name":"BR-6XP","ly":9.092},{"name":"E-SCTX","ly":9.276},{"name":"7-PO3P","ly":9.281},{"name":"WMBZ-U","ly":9.319},{"name":"UL-4ZW","ly":9.656},{"name":"VORM-W","ly":9.73}];
+const CONFIGS        = [{"econ":0,"exp":3,"fuelPerLY":3600.0,"effectiveCargo":362565.9375},{"econ":1,"exp":2,"fuelPerLY":3348.0,"effectiveCargo":285592.5},{"econ":2,"exp":1,"fuelPerLY":3144.313041,"effectiveCargo":225975.0},{"econ":3,"exp":0,"fuelPerLY":3018.7266,"effectiveCargo":179970.0}];
 const RATE_PER_LY    = 12;
 const RATE_FLAT      = 0;
 const PRICING_MODE   = 'per_ly';
 const COLLATERAL_PCT = 0;
-const ISO_JBV_PCT    = 100;
+const ISO_PRICE      = 675.7;  // baked at build time from DB snapshot
+const HUB            = '4-HWWF';
 
 function fmt(n, d) {
   d = d || 0;
@@ -369,86 +370,134 @@ function fmtB(n) {
   return s + fmt(a, 0);
 }
 
-function getSysLy() {
-  var name = (document.getElementById('sys_input').value || '').trim().toUpperCase();
-  if (!name) return null;
+function lookupLy(name) {
+  var n = (name || '').trim().toUpperCase();
+  if (!n) return null;
   for (var i = 0; i < SYSTEMS.length; i++) {
-    if (SYSTEMS[i].name.toUpperCase() === name) return SYSTEMS[i].ly;
+    if (SYSTEMS[i].name.toUpperCase() === n) return SYSTEMS[i].ly;
   }
-  return undefined; // not found
+  return undefined; // not in list
+}
+
+// When pickup changes: auto-set destination to HUB unless pickup IS HUB
+function onPickupChange() {
+  var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
+  var destEl = document.getElementById('dest_input');
+  var distEl = document.getElementById('sys_dist_note');
+
+  if (pickup === HUB) {
+    // Outbound: let customer pick destination freely
+    destEl.readOnly = false;
+    destEl.style.color = '';
+    destEl.style.opacity = '1';
+    destEl.placeholder = 'Type destination system…';
+    if (destEl.value.toUpperCase() === HUB) destEl.value = '';
+    distEl.textContent = 'Hub — choose destination below';
+    distEl.style.color = 'var(--dim)';
+  } else if (pickup === '') {
+    destEl.readOnly = false;
+    destEl.value = '';
+    destEl.style.color = '';
+    destEl.placeholder = 'Auto-filled or type system…';
+    distEl.textContent = '';
+  } else {
+    // Inbound: destination locked to HUB
+    destEl.readOnly = true;
+    destEl.value = HUB;
+    destEl.style.color = 'var(--dim)';
+    var ly = lookupLy(pickup);
+    if (ly === undefined) {
+      distEl.textContent = 'System not found';
+      distEl.style.color = 'var(--red)';
+    } else {
+      distEl.textContent = ly.toFixed(3) + ' ly';
+      distEl.style.color = '';
+    }
+  }
+  recalc();
+}
+
+function getRoute() {
+  var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
+  var dest   = (document.getElementById('dest_input').value || '').trim().toUpperCase();
+  if (!pickup || !dest) return null;
+
+  var ly, from, to;
+  if (pickup === HUB) {
+    // Outbound: 4-HWWF → dest
+    ly   = lookupLy(dest);
+    from = HUB;
+    to   = dest;
+  } else {
+    // Inbound: pickup → 4-HWWF
+    ly   = lookupLy(pickup);
+    from = pickup;
+    to   = HUB;
+  }
+
+  if (ly == null || ly === undefined) return null;
+  return { ly: ly, from: from, to: to };
 }
 
 function recalc() {
-  var lyRaw   = getSysLy();
-  var vol     = parseFloat(document.getElementById('cargo_vol').value)  || 0;
-  var coll    = parseFloat(document.getElementById('cargo_coll').value) || 0;
-  var isoPrice = (parseFloat(document.getElementById('iso_type').value) || 0) * ISO_JBV_PCT / 100;
-  var sysName = (document.getElementById('sys_input').value || '').trim();
+  var route = getRoute();
+  var vol   = parseFloat(document.getElementById('cargo_vol').value)  || 0;
+  var coll  = parseFloat(document.getElementById('cargo_coll').value) || 0;
 
-  var distEl = document.getElementById('sys_dist_note');
-
-  // Validate system input
-  if (sysName === '') {
-    distEl.textContent = '';
-    distEl.style.color = '';
-  } else if (lyRaw === undefined) {
-    distEl.textContent = 'System not found';
-    distEl.style.color = 'var(--red)';
-  } else if (lyRaw === 0) {
-    distEl.textContent = '4-HWWF (origin)';
-    distEl.style.color = 'var(--dim)';
+  // Update dest note
+  var destNoteEl = document.getElementById('dest_note');
+  var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
+  if (pickup === HUB) {
+    var destVal = (document.getElementById('dest_input').value || '').trim().toUpperCase();
+    var destLy  = lookupLy(destVal);
+    if (destVal === '') {
+      destNoteEl.textContent = '';
+    } else if (destLy === undefined) {
+      destNoteEl.textContent = 'System not found';
+      destNoteEl.style.color = 'var(--red)';
+    } else {
+      destNoteEl.textContent = destLy.toFixed(3) + ' ly';
+      destNoteEl.style.color = '';
+    }
   } else {
-    distEl.textContent = lyRaw.toFixed(3) + ' ly';
-    distEl.style.color = '';
+    destNoteEl.textContent = '';
   }
 
-  var ly = (lyRaw != null && lyRaw > 0) ? lyRaw : 0;
-  var hasSystem = ly > 0;
-  var hasVol    = vol > 0;
-
-  // Show/hide empty state vs quote card
   var emptyEl = document.getElementById('quote_empty');
   var cardEl  = document.getElementById('quote_card');
-  if (!hasSystem || !hasVol) {
+
+  if (!route || route.ly <= 0 || !vol) {
     emptyEl.style.display = '';
     cardEl.classList.remove('show');
     saveState();
     return;
   }
 
-  // Find optimal config (min total fee)
-  var collFee    = coll * COLLATERAL_PCT / 100;
-  var markupFee  = PRICING_MODE === 'per_ly' ? RATE_PER_LY * ly * vol : RATE_FLAT * vol;
+  var ly        = route.ly;
+  var collFee   = coll * COLLATERAL_PCT / 100;
+  var markupFee = PRICING_MODE === 'per_ly' ? RATE_PER_LY * ly * vol : RATE_FLAT * vol;
   var bestResult = null;
 
   CONFIGS.forEach(function(c) {
     var trips    = Math.ceil(vol / c.effectiveCargo);
-    var isoUsed  = trips * ly * 2 * c.fuelPerLY;  // always round trip
-    var fuelCost = isoUsed * isoPrice;
+    var isoUsed  = trips * ly * 2 * c.fuelPerLY;
+    var fuelCost = isoUsed * ISO_PRICE;
     var total    = fuelCost + markupFee + collFee;
     if (bestResult === null || total < bestResult.total) {
-      bestResult = {
-        trips:    trips,
-        isoUsed:  isoUsed,
-        fuelCost: fuelCost,
-        total:    total,
-        econ:     c.econ,
-        exp:      c.exp,
-      };
+      bestResult = { trips: trips, isoUsed: isoUsed, fuelCost: fuelCost, total: total };
     }
   });
 
-  // Populate quote card
   emptyEl.style.display = 'none';
   cardEl.classList.add('show');
 
   var totalISK = bestResult.total;
-  document.getElementById('q_total').textContent     = fmtB(totalISK) + ' ISK';
-  document.getElementById('q_total_sub').textContent = fmt(Math.round(totalISK)) + ' ISK &mdash; round trip, ' + bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips');
-  document.getElementById('q_total2').textContent    = fmtB(totalISK) + ' ISK';
-  document.getElementById('q_total_sub').innerHTML   = fmt(Math.round(totalISK)) + ' ISK &mdash; round trip, ' + bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips');
+  document.getElementById('q_total').textContent   = fmtB(totalISK) + ' ISK';
+  document.getElementById('q_total2').textContent  = fmtB(totalISK) + ' ISK';
+  document.getElementById('q_total_sub').innerHTML = fmt(Math.round(totalISK)) + ' ISK &mdash; round trip, ' +
+    bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips');
 
-  document.getElementById('q_route').textContent = '4-HWWF → ' + sysName.toUpperCase();
+  document.getElementById('q_route').textContent = route.from + ' → ' + route.to;
   document.getElementById('q_dist').textContent  = ly.toFixed(3) + ' ly (×2 round trip)';
   document.getElementById('q_vol').textContent   = fmt(Math.round(vol)) + ' m³';
 
@@ -460,9 +509,9 @@ function recalc() {
     collRow.style.display = 'none';
   }
 
-  document.getElementById('q_trips').textContent   = bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips') + ' (round trip each)';
-  document.getElementById('q_fuel').textContent    = fmtB(bestResult.fuelCost) + ' ISK';
-  document.getElementById('q_markup').textContent  = fmtB(markupFee) + ' ISK';
+  document.getElementById('q_trips').textContent  = bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips') + ' (round trip each)';
+  document.getElementById('q_fuel').textContent   = fmtB(bestResult.fuelCost) + ' ISK';
+  document.getElementById('q_markup').textContent = fmtB(markupFee) + ' ISK';
 
   var collFeeRow = document.getElementById('q_coll_fee_row');
   if (COLLATERAL_PCT > 0 && coll > 0) {
@@ -472,14 +521,21 @@ function recalc() {
     collFeeRow.style.display = 'none';
   }
 
-  // Reset copy button
+  // Update contract instructions with actual systems
+  var ci = document.getElementById('contract_instructions');
+  if (ci) {
+    ci.innerHTML = 'Set reward to quoted fee &middot; Set collateral to declared value &middot; ' +
+      'Pickup: <strong style="color:var(--accent2)">' + route.from + '</strong> &middot; ' +
+      'Deliver to: <strong style="color:var(--accent2)">' + route.to + '</strong>';
+  }
+
   var btn = document.getElementById('copy_btn');
   btn.classList.remove('copied');
   btn.textContent = '📋  Copy Quote to Clipboard';
 
-  // Store result for copy function
   window._quoteData = {
-    system:   sysName.toUpperCase(),
+    from:     route.from,
+    to:       route.to,
     ly:       ly,
     vol:      vol,
     coll:     coll,
@@ -498,15 +554,15 @@ function copyQuote() {
   if (!d) return;
 
   var lines = [
-    'Haul Quote — Infinite Solutions',
+    'Freight Quote — Infinite Solutions',
     '',
-    'Route:      4-HWWF → ' + d.system + ' (' + d.ly.toFixed(3) + ' ly, round trip)',
+    'Route:      ' + d.from + ' → ' + d.to + ' (' + d.ly.toFixed(3) + ' ly, round trip)',
     'Volume:     ' + fmt(Math.round(d.vol)) + ' m³',
     'Collateral: ' + (d.coll > 0 ? fmtB(d.coll) + ' ISK' : 'None declared'),
     '',
     '──────────────────────────────',
     'Fuel recovery:  ' + fmtB(d.fuelCost) + ' ISK',
-    'Service fee:    ' + fmtB(d.markup)   + ' ISK  (' + RATE_PER_LY + ' ISK/m³/LY)',
+    'Service fee:    ' + fmtB(d.markup) + ' ISK',
   ];
   if (COLLATERAL_PCT > 0 && d.coll > 0) {
     lines.push('Collateral fee: ' + fmtB(d.collFee) + ' ISK  (' + COLLATERAL_PCT + '%)');
@@ -515,12 +571,13 @@ function copyQuote() {
     '──────────────────────────────',
     'TOTAL FEE:      ' + fmt(Math.round(d.total)) + ' ISK',
     '',
-    'Contract cargo to Hamektok Hakaari in-game.',
+    'Create courier contract to: Gromalok Hakaari',
+    'Pickup: ' + d.from + '  |  Deliver to: ' + d.to,
   ]);
 
   var text = lines.join('
 ');
-  navigator.clipboard.writeText(text).then(function() {
+  var onDone = function(ok) {
     var btn = document.getElementById('copy_btn');
     btn.classList.add('copied');
     btn.textContent = '✓  Copied to Clipboard';
@@ -528,32 +585,22 @@ function copyQuote() {
       btn.classList.remove('copied');
       btn.textContent = '📋  Copy Quote to Clipboard';
     }, 2500);
-  }).catch(function() {
-    // Fallback for older browsers
+  };
+  navigator.clipboard.writeText(text).then(onDone).catch(function() {
     var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    var btn = document.getElementById('copy_btn');
-    btn.classList.add('copied');
-    btn.textContent = '✓  Copied!';
-    setTimeout(function() {
-      btn.classList.remove('copied');
-      btn.textContent = '📋  Copy Quote to Clipboard';
-    }, 2500);
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); onDone();
   });
 }
 
 function saveState() {
   var s = {};
-  ['iso_type', 'cargo_vol', 'cargo_coll'].forEach(function(id) {
+  ['cargo_vol', 'cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if (el) s[id] = el.value;
   });
-  var si = document.getElementById('sys_input'); if (si) s['sys_input'] = si.value;
+  var si = document.getElementById('sys_input');   if (si) s['sys_input']   = si.value;
+  var di = document.getElementById('dest_input');  if (di) s['dest_input']  = di.value;
   try { localStorage.setItem('haul_quote_state', JSON.stringify(s)); } catch(e) {}
 }
 
@@ -561,10 +608,11 @@ function loadState() {
   var raw; try { raw = localStorage.getItem('haul_quote_state'); } catch(e) {}
   if (!raw) { recalc(); return; }
   var s; try { s = JSON.parse(raw); } catch(e) { recalc(); return; }
-  ['iso_type', 'cargo_vol', 'cargo_coll'].forEach(function(id) {
+  ['cargo_vol', 'cargo_coll'].forEach(function(id) {
     var el = document.getElementById(id); if (el && s[id] != null) el.value = s[id];
   });
-  var si = document.getElementById('sys_input'); if (si && s['sys_input'] != null) si.value = s['sys_input'];
+  var si = document.getElementById('sys_input');
+  if (si && s['sys_input'] != null) { si.value = s['sys_input']; onPickupChange(); return; }
   recalc();
 }
 

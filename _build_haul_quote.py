@@ -173,10 +173,13 @@ VALE_SYSTEMS = [
 ]
 
 systems_js = json.dumps([{'name': s[0], 'ly': s[1]} for s in VALE_SYSTEMS], separators=(',', ':'))
+# Include all systems (including 4-HWWF) in datalist — outbound routes need it as pickup
 systems_datalist = '\n'.join(
-    f'        <option value="{s[0]}">{s[0]} &mdash; {s[1]:.3f} ly</option>'
-    for s in VALE_SYSTEMS if s[1] > 0   # exclude origin itself
+    f'        <option value="{s[0]}">{s[0]}{f" &mdash; {s[1]:.3f} ly" if s[1] > 0 else " &mdash; Hub"}</option>'
+    for s in VALE_SYSTEMS
 )
+# Baked-in iso price (not shown to customer)
+ISO_PRICE_BAKED = round(DEFAULT_ISO_PRICE * ISO_JBV_PCT / 100, 4)
 
 build_date = datetime.now(timezone.utc).strftime('%d %b %Y')
 
@@ -186,7 +189,7 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Haul Quote &mdash; Infinite Solutions</title>
+<title>Infinite Solutions &mdash; Freighting Service</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 :root{{
@@ -282,28 +285,30 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
 <body>
 <div class="page">
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-  <a class="back-link" href="index.html">&#8592; Industrial Market</a>
-</div>
-
 <div class="hdr">
-  <h1>HAUL QUOTE</h1>
-  <div class="sub">Jump Freight &middot; Vale of the Silent &middot; 4-HWWF</div>
+  <h1>INFINITE SOLUTIONS</h1>
+  <div class="sub">Jump Freight &middot; Freighting Service</div>
 </div>
 
 <!-- Service Info -->
 <div class="panel">
-  <div class="panel-title">Service Info</div>
-  <div class="service-pills">
-    <div class="pill">Origin: <span>4-HWWF</span></div>
-    <div class="pill">Region: <span>Vale of the Silent</span></div>
-    <div class="pill">Max range: <span>~10 LY</span></div>
-    <div class="pill">Rate: <span>{RATE_PER_LY} ISK/m&#179;/LY</span></div>
-    <div class="pill">Collateral: <span>{"Free" if COLLATERAL_PCT == 0 else f"{COLLATERAL_PCT}%"}</span></div>
-  </div>
-  <p style="font-size:.82em;color:var(--dim);margin-top:10px;">
-    Enter your pickup system, cargo volume, and declared collateral below for an instant quote.
-    Fuel costs are recovered on top of the per-LY service fee &mdash; the quote below covers everything.
+  <div class="panel-title">How It Works</div>
+  <p style="font-size:.88em;color:var(--text);line-height:1.65;margin-bottom:10px;">
+    Enter your <strong style="color:var(--accent2);">pickup system</strong>, the
+    <strong style="color:var(--accent2);">volume</strong> of your cargo, and its
+    <strong style="color:var(--accent2);">declared collateral value</strong> to receive an instant quote.
+  </p>
+  <p style="font-size:.88em;color:var(--text);line-height:1.65;margin-bottom:10px;">
+    Once you have your quote, create a <strong style="color:var(--accent2);">courier contract</strong> in EVE
+    addressed to <strong style="color:var(--accent2);">Gromalok Hakaari</strong>.
+    Set the <strong style="color:var(--accent2);">reward</strong> to the quoted fee,
+    the <strong style="color:var(--accent2);">collateral</strong> to your declared value,
+    and the <strong style="color:var(--accent2);">pickup</strong> and
+    <strong style="color:var(--accent2);">destination</strong> to the systems shown in your quote.
+  </p>
+  <p style="font-size:.82em;color:var(--dim);line-height:1.5;">
+    The quoted fee covers all fuel costs plus the service markup &mdash; no hidden charges.
+    {"Collateral coverage is included at no extra charge." if COLLATERAL_PCT == 0 else f"A {COLLATERAL_PCT}% collateral fee applies."}
   </p>
 </div>
 
@@ -314,12 +319,20 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
   <div class="form-row">
     <label>Pickup System</label>
     <input type="text" id="sys_input" list="sys_list" placeholder="Type system name&hellip;"
-      oninput="recalc()" autocomplete="off"
+      oninput="onPickupChange()" autocomplete="off"
       style="min-width:220px;flex:1;">
     <datalist id="sys_list">
 {systems_datalist}
     </datalist>
     <span class="iv" id="sys_dist_note"></span>
+  </div>
+
+  <div class="form-row">
+    <label>Destination</label>
+    <input type="text" id="dest_input" list="sys_list" placeholder="Auto-filled or type system&hellip;"
+      oninput="recalc()" autocomplete="off"
+      style="min-width:220px;flex:1;">
+    <span class="iv" id="dest_note"></span>
   </div>
 
   <div class="form-row">
@@ -335,16 +348,6 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
       placeholder="Declared value (ISK)" style="width:190px;">
     <span class="unit">ISK</span>
   </div>
-
-  <hr class="div">
-
-  <div class="form-row">
-    <label>Isotope Type</label>
-    <select id="iso_type" onchange="recalc()" style="min-width:200px;">
-{isotope_options}
-    </select>
-  </div>
-  <p class="snap-note">Jita snapshot: {snap_date}</p>
 </div>
 
 <!-- Quote Output -->
@@ -413,9 +416,12 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
 <div class="panel">
   <div class="panel-title">Arrange Delivery</div>
   <div class="contact-card">
-    <div class="ct">To book your haul, create a courier contract in EVE addressed to:</div>
-    <div class="cn">Hamektok Hakaari</div>
-    <div class="ci">Set the reward to the quoted fee &middot; Set collateral to your declared value &middot; Pickup from your system &middot; Deliver to 4-HWWF</div>
+    <div class="ct">Create a courier contract in EVE Online addressed to:</div>
+    <div class="cn">Gromalok Hakaari</div>
+    <div class="ci" id="contract_instructions">
+      Set reward to quoted fee &middot; Set collateral to declared value &middot;
+      Pickup and destination as shown in your quote above
+    </div>
   </div>
 </div>
 
@@ -425,14 +431,14 @@ hr.div{{border:none;border-top:1px solid var(--border);margin:14px 0;}}
 
 </div>
 <script>
-const SYSTEMS = {systems_js};
-// Pre-computed module configs (server-side, matches pilot's actual setup)
-const CONFIGS = {configs_js};
+const SYSTEMS        = {systems_js};
+const CONFIGS        = {configs_js};
 const RATE_PER_LY    = {RATE_PER_LY};
 const RATE_FLAT      = {RATE_FLAT};
 const PRICING_MODE   = '{PRICING_MODE}';
 const COLLATERAL_PCT = {COLLATERAL_PCT};
-const ISO_JBV_PCT    = {ISO_JBV_PCT};
+const ISO_PRICE      = {ISO_PRICE_BAKED};  // baked at build time from DB snapshot
+const HUB            = '4-HWWF';
 
 function fmt(n, d) {{
   d = d || 0;
@@ -446,86 +452,134 @@ function fmtB(n) {{
   return s + fmt(a, 0);
 }}
 
-function getSysLy() {{
-  var name = (document.getElementById('sys_input').value || '').trim().toUpperCase();
-  if (!name) return null;
+function lookupLy(name) {{
+  var n = (name || '').trim().toUpperCase();
+  if (!n) return null;
   for (var i = 0; i < SYSTEMS.length; i++) {{
-    if (SYSTEMS[i].name.toUpperCase() === name) return SYSTEMS[i].ly;
+    if (SYSTEMS[i].name.toUpperCase() === n) return SYSTEMS[i].ly;
   }}
-  return undefined; // not found
+  return undefined; // not in list
+}}
+
+// When pickup changes: auto-set destination to HUB unless pickup IS HUB
+function onPickupChange() {{
+  var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
+  var destEl = document.getElementById('dest_input');
+  var distEl = document.getElementById('sys_dist_note');
+
+  if (pickup === HUB) {{
+    // Outbound: let customer pick destination freely
+    destEl.readOnly = false;
+    destEl.style.color = '';
+    destEl.style.opacity = '1';
+    destEl.placeholder = 'Type destination system\u2026';
+    if (destEl.value.toUpperCase() === HUB) destEl.value = '';
+    distEl.textContent = 'Hub \u2014 choose destination below';
+    distEl.style.color = 'var(--dim)';
+  }} else if (pickup === '') {{
+    destEl.readOnly = false;
+    destEl.value = '';
+    destEl.style.color = '';
+    destEl.placeholder = 'Auto-filled or type system\u2026';
+    distEl.textContent = '';
+  }} else {{
+    // Inbound: destination locked to HUB
+    destEl.readOnly = true;
+    destEl.value = HUB;
+    destEl.style.color = 'var(--dim)';
+    var ly = lookupLy(pickup);
+    if (ly === undefined) {{
+      distEl.textContent = 'System not found';
+      distEl.style.color = 'var(--red)';
+    }} else {{
+      distEl.textContent = ly.toFixed(3) + ' ly';
+      distEl.style.color = '';
+    }}
+  }}
+  recalc();
+}}
+
+function getRoute() {{
+  var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
+  var dest   = (document.getElementById('dest_input').value || '').trim().toUpperCase();
+  if (!pickup || !dest) return null;
+
+  var ly, from, to;
+  if (pickup === HUB) {{
+    // Outbound: 4-HWWF → dest
+    ly   = lookupLy(dest);
+    from = HUB;
+    to   = dest;
+  }} else {{
+    // Inbound: pickup → 4-HWWF
+    ly   = lookupLy(pickup);
+    from = pickup;
+    to   = HUB;
+  }}
+
+  if (ly == null || ly === undefined) return null;
+  return {{ ly: ly, from: from, to: to }};
 }}
 
 function recalc() {{
-  var lyRaw   = getSysLy();
-  var vol     = parseFloat(document.getElementById('cargo_vol').value)  || 0;
-  var coll    = parseFloat(document.getElementById('cargo_coll').value) || 0;
-  var isoPrice = (parseFloat(document.getElementById('iso_type').value) || 0) * ISO_JBV_PCT / 100;
-  var sysName = (document.getElementById('sys_input').value || '').trim();
+  var route = getRoute();
+  var vol   = parseFloat(document.getElementById('cargo_vol').value)  || 0;
+  var coll  = parseFloat(document.getElementById('cargo_coll').value) || 0;
 
-  var distEl = document.getElementById('sys_dist_note');
-
-  // Validate system input
-  if (sysName === '') {{
-    distEl.textContent = '';
-    distEl.style.color = '';
-  }} else if (lyRaw === undefined) {{
-    distEl.textContent = 'System not found';
-    distEl.style.color = 'var(--red)';
-  }} else if (lyRaw === 0) {{
-    distEl.textContent = '4-HWWF (origin)';
-    distEl.style.color = 'var(--dim)';
+  // Update dest note
+  var destNoteEl = document.getElementById('dest_note');
+  var pickup = (document.getElementById('sys_input').value || '').trim().toUpperCase();
+  if (pickup === HUB) {{
+    var destVal = (document.getElementById('dest_input').value || '').trim().toUpperCase();
+    var destLy  = lookupLy(destVal);
+    if (destVal === '') {{
+      destNoteEl.textContent = '';
+    }} else if (destLy === undefined) {{
+      destNoteEl.textContent = 'System not found';
+      destNoteEl.style.color = 'var(--red)';
+    }} else {{
+      destNoteEl.textContent = destLy.toFixed(3) + ' ly';
+      destNoteEl.style.color = '';
+    }}
   }} else {{
-    distEl.textContent = lyRaw.toFixed(3) + ' ly';
-    distEl.style.color = '';
+    destNoteEl.textContent = '';
   }}
 
-  var ly = (lyRaw != null && lyRaw > 0) ? lyRaw : 0;
-  var hasSystem = ly > 0;
-  var hasVol    = vol > 0;
-
-  // Show/hide empty state vs quote card
   var emptyEl = document.getElementById('quote_empty');
   var cardEl  = document.getElementById('quote_card');
-  if (!hasSystem || !hasVol) {{
+
+  if (!route || route.ly <= 0 || !vol) {{
     emptyEl.style.display = '';
     cardEl.classList.remove('show');
     saveState();
     return;
   }}
 
-  // Find optimal config (min total fee)
-  var collFee    = coll * COLLATERAL_PCT / 100;
-  var markupFee  = PRICING_MODE === 'per_ly' ? RATE_PER_LY * ly * vol : RATE_FLAT * vol;
+  var ly        = route.ly;
+  var collFee   = coll * COLLATERAL_PCT / 100;
+  var markupFee = PRICING_MODE === 'per_ly' ? RATE_PER_LY * ly * vol : RATE_FLAT * vol;
   var bestResult = null;
 
   CONFIGS.forEach(function(c) {{
     var trips    = Math.ceil(vol / c.effectiveCargo);
-    var isoUsed  = trips * ly * 2 * c.fuelPerLY;  // always round trip
-    var fuelCost = isoUsed * isoPrice;
+    var isoUsed  = trips * ly * 2 * c.fuelPerLY;
+    var fuelCost = isoUsed * ISO_PRICE;
     var total    = fuelCost + markupFee + collFee;
     if (bestResult === null || total < bestResult.total) {{
-      bestResult = {{
-        trips:    trips,
-        isoUsed:  isoUsed,
-        fuelCost: fuelCost,
-        total:    total,
-        econ:     c.econ,
-        exp:      c.exp,
-      }};
+      bestResult = {{ trips: trips, isoUsed: isoUsed, fuelCost: fuelCost, total: total }};
     }}
   }});
 
-  // Populate quote card
   emptyEl.style.display = 'none';
   cardEl.classList.add('show');
 
   var totalISK = bestResult.total;
-  document.getElementById('q_total').textContent     = fmtB(totalISK) + ' ISK';
-  document.getElementById('q_total_sub').textContent = fmt(Math.round(totalISK)) + ' ISK &mdash; round trip, ' + bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips');
-  document.getElementById('q_total2').textContent    = fmtB(totalISK) + ' ISK';
-  document.getElementById('q_total_sub').innerHTML   = fmt(Math.round(totalISK)) + ' ISK &mdash; round trip, ' + bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips');
+  document.getElementById('q_total').textContent   = fmtB(totalISK) + ' ISK';
+  document.getElementById('q_total2').textContent  = fmtB(totalISK) + ' ISK';
+  document.getElementById('q_total_sub').innerHTML = fmt(Math.round(totalISK)) + ' ISK &mdash; round trip, ' +
+    bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips');
 
-  document.getElementById('q_route').textContent = '4-HWWF \u2192 ' + sysName.toUpperCase();
+  document.getElementById('q_route').textContent = route.from + ' \u2192 ' + route.to;
   document.getElementById('q_dist').textContent  = ly.toFixed(3) + ' ly (\u00D72 round trip)';
   document.getElementById('q_vol').textContent   = fmt(Math.round(vol)) + ' m\u00B3';
 
@@ -537,9 +591,9 @@ function recalc() {{
     collRow.style.display = 'none';
   }}
 
-  document.getElementById('q_trips').textContent   = bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips') + ' (round trip each)';
-  document.getElementById('q_fuel').textContent    = fmtB(bestResult.fuelCost) + ' ISK';
-  document.getElementById('q_markup').textContent  = fmtB(markupFee) + ' ISK';
+  document.getElementById('q_trips').textContent  = bestResult.trips + (bestResult.trips === 1 ? ' trip' : ' trips') + ' (round trip each)';
+  document.getElementById('q_fuel').textContent   = fmtB(bestResult.fuelCost) + ' ISK';
+  document.getElementById('q_markup').textContent = fmtB(markupFee) + ' ISK';
 
   var collFeeRow = document.getElementById('q_coll_fee_row');
   if (COLLATERAL_PCT > 0 && coll > 0) {{
@@ -549,14 +603,21 @@ function recalc() {{
     collFeeRow.style.display = 'none';
   }}
 
-  // Reset copy button
+  // Update contract instructions with actual systems
+  var ci = document.getElementById('contract_instructions');
+  if (ci) {{
+    ci.innerHTML = 'Set reward to quoted fee &middot; Set collateral to declared value &middot; ' +
+      'Pickup: <strong style="color:var(--accent2)">' + route.from + '</strong> &middot; ' +
+      'Deliver to: <strong style="color:var(--accent2)">' + route.to + '</strong>';
+  }}
+
   var btn = document.getElementById('copy_btn');
   btn.classList.remove('copied');
-  btn.textContent = '📋  Copy Quote to Clipboard';
+  btn.textContent = '\U0001F4CB  Copy Quote to Clipboard';
 
-  // Store result for copy function
   window._quoteData = {{
-    system:   sysName.toUpperCase(),
+    from:     route.from,
+    to:       route.to,
     ly:       ly,
     vol:      vol,
     coll:     coll,
@@ -575,15 +636,15 @@ function copyQuote() {{
   if (!d) return;
 
   var lines = [
-    'Haul Quote \u2014 Infinite Solutions',
+    'Freight Quote \u2014 Infinite Solutions',
     '',
-    'Route:      4-HWWF \u2192 ' + d.system + ' (' + d.ly.toFixed(3) + ' ly, round trip)',
+    'Route:      ' + d.from + ' \u2192 ' + d.to + ' (' + d.ly.toFixed(3) + ' ly, round trip)',
     'Volume:     ' + fmt(Math.round(d.vol)) + ' m\u00B3',
     'Collateral: ' + (d.coll > 0 ? fmtB(d.coll) + ' ISK' : 'None declared'),
     '',
     '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
     'Fuel recovery:  ' + fmtB(d.fuelCost) + ' ISK',
-    'Service fee:    ' + fmtB(d.markup)   + ' ISK  (' + RATE_PER_LY + ' ISK/m\u00B3/LY)',
+    'Service fee:    ' + fmtB(d.markup) + ' ISK',
   ];
   if (COLLATERAL_PCT > 0 && d.coll > 0) {{
     lines.push('Collateral fee: ' + fmtB(d.collFee) + ' ISK  (' + COLLATERAL_PCT + '%)');
@@ -592,11 +653,12 @@ function copyQuote() {{
     '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
     'TOTAL FEE:      ' + fmt(Math.round(d.total)) + ' ISK',
     '',
-    'Contract cargo to Hamektok Hakaari in-game.',
+    'Create courier contract to: Gromalok Hakaari',
+    'Pickup: ' + d.from + '  |  Deliver to: ' + d.to,
   ]);
 
   var text = lines.join('\n');
-  navigator.clipboard.writeText(text).then(function() {{
+  var onDone = function(ok) {{
     var btn = document.getElementById('copy_btn');
     btn.classList.add('copied');
     btn.textContent = '\u2713  Copied to Clipboard';
@@ -604,32 +666,22 @@ function copyQuote() {{
       btn.classList.remove('copied');
       btn.textContent = '\U0001F4CB  Copy Quote to Clipboard';
     }}, 2500);
-  }}).catch(function() {{
-    // Fallback for older browsers
+  }};
+  navigator.clipboard.writeText(text).then(onDone).catch(function() {{
     var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    var btn = document.getElementById('copy_btn');
-    btn.classList.add('copied');
-    btn.textContent = '\u2713  Copied!';
-    setTimeout(function() {{
-      btn.classList.remove('copied');
-      btn.textContent = '\U0001F4CB  Copy Quote to Clipboard';
-    }}, 2500);
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); onDone();
   }});
 }}
 
 function saveState() {{
   var s = {{}};
-  ['iso_type', 'cargo_vol', 'cargo_coll'].forEach(function(id) {{
+  ['cargo_vol', 'cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if (el) s[id] = el.value;
   }});
-  var si = document.getElementById('sys_input'); if (si) s['sys_input'] = si.value;
+  var si = document.getElementById('sys_input');   if (si) s['sys_input']   = si.value;
+  var di = document.getElementById('dest_input');  if (di) s['dest_input']  = di.value;
   try {{ localStorage.setItem('haul_quote_state', JSON.stringify(s)); }} catch(e) {{}}
 }}
 
@@ -637,10 +689,11 @@ function loadState() {{
   var raw; try {{ raw = localStorage.getItem('haul_quote_state'); }} catch(e) {{}}
   if (!raw) {{ recalc(); return; }}
   var s; try {{ s = JSON.parse(raw); }} catch(e) {{ recalc(); return; }}
-  ['iso_type', 'cargo_vol', 'cargo_coll'].forEach(function(id) {{
+  ['cargo_vol', 'cargo_coll'].forEach(function(id) {{
     var el = document.getElementById(id); if (el && s[id] != null) el.value = s[id];
   }});
-  var si = document.getElementById('sys_input'); if (si && s['sys_input'] != null) si.value = s['sys_input'];
+  var si = document.getElementById('sys_input');
+  if (si && s['sys_input'] != null) {{ si.value = s['sys_input']; onPickupChange(); return; }}
   recalc();
 }}
 
