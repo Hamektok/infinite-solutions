@@ -183,6 +183,7 @@ tbody tr td.td-dim{{color:var(--dim);font-family:'Rajdhani',sans-serif;font-size
 <div class="page">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
   <a class="back-link" href="index.html">&#8592; Industrial Market</a>
+  <a class="back-link" href="haul_quote.html" style="margin-right:12px">Customer Quote &#8594;</a>
   <a class="back-link" href="ore_haul_calculator.html">Ore Haul Calculator &#8594;</a>
 </div>
 <div class="hdr">
