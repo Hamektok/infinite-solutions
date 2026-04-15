@@ -280,7 +280,6 @@ class AdminDashboard:
         self.notebook.add(self.export_frame, text='  Export Analysis  ')
         self.build_export_tab()
 
-
         # Tab 7: Ore Import Analysis
         self.ore_import_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.ore_import_frame, text='  Ore Import  ')
@@ -325,6 +324,11 @@ class AdminDashboard:
         self.haul_rates_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.haul_rates_frame, text='  Haul Rates  ')
         self._build_haul_rates_tab()
+
+        # Tab 15: Gank Watch
+        self.gank_watch_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.gank_watch_frame, text='  Gank Watch  ')
+        self._build_gank_watch_tab()
 
     def build_rates_tab(self):
         """Build the Market Rates management tab."""
@@ -2244,7 +2248,7 @@ class AdminDashboard:
     # ── Item flags helpers ──────────────────────────────────────────────────
 
     def _ensure_flags_table(self):
-        """Create item_flags table if it doesn't exist."""
+        """Create item_flags table if it doesn't exist, and ensure performance indexes."""
         try:
             conn = sqlite3.connect(DB_PATH)
             conn.execute("""CREATE TABLE IF NOT EXISTS item_flags (
@@ -2252,6 +2256,9 @@ class AdminDashboard:
                 flag_key TEXT NOT NULL,
                 PRIMARY KEY (type_id, flag_key)
             )""")
+            # Composite index makes "latest snapshot per type_id" queries instant
+            conn.execute("""CREATE INDEX IF NOT EXISTS idx_mps_type_ts
+                ON market_price_snapshots(type_id, timestamp)""")
             conn.commit()
             conn.close()
         except Exception:
@@ -2974,19 +2981,22 @@ class AdminDashboard:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("""
+            WITH latest AS (
+                SELECT type_id, MAX(timestamp) AS ts
+                FROM market_price_snapshots
+                GROUP BY type_id
+            )
             SELECT it.type_name,
                    tmi.category,
                    it.volume,
                    mps.best_buy,
                    mps.best_sell
             FROM tracked_market_items tmi
-            JOIN inv_types it            ON tmi.type_id = it.type_id
-            JOIN market_price_snapshots mps ON tmi.type_id = mps.type_id
-            WHERE mps.timestamp = (
-                SELECT MAX(timestamp) FROM market_price_snapshots
-                WHERE type_id = tmi.type_id
-            )
-              AND mps.best_sell > 0
+            JOIN inv_types it ON tmi.type_id = it.type_id
+            JOIN latest      ON latest.type_id = tmi.type_id
+            JOIN market_price_snapshots mps
+                 ON mps.type_id = latest.type_id AND mps.timestamp = latest.ts
+            WHERE mps.best_sell > 0
             ORDER BY tmi.category, it.type_name
         """)
         rows = cursor.fetchall()
@@ -8490,97 +8500,445 @@ class AdminDashboard:
 
     # ── HAUL RATES TAB ────────────────────────────────────────────────────────
 
-    def _build_haul_rates_tab(self):
-        import json as _json
-        frame = self.haul_rates_frame
-        BG, FG, ENTRY_BG = '#0a1520', '#c8d8e8', '#0d1e30'
-        LABEL_W = 24
+    _VALE_SYSTEMS = [
+        ('4-HWWF', 0),     ('PM-DWE', 0.893), ('4GYV-Q', 0.937), ('EIDI-N', 1.023),
+        ('YMJG-4', 1.136), ('DAYP-G', 1.356), ('WBR5-R', 1.443), ('8TPX-N', 1.491),
+        ('KRUN-N', 1.499), ('TVN-FM', 1.502), ('IPAY-2', 1.577), ('K8X-6B', 1.72),
+        ('0MV-4W', 1.927), ('AZBR-2', 2.03),  ('Q-L07F', 2.198), ('U54-1L', 2.247),
+        ('P3EN-E', 2.278), ('T-GCGL', 2.44),  ('V-OJEN', 2.469), ('X445-5', 2.533),
+        ('05R-7A', 2.559), ('FS-RFL', 2.619), ('NCGR-Q', 2.658), ('Z-8Q65', 2.7),
+        ('IFJ-EL', 2.748), ('9OO-LH', 2.759), ('MC6O-F', 2.774), ('X97D-W', 2.799),
+        ('49-0LI', 2.815), ('0-R5TS', 2.844), ('669-IX', 2.888), ('0R-F2F', 3.002),
+        ('47L-J4', 3.07),  ('N-HSK0', 3.163), ('HE-V4V', 3.182), ('V-NL3K', 3.223),
+        ('0J3L-V', 3.232), ('S-NJBB', 3.307), ('XF-PWO', 3.361), ('R-P7KL', 3.37),
+        ('A8A-JN', 3.386), ('NFM-0V', 3.389), ('E-D0VZ', 3.401), ('6WW-28', 3.432),
+        ('UH-9ZG', 3.448), ('YXIB-I', 3.497), ('LZ-6SU', 3.503), ('Y0-BVN', 3.631),
+        ('7-UH4Z', 3.631), ('1N-FJ8', 3.718), ('2DWM-2', 3.732), ('H-UCD1', 3.802),
+        ('G-LOIT', 3.828), ('1-GBBP', 3.837), ('B-588R', 3.905), ('5ZO-NZ', 4.132),
+        ('H-NOU5', 4.337), ('97-M96', 4.356), ('T-ZWA1', 4.379), ('3HX-DL', 4.409),
+        ('7-K5EL', 4.429), ('KX-2UI', 4.579), ('GEKJ-9', 4.62),  ('MY-T2P', 4.817),
+        ('Y-ZXIO', 4.827), ('C-FP70', 4.899), ('G96R-F', 5.079), ('Q-R3GP', 5.081),
+        ('ZA0L-U', 5.118), ('FA-DMO', 5.257), ('XV-8JQ', 5.341), ('N-5QPW', 5.528),
+        ('MO-FIF', 5.566), ('MA-XAP', 5.716), ('H-5GUI', 5.717), ('C-J7CR', 5.852),
+        ('Q-EHMJ', 5.941), ('XSQ-TF', 6.193), ('H-1EOH', 6.423), ('FMBR-8', 6.451),
+        ('FH-TTC', 6.633), ('VI2K-J', 6.669), ('6Y-WRK', 6.755), ('5T-KM3', 6.789),
+        ('IR-DYY', 6.818), ('MQ-O27', 7.129), ('ZLZ-1Z', 7.348), ('F-D49D', 7.382),
+        ('RVCZ-C', 7.422), ('B-E3KQ', 7.87),  ('Y5J-EU', 7.899), ('H-EY0P', 8.008),
+        ('O-LR1H', 8.088), ('LS9B-9', 8.17),  ('C-DHON', 8.317), ('G5ED-Y', 8.656),
+        ('UNAG-6', 8.692), ('A-QRQT', 8.849), ('8-TFDX', 9.072), ('BR-6XP', 9.092),
+        ('E-SCTX', 9.276), ('7-PO3P', 9.281), ('WMBZ-U', 9.319), ('UL-4ZW', 9.656),
+        ('VORM-W', 9.73),
+    ]
+    _ISOTOPE_IDS = [
+        (17888, 'Nitrogen Isotopes'),
+        (17889, 'Hydrogen Isotopes'),
+        (17887, 'Oxygen Isotopes'),
+        (16274, 'Helium Isotopes'),
+    ]
+    _ECON_MAP  = {'Experimental — 7%': 0.07, 'Prototype — 10%': 0.10}
+    _TRIP_MAP  = {'Round-trip': 2, 'One-way': 1}
 
-        rates_path = os.path.join(PROJECT_DIR, 'haul_rates.json')
+    def _build_haul_rates_tab(self):
+        import math as _math, json as _json
+
+        rates_path  = os.path.join(PROJECT_DIR, 'haul_rates.json')
         build_script = os.path.join(PROJECT_DIR, '_build_haul_quote.py')
 
-        # Load current values from haul_rates.json or defaults
+        # ── Fetch live isotope prices from DB ─────────────────────────────
+        iso_prices = {17888: 669.0, 17889: 580.0, 17887: 736.0, 16274: 825.0}
+        try:
+            _c = sqlite3.connect(DB_PATH)
+            _rows = _c.execute("""
+                WITH latest AS (
+                    SELECT type_id, MAX(timestamp) ts
+                    FROM market_price_snapshots
+                    WHERE type_id IN (17888,17889,17887,16274)
+                    GROUP BY type_id
+                )
+                SELECT mps.type_id, mps.best_buy
+                FROM market_price_snapshots mps
+                JOIN latest ON mps.type_id=latest.type_id AND mps.timestamp=latest.ts
+            """).fetchall()
+            for tid, price in _rows:
+                if price: iso_prices[tid] = round(price, 2)
+            _c.close()
+        except Exception:
+            pass
+        self._hc_iso_prices = iso_prices
+
+        # ── Load saved defaults ───────────────────────────────────────────
         defaults = dict(
             pricing_mode='per_ly', rate_per_ly=12.0, rate_flat=0.0,
             collateral_pct=0.0, jf_skill=4, jfc_skill=4,
-            econ_bonus=0.07, exp_bonus=1.275, iso_jbv_pct=100.0,
+            econ_bonus=0.07, iso_jbv_pct=100.0,
         )
         try:
             with open(rates_path, encoding='utf-8') as _f:
-                saved = _json.load(_f)
-            defaults.update(saved)
+                defaults.update(_json.load(_f))
         except Exception:
             pass
 
+        # ── Colours ───────────────────────────────────────────────────────
+        BG, FG, DIM = '#0a1520', '#c8d8e8', '#4a5870'
+        EBG = '#0d1e30'
+        GREEN, GOLD, BLUE = '#33dd88', '#ffd700', '#66aaff'
+
+        frame = self.haul_rates_frame
+
+        # ── Outer layout: title + 2-column body ──────────────────────────
         outer = tk.Frame(frame, bg=BG)
-        outer.pack(fill='both', expand=True, padx=20, pady=16)
+        outer.pack(fill='both', expand=True)
 
-        tk.Label(outer, text='Jump Freight Rate Config', bg=BG, fg='#66aaff',
-                 font=('Segoe UI', 12, 'bold')).pack(anchor='w', pady=(0, 12))
+        # Title bar
+        hdr = tk.Frame(outer, bg=BG)
+        hdr.pack(fill='x', padx=14, pady=(10, 4))
+        tk.Label(hdr, text='JUMP FREIGHT CALCULATOR', bg=BG, fg=BLUE,
+                 font=('Segoe UI', 12, 'bold')).pack(side='left')
+        tk.Label(hdr, text='Rhea  ·  Vale of the Silent  ·  4-HWWF', bg=BG, fg=DIM,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(14, 0))
 
-        form = tk.Frame(outer, bg=BG)
-        form.pack(anchor='w')
+        # 2-column body
+        body = tk.Frame(outer, bg=BG)
+        body.pack(fill='both', expand=True, padx=14, pady=(0, 10))
+        body.columnconfigure(0, weight=0, minsize=345)
+        body.columnconfigure(1, weight=1)
 
-        def row(label, var, col=0):
-            r = len(form.grid_slaves()) // 2
-            tk.Label(form, text=label, bg=BG, fg=FG,
-                     font=('Segoe UI', 9), width=LABEL_W, anchor='w'
-                     ).grid(row=r, column=col*2, padx=(0, 8), pady=4, sticky='w')
-            e = tk.Entry(form, textvariable=var, width=16, bg=ENTRY_BG, fg=FG,
-                         insertbackground=FG, font=('Segoe UI', 9))
-            e.grid(row=r, column=col*2+1, padx=(0, 24), pady=4, sticky='w')
-            return e
+        left  = tk.Frame(body, bg=BG)
+        left.grid(row=0, column=0, sticky='nsew', padx=(0, 16))
+        right = tk.Frame(body, bg=BG)
+        right.grid(row=0, column=1, sticky='nsew')
 
-        self._hr = {}
+        LW = 22  # label column width (chars)
 
-        def mkvar(key, cast=float):
-            v = tk.StringVar(value=str(defaults.get(key, '')))
-            self._hr[key] = (v, cast)
-            return v
+        def _sect(parent, text):
+            tk.Label(parent, text=text, bg=BG, fg='#ffaa44',
+                     font=('Segoe UI', 8, 'bold')).pack(anchor='w', pady=(8, 1))
+            tk.Frame(parent, bg='#1e2d40', height=1).pack(fill='x', pady=(0, 5))
 
-        row('Rate per LY  (ISK/m³/LY)',    mkvar('rate_per_ly'))
-        row('Collateral fee  (%)',          mkvar('collateral_pct'))
-        row('JF Skill  (1–5)',              mkvar('jf_skill', int))
-        row('JFC Skill  (1–5)',             mkvar('jfc_skill', int))
-        row('Economizer bonus  (0.07=7%)',  mkvar('econ_bonus'))
-        row('Cargo expander bonus  (1.275)',mkvar('exp_bonus'))
-        row('Isotope price  (% of JBV)',    mkvar('iso_jbv_pct'))
+        def _row(parent, label, widget, note_var=None, note_text=None, lw=LW):
+            rf = tk.Frame(parent, bg=BG)
+            rf.pack(fill='x', pady=2)
+            tk.Label(rf, text=label, bg=BG, fg=FG, font=('Segoe UI', 9),
+                     width=lw, anchor='w').pack(side='left')
+            widget(rf).pack(side='left', padx=(4, 0))
+            if note_var:
+                tk.Label(rf, textvariable=note_var, bg=BG, fg=GOLD,
+                         font=('Segoe UI', 8)).pack(side='left', padx=(6, 0))
+            elif note_text:
+                tk.Label(rf, text=note_text, bg=BG, fg=DIM,
+                         font=('Segoe UI', 8)).pack(side='left', padx=(4, 0))
 
-        # Pricing mode toggle
-        mode_var = tk.StringVar(value=defaults.get('pricing_mode', 'per_ly'))
-        self._hr['pricing_mode'] = (mode_var, str)
-        mf = tk.Frame(outer, bg=BG)
-        mf.pack(anchor='w', pady=(4, 12))
-        tk.Label(mf, text='Pricing mode:', bg=BG, fg=FG,
-                 font=('Segoe UI', 9)).pack(side='left', padx=(0, 8))
-        tk.Radiobutton(mf, text='Per LY  (recommended)', variable=mode_var,
-                       value='per_ly', bg=BG, fg='#44dd88',
-                       selectcolor='#0d1e30', activebackground=BG,
-                       font=('Segoe UI', 9)).pack(side='left', padx=4)
-        tk.Radiobutton(mf, text='Flat markup', variable=mode_var,
-                       value='flat', bg=BG, fg=FG,
-                       selectcolor='#0d1e30', activebackground=BG,
-                       font=('Segoe UI', 9)).pack(side='left', padx=4)
+        # ── LEFT: TRIP PARAMETERS ─────────────────────────────────────────
+        _sect(left, 'TRIP PARAMETERS')
 
-        # Status label
+        sys_names = [s[0] for s in self._VALE_SYSTEMS]
+        self._hc_sys_var  = tk.StringVar()
+        self._hc_dist_var = tk.StringVar(value='—')
+        rf = tk.Frame(left, bg=BG); rf.pack(fill='x', pady=2)
+        tk.Label(rf, text='Pickup / Destination', bg=BG, fg=FG, font=('Segoe UI', 9),
+                 width=LW, anchor='w').pack(side='left')
+        ttk.Combobox(rf, textvariable=self._hc_sys_var, values=sys_names,
+                     width=14, state='readonly').pack(side='left', padx=(4, 0))
+        tk.Label(rf, textvariable=self._hc_dist_var, bg=BG, fg=GOLD,
+                 font=('Segoe UI', 8)).pack(side='left', padx=(8, 0))
+        rf2 = tk.Frame(left, bg=BG); rf2.pack(fill='x')
+        tk.Label(rf2, text='', bg=BG, width=LW).pack(side='left')
+        tk.Label(rf2, text='4-HWWF is always the other endpoint', bg=BG, fg=DIM,
+                 font=('Segoe UI', 7, 'italic')).pack(side='left', padx=(4, 0))
+
+        self._hc_trip_var = tk.StringVar(value='Round-trip')
+        _row(left, 'Trip Type',
+             lambda p: ttk.Combobox(p, textvariable=self._hc_trip_var,
+                                    values=list(self._TRIP_MAP), width=11, state='readonly'))
+
+        iso_display = [f"{name}  —  {iso_prices.get(tid, 0):,.2f} ISK/unit"
+                       for tid, name in self._ISOTOPE_IDS]
+        # map display string → type_id for recalc
+        self._hc_iso_disp_map = {d: tid for d, (tid, _) in
+                                  zip(iso_display, self._ISOTOPE_IDS)}
+        self._hc_iso_var = tk.StringVar(value=iso_display[0])
+        _row(left, 'Isotope',
+             lambda p: ttk.Combobox(p, textvariable=self._hc_iso_var,
+                                    values=iso_display, width=30, state='readonly'))
+
+        self._hc_iso_pct_var = tk.StringVar(value=str(defaults['iso_jbv_pct']))
+        _row(left, 'Isotope cost basis',
+             lambda p: tk.Entry(p, textvariable=self._hc_iso_pct_var,
+                                width=7, bg=EBG, fg=FG, insertbackground=FG,
+                                font=('Segoe UI', 9)),
+             note_text='% of JBV')
+
+        # ── LEFT: SHIP & SKILLS ───────────────────────────────────────────
+        _sect(left, 'SHIP & SKILLS')
+
+        rf = tk.Frame(left, bg=BG); rf.pack(fill='x', pady=2)
+        tk.Label(rf, text='Ship', bg=BG, fg=FG, font=('Segoe UI', 9),
+                 width=LW, anchor='w').pack(side='left')
+        tk.Label(rf, text='Rhea  —  10,000 fuel/LY  —  180,000 m³', bg=BG, fg=DIM,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(4, 0))
+
+        self._hc_jf_var      = tk.StringVar(value=str(int(defaults['jf_skill'])))
+        self._hc_jf_note_var = tk.StringVar()
+        _row(left, 'Jump Freighters',
+             lambda p: ttk.Combobox(p, textvariable=self._hc_jf_var,
+                                    values=['1','2','3','4','5'], width=4, state='readonly'),
+             note_var=self._hc_jf_note_var)
+
+        self._hc_jfc_var      = tk.StringVar(value=str(int(defaults['jfc_skill'])))
+        self._hc_jfc_note_var = tk.StringVar()
+        _row(left, 'Jump Fuel Conservation',
+             lambda p: ttk.Combobox(p, textvariable=self._hc_jfc_var,
+                                    values=['1','2','3','4','5'], width=4, state='readonly'),
+             note_var=self._hc_jfc_note_var, lw=LW)
+
+        # ── LEFT: MODULES ─────────────────────────────────────────────────
+        _sect(left, 'MODULES')
+
+        saved_econ_bonus = defaults.get('econ_bonus', 0.07)
+        econ_default = 'Prototype — 10%' if abs(saved_econ_bonus - 0.10) < 0.001 else 'Experimental — 7%'
+        self._hc_econ_var = tk.StringVar(value=econ_default)
+        _row(left, 'Economizer',
+             lambda p: ttk.Combobox(p, textvariable=self._hc_econ_var,
+                                    values=list(self._ECON_MAP), width=20, state='readonly'))
+
+        rf = tk.Frame(left, bg=BG); rf.pack(fill='x', pady=2)
+        tk.Label(rf, text='Cargo Expander', bg=BG, fg=FG, font=('Segoe UI', 9),
+                 width=LW, anchor='w').pack(side='left')
+        tk.Label(rf, text='Expanded Cargohold II  —  27.5%', bg=BG, fg=DIM,
+                 font=('Segoe UI', 9)).pack(side='left', padx=(4, 0))
+
+        # ── LEFT: PRICING ─────────────────────────────────────────────────
+        _sect(left, 'PRICING')
+
+        self._hc_mode_var = tk.StringVar(
+            value='Per LY' if defaults['pricing_mode'] == 'per_ly' else 'Flat Markup')
+        _row(left, 'Pricing Model',
+             lambda p: ttk.Combobox(p, textvariable=self._hc_mode_var,
+                                    values=['Per LY', 'Flat Markup'], width=12, state='readonly'))
+
+        self._hc_rate_ly_var   = tk.StringVar(value=str(defaults['rate_per_ly']))
+        self._hc_rate_ly_note  = tk.StringVar()
+        _row(left, 'Rate per LY',
+             lambda p: tk.Entry(p, textvariable=self._hc_rate_ly_var,
+                                width=8, bg=EBG, fg=FG, insertbackground=FG,
+                                font=('Segoe UI', 9)),
+             note_var=self._hc_rate_ly_note)
+
+        self._hc_rate_flat_var = tk.StringVar(value=str(defaults['rate_flat']))
+        _row(left, 'Flat Markup',
+             lambda p: tk.Entry(p, textvariable=self._hc_rate_flat_var,
+                                width=8, bg=EBG, fg=FG, insertbackground=FG,
+                                font=('Segoe UI', 9)),
+             note_text='ISK/m³')
+
+        self._hc_coll_pct_var = tk.StringVar(value=str(defaults['collateral_pct']))
+        _row(left, 'Collateral Fee',
+             lambda p: tk.Entry(p, textvariable=self._hc_coll_pct_var,
+                                width=8, bg=EBG, fg=FG, insertbackground=FG,
+                                font=('Segoe UI', 9)),
+             note_text='% of collateral')
+
+        # ── RIGHT: CARGO ──────────────────────────────────────────────────
+        _sect(right, 'CARGO')
+
+        self._hc_vol_var = tk.StringVar(value='0')
+        _row(right, 'Volume', lw=14,
+             widget=lambda p: tk.Entry(p, textvariable=self._hc_vol_var,
+                                       width=18, bg=EBG, fg=FG, insertbackground=FG,
+                                       font=('Segoe UI', 9)),
+             note_text='m³')
+
+        self._hc_coll_isk_var = tk.StringVar(value='0')
+        _row(right, 'Collateral', lw=14,
+             widget=lambda p: tk.Entry(p, textvariable=self._hc_coll_isk_var,
+                                       width=18, bg=EBG, fg=FG, insertbackground=FG,
+                                       font=('Segoe UI', 9)),
+             note_text='ISK')
+
+        # ── RIGHT: CONFIGURATION COMPARISON ──────────────────────────────
+        _sect(right, 'CONFIGURATION COMPARISON  —  3 LOW SLOTS')
+
+        cols     = ('fit', 'cargo', 'fuel_ly', 'trips', 'isotopes', 'fuel_cost', 'total_fee')
+        hdrs     = ('Configuration', 'Avail. Cargo', 'Fuel/LY', 'Trips', 'Isotopes', 'Fuel Cost', 'Total Fee')
+        widths   = (140, 110, 80, 55, 100, 110, 115)
+        anchors  = ('w', 'e', 'e', 'e', 'e', 'e', 'e')
+
+        tree_f = tk.Frame(right, bg=BG)
+        tree_f.pack(fill='x', pady=(0, 4))
+
+        self._hc_tree = ttk.Treeview(tree_f, columns=cols, show='headings', height=4,
+                                      selectmode='none')
+        for col, hdr, w, anch in zip(cols, hdrs, widths, anchors):
+            self._hc_tree.heading(col, text=hdr)
+            self._hc_tree.column(col, width=w, anchor=anch, stretch=False)
+        self._hc_tree.tag_configure('winner', foreground=GREEN, font=('Segoe UI', 9, 'bold'))
+        self._hc_tree.pack(fill='x')
+
+        self._hc_winner_var = tk.StringVar()
+        tk.Label(right, textvariable=self._hc_winner_var, bg=BG, fg=GREEN,
+                 font=('Segoe UI', 9, 'bold')).pack(anchor='w', pady=(4, 0))
+
+        # ── RIGHT: PUBLISH ────────────────────────────────────────────────
+        _sect(right, 'PUBLISH RATES  →  CUSTOMER QUOTE PAGE')
+
         self._hr_status = tk.StringVar(value='')
-        tk.Label(outer, textvariable=self._hr_status, bg=BG, fg='#44dd88',
-                 font=('Segoe UI', 9)).pack(anchor='w', pady=(0, 8))
+        tk.Label(right, textvariable=self._hr_status, bg=BG, fg=GREEN,
+                 font=('Segoe UI', 9)).pack(anchor='w')
+        tk.Button(right, text='Save haul_rates.json  &  Rebuild Quote Page',
+                  bg='#0d2818', fg=GREEN, font=('Segoe UI', 10, 'bold'),
+                  relief='flat', padx=12, pady=7, cursor='hand2',
+                  command=lambda: self._haul_save_and_rebuild(rates_path, build_script)
+                  ).pack(anchor='w', pady=(6, 0))
 
-        # Save & Rebuild button
-        tk.Button(
-            outer,
-            text='Save & Rebuild Customer Quote Page',
-            bg='#1a3020', fg='#44dd88',
-            font=('Segoe UI', 11, 'bold'),
-            relief='flat', padx=16, pady=8, cursor='hand2',
-            command=lambda: self._haul_save_and_rebuild(rates_path, build_script)
-        ).pack(anchor='w')
+        # ── Wire _hr for publish ──────────────────────────────────────────
+        # econ_bonus stored via _hc_econ_var (display string) — resolved in save
+        self._hr = {
+            'rate_per_ly':    (self._hc_rate_ly_var,   float),
+            'rate_flat':      (self._hc_rate_flat_var,  float),
+            'collateral_pct': (self._hc_coll_pct_var,   float),
+            'jf_skill':       (self._hc_jf_var,         int),
+            'jfc_skill':      (self._hc_jfc_var,        int),
+            'iso_jbv_pct':    (self._hc_iso_pct_var,    float),
+        }
+
+        # ── Trace all vars → recalc ───────────────────────────────────────
+        for v in (self._hc_sys_var, self._hc_trip_var, self._hc_iso_var,
+                  self._hc_iso_pct_var, self._hc_jf_var, self._hc_jfc_var,
+                  self._hc_econ_var, self._hc_mode_var, self._hc_rate_ly_var,
+                  self._hc_rate_flat_var, self._hc_coll_pct_var,
+                  self._hc_vol_var, self._hc_coll_isk_var):
+            v.trace_add('write', self._hc_recalc)
+
+        self._hc_recalc()
+
+    def _hc_recalc(self, *_):
+        """Recompute all 4 configs and update the results treeview."""
+        import math as _math
+
+        sys_name = self._hc_sys_var.get().strip()
+        ly_map   = dict(self._VALE_SYSTEMS)
+        ly       = ly_map.get(sys_name, None)
+
+        if ly is None:
+            self._hc_dist_var.set('not found' if sys_name else '—')
+        elif ly == 0:
+            self._hc_dist_var.set('4-HWWF (origin)')
+        else:
+            self._hc_dist_var.set(f'{ly:.3f} ly from 4-HWWF')
+
+        try:
+            trip_mult  = self._TRIP_MAP.get(self._hc_trip_var.get(), 2)
+            iso_tid    = self._hc_iso_disp_map.get(self._hc_iso_var.get(),
+                                                    next(iter(self._hc_iso_disp_map.values())))
+            iso_jbv    = self._hc_iso_prices.get(iso_tid, 0)
+            iso_pct    = float(self._hc_iso_pct_var.get() or 100) / 100
+            iso_price  = iso_jbv * iso_pct
+
+            jf  = int(self._hc_jf_var.get()  or 4)
+            jfc = int(self._hc_jfc_var.get() or 4)
+
+            econ_bonus = self._ECON_MAP.get(self._hc_econ_var.get(), 0.07)
+            exp_bonus  = 1.275
+
+            mode    = self._hc_mode_var.get()
+            rate_ly = float(self._hc_rate_ly_var.get()   or 0)
+            flat    = float(self._hc_rate_flat_var.get() or 0)
+            coll_pct = float(self._hc_coll_pct_var.get() or 0) / 100
+
+            vol      = float(self._hc_vol_var.get()      or 0)
+            coll_isk = float(self._hc_coll_isk_var.get() or 0)
+        except ValueError:
+            return
+
+        # Adjusted base fuel/LY from skills
+        adj_base  = 10000 * (1 - 0.1*jf) * (1 - 0.1*jfc)
+        base_cargo = 180000
+
+        # Update skill notes
+        self._hc_jf_note_var.set(f'−{jf*10}%  →  ×{1-0.1*jf:.1f}')
+        self._hc_jfc_note_var.set(f'−{jfc*10}%  →  ×{1-0.1*jfc:.1f}')
+
+        # Per-route markup note
+        eff_ly = ly if ly else 0
+        if mode == 'Per LY' and eff_ly > 0:
+            self._hc_rate_ly_note.set(f'= {rate_ly * eff_ly:.2f} ISK/m³ this route')
+        elif mode == 'Per LY':
+            self._hc_rate_ly_note.set('ISK/m³/LY')
+        else:
+            self._hc_rate_ly_note.set('')
+
+        markup_per_m3 = (rate_ly * eff_ly) if mode == 'Per LY' else flat
+        coll_fee  = coll_isk * coll_pct
+        markup_fee = markup_per_m3 * vol
+
+        STACK_C = 2.67
+        MOD_ECON, MOD_EXP, MOD_BULK = 3500, 5, 5
+        BULKHEADS = 3
+
+        results = []
+        for econ_n in range(4):
+            exp_n = 3 - econ_n
+            # Stacking-penalised fuel reduction
+            fuel = adj_base
+            for rank in range(1, econ_n + 1):
+                fuel *= (1 - econ_bonus * _math.exp(-((rank-1)/STACK_C)**2))
+            # Cargo capacity
+            cargo_gross = base_cargo * (exp_bonus ** exp_n)
+            overhead    = (3 - econ_n)*MOD_ECON + (3 - exp_n)*MOD_EXP + BULKHEADS*MOD_BULK
+            eff_cargo   = max(0, cargo_gross - overhead)
+
+            trips     = _math.ceil(vol / eff_cargo) if vol > 0 and eff_cargo > 0 else 0
+            iso_used  = trips * eff_ly * trip_mult * fuel if (ly and ly > 0) else 0
+            fuel_cost = iso_used * iso_price
+            total_fee = fuel_cost + markup_fee + coll_fee
+
+            if   econ_n == 0: lbl = '3 Exp'
+            elif exp_n  == 0: lbl = '3 Econ'
+            else:             lbl = f'{econ_n} Econ / {exp_n} Exp'
+
+            results.append(dict(label=lbl, eff_cargo=eff_cargo, fuel_per_ly=fuel,
+                                trips=trips, iso_used=iso_used,
+                                fuel_cost=fuel_cost, total_fee=total_fee))
+
+        has_data = vol > 0 or coll_isk > 0
+        winner_i = -1
+        if has_data and eff_ly > 0:
+            min_fee  = min(r['total_fee'] for r in results)
+            winner_i = next(i for i,r in enumerate(results) if r['total_fee'] == min_fee)
+
+        self._hc_tree.delete(*self._hc_tree.get_children())
+        for i, r in enumerate(results):
+            is_win = (i == winner_i)
+            lbl = r['label'] + ('  ★' if is_win else '')
+            fmt = lambda n: f'{n:,.0f}' if n else '—'
+            self._hc_tree.insert('', 'end', tags=('winner',) if is_win else (),
+                                  values=(lbl,
+                                          f"{r['eff_cargo']:,.0f}",
+                                          f"{r['fuel_per_ly']:,.0f}",
+                                          str(r['trips']) if r['trips'] else '—',
+                                          fmt(r['iso_used']),
+                                          fmt(r['fuel_cost']),
+                                          fmt(r['total_fee'])))
+
+        if winner_i >= 0:
+            w = results[winner_i]
+            max_fee  = max(r['total_fee'] for r in results)
+            savings  = max_fee - w['total_fee']
+            self._hc_winner_var.set(
+                f"Best: {w['label']}  |  Fee: {w['total_fee']:,.0f} ISK"
+                + (f"  |  Saves {savings:,.0f} ISK vs worst fit" if savings > 0 else ''))
+        else:
+            self._hc_winner_var.set('')
 
     def _haul_save_and_rebuild(self, rates_path, build_script):
         import json as _json, subprocess as _sp, threading as _th, datetime as _dt
 
-        data = {'published': _dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')}
+        data = {
+            'published':    _dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'),
+            'pricing_mode': 'per_ly' if self._hc_mode_var.get() == 'Per LY' else 'flat',
+            'econ_bonus':   self._ECON_MAP.get(self._hc_econ_var.get(), 0.07),
+            'exp_bonus':    1.275,
+        }
         try:
             for key, (var, cast) in self._hr.items():
                 data[key] = cast(var.get())
@@ -8608,12 +8966,469 @@ class AdminDashboard:
                     self.root.after(0, lambda: self._hr_status.set(
                         'Done — haul_quote.html rebuilt successfully.'))
                 else:
-                    err = result.stderr.strip().splitlines()[-1] if result.stderr.strip() else 'unknown error'
+                    err = (result.stderr.strip().splitlines()[-1]
+                           if result.stderr.strip() else 'unknown error')
                     self.root.after(0, lambda: self._hr_status.set(f'Build failed: {err}'))
             except Exception as e:
                 self.root.after(0, lambda: self._hr_status.set(f'Build error: {e}'))
 
         _th.Thread(target=run, daemon=True).start()
+
+
+    # ── Gank Watch tab ────────────────────────────────────────────────────────
+
+    def _build_gank_watch_tab(self):
+        import threading as _th, subprocess as _sp
+
+        # Local colour/font constants (same palette as other tabs)
+        BG     = '#0a1520'
+        FG     = '#c8d8e8'
+        DIM    = '#4a5870'
+        PANEL2 = '#0d1e30'
+        ENTRY  = '#0d1e30'
+        ACCENT = '#ff8833'
+        GOLD   = '#ffd700'
+        FONT   = ('Segoe UI', 9)
+
+        parent = self.gank_watch_frame
+        parent.columnconfigure(0, weight=1, minsize=520)
+        parent.columnconfigure(1, weight=0, minsize=320)
+        parent.rowconfigure(0, weight=1)
+
+        # ── Left column: watchlist ────────────────────────────────────────────
+        left = tk.Frame(parent, bg=BG)
+        left.grid(row=0, column=0, sticky='nsew', padx=(12, 6), pady=12)
+        left.rowconfigure(1, weight=1)
+        left.columnconfigure(0, weight=1)
+
+        tk.Label(left, text='Watchlist', bg=BG, fg=GOLD,
+                 font=('Segoe UI', 11, 'bold')).grid(row=0, column=0, sticky='w', pady=(0, 6))
+
+        # Treeview
+        cols = ('name', 'type', 'tag', 'kills', 'source')
+        tv = ttk.Treeview(left, columns=cols, show='headings', height=22)
+        tv.heading('name',   text='Name')
+        tv.heading('type',   text='Type')
+        tv.heading('tag',    text='Tag')
+        tv.heading('kills',  text='Kills')
+        tv.heading('source', text='Source')
+        tv.column('name',   width=200, anchor='w')
+        tv.column('type',   width=100, anchor='center')
+        tv.column('tag',    width=90,  anchor='center')
+        tv.column('kills',  width=55,  anchor='center')
+        tv.column('source', width=60,  anchor='center')
+        tv.tag_configure('ganker',   foreground='#e05050')
+        tv.tag_configure('cyno_alt', foreground='#e0a030')
+        tv.tag_configure('manual',   foreground='#8888cc')
+        sb = ttk.Scrollbar(left, orient='vertical', command=tv.yview)
+        tv.configure(yscrollcommand=sb.set)
+        tv.grid(row=1, column=0, sticky='nsew')
+        sb.grid(row=1, column=1, sticky='ns')
+        self._gw_tv = tv
+
+        # Kill log detail panel
+        tk.Label(left, text='Recent Kills (select a row)', bg=BG, fg=DIM,
+                 font=('Segoe UI', 8, 'italic')).grid(row=2, column=0, sticky='w', pady=(8,2))
+        log_cols = ('time', 'system', 'ship')
+        log_tv = ttk.Treeview(left, columns=log_cols, show='headings', height=5)
+        log_tv.heading('time',   text='Kill Time (UTC)')
+        log_tv.heading('system', text='System')
+        log_tv.heading('ship',   text='Victim Ship')
+        log_tv.column('time',   width=140, anchor='w')
+        log_tv.column('system', width=100, anchor='w')
+        log_tv.column('ship',   width=160, anchor='w')
+        log_sb = ttk.Scrollbar(left, orient='vertical', command=log_tv.yview)
+        log_tv.configure(yscrollcommand=log_sb.set)
+        log_tv.grid(row=3, column=0, sticky='ew', pady=(0,4))
+        log_sb.grid(row=3, column=1, sticky='ns')
+        self._gw_log_tv = log_tv
+
+        def on_select(event):
+            sel = tv.selection()
+            if not sel:
+                return
+            vals = tv.item(sel[0], 'values')
+            if not vals:
+                return
+            name, etype = vals[0], vals[1]
+            for row in log_tv.get_children():
+                log_tv.delete(row)
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                rows = conn.execute("""
+                    SELECT killmail_time, system_name, victim_ship_name
+                    FROM gank_kill_log
+                    WHERE entity_name = ? AND entity_type = ?
+                    ORDER BY killmail_time DESC
+                    LIMIT 20
+                """, (name, etype)).fetchall()
+                conn.close()
+                for km_time, sys_name, ship in rows:
+                    log_tv.insert('', 'end', values=(
+                        (km_time or '')[:19].replace('T', ' '),
+                        sys_name or '',
+                        ship or ''
+                    ))
+            except Exception:
+                pass
+
+        tv.bind('<<TreeviewSelect>>', on_select)
+
+        # Bottom controls
+        ctrl = tk.Frame(left, bg=BG)
+        ctrl.grid(row=4, column=0, sticky='ew', pady=(8, 0))
+
+        self._gw_pages_var = tk.IntVar(value=5)
+        tk.Label(ctrl, text='Max pages:', bg=BG, fg=FG,
+                 font=FONT).pack(side='left')
+        tk.Spinbox(ctrl, from_=1, to=20, width=3,
+                   textvariable=self._gw_pages_var,
+                   bg=ENTRY, fg=FG, insertbackground=FG,
+                   font=FONT, buttonbackground=PANEL2).pack(side='left', padx=(4, 8))
+        tk.Label(ctrl, text='Lookback (hrs):', bg=BG, fg=FG,
+                 font=FONT).pack(side='left')
+        self._gw_hours_var = tk.IntVar(value=48)
+        tk.Spinbox(ctrl, from_=0, to=720, width=4,
+                   textvariable=self._gw_hours_var,
+                   bg=ENTRY, fg=FG, insertbackground=FG,
+                   font=FONT, buttonbackground=PANEL2).pack(side='left', padx=(4, 4))
+        tk.Label(ctrl, text='(0=unlimited)', bg=BG, fg=DIM,
+                 font=('Segoe UI', 8, 'italic')).pack(side='left', padx=(0, 12))
+
+        self._gw_progress = tk.StringVar(value='')
+        tk.Label(ctrl, textvariable=self._gw_progress, bg=BG, fg=DIM,
+                 font=('Segoe UI', 8, 'italic'), wraplength=280,
+                 justify='left').pack(side='left', fill='x', expand=True)
+
+        btn_row = tk.Frame(left, bg=BG)
+        btn_row.grid(row=5, column=0, sticky='ew', pady=(6, 0))
+
+        tk.Button(btn_row, text='Fetch Recent Gank Data',
+                  bg=ACCENT, fg='#000', font=FONT, relief='flat', padx=8,
+                  command=self._gw_fetch).pack(side='left', padx=(0, 8))
+        tk.Button(btn_row, text='Remove Selected',
+                  bg=PANEL2, fg=FG, font=FONT, relief='flat', padx=8,
+                  command=self._gw_remove_selected).pack(side='left', padx=(0, 8))
+        tk.Button(btn_row, text='Publish Page',
+                  bg=PANEL2, fg=FG, font=FONT, relief='flat', padx=8,
+                  command=self._gw_publish).pack(side='left')
+
+        # ── Right column: manual add + ESI push ──────────────────────────────
+        right = tk.Frame(parent, bg=PANEL2, bd=1, relief='solid')
+        right.grid(row=0, column=1, sticky='nsew', padx=(6, 12), pady=12)
+        right.columnconfigure(0, weight=1)
+
+        # Manual add section
+        tk.Label(right, text='Add Manually', bg=PANEL2, fg=GOLD,
+                 font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=12, pady=(12, 4))
+
+        add_frame = tk.Frame(right, bg=PANEL2)
+        add_frame.pack(fill='x', padx=12, pady=(0, 4))
+        tk.Label(add_frame, text='Entity ID:', bg=PANEL2, fg=FG,
+                 font=FONT).grid(row=0, column=0, sticky='w', pady=2)
+        self._gw_add_id = tk.Entry(add_frame, bg=ENTRY, fg=FG,
+                                   insertbackground=FG, font=FONT, width=14)
+        self._gw_add_id.grid(row=0, column=1, sticky='w', padx=(6, 0), pady=2)
+
+        tk.Label(add_frame, text='Type:', bg=PANEL2, fg=FG,
+                 font=FONT).grid(row=1, column=0, sticky='w', pady=2)
+        self._gw_add_type = ttk.Combobox(add_frame, width=12, state='readonly',
+                                          values=['character', 'corporation', 'alliance'])
+        self._gw_add_type.set('character')
+        self._gw_add_type.grid(row=1, column=1, sticky='w', padx=(6, 0), pady=2)
+
+        self._gw_add_status = tk.StringVar(value='')
+        tk.Label(right, textvariable=self._gw_add_status, bg=PANEL2, fg=DIM,
+                 font=('Segoe UI', 8, 'italic'), wraplength=260,
+                 justify='left').pack(anchor='w', padx=12)
+
+        tk.Button(right, text='Add to Watchlist',
+                  bg=ACCENT, fg='#000', font=FONT, relief='flat', padx=8,
+                  command=self._gw_add_manual).pack(anchor='w', padx=12, pady=(4, 12))
+
+        # Divider
+        ttk.Separator(right, orient='horizontal').pack(fill='x', padx=8, pady=4)
+
+        # ESI Push section
+        tk.Label(right, text='In-Game Contacts', bg=PANEL2, fg=GOLD,
+                 font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=12, pady=(8, 4))
+
+        tk.Label(right, text='Push all watchlist entries to your\ncontacts at −10 standing.',
+                 bg=PANEL2, fg=DIM, font=('Segoe UI', 8), justify='left').pack(
+                     anchor='w', padx=12, pady=(0, 6))
+
+        self._gw_scope_warn = tk.StringVar(value='')
+        tk.Label(right, textvariable=self._gw_scope_warn, bg=PANEL2, fg='#e05050',
+                 font=('Segoe UI', 8, 'italic'), wraplength=260,
+                 justify='left').pack(anchor='w', padx=12)
+
+        self._gw_push_status = tk.StringVar(value='')
+        tk.Label(right, textvariable=self._gw_push_status, bg=PANEL2, fg=DIM,
+                 font=('Segoe UI', 8, 'italic'), wraplength=260,
+                 justify='left').pack(anchor='w', padx=12)
+
+        btn_push_row = tk.Frame(right, bg=PANEL2)
+        btn_push_row.pack(anchor='w', padx=12, pady=(4, 4))
+        tk.Button(btn_push_row, text='Push to Contacts (−10)',
+                  bg='#8b1a1a', fg='#fff', font=FONT, relief='flat', padx=8,
+                  command=self._gw_push_contacts).pack(side='left', padx=(0, 6))
+        tk.Button(btn_push_row, text='Re-authorize',
+                  bg=PANEL2, fg=DIM, font=('Segoe UI', 8), relief='flat', padx=6,
+                  command=self._gw_reauthorize).pack(side='left')
+
+        # Populate tree on load
+        self._gw_reload_tree()
+
+    def _gw_reload_tree(self):
+        """Reload treeview from DB."""
+        tv = self._gw_tv
+        for row in tv.get_children():
+            tv.delete(row)
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            rows = conn.execute("""
+                SELECT entity_name, entity_type, tag, kill_count, added_by
+                FROM gank_watchlist
+                ORDER BY kill_count DESC, entity_name
+            """).fetchall()
+            conn.close()
+        except Exception:
+            return
+        for name, etype, tag, kills, source in rows:
+            display_name = name or f'<ID unknown>'
+            tag_label    = tag or 'ganker'
+            row_tag      = 'manual' if source == 'manual' else tag_label
+            tv.insert('', 'end',
+                      values=(display_name, etype, tag_label, kills, source),
+                      tags=(row_tag,))
+
+    def _gw_fetch(self):
+        """Run fetch_gank_candidates.py in background thread."""
+        import threading as _th
+        import importlib.util, sys as _sys
+
+        max_pages = self._gw_pages_var.get()
+        hours     = self._gw_hours_var.get() or None  # 0 means unlimited
+        self._gw_progress.set('Starting fetch…')
+
+        script_path = os.path.join(PROJECT_DIR, 'scripts', 'fetch_gank_candidates.py')
+
+        def cb(msg):
+            self.root.after(0, lambda m=msg: self._gw_progress.set(m))
+
+        def run():
+            try:
+                spec = importlib.util.spec_from_file_location('fetch_gank_candidates', script_path)
+                mod  = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                mod.run(max_pages=max_pages, hours=hours, progress_cb=cb)
+                self.root.after(0, self._gw_reload_tree)
+            except Exception as e:
+                self.root.after(0, lambda: self._gw_progress.set(f'Error: {e}'))
+
+        _th.Thread(target=run, daemon=True).start()
+
+    def _gw_remove_selected(self):
+        tv  = self._gw_tv
+        sel = tv.selection()
+        if not sel:
+            return
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            for item in sel:
+                vals = tv.item(item, 'values')
+                name, etype = vals[0], vals[1]
+                conn.execute(
+                    'DELETE FROM gank_watchlist WHERE entity_name = ? AND entity_type = ?',
+                    (name, etype)
+                )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            self._gw_progress.set(f'Remove error: {e}')
+            return
+        self._gw_reload_tree()
+
+    def _gw_add_manual(self):
+        """Resolve entity ID via ESI and add to watchlist."""
+        import threading as _th
+
+        raw_id = self._gw_add_id.get().strip()
+        etype  = self._gw_add_type.get()
+        if not raw_id.isdigit():
+            self._gw_add_status.set('Enter a numeric entity ID.')
+            return
+
+        entity_id = int(raw_id)
+        self._gw_add_status.set('Resolving name…')
+
+        def run():
+            try:
+                import requests as _req
+                r = _req.post('https://esi.evetech.net/latest/universe/names/',
+                              json=[entity_id],
+                              headers={'User-Agent': 'EVE Market Tool / Hamektok Hakaari'},
+                              timeout=10)
+                name = None
+                if r.status_code == 200 and r.json():
+                    name = r.json()[0].get('name')
+
+                conn = sqlite3.connect(DB_PATH)
+                from datetime import datetime as _dt2, timezone as _tz
+                now  = _dt2.now(_tz.utc).isoformat()
+                conn.execute("""
+                    INSERT INTO gank_watchlist
+                        (entity_id, entity_type, entity_name, kill_count, tag, added_by, added_at)
+                    VALUES (?, ?, ?, 0, 'ganker', 'manual', ?)
+                    ON CONFLICT(entity_id, entity_type) DO UPDATE SET
+                        entity_name = COALESCE(excluded.entity_name, entity_name),
+                        added_by    = 'manual'
+                """, (entity_id, etype, name, now))
+                conn.commit()
+                conn.close()
+
+                msg = f'Added: {name or entity_id} ({etype})'
+                self.root.after(0, lambda: self._gw_add_status.set(msg))
+                self.root.after(0, self._gw_reload_tree)
+                self.root.after(0, lambda: self._gw_add_id.delete(0, 'end'))
+            except Exception as e:
+                self.root.after(0, lambda: self._gw_add_status.set(f'Error: {e}'))
+
+        _th.Thread(target=run, daemon=True).start()
+
+    def _gw_publish(self):
+        """Call _build_gank_watchlist.py via subprocess."""
+        import subprocess as _sp, threading as _th
+
+        build_script = os.path.join(PROJECT_DIR, '_build_gank_watchlist.py')
+
+        def run():
+            self.root.after(0, lambda: self._gw_progress.set('Building watchlist page…'))
+            try:
+                result = _sp.run(
+                    [sys.executable, build_script],
+                    capture_output=True, text=True, cwd=PROJECT_DIR
+                )
+                if result.returncode == 0:
+                    self.root.after(0, lambda: self._gw_progress.set(
+                        'gank_watchlist.html built successfully.'))
+                else:
+                    err = (result.stderr.strip().splitlines()[-1]
+                           if result.stderr.strip() else 'unknown error')
+                    self.root.after(0, lambda: self._gw_progress.set(f'Build failed: {err}'))
+            except Exception as e:
+                self.root.after(0, lambda: self._gw_progress.set(f'Build error: {e}'))
+
+        _th.Thread(target=run, daemon=True).start()
+
+    def _gw_push_contacts(self):
+        """Push all watchlist entries to Hamektok's contacts at −10 standing."""
+        import threading as _th
+
+        self._gw_push_status.set('Checking auth…')
+
+        def run():
+            try:
+                import sys as _sys, os as _os, json as _json, base64 as _b64
+                import requests as _req
+
+                cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
+                scripts_dir = _os.path.join(PROJECT_DIR, 'scripts')
+                if scripts_dir not in _sys.path:
+                    _sys.path.insert(0, scripts_dir)
+
+                from token_manager import TokenManager
+                tm    = TokenManager(cred_path)
+                token = tm.get_access_token()
+
+                # Decode JWT to check scopes
+                parts = token.split('.')
+                if len(parts) >= 2:
+                    padded = parts[1] + '=' * (-len(parts[1]) % 4)
+                    payload = _json.loads(_b64.urlsafe_b64decode(padded))
+                    scopes  = payload.get('scp', [])
+                    if isinstance(scopes, str):
+                        scopes = scopes.split()
+                    if 'esi-characters.write_contacts.v1' not in scopes:
+                        self.root.after(0, lambda: self._gw_scope_warn.set(
+                            'Scope missing: esi-characters.write_contacts.v1\n'
+                            'Click Re-authorize to add it.'))
+                        self.root.after(0, lambda: self._gw_push_status.set(''))
+                        return
+                    else:
+                        self.root.after(0, lambda: self._gw_scope_warn.set(''))
+
+                with open(cred_path) as f:
+                    creds = _json.load(f)
+                char_id = creds.get('character_id', 2112673557)
+
+                # Load watchlist
+                conn  = sqlite3.connect(DB_PATH)
+                rows  = conn.execute(
+                    'SELECT entity_id, entity_type FROM gank_watchlist'
+                ).fetchall()
+                conn.close()
+
+                if not rows:
+                    self.root.after(0, lambda: self._gw_push_status.set('Watchlist is empty.'))
+                    return
+
+                BATCH = 100
+                pushed, failed = 0, 0
+                headers = {
+                    'Authorization': f'Bearer {token}',
+                    'Content-Type':  'application/json',
+                }
+
+                for i in range(0, len(rows), BATCH):
+                    batch = rows[i:i + BATCH]
+                    body  = [{'contact_id': eid, 'contact_type': etype, 'standing': -10}
+                             for eid, etype in batch]
+                    url   = (f'https://esi.evetech.net/latest'
+                             f'/characters/{char_id}/contacts/')
+                    r = _req.put(url, json=body, headers=headers, timeout=15)
+                    if r.status_code in (200, 204):
+                        pushed += len(batch)
+                    else:
+                        failed += len(batch)
+
+                msg = f'{pushed} contacts pushed, {failed} failed.'
+                self.root.after(0, lambda: self._gw_push_status.set(msg))
+
+            except Exception as e:
+                self.root.after(0, lambda: self._gw_push_status.set(f'Error: {e}'))
+
+        _th.Thread(target=run, daemon=True).start()
+
+    def _gw_reauthorize(self):
+        """Open EVE SSO URL in browser with required scopes."""
+        import webbrowser as _wb
+        import json as _json, os as _os
+
+        cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
+        try:
+            with open(cred_path) as f:
+                creds = _json.load(f)
+            client_id = creds.get('client_id', '')
+        except Exception:
+            client_id = ''
+
+        scopes = (
+            'esi-characters.write_contacts.v1 '
+            'esi-wallet.read_character_wallet.v1 '
+            'esi-characters.read_standings.v1'
+        )
+        import urllib.parse
+        url = ('https://login.eveonline.com/v2/oauth/authorize?'
+               + urllib.parse.urlencode({
+                   'response_type': 'code',
+                   'client_id':     client_id,
+                   'redirect_uri':  'http://localhost:5000/auth/callback',
+                   'scope':         scopes,
+                   'state':         'reauth_gank_watch',
+               }))
+        _wb.open(url)
+        self._gw_scope_warn.set('Browser opened — complete auth, then update refresh_token in credentials_gank_contact.json.')
 
 
 def main():
