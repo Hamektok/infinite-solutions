@@ -136,6 +136,30 @@ CYNO_JUMPER_SHIPS = STEALTH_BOMBERS | T3_CRUISERS | BLACK_OPS | DREADS | CARRIER
 
 NPC_CORP_THRESHOLD  = 2_000_000
 
+# Faction Warfare militia factions and their opposing counterpart.
+# A kill where the victim is enlisted in one FW faction and an attacker
+# is enlisted in the opposing faction is legitimate militia combat — not a gank.
+FW_OPPOSING = {
+    500001: 500004,  # Caldari State  vs Gallente Federation
+    500004: 500001,  # Gallente Federation vs Caldari State
+    500003: 500002,  # Amarr Empire   vs Minmatar Republic
+    500002: 500003,  # Minmatar Republic vs Amarr Empire
+}
+
+
+def is_fw_kill(esi):
+    """Return True if this is a faction-warfare combat kill (not a gank)."""
+    victim_faction = esi.get('victim', {}).get('faction_id')
+    if not victim_faction:
+        return False
+    opposing = FW_OPPOSING.get(victim_faction)
+    if not opposing:
+        return False
+    return any(
+        a.get('faction_id') == opposing and a.get('character_id', 0) > 0
+        for a in esi.get('attackers', [])
+    )
+
 
 # ── DB setup ──────────────────────────────────────────────────────────────────
 
@@ -393,7 +417,8 @@ def run_fetch_pass(conn, max_pages=5, cutoff=None, progress_cb=None):
                                if a.get('character_id', 0) > 0]
 
                 # ── Path A: high-sec gank ──────────────────────────────────
-                if sec >= 0.45 and not esi.get('war_id') and victim_type in HAULER_SHIPS and human_atk:
+                if (sec >= 0.45 and not esi.get('war_id') and not is_fw_kill(esi)
+                        and victim_type in HAULER_SHIPS and human_atk):
                     g_processed += 1
                     seen = set()
                     for a in human_atk:
