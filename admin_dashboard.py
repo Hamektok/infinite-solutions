@@ -9007,21 +9007,27 @@ class AdminDashboard:
                  font=('Segoe UI', 11, 'bold')).grid(row=0, column=0, sticky='w', pady=(0, 6))
 
         # Treeview
-        cols = ('name', 'type', 'tag', 'kills', 'source')
+        cols = ('name', 'type', 'tag', 'kills', 'source', 'contact')
         tv = ttk.Treeview(left, columns=cols, show='headings', height=22)
-        tv.heading('name',   text='Name')
-        tv.heading('type',   text='Type')
-        tv.heading('tag',    text='Tag')
-        tv.heading('kills',  text='Kills')
-        tv.heading('source', text='Source')
-        tv.column('name',   width=200, anchor='w')
-        tv.column('type',   width=100, anchor='center')
-        tv.column('tag',    width=90,  anchor='center')
-        tv.column('kills',  width=55,  anchor='center')
-        tv.column('source', width=60,  anchor='center')
-        tv.tag_configure('ganker',   foreground='#e05050')
-        tv.tag_configure('cyno_alt', foreground='#e0a030')
-        tv.tag_configure('manual',   foreground='#8888cc')
+        tv.heading('name',    text='Name')
+        tv.heading('type',    text='Type')
+        tv.heading('tag',     text='Tag')
+        tv.heading('kills',   text='Kills')
+        tv.heading('source',  text='Source')
+        tv.heading('contact', text='Contact')
+        tv.column('name',    width=200, anchor='w')
+        tv.column('type',    width=100, anchor='center')
+        tv.column('tag',     width=90,  anchor='center')
+        tv.column('kills',   width=55,  anchor='center')
+        tv.column('source',  width=60,  anchor='center')
+        tv.column('contact', width=70,  anchor='center')
+        # Row tags: type colour + optional green bg when already in contacts
+        tv.tag_configure('ganker',          foreground='#e05050')
+        tv.tag_configure('cyno_alt',        foreground='#e0a030')
+        tv.tag_configure('manual',          foreground='#8888cc')
+        tv.tag_configure('ganker_added',    foreground='#e05050', background='#0b2016')
+        tv.tag_configure('cyno_alt_added',  foreground='#e0a030', background='#0b2016')
+        tv.tag_configure('manual_added',    foreground='#8888cc', background='#0b2016')
         sb = ttk.Scrollbar(left, orient='vertical', command=tv.yview)
         tv.configure(yscrollcommand=sb.set)
         tv.grid(row=1, column=0, sticky='nsew')
@@ -9108,6 +9114,9 @@ class AdminDashboard:
         tk.Button(btn_row, text='Fetch Recent Gank Data',
                   bg=ACCENT, fg='#000', font=FONT, relief='flat', padx=8,
                   command=self._gw_fetch).pack(side='left', padx=(0, 8))
+        tk.Button(btn_row, text='Refresh Contact Status',
+                  bg='#1a3a2a', fg='#66cc88', font=FONT, relief='flat', padx=8,
+                  command=self._gw_refresh_contacts).pack(side='left', padx=(0, 8))
         tk.Button(btn_row, text='Remove Selected',
                   bg=PANEL2, fg=FG, font=FONT, relief='flat', padx=8,
                   command=self._gw_remove_selected).pack(side='left', padx=(0, 8))
@@ -9189,19 +9198,22 @@ class AdminDashboard:
         try:
             conn = sqlite3.connect(DB_PATH)
             rows = conn.execute("""
-                SELECT entity_name, entity_type, tag, kill_count, added_by
+                SELECT entity_name, entity_type, tag, kill_count, added_by,
+                       COALESCE(in_contacts, 0)
                 FROM gank_watchlist
                 ORDER BY kill_count DESC, entity_name
             """).fetchall()
             conn.close()
         except Exception:
             return
-        for name, etype, tag, kills, source in rows:
-            display_name = name or f'<ID unknown>'
-            tag_label    = tag or 'ganker'
-            row_tag      = 'manual' if source == 'manual' else tag_label
+        for name, etype, tag, kills, source, in_contacts in rows:
+            display_name   = name or '<ID unknown>'
+            tag_label      = tag or 'ganker'
+            base_tag       = 'manual' if source == 'manual' else tag_label
+            row_tag        = f'{base_tag}_added' if in_contacts else base_tag
+            contact_marker = '\u2713 Added' if in_contacts else '\u2014'
             tv.insert('', 'end',
-                      values=(display_name, etype, tag_label, kills, source),
+                      values=(display_name, etype, tag_label, kills, source, contact_marker),
                       tags=(row_tag,))
 
     def _gw_fetch(self):
@@ -9382,6 +9394,7 @@ class AdminDashboard:
                     'Content-Type':  'application/json',
                 }
 
+                conn2 = sqlite3.connect(DB_PATH)
                 for i in range(0, len(rows), BATCH):
                     batch = rows[i:i + BATCH]
                     body  = [{'contact_id': eid, 'contact_type': etype, 'standing': -10}
@@ -9391,14 +9404,106 @@ class AdminDashboard:
                     r = _req.put(url, json=body, headers=headers, timeout=15)
                     if r.status_code in (200, 204):
                         pushed += len(batch)
+                        for eid, etype in batch:
+                            conn2.execute(
+                                'UPDATE gank_watchlist SET in_contacts=1'
+                                ' WHERE entity_id=? AND entity_type=?',
+                                (eid, etype))
                     else:
                         failed += len(batch)
+                conn2.commit()
+                conn2.close()
 
                 msg = f'{pushed} contacts pushed, {failed} failed.'
                 self.root.after(0, lambda: self._gw_push_status.set(msg))
+                self.root.after(0, self._gw_reload_tree)
 
             except Exception as e:
                 self.root.after(0, lambda: self._gw_push_status.set(f'Error: {e}'))
+
+        _th.Thread(target=run, daemon=True).start()
+
+    def _gw_refresh_contacts(self):
+        """Fetch current in-game contact list from ESI and update in_contacts flags."""
+        import threading as _th
+
+        self._gw_progress.set('Fetching contact list from ESI…')
+
+        def run():
+            try:
+                import sys as _sys, os as _os, json as _json, base64 as _b64
+                import requests as _req
+
+                cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
+                scripts_dir = _os.path.join(PROJECT_DIR, 'scripts')
+                if scripts_dir not in _sys.path:
+                    _sys.path.insert(0, scripts_dir)
+
+                from token_manager import TokenManager
+                tm    = TokenManager(cred_path)
+                token = tm.get_access_token()
+
+                # Check read_contacts scope
+                parts = token.split('.')
+                if len(parts) >= 2:
+                    padded  = parts[1] + '=' * (-len(parts[1]) % 4)
+                    payload = _json.loads(_b64.urlsafe_b64decode(padded))
+                    scopes  = payload.get('scp', [])
+                    if isinstance(scopes, str):
+                        scopes = scopes.split()
+                    if 'esi-characters.read_contacts.v1' not in scopes:
+                        self.root.after(0, lambda: self._gw_scope_warn.set(
+                            'Scope missing: esi-characters.read_contacts.v1\n'
+                            'Click Re-authorize to add it.'))
+                        self.root.after(0, lambda: self._gw_progress.set(''))
+                        return
+
+                with open(cred_path) as f:
+                    creds = _json.load(f)
+                char_id = creds.get('character_id', 2112673557)
+
+                headers = {'Authorization': f'Bearer {token}'}
+                base_url = f'https://esi.evetech.net/latest/characters/{char_id}/contacts/'
+
+                # Paginate through all contacts
+                contact_ids = set()
+                page = 1
+                while True:
+                    r = _req.get(base_url, headers=headers,
+                                 params={'page': page}, timeout=15)
+                    if r.status_code != 200:
+                        break
+                    data = r.json()
+                    if not data:
+                        break
+                    for c in data:
+                        contact_ids.add(c['contact_id'])
+                    if len(data) < 100:
+                        break
+                    page += 1
+
+                # Update in_contacts for all watchlist entries
+                conn2 = sqlite3.connect(DB_PATH)
+                watchlist = conn2.execute(
+                    'SELECT entity_id, entity_type FROM gank_watchlist'
+                ).fetchall()
+                for eid, etype in watchlist:
+                    flag = 1 if eid in contact_ids else 0
+                    conn2.execute(
+                        'UPDATE gank_watchlist SET in_contacts=? WHERE entity_id=? AND entity_type=?',
+                        (flag, eid, etype))
+                conn2.commit()
+                conn2.close()
+
+                added   = sum(1 for eid, _ in watchlist if eid in contact_ids)
+                pending = len(watchlist) - added
+                self.root.after(0, lambda: self._gw_progress.set(
+                    f'Contact status refreshed: {added} added, {pending} not in contacts.'))
+                self.root.after(0, lambda: self._gw_scope_warn.set(''))
+                self.root.after(0, self._gw_reload_tree)
+
+            except Exception as e:
+                self.root.after(0, lambda: self._gw_progress.set(f'Error: {e}'))
 
         _th.Thread(target=run, daemon=True).start()
 
@@ -9417,6 +9522,7 @@ class AdminDashboard:
 
         scopes = (
             'esi-characters.write_contacts.v1 '
+            'esi-characters.read_contacts.v1 '
             'esi-wallet.read_character_wallet.v1 '
             'esi-characters.read_standings.v1'
         )
