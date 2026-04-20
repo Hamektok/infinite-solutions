@@ -10,6 +10,16 @@ DB_PATH  = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mydatabase.
 OUT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gank_watchlist.html')
 
 # ── Load data from DB ─────────────────────────────────────────────────────────
+FREIGHTERS      = {'Charon','Fenrir','Obelisk','Providence','Bowhead','Avalanche'}
+JUMP_FREIGHTERS = {'Rhea','Nomad','Anshar','Ark'}
+
+def ship_cats(ship_set):
+    cats = set()
+    for s in ship_set:
+        if s in FREIGHTERS:      cats.add('fr')
+        if s in JUMP_FREIGHTERS: cats.add('jf')
+    return ' '.join(sorted(cats)) if cats else 'other'
+
 build_ts = datetime.now(timezone.utc).strftime('%d %b %Y %H:%M UTC')
 
 ganker_alliances = []
@@ -20,14 +30,19 @@ cyno_chars       = []
 try:
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
-        SELECT entity_name, entity_type, tag, kill_count
-        FROM gank_watchlist
-        ORDER BY kill_count DESC, entity_name COLLATE NOCASE
+        SELECT w.entity_name, w.entity_type, w.tag, w.kill_count,
+               GROUP_CONCAT(DISTINCT k.victim_ship_name) as ships
+        FROM gank_watchlist w
+        LEFT JOIN gank_kill_log k ON k.entity_id = w.entity_id
+        GROUP BY w.entity_id
+        ORDER BY w.kill_count DESC, w.entity_name COLLATE NOCASE
     """).fetchall()
     conn.close()
 
-    for name, etype, tag, kills in rows:
-        label = (name or '(unknown)', kills or 0)
+    for name, etype, tag, kills, ships_csv in rows:
+        ship_set = set(ships_csv.split(',')) if ships_csv else set()
+        cats     = ship_cats(ship_set)
+        label    = (name or '(unknown)', kills or 0, cats)
         if tag == 'cyno_alt':
             cyno_chars.append(label)
         elif etype == 'alliance':
@@ -48,7 +63,7 @@ def name_list(entries, empty_msg='No entries yet.'):
     def esc(s):
         return s.replace('&', '&amp;').replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     items = ''.join(
-        f'<li>'
+        f'<li data-ships="{cats}">'
         f'<span class="name">{esc(n)}</span>'
         f'<span class="kills">{k}x</span>'
         f'<button class="copy-btn" data-name="{esc(n)}" title="Copy to clipboard">'
@@ -56,7 +71,7 @@ def name_list(entries, empty_msg='No entries yet.'):
         f'<path d="M2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-1H9v1H2V6h1V5H2z"/></svg>'
         f'</button>'
         f'</li>'
-        for n, k in entries
+        for n, k, cats in entries
     )
     return f'<ul class="namelist">{items}</ul>'
 
@@ -121,6 +136,18 @@ p.empty{{color:var(--dim);font-size:.82em;font-style:italic;}}
 footer{{text-align:center;color:var(--dim);font-size:.76em;margin-top:28px;letter-spacing:1px;}}
 @media(max-width:950px){{.grid{{grid-template-columns:repeat(2,1fr);}}}}
 @media(max-width:500px){{.grid{{grid-template-columns:1fr;}}}}
+.filter-bar{{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-bottom:16px;padding:10px 14px;
+  background:var(--panel2);border:1px solid var(--border);border-radius:6px;}}
+.filter-bar .filter-label{{color:var(--dim);font-size:.78em;letter-spacing:2px;
+  text-transform:uppercase;margin-right:4px;}}
+.filter-btn{{background:var(--panel);border:1px solid var(--border);color:var(--dim);
+  font-family:'Rajdhani',sans-serif;font-size:.85em;font-weight:600;
+  padding:5px 14px;border-radius:4px;cursor:pointer;letter-spacing:1px;
+  transition:background .15s,color .15s,border-color .15s;}}
+.filter-btn:hover{{color:var(--text);border-color:#3a4555;}}
+.filter-btn.active{{background:#1a2535;color:#ffcc44;border-color:#ffcc44;}}
+.filter-count{{margin-left:auto;color:var(--dim);font-size:.78em;}}
 </style>
 </head>
 <body>
@@ -130,6 +157,14 @@ footer{{text-align:center;color:var(--dim);font-size:.76em;margin-top:28px;lette
     <h1>GANKER WATCHLIST</h1>
     <div class="sub">Infinite Solutions</div>
     <div class="meta">{total_entries:,} entities tracked &mdash; updated {build_ts}</div>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">Filter by victim ship:</span>
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="fr">Freighter</button>
+    <button class="filter-btn" data-filter="jf">Jump Freighter</button>
+    <span class="filter-count" id="filter-count"></span>
   </div>
 
   <div class="desc">
@@ -181,6 +216,48 @@ document.querySelectorAll('.copy-btn').forEach(btn => {{
       btn.classList.add('copied');
       setTimeout(() => btn.classList.remove('copied'), 1200);
     }});
+  }});
+}});
+
+// ── Ship type filter ──────────────────────────────────────────────────────────
+const activeFilters = new Set();
+
+function applyFilter() {{
+  const all = activeFilters.size === 0 || activeFilters.has('all');
+  let visible = 0;
+  document.querySelectorAll('ul.namelist li').forEach(li => {{
+    const ships = li.dataset.ships || '';
+    const show  = all || [...activeFilters].some(f => ships.split(' ').includes(f));
+    li.style.display = show ? '' : 'none';
+    if (show) visible++;
+  }});
+  const total = document.querySelectorAll('ul.namelist li').length;
+  document.getElementById('filter-count').textContent =
+    all ? '' : visible + ' of {total_entries} shown';
+}}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {{
+  btn.addEventListener('click', () => {{
+    const f = btn.dataset.filter;
+    if (f === 'all') {{
+      activeFilters.clear();
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }} else {{
+      activeFilters.delete('all');
+      document.querySelector('.filter-btn[data-filter="all"]').classList.remove('active');
+      if (activeFilters.has(f)) {{
+        activeFilters.delete(f);
+        btn.classList.remove('active');
+        if (activeFilters.size === 0) {{
+          document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+        }}
+      }} else {{
+        activeFilters.add(f);
+        btn.classList.add('active');
+      }}
+    }}
+    applyFilter();
   }});
 }});
 </script>
