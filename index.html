@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202604192210"></script>
+    <script src="buyback_data.js?v=202604200010"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -503,6 +503,29 @@
         .ice-group-divider:first-child {
             margin-top: 0;
         }
+
+        .ore-family-divider {
+            grid-column: 1 / -1;
+            font-size: 10px;
+            color: rgba(130, 160, 180, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 3px 2px 2px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 6px;
+        }
+
+        .ore-grade-toggle {
+            padding: 6px 2px 10px;
+            font-size: 0.82em;
+            color: rgba(160, 190, 210, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .ore-grade-toggle input { cursor: pointer; }
 
         .item {
             background: rgba(0, 50, 80, 0.3);
@@ -2328,6 +2351,7 @@
                     <button class="sub-tab" onclick="showSubTab('gas')" data-market-tab="gas_cloud_materials">Gas Cloud Materials</button>
                     <button class="sub-tab" onclick="showSubTab('research')" data-market-tab="research_equipment">Research Equipment</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" data-market-tab="salvaged_materials">Salvaged Materials</button>
+                    <button class="sub-tab" onclick="showSubTab('compressed-ores')" data-market-tab="compressed_ores">Compressed Ores</button>
                 </div>
 
                 <div class="content">
@@ -2385,6 +2409,28 @@
                     <!-- SALVAGE SUB-CONTENT (hidden initially) -->
                     <div id="salvage-content" class="tab-content">
                         <div id="salvage-grid"></div>
+                    </div>
+
+                    <!-- COMPRESSED ORES SUB-CONTENT -->
+                    <div id="compressed-ores-content" class="tab-content">
+                        <div class="pi-tier-tabs">
+                            <button class="pi-tier-tab ore-cat-tab active"
+                                    onclick="filterCompressedCat(this,'standard')"
+                                    data-market-sub="compressed_ores:standard_ores">Standard Ores</button>
+                            <button class="pi-tier-tab ore-cat-tab"
+                                    onclick="filterCompressedCat(this,'moon')"
+                                    data-market-sub="compressed_ores:moon_ores">Moon Ores</button>
+                            <button class="pi-tier-tab ore-cat-tab"
+                                    onclick="filterCompressedCat(this,'ice')"
+                                    data-market-sub="compressed_ores:ice_ores">Ice Ores</button>
+                        </div>
+                        <div class="ore-grade-toggle">
+                            <label>
+                                <input type="checkbox" id="showAllGrades" onchange="renderCompressedOres(currentOreType)">
+                                Show grade variants (II-Grade / III-Grade / IV-Grade)
+                            </label>
+                        </div>
+                        <div class="item-grid" id="compressed-ores-grid"></div>
                     </div>
 
                     <div class="footer">
@@ -3359,7 +3405,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 19, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 20, 2026 00:08 EVE"
+            "inventoryLastUpdated": "Apr 20, 2026 02:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5498,7 +5544,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         function showSubTab(subTabName) {
             // Hide all sub-content
-            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content').forEach(content => {
+            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content, #compressed-ores-content').forEach(content => {
                 content.classList.remove('active');
             });
 
@@ -5529,6 +5575,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             renderGasCloudMaterials(inventory);
             renderResearchEquipment(inventory);
             renderSalvage(inventory);
+            renderCompressedOres('standard');
         }
 
         // ============================================
@@ -5830,13 +5877,25 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 }
             });
 
-            // Show/hide subcategory filter buttons (moon / PI)
+            // Show/hide subcategory filter buttons (moon / PI / compressed-ores)
             document.querySelectorAll('[data-market-sub]').forEach(btn => {
                 const [tabKey, subKey] = btn.getAttribute('data-market-sub').split(':');
                 if (mv[tabKey] && mv[tabKey].subs && mv[tabKey].subs[subKey] !== undefined) {
                     btn.style.display = mv[tabKey].subs[subKey].visible ? '' : 'none';
                 }
             });
+
+            // If the currently-active sub-tab is hidden, activate the first visible one
+            const activeBtn = document.querySelector('.sub-tab.active');
+            if (activeBtn && activeBtn.style.display === 'none') {
+                const allSubTabs = document.querySelectorAll('.sub-tab');
+                for (const btn of allSubTabs) {
+                    if (btn.style.display !== 'none') {
+                        btn.click();
+                        break;
+                    }
+                }
+            }
         }
 
         function renderSalvage(inventory) {
@@ -5896,6 +5955,56 @@ Tip: Copy directly from EVE inventory window"></textarea>
             document.querySelectorAll('.research-tier-tab').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderResearchEquipment(EMBEDDED_DATA.inventory, tier);
+        }
+
+        // ============================================
+        // COMPRESSED ORES
+        // ============================================
+
+        let currentOreType = 'standard';
+
+        function filterCompressedCat(btn, type) {
+            document.querySelectorAll('.ore-cat-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentOreType = type;
+            renderCompressedOres(type);
+        }
+
+        function renderCompressedOres(type) {
+            const grid = document.getElementById('compressed-ores-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (typeof BUYBACK_DATA === 'undefined' || !BUYBACK_DATA.compressedOresData) return;
+            const catalog = BUYBACK_DATA.compressedOresData[type];
+            if (!catalog) return;
+            const showVariants = document.getElementById('showAllGrades') &&
+                                 document.getElementById('showAllGrades').checked;
+            const inventory = EMBEDDED_DATA.inventory;
+
+            // catalog is {tierName: [families]} for standard/moon, array [families] for ice
+            const tierGroups = Array.isArray(catalog) ? { '': catalog } : catalog;
+
+            Object.entries(tierGroups).forEach(([tierName, families]) => {
+                if (tierName) {
+                    const d = document.createElement('div');
+                    d.className = 'ice-group-divider';
+                    d.textContent = tierName;
+                    grid.appendChild(d);
+                }
+                families.forEach(family => {
+                    const fd = document.createElement('div');
+                    fd.className = 'ore-family-divider';
+                    fd.textContent = family.baseName;
+                    grid.appendChild(fd);
+
+                    const variantsToShow = showVariants ? family.variants : family.variants.slice(0, 1);
+                    variantsToShow.forEach(name => {
+                        const qty = inventory[name] || 0;
+                        const card = createItemCard(name, qty, getRates(name));
+                        grid.appendChild(card);
+                    });
+                });
+            });
         }
 
         function createItemCard(name, quantity, rates) {
