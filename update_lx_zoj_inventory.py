@@ -5,6 +5,7 @@ and updates index.html with current stock levels.
 """
 import requests
 import sqlite3
+import json
 import os
 import sys
 from datetime import datetime, timezone
@@ -26,11 +27,14 @@ HTML_BACKUP_PATH = os.path.join(PROJECT_DIR, 'index.backup.html')
 
 ESI_BASE_URL = 'https://esi.evetech.net/latest'
 
-# Your character ID
-CHARACTER_ID = 2114278577
+# Character and credentials
+CHARACTER_ID      = 97153110   # Hamektok Hakaari
+CREDENTIALS_FILE  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  'config', 'credentials_hamektok.json')
 
-# LX-ZOJ Structure ID
-LX_ZOJ_STRUCTURE_ID = 1027625808467
+# 4-HWWF Keepstar (WinterCo. Central Station) — new inventory location
+LX_ZOJ_STRUCTURE_ID   = 1035466617946   # the Keepstar
+STORE_CONTAINER_ID     = 1053458856856   # "Store Items" container inside it
 
 # FW Staging Structure ID — loaded from site_config at runtime (blank = disabled)
 FW_STRUCTURE_ID = None  # populated in main() from site_config
@@ -43,10 +47,22 @@ CONTAINER_TYPE_IDS = {3462, 3463, 3464, 3465, 3466, 11489, 17366, 33003, 33005, 
 # ============================================
 
 def get_authenticated_headers():
-    """Get headers with authentication token."""
+    """Get headers with authentication token for Hamektok Hakaari."""
     try:
-        token = get_token()
-        return {'Authorization': f'Bearer {token}'}
+        from base64 import b64encode
+        creds = json.load(open(CREDENTIALS_FILE))
+        auth  = b64encode(f'{creds["client_id"]}:{creds["client_secret"]}'.encode()).decode()
+        r = requests.post('https://login.eveonline.com/v2/oauth/token',
+            headers={'Authorization': f'Basic {auth}',
+                     'Content-Type': 'application/x-www-form-urlencoded'},
+            data={'grant_type': 'refresh_token',
+                  'refresh_token': creds['refresh_token']}, timeout=15)
+        if r.status_code != 200:
+            print(f"[ERROR] Token refresh failed: {r.status_code} {r.text}")
+            return None
+        token = r.json()['access_token']
+        return {'Authorization': f'Bearer {token}',
+                'User-Agent': 'EVE Market Tool / Hamektok Hakaari'}
     except Exception as e:
         print(f"[ERROR] Failed to get access token: {e}")
         return None
@@ -84,12 +100,12 @@ def get_character_assets(headers):
     return all_assets
 
 def filter_lx_zoj_items(assets):
-    """Filter assets to LX-ZOJ structure hangar, including contents of containers.
+    """Filter assets to the Store Items container at the 4-HWWF Keepstar,
+    including contents of any sub-containers within it.
 
     Each returned asset gets a '_container_item_id' key set to the item_id of
-    the top-level hangar container it lives in (or None if directly in the hangar).
+    the top-level container it lives in (STORE_CONTAINER_ID for direct children).
     """
-    # Build a fast lookup: location_id -> [assets at that location]
     by_location = {}
     for asset in assets:
         loc = asset.get('location_id')
@@ -97,14 +113,12 @@ def filter_lx_zoj_items(assets):
             by_location[loc] = []
         by_location[loc].append(asset)
 
-    # Start with items directly in the LX-ZOJ hangar.
-    # Seed queue as (item, top_container_id) — top-level items have None.
+    # Seed BFS from items directly inside the Store Items container.
+    # top_cid is always STORE_CONTAINER_ID for direct children (and inherited below).
     result = []
     visited_ids = set()
-    queue = [(a, None) for a in by_location.get(LX_ZOJ_STRUCTURE_ID, [])
-             if a.get('location_flag') == 'Hangar']
+    queue = [(a, STORE_CONTAINER_ID) for a in by_location.get(STORE_CONTAINER_ID, [])]
 
-    # BFS: walk into any containers found in the hangar
     while queue:
         batch, queue = queue, []
         for item, top_cid in batch:
@@ -112,18 +126,14 @@ def filter_lx_zoj_items(assets):
             if item_id in visited_ids:
                 continue
             visited_ids.add(item_id)
-            # Annotate with the inherited (or self-assigned) top-level container id
-            item = dict(item)  # copy so we don't mutate the original ESI data
+            item = dict(item)
             item['_container_item_id'] = top_cid
             result.append(item)
-            # If this item is itself a container, its children inherit item_id as top_cid
-            child_top = item_id if top_cid is None else top_cid
+            # Walk into any sub-containers
             for child in by_location.get(item_id, []):
-                queue.append((child, child_top))
+                queue.append((child, top_cid))
 
-    direct = sum(1 for a in result if a.get('location_id') == LX_ZOJ_STRUCTURE_ID)
-    in_containers = len(result) - direct
-    print(f"[OK] LX-ZOJ hangar: {direct} direct, {in_containers} in containers ({len(result)} total)")
+    print(f"[OK] Store Items container: {len(result)} items found")
     return result
 
 
@@ -605,8 +615,7 @@ def update_known_containers(conn, all_assets, esi_names, snapshot_time):
 
     hangar_containers = [
         a for a in all_assets
-        if (a.get('location_id') == LX_ZOJ_STRUCTURE_ID
-            and a.get('location_flag') == 'Hangar'
+        if (a.get('location_id') == STORE_CONTAINER_ID
             and (a['item_id'] in items_with_children
                  or a.get('type_id') in CONTAINER_TYPE_IDS))
     ]
@@ -714,8 +723,9 @@ def main():
     # Switch to main branch FIRST (before modifying any files)
     original_branch = ensure_main_branch()
 
-    print(f"\nCharacter ID: {CHARACTER_ID}")
-    print(f"Structure: LX-ZOJ ({LX_ZOJ_STRUCTURE_ID})")
+    print(f"\nCharacter ID: {CHARACTER_ID} (Hamektok Hakaari)")
+    print(f"Structure: 4-HWWF Keepstar ({LX_ZOJ_STRUCTURE_ID})")
+    print(f"Container: Store Items ({STORE_CONTAINER_ID})")
 
     # Get authentication
     headers = get_authenticated_headers()
@@ -766,8 +776,7 @@ def main():
         }
         container_ids = {
             a['item_id'] for a in all_assets
-            if (a.get('location_id') == LX_ZOJ_STRUCTURE_ID
-                and a.get('location_flag') == 'Hangar'
+            if (a.get('location_id') == STORE_CONTAINER_ID
                 and (a['item_id'] in items_with_children_set
                      or a.get('type_id') in CONTAINER_TYPE_IDS))
         }

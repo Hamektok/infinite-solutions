@@ -55,7 +55,8 @@ CONFIG_TO_DB_CATEGORY = {
 }
 
 # Market tab visibility keys
-MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials', 'research_equipment', 'pi_materials', 'salvaged_materials']
+MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials',
+                   'research_equipment', 'pi_materials', 'salvaged_materials', 'compressed_ores']
 
 # Market subcategory definitions: (tab_key, sub_key, display_name)
 MARKET_SUBTAB_DEFS = [
@@ -75,7 +76,28 @@ MARKET_SUBTAB_DEFS = [
     ('pi_materials',        'p2',                    'P2'),
     ('pi_materials',        'p3',                    'P3'),
     ('pi_materials',        'p4',                    'P4'),
+    ('compressed_ores',     'standard_ores',         'Standard Ores'),
+    ('compressed_ores',     'moon_ores',             'Moon Ores'),
+    ('compressed_ores',     'ice_ores',              'Ice Ores'),
 ]
+
+# Compressed ore tier groupings (base name without "Compressed " prefix)
+STANDARD_ORE_TIERS = {
+    'High-Sec Ores': ['Veldspar', 'Scordite', 'Pyroxeres', 'Plagioclase', 'Omber',
+                      'Kernite', 'Jaspet', 'Hemorphite', 'Hedbergite'],
+    'Low-Sec Ores':  ['Gneiss', 'Dark Ochre', 'Spodumain'],
+    'Null-Sec Ores': ['Crokite', 'Bistot', 'Arkonor', 'Mercoxit'],
+    'Special Ores':  ['Ducinium', 'Eifyrium', 'Griemeer', 'Hezorime', 'Kylixium',
+                      'Mordunium', 'Nocxite', 'Ueganite', 'Ytirium'],
+}
+
+MOON_ORE_TIERS = {
+    'R4 \u2014 Ubiquitous':   ['Bitumens', 'Coesite', 'Sylvite', 'Zeolites'],
+    'R8 \u2014 Common':       ['Cobaltite', 'Euxenite', 'Scheelite', 'Titanite'],
+    'R16 \u2014 Uncommon':    ['Chromite', 'Otavite', 'Sperrylite', 'Vanadinite'],
+    'R32 \u2014 Rare':        ['Carnotite', 'Cinnabar', 'Pollucite', 'Zircon'],
+    'R64 \u2014 Exceptional': ['Loparite', 'Monazite', 'Xenotime', 'Ytterbite'],
+}
 
 
 def load_sde_ore_data(ore_type_ids):
@@ -141,6 +163,60 @@ def compute_ore_mineral_values(ore_type_ids, avg_prices, efficiency_pct):
         ore_values[type_id] = round(total_value / portion, 4) if portion > 0 else 0
 
     return ore_values
+
+
+def build_compressed_ore_catalog(conn):
+    """
+    Build the compressedOresData structure for buyback_data.js.
+    Returns a dict with keys: 'standard', 'moon', 'ice'.
+    Each entry groups ore families by tier, with variant name lists.
+    """
+    rows = conn.execute("""
+        SELECT type_name, category, display_order
+        FROM tracked_market_items
+        WHERE type_name LIKE 'Compressed%'
+          AND category IN ('standard_ore', 'ice_ore', 'moon_ore')
+        ORDER BY category, display_order
+    """).fetchall()
+
+    # Index by category → {base_name: [variant_name, ...]}  (ordered)
+    by_cat = {'standard_ore': {}, 'moon_ore': {}, 'ice_ore': {}}
+    for name, cat, _ in rows:
+        # Strip prefix and grade suffix to get base name
+        base = name.replace('Compressed ', '', 1)
+        base = base.replace(' II-Grade', '').replace(' III-Grade', '').replace(' IV-Grade', '')
+        by_cat[cat].setdefault(base, []).append(name)
+
+    def make_tier_groups(tier_map, cat_key):
+        result = {}
+        for tier_name, base_names in tier_map.items():
+            families = []
+            for base in base_names:
+                variants = by_cat[cat_key].get(base)
+                if variants:
+                    families.append({'baseName': base, 'variants': variants})
+            if families:
+                result[tier_name] = families
+        return result
+
+    standard = make_tier_groups(STANDARD_ORE_TIERS, 'standard_ore')
+
+    moon = make_tier_groups(MOON_ORE_TIERS, 'moon_ore')
+
+    # Ice: flat list sorted by display_order (already sorted above)
+    ice = []
+    seen_ice = set()
+    for name, cat, _ in rows:
+        if cat != 'ice_ore':
+            continue
+        base = name.replace('Compressed ', '', 1).replace(' IV-Grade', '')
+        if base not in seen_ice:
+            seen_ice.add(base)
+            variants = by_cat['ice_ore'].get(base, [])
+            if variants:
+                ice.append({'baseName': base, 'variants': variants})
+
+    return {'standard': standard, 'moon': moon, 'ice': ice}
 
 
 def get_buyback_data():
@@ -247,6 +323,9 @@ def get_buyback_data():
     except Exception:
         consignor_by_type = {}
 
+    # Build compressed ore catalog before closing connection
+    compressed_ores_data = build_compressed_ore_catalog(conn)
+
     conn.close()
 
     # Identify all ore type_ids that need mineral-value calculation
@@ -349,6 +428,7 @@ def get_buyback_data():
         'items': buyback_items,
         'categories': categories,
         'marketVisibility': market_visibility,
+        'compressedOresData': compressed_ores_data,
         'refiningEfficiency': refining_efficiency,
         'generated': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
     }
