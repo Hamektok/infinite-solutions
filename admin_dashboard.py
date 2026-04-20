@@ -9335,46 +9335,47 @@ class AdminDashboard:
 
         _th.Thread(target=run, daemon=True).start()
 
+    def _gw_get_token(self):
+        """Refresh and return (access_token, scopes, char_id) using credentials_gank_contact.json."""
+        import json as _json, base64 as _b64, requests as _req, os as _os
+        cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
+        with open(cred_path) as f:
+            creds = _json.load(f)
+        r = _req.post('https://login.eveonline.com/v2/oauth/token',
+                      data={'grant_type': 'refresh_token',
+                            'refresh_token': creds['refresh_token']},
+                      auth=(creds['client_id'], creds['client_secret']),
+                      headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                      timeout=15)
+        r.raise_for_status()
+        token = r.json()['access_token']
+        parts  = token.split('.')
+        padded = parts[1] + '=' * (-len(parts[1]) % 4)
+        payload = _json.loads(_b64.urlsafe_b64decode(padded))
+        scopes  = payload.get('scp', [])
+        if isinstance(scopes, str):
+            scopes = scopes.split()
+        return token, scopes, creds.get('character_id', 2112673557)
+
     def _gw_push_contacts(self):
-        """Push all watchlist entries to Hamektok's contacts at −10 standing."""
+        """Push all watchlist entries to Gromalok's contacts at −10 standing."""
         import threading as _th
 
         self._gw_push_status.set('Checking auth…')
 
         def run():
             try:
-                import sys as _sys, os as _os, json as _json, base64 as _b64
                 import requests as _req
 
-                cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
-                scripts_dir = _os.path.join(PROJECT_DIR, 'scripts')
-                if scripts_dir not in _sys.path:
-                    _sys.path.insert(0, scripts_dir)
+                token, scopes, char_id = self._gw_get_token()
 
-                from token_manager import TokenManager
-                tm    = TokenManager(cred_path)
-                token = tm.get_access_token()
-
-                # Decode JWT to check scopes
-                parts = token.split('.')
-                if len(parts) >= 2:
-                    padded = parts[1] + '=' * (-len(parts[1]) % 4)
-                    payload = _json.loads(_b64.urlsafe_b64decode(padded))
-                    scopes  = payload.get('scp', [])
-                    if isinstance(scopes, str):
-                        scopes = scopes.split()
-                    if 'esi-characters.write_contacts.v1' not in scopes:
-                        self.root.after(0, lambda: self._gw_scope_warn.set(
-                            'Scope missing: esi-characters.write_contacts.v1\n'
-                            'Click Re-authorize to add it.'))
-                        self.root.after(0, lambda: self._gw_push_status.set(''))
-                        return
-                    else:
-                        self.root.after(0, lambda: self._gw_scope_warn.set(''))
-
-                with open(cred_path) as f:
-                    creds = _json.load(f)
-                char_id = creds.get('character_id', 2112673557)
+                if 'esi-characters.write_contacts.v1' not in scopes:
+                    self.root.after(0, lambda: self._gw_scope_warn.set(
+                        'Scope missing: esi-characters.write_contacts.v1\n'
+                        'Click Re-authorize to add it.'))
+                    self.root.after(0, lambda: self._gw_push_status.set(''))
+                    return
+                self.root.after(0, lambda: self._gw_scope_warn.set(''))
 
                 # Load watchlist
                 conn  = sqlite3.connect(DB_PATH)
@@ -9431,36 +9432,17 @@ class AdminDashboard:
 
         def run():
             try:
-                import sys as _sys, os as _os, json as _json, base64 as _b64
                 import requests as _req
 
-                cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
-                scripts_dir = _os.path.join(PROJECT_DIR, 'scripts')
-                if scripts_dir not in _sys.path:
-                    _sys.path.insert(0, scripts_dir)
+                token, scopes, char_id = self._gw_get_token()
 
-                from token_manager import TokenManager
-                tm    = TokenManager(cred_path)
-                token = tm.get_access_token()
-
-                # Check read_contacts scope
-                parts = token.split('.')
-                if len(parts) >= 2:
-                    padded  = parts[1] + '=' * (-len(parts[1]) % 4)
-                    payload = _json.loads(_b64.urlsafe_b64decode(padded))
-                    scopes  = payload.get('scp', [])
-                    if isinstance(scopes, str):
-                        scopes = scopes.split()
-                    if 'esi-characters.read_contacts.v1' not in scopes:
-                        self.root.after(0, lambda: self._gw_scope_warn.set(
-                            'Scope missing: esi-characters.read_contacts.v1\n'
-                            'Click Re-authorize to add it.'))
-                        self.root.after(0, lambda: self._gw_progress.set(''))
-                        return
-
-                with open(cred_path) as f:
-                    creds = _json.load(f)
-                char_id = creds.get('character_id', 2112673557)
+                if 'esi-characters.read_contacts.v1' not in scopes:
+                    self.root.after(0, lambda: self._gw_scope_warn.set(
+                        'Scope missing: esi-characters.read_contacts.v1\n'
+                        'Click Re-authorize to add it.'))
+                    self.root.after(0, lambda: self._gw_progress.set(''))
+                    return
+                self.root.after(0, lambda: self._gw_scope_warn.set(''))
 
                 headers = {'Authorization': f'Bearer {token}'}
                 base_url = f'https://esi.evetech.net/latest/characters/{char_id}/contacts/'

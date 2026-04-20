@@ -25,6 +25,7 @@ CLIENT_SECRET = creds['client_secret']
 REDIRECT_URI  = 'http://localhost:5000/auth/callback'
 SCOPES        = (
     'esi-characters.write_contacts.v1 '
+    'esi-characters.read_contacts.v1 '
     'esi-wallet.read_character_wallet.v1 '
     'esi-characters.read_standings.v1'
 )
