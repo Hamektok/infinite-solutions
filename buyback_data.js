@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-04-21 20:30 UTC
+// Generated: 2026-04-21 20:38 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -9966,7 +9966,7 @@ const BUYBACK_DATA = {
       "subs": {}
     },
     "compressed_ores": {
-      "visible": false,
+      "visible": true,
       "subs": {
         "standard_ores": {
           "visible": true,
@@ -12028,5 +12028,5 @@ const BUYBACK_DATA = {
     }
   ],
   "refiningEfficiency": 90.63,
-  "generated": "2026-04-21 20:30 UTC"
+  "generated": "2026-04-21 20:38 UTC"
 };
