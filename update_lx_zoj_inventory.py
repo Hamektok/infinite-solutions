@@ -34,7 +34,7 @@ CREDENTIALS_FILE  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 # 4-HWWF Keepstar (WinterCo. Central Station) — new inventory location
 LX_ZOJ_STRUCTURE_ID   = 1035466617946   # the Keepstar
-STORE_CONTAINER_ID     = 1053458856856   # "Store Items" container inside it
+STORE_CONTAINER_ID     = 1053458856856   # "Store Items" container (Hamektok Hakaari)
 
 # FW Staging Structure ID — loaded from site_config at runtime (blank = disabled)
 FW_STRUCTURE_ID = None  # populated in main() from site_config

@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-04-21 18:11 UTC
+// Generated: 2026-04-21 20:30 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -9966,7 +9966,7 @@ const BUYBACK_DATA = {
       "subs": {}
     },
     "compressed_ores": {
-      "visible": true,
+      "visible": false,
       "subs": {
         "standard_ores": {
           "visible": true,
@@ -9981,6 +9981,10 @@ const BUYBACK_DATA = {
           "displayName": "Ice Ores"
         }
       }
+    },
+    "mineral_calculator": {
+      "visible": true,
+      "subs": {}
     }
   },
   "compressedOresData": {
@@ -10405,6 +10409,1624 @@ const BUYBACK_DATA = {
       }
     ]
   },
+  "oreRefineData": [
+    {
+      "name": "Compressed Blue Ice",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 62.5347,
+        "16273": 31.7205,
+        "16275": 0.9063,
+        "17887": 375.2082
+      }
+    },
+    {
+      "name": "Compressed Blue Ice IV-Grade",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 94.2552,
+        "16273": 49.8465,
+        "16275": 0.9063,
+        "17887": 437.7429
+      }
+    },
+    {
+      "name": "Compressed Clear Icicle",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 62.5347,
+        "16273": 31.7205,
+        "16274": 375.2082,
+        "16275": 0.9063
+      }
+    },
+    {
+      "name": "Compressed Clear Icicle IV-Grade",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 94.2552,
+        "16273": 49.8465,
+        "16274": 437.7429,
+        "16275": 0.9063
+      }
+    },
+    {
+      "name": "Compressed Dark Glitter",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 626.2533,
+        "16273": 1251.6003,
+        "16275": 62.5347
+      }
+    },
+    {
+      "name": "Compressed Gelidus",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 312.6735,
+        "16273": 626.2533,
+        "16275": 94.2552
+      }
+    },
+    {
+      "name": "Compressed Glacial Mass",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 62.5347,
+        "16273": 31.7205,
+        "16275": 0.9063,
+        "17889": 375.2082
+      }
+    },
+    {
+      "name": "Compressed Glacial Mass IV-Grade",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 94.2552,
+        "16273": 49.8465,
+        "16275": 0.9063,
+        "17889": 437.7429
+      }
+    },
+    {
+      "name": "Compressed Glare Crust",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 1251.6003,
+        "16273": 626.2533,
+        "16275": 31.7205
+      }
+    },
+    {
+      "name": "Compressed Krystallos",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 156.7899,
+        "16273": 626.2533,
+        "16275": 156.7899
+      }
+    },
+    {
+      "name": "Compressed White Glaze",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 62.5347,
+        "16273": 31.7205,
+        "16275": 0.9063,
+        "17888": 375.2082
+      }
+    },
+    {
+      "name": "Compressed White Glaze IV-Grade",
+      "category": "ice_ore",
+      "portionSize": 1,
+      "minerals": {
+        "16272": 94.2552,
+        "16273": 49.8465,
+        "16275": 0.9063,
+        "17888": 437.7429
+      }
+    },
+    {
+      "name": "Compressed Bitumens",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 54.378,
+        "36": 3.6252,
+        "16633": 0.589095
+      }
+    },
+    {
+      "name": "Compressed Coesite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 18.126,
+        "36": 3.6252,
+        "16636": 0.589095
+      }
+    },
+    {
+      "name": "Compressed Brimful Bitumens",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 62.5347,
+        "36": 4.16898,
+        "16633": 0.679725
+      }
+    },
+    {
+      "name": "Compressed Brimful Coesite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 20.8449,
+        "36": 4.16898,
+        "16636": 0.679725
+      }
+    },
+    {
+      "name": "Compressed Brimful Sylvite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 41.6898,
+        "36": 4.16898,
+        "16635": 0.679725
+      }
+    },
+    {
+      "name": "Compressed Brimful Zeolites",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 83.3796,
+        "36": 4.16898,
+        "16634": 0.679725
+      }
+    },
+    {
+      "name": "Compressed Glistening Bitumens",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 108.756,
+        "36": 7.2504,
+        "16633": 1.17819
+      }
+    },
+    {
+      "name": "Compressed Glistening Coesite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 36.252,
+        "36": 7.2504,
+        "16636": 1.17819
+      }
+    },
+    {
+      "name": "Compressed Glistening Sylvite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 72.504,
+        "36": 7.2504,
+        "16635": 1.17819
+      }
+    },
+    {
+      "name": "Compressed Glistening Zeolites",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 145.008,
+        "36": 7.2504,
+        "16634": 1.17819
+      }
+    },
+    {
+      "name": "Compressed Sylvite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 36.252,
+        "36": 3.6252,
+        "16635": 0.589095
+      }
+    },
+    {
+      "name": "Compressed Zeolites",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 72.504,
+        "36": 3.6252,
+        "16634": 0.589095
+      }
+    },
+    {
+      "name": "Compressed Cobaltite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16640": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Euxenite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16639": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Scheelite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16637": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Titanite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16638": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Copious Cobaltite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16640": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Copious Euxenite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16639": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Copious Scheelite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16637": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Copious Titanite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16638": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Twinkling Cobaltite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16640": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Twinkling Euxenite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16639": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Twinkling Scheelite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16637": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Twinkling Titanite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16638": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Chromite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.09063,
+        "16641": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Otavite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.09063,
+        "16643": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Sperrylite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.09063,
+        "16644": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Vanadinite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.09063,
+        "16642": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Lavish Chromite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.108756,
+        "16641": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Lavish Otavite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.108756,
+        "16643": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Lavish Sperrylite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.108756,
+        "16644": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Lavish Vanadinite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.108756,
+        "16642": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Shimmering Chromite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.18126,
+        "16641": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Shimmering Otavite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.18126,
+        "16643": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Shimmering Sperrylite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.18126,
+        "16644": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Shimmering Vanadinite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.18126,
+        "16642": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Carnotite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.135945,
+        "16640": 0.09063,
+        "16649": 0.45315
+      }
+    },
+    {
+      "name": "Compressed Zircon",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.135945,
+        "16638": 0.09063,
+        "16648": 0.45315
+      }
+    },
+    {
+      "name": "Compressed Pollucite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.135945,
+        "16639": 0.09063,
+        "16647": 0.45315
+      }
+    },
+    {
+      "name": "Compressed Cinnabar",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.135945,
+        "16637": 0.09063,
+        "16646": 0.45315
+      }
+    },
+    {
+      "name": "Compressed Replete Carnotite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.154071,
+        "16640": 0.108756,
+        "16649": 0.525654
+      }
+    },
+    {
+      "name": "Compressed Replete Zircon",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.154071,
+        "16638": 0.108756,
+        "16648": 0.525654
+      }
+    },
+    {
+      "name": "Compressed Replete Pollucite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.154071,
+        "16639": 0.108756,
+        "16647": 0.525654
+      }
+    },
+    {
+      "name": "Compressed Replete Cinnabar",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.154071,
+        "16637": 0.108756,
+        "16646": 0.525654
+      }
+    },
+    {
+      "name": "Compressed Glowing Carnotite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.27189,
+        "16640": 0.18126,
+        "16649": 0.9063
+      }
+    },
+    {
+      "name": "Compressed Glowing Zircon",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.27189,
+        "16638": 0.18126,
+        "16648": 0.9063
+      }
+    },
+    {
+      "name": "Compressed Glowing Pollucite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.27189,
+        "16639": 0.18126,
+        "16647": 0.9063
+      }
+    },
+    {
+      "name": "Compressed Glowing Cinnabar",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.27189,
+        "16637": 0.18126,
+        "16646": 0.9063
+      }
+    },
+    {
+      "name": "Compressed Loparite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.18126,
+        "16639": 0.18126,
+        "16644": 0.09063,
+        "16652": 0.199386
+      }
+    },
+    {
+      "name": "Compressed Xenotime",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.18126,
+        "16640": 0.18126,
+        "16642": 0.09063,
+        "16650": 0.199386
+      }
+    },
+    {
+      "name": "Compressed Monazite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.18126,
+        "16637": 0.18126,
+        "16641": 0.09063,
+        "16651": 0.199386
+      }
+    },
+    {
+      "name": "Compressed Ytterbite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.18126,
+        "16638": 0.18126,
+        "16643": 0.09063,
+        "16653": 0.199386
+      }
+    },
+    {
+      "name": "Compressed Bountiful Loparite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.208449,
+        "16639": 0.208449,
+        "16644": 0.108756,
+        "16652": 0.226575
+      }
+    },
+    {
+      "name": "Compressed Bountiful Xenotime",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.208449,
+        "16640": 0.208449,
+        "16642": 0.108756,
+        "16650": 0.226575
+      }
+    },
+    {
+      "name": "Compressed Bountiful Monazite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.208449,
+        "16637": 0.208449,
+        "16641": 0.108756,
+        "16651": 0.226575
+      }
+    },
+    {
+      "name": "Compressed Bountiful Ytterbite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.208449,
+        "16638": 0.208449,
+        "16643": 0.108756,
+        "16653": 0.226575
+      }
+    },
+    {
+      "name": "Compressed Shining Loparite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16633": 0.36252,
+        "16639": 0.36252,
+        "16644": 0.18126,
+        "16652": 0.398772
+      }
+    },
+    {
+      "name": "Compressed Shining Xenotime",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16634": 0.36252,
+        "16640": 0.36252,
+        "16642": 0.18126,
+        "16650": 0.398772
+      }
+    },
+    {
+      "name": "Compressed Shining Monazite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16635": 0.36252,
+        "16637": 0.36252,
+        "16641": 0.18126,
+        "16651": 0.398772
+      }
+    },
+    {
+      "name": "Compressed Shining Ytterbite",
+      "category": "moon_ore",
+      "portionSize": 100,
+      "minerals": {
+        "16636": 0.36252,
+        "16638": 0.36252,
+        "16643": 0.18126,
+        "16653": 0.398772
+      }
+    },
+    {
+      "name": "Compressed Veldspar",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 3.6252
+      }
+    },
+    {
+      "name": "Compressed Veldspar II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 3.80646
+      }
+    },
+    {
+      "name": "Compressed Veldspar III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 3.98772
+      }
+    },
+    {
+      "name": "Compressed Veldspar IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 4.16898
+      }
+    },
+    {
+      "name": "Compressed Scordite",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.35945,
+        "35": 0.99693
+      }
+    },
+    {
+      "name": "Compressed Scordite II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.431954,
+        "35": 1.033182
+      }
+    },
+    {
+      "name": "Compressed Scordite III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.495395,
+        "35": 1.078497
+      }
+    },
+    {
+      "name": "Compressed Scordite IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.567899,
+        "35": 1.132875
+      }
+    },
+    {
+      "name": "Compressed Pyroxeres",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.81567,
+        "36": 0.27189
+      }
+    },
+    {
+      "name": "Compressed Pyroxeres II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.860985,
+        "36": 0.290016
+      }
+    },
+    {
+      "name": "Compressed Pyroxeres III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.897237,
+        "36": 0.299079
+      }
+    },
+    {
+      "name": "Compressed Pyroxeres IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.942552,
+        "36": 0.317205
+      }
+    },
+    {
+      "name": "Compressed Plagioclase",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.586025,
+        "36": 0.63441
+      }
+    },
+    {
+      "name": "Compressed Plagioclase II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.667592,
+        "36": 0.670662
+      }
+    },
+    {
+      "name": "Compressed Plagioclase III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.749159,
+        "36": 0.697851
+      }
+    },
+    {
+      "name": "Compressed Plagioclase IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 1.821663,
+        "36": 0.734103
+      }
+    },
+    {
+      "name": "Compressed Omber",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.81567,
+        "37": 0.679725
+      }
+    },
+    {
+      "name": "Compressed Omber II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.860985,
+        "37": 0.715977
+      }
+    },
+    {
+      "name": "Compressed Omber III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.897237,
+        "37": 0.752229
+      }
+    },
+    {
+      "name": "Compressed Omber IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.942552,
+        "37": 0.779418
+      }
+    },
+    {
+      "name": "Compressed Kernite",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 0.54378,
+        "37": 1.08756
+      }
+    },
+    {
+      "name": "Compressed Kernite II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 0.570969,
+        "37": 1.141938
+      }
+    },
+    {
+      "name": "Compressed Kernite III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 0.598158,
+        "37": 1.196316
+      }
+    },
+    {
+      "name": "Compressed Kernite IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 0.625347,
+        "37": 1.250694
+      }
+    },
+    {
+      "name": "Compressed Jaspet",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 1.35945,
+        "38": 0.45315
+      }
+    },
+    {
+      "name": "Compressed Jaspet II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 1.431954,
+        "38": 0.480339
+      }
+    },
+    {
+      "name": "Compressed Jaspet III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 1.495395,
+        "38": 0.498465
+      }
+    },
+    {
+      "name": "Compressed Jaspet IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 1.567899,
+        "38": 0.525654
+      }
+    },
+    {
+      "name": "Compressed Hemorphite",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.17512,
+        "38": 0.81567
+      }
+    },
+    {
+      "name": "Compressed Hemorphite II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.283876,
+        "38": 0.860985
+      }
+    },
+    {
+      "name": "Compressed Hemorphite III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.392632,
+        "38": 0.897237
+      }
+    },
+    {
+      "name": "Compressed Hemorphite IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.501388,
+        "38": 0.942552
+      }
+    },
+    {
+      "name": "Compressed Hedbergite",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 4.07835,
+        "38": 1.08756
+      }
+    },
+    {
+      "name": "Compressed Hedbergite II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 4.286799,
+        "38": 1.141938
+      }
+    },
+    {
+      "name": "Compressed Hedbergite III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 4.486185,
+        "38": 1.196316
+      }
+    },
+    {
+      "name": "Compressed Hedbergite IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 4.694634,
+        "38": 1.250694
+      }
+    },
+    {
+      "name": "Compressed Gneiss",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 18.126,
+        "36": 13.5945,
+        "37": 7.2504
+      }
+    },
+    {
+      "name": "Compressed Gneiss II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 19.0323,
+        "36": 14.274225,
+        "37": 7.61292
+      }
+    },
+    {
+      "name": "Compressed Gneiss III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 19.9386,
+        "36": 14.95395,
+        "37": 7.97544
+      }
+    },
+    {
+      "name": "Compressed Gneiss IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 20.8449,
+        "36": 15.633675,
+        "37": 8.33796
+      }
+    },
+    {
+      "name": "Compressed Dark Ochre",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 12.32568,
+        "37": 10.8756,
+        "38": 2.90016
+      }
+    },
+    {
+      "name": "Compressed Dark Ochre II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 12.941964,
+        "37": 11.41938,
+        "38": 3.045168
+      }
+    },
+    {
+      "name": "Compressed Dark Ochre III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 13.558248,
+        "37": 11.96316,
+        "38": 3.190176
+      }
+    },
+    {
+      "name": "Compressed Dark Ochre IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "36": 14.174532,
+        "37": 12.50694,
+        "38": 3.335184
+      }
+    },
+    {
+      "name": "Compressed Crokite",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 7.2504,
+        "36": 18.126,
+        "38": 7.2504
+      }
+    },
+    {
+      "name": "Compressed Crokite II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 7.61292,
+        "36": 19.0323,
+        "38": 7.61292
+      }
+    },
+    {
+      "name": "Compressed Crokite III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 7.97544,
+        "36": 19.9386,
+        "38": 7.97544
+      }
+    },
+    {
+      "name": "Compressed Crokite IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 8.33796,
+        "36": 20.8449,
+        "38": 8.33796
+      }
+    },
+    {
+      "name": "Compressed Bistot",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 29.0016,
+        "36": 10.8756,
+        "39": 1.45008
+      }
+    },
+    {
+      "name": "Compressed Bistot II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 30.45168,
+        "36": 11.41938,
+        "39": 1.522584
+      }
+    },
+    {
+      "name": "Compressed Bistot III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 31.90176,
+        "36": 11.96316,
+        "39": 1.595088
+      }
+    },
+    {
+      "name": "Compressed Bistot IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 33.35184,
+        "36": 12.50694,
+        "39": 1.667592
+      }
+    },
+    {
+      "name": "Compressed Arkonor",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 29.0016,
+        "36": 10.8756,
+        "40": 1.08756
+      }
+    },
+    {
+      "name": "Compressed Arkonor II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 30.45168,
+        "36": 11.41938,
+        "40": 1.141938
+      }
+    },
+    {
+      "name": "Compressed Arkonor III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 31.90176,
+        "36": 11.96316,
+        "40": 1.196316
+      }
+    },
+    {
+      "name": "Compressed Arkonor IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 33.35184,
+        "36": 12.50694,
+        "40": 1.250694
+      }
+    },
+    {
+      "name": "Compressed Spodumain",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 435.024,
+        "37": 9.063,
+        "38": 1.45008,
+        "39": 0.72504,
+        "40": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Spodumain II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 456.7752,
+        "37": 9.51615,
+        "38": 1.522584,
+        "39": 0.761292,
+        "40": 0.380646
+      }
+    },
+    {
+      "name": "Compressed Spodumain III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 478.5264,
+        "37": 9.9693,
+        "38": 1.595088,
+        "39": 0.797544,
+        "40": 0.398772
+      }
+    },
+    {
+      "name": "Compressed Spodumain IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 500.2776,
+        "37": 10.42245,
+        "38": 1.667592,
+        "39": 0.833796,
+        "40": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Mercoxit",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "11399": 1.26882
+      }
+    },
+    {
+      "name": "Compressed Mercoxit II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "11399": 1.332261
+      }
+    },
+    {
+      "name": "Compressed Mercoxit III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "11399": 1.395702
+      }
+    },
+    {
+      "name": "Compressed Kylixium",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 2.7189,
+        "35": 1.8126,
+        "36": 4.98465
+      }
+    },
+    {
+      "name": "Compressed Kylixium II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 2.854845,
+        "35": 1.90323,
+        "36": 5.238414
+      }
+    },
+    {
+      "name": "Compressed Kylixium III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 2.99079,
+        "35": 1.99386,
+        "36": 5.483115
+      }
+    },
+    {
+      "name": "Compressed Kylixium IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 3.126735,
+        "35": 2.08449,
+        "36": 5.736879
+      }
+    },
+    {
+      "name": "Compressed Nocxite",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 8.1567,
+        "35": 1.35945,
+        "38": 0.951615
+      }
+    },
+    {
+      "name": "Compressed Nocxite II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 8.564535,
+        "35": 1.431954,
+        "38": 1.005993
+      }
+    },
+    {
+      "name": "Compressed Nocxite III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 8.97237,
+        "35": 1.495395,
+        "38": 1.051308
+      }
+    },
+    {
+      "name": "Compressed Nocxite IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 9.380205,
+        "35": 1.567899,
+        "38": 1.096623
+      }
+    },
+    {
+      "name": "Compressed Ueganite",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 7.2504,
+        "40": 0.36252
+      }
+    },
+    {
+      "name": "Compressed Ueganite II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 7.61292,
+        "40": 0.380646
+      }
+    },
+    {
+      "name": "Compressed Ueganite III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 7.97544,
+        "40": 0.398772
+      }
+    },
+    {
+      "name": "Compressed Ueganite IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 8.33796,
+        "40": 0.416898
+      }
+    },
+    {
+      "name": "Compressed Hezorime",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 18.126,
+        "37": 1.08756,
+        "39": 0.54378
+      }
+    },
+    {
+      "name": "Compressed Hezorime II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 19.0323,
+        "37": 1.141938,
+        "39": 0.570969
+      }
+    },
+    {
+      "name": "Compressed Hezorime III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 19.9386,
+        "37": 1.196316,
+        "39": 0.598158
+      }
+    },
+    {
+      "name": "Compressed Hezorime IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 20.8449,
+        "37": 1.250694,
+        "39": 0.625347
+      }
+    },
+    {
+      "name": "Compressed Griemeer",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 2.26575,
+        "37": 0.72504
+      }
+    },
+    {
+      "name": "Compressed Griemeer II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 2.383569,
+        "37": 0.761292
+      }
+    },
+    {
+      "name": "Compressed Griemeer III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 2.492325,
+        "37": 0.797544
+      }
+    },
+    {
+      "name": "Compressed Griemeer IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "34": 2.610144,
+        "37": 0.833796
+      }
+    },
+    {
+      "name": "Compressed Mordunium",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.879111
+      }
+    },
+    {
+      "name": "Compressed Mordunium II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.915363
+      }
+    },
+    {
+      "name": "Compressed Mordunium III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 0.969741
+      }
+    },
+    {
+      "name": "Compressed Mordunium IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "35": 1.015056
+      }
+    },
+    {
+      "name": "Compressed Ytirium",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.17512
+      }
+    },
+    {
+      "name": "Compressed Ytirium II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.283876
+      }
+    },
+    {
+      "name": "Compressed Ytirium III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.392632
+      }
+    },
+    {
+      "name": "Compressed Ytirium IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "37": 2.501388
+      }
+    },
+    {
+      "name": "Compressed Eifyrium",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "39": 2.410758
+      }
+    },
+    {
+      "name": "Compressed Eifyrium II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "39": 2.528577
+      }
+    },
+    {
+      "name": "Compressed Eifyrium III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "39": 2.655459
+      }
+    },
+    {
+      "name": "Compressed Eifyrium IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "39": 2.773278
+      }
+    },
+    {
+      "name": "Compressed Ducinium",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "40": 1.54071
+      }
+    },
+    {
+      "name": "Compressed Ducinium II-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "40": 1.622277
+      }
+    },
+    {
+      "name": "Compressed Ducinium III-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "40": 1.694781
+      }
+    },
+    {
+      "name": "Compressed Ducinium IV-Grade",
+      "category": "standard_ore",
+      "portionSize": 100,
+      "minerals": {
+        "40": 1.776348
+      }
+    }
+  ],
   "refiningEfficiency": 90.63,
-  "generated": "2026-04-21 18:11 UTC"
+  "generated": "2026-04-21 20:30 UTC"
 };

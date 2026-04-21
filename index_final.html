@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202604211811"></script>
+    <script src="buyback_data.js?v=202604212030"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -526,6 +526,114 @@
         }
 
         .ore-grade-toggle input { cursor: pointer; }
+
+        /* ── Mineral Calculator ──────────────────────────────────────────── */
+        .mineral-group-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: .6em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #00d9ff;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(0,217,255,.15);
+        }
+        .mineral-input-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px 10px;
+        }
+        .mineral-tier-divider {
+            grid-column: 1 / -1;
+            font-family: 'Orbitron', sans-serif;
+            font-size: .55em;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #4a8aa0;
+            padding: 5px 0 2px;
+            border-top: 1px solid rgba(0,217,255,.15);
+            margin-top: 2px;
+        }
+        .mineral-tier-divider:first-child { border-top: none; margin-top: 0; }
+        .mineral-input-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 7px;
+        }
+        .mineral-label-block {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .mineral-label-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: .92em;
+            font-weight: 700;
+            color: #88d0e8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mineral-label-sub {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: .75em;
+            font-weight: 600;
+            color: #4a8aa0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mineral-label-sub .mineral-qty-val {
+            color: #6fb3d0;
+        }
+        .mineral-label-sub .mineral-pct-val {
+            color: #00d9ff;
+        }
+        .mineral-input-row input {
+            background: rgba(0,20,40,.55);
+            border: 1px solid rgba(0,217,255,.25);
+            border-radius: 4px;
+            color: #a0c8e0;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: .93em;
+            font-weight: 600;
+            padding: 4px 6px;
+            width: 70px;
+            min-width: 70px;
+            flex-shrink: 0;
+            outline: none;
+            transition: border-color .15s;
+            text-align: right;
+        }
+        .mineral-input-row input::placeholder { color: #2a5a70; }
+        .mineral-input-row input:focus { border-color: #00d9ff; outline: none; }
+        .mineral-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(0,217,255,.1);
+            font-size: .9em;
+        }
+        .mineral-result-row:last-child { border-bottom: none; }
+        .mineral-result-name { color: #88d0e8; flex: 1; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
+        .mineral-result-qty {
+            color: #ffcc44;
+            font-family: 'Orbitron', sans-serif;
+            font-size: .8em;
+            font-weight: 700;
+            margin-left: 12px;
+        }
+        .mineral-warn {
+            color: #ff6b6b;
+            font-size: .82em;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
 
         .item {
             background: rgba(0, 50, 80, 0.3);
@@ -2352,6 +2460,7 @@
                     <button class="sub-tab" onclick="showSubTab('research')" data-market-tab="research_equipment">Research Equipment</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" data-market-tab="salvaged_materials">Salvaged Materials</button>
                     <button class="sub-tab" onclick="showSubTab('compressed-ores')" data-market-tab="compressed_ores">Compressed Ores</button>
+                    <button class="sub-tab" onclick="showSubTab('mineral-calc')" data-market-tab="mineral_calculator">Mineral Calculator</button>
                 </div>
 
                 <div class="content">
@@ -2431,6 +2540,41 @@
                             </label>
                         </div>
                         <div class="item-grid" id="compressed-ores-grid"></div>
+                    </div>
+
+                    <!-- MINERAL CALCULATOR SUB-CONTENT -->
+                    <div id="mineral-calc-content" class="tab-content">
+                        <div class="buyback-program-bar" style="margin-bottom:14px;color:#a0c8e0;font-family:'Rajdhani',sans-serif;font-size:15px;line-height:1.5">
+                            Enter the mineral quantities you need below. The calculator will find
+                            the on-hand compressed ore combination that refines to at least your
+                            requested amounts at <strong style="color:#00ffff">90.63% efficiency</strong>.
+                            You may receive additional minerals as a side effect — this is expected.
+                        </div>
+                        <div class="buyback-quote-row" style="gap:16px;align-items:flex-start">
+                            <!-- INPUT PANEL -->
+                            <div class="quote-panel" style="flex:1.4;min-width:260px">
+                                <div class="buyback-section-header">Desired Minerals</div>
+                                <div class="mineral-group-label">Standard Minerals</div>
+                                <div class="mineral-input-grid" id="mineral-grid-std"></div>
+                                <div class="mineral-group-label" style="margin-top:14px">Ice Products</div>
+                                <div class="mineral-input-grid" id="mineral-grid-ice"></div>
+                                <div class="mineral-group-label" style="margin-top:14px">Moon Raw Materials</div>
+                                <div class="mineral-input-grid" id="mineral-grid-moon"></div>
+                                <div style="margin-top:16px;display:flex;gap:10px">
+                                    <button class="btn-calculate" onclick="calculateMineralOrder()">Calculate Order</button>
+                                    <button class="btn-clear" onclick="clearMineralCalc()">Clear</button>
+                                </div>
+                            </div>
+                            <!-- RESULTS PANEL -->
+                            <div class="quote-panel" style="flex:1;min-width:240px">
+                                <div class="buyback-section-header">Order Result</div>
+                                <div id="mineral-results-body">
+                                    <p style="color:#4a8aa0;font-size:.85em;font-style:italic;font-family:'Rajdhani',sans-serif">
+                                        Enter mineral quantities and click Calculate.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="footer">
@@ -2858,12 +3002,12 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Arkonor IV-Grade": 0,
                         "Compressed Azure Cytoserocin": 0,
                         "Compressed Azure Mykoserocin": 0,
-                        "Compressed Bistot": 0,
+                        "Compressed Bistot": 24073,
                         "Compressed Bistot II-Grade": 0,
                         "Compressed Bistot III-Grade": 0,
                         "Compressed Bistot IV-Grade": 0,
                         "Compressed Bitumens": 0,
-                        "Compressed Blue Ice": 0,
+                        "Compressed Blue Ice": 1092,
                         "Compressed Blue Ice IV-Grade": 0,
                         "Compressed Bountiful Loparite": 0,
                         "Compressed Bountiful Monazite": 0,
@@ -2888,13 +3032,13 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Copious Titanite": 0,
                         "Compressed Crokite": 0,
                         "Compressed Crokite II-Grade": 0,
-                        "Compressed Crokite III-Grade": 0,
-                        "Compressed Crokite IV-Grade": 0,
+                        "Compressed Crokite III-Grade": 10,
+                        "Compressed Crokite IV-Grade": 1026,
                         "Compressed Dark Glitter": 0,
                         "Compressed Dark Ochre": 0,
                         "Compressed Dark Ochre II-Grade": 0,
                         "Compressed Dark Ochre III-Grade": 0,
-                        "Compressed Dark Ochre IV-Grade": 0,
+                        "Compressed Dark Ochre IV-Grade": 2782,
                         "Compressed Ducinium": 0,
                         "Compressed Ducinium II-Grade": 0,
                         "Compressed Ducinium III-Grade": 0,
@@ -2926,22 +3070,22 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Glowing Pollucite": 0,
                         "Compressed Glowing Zircon": 0,
                         "Compressed Gneiss": 0,
-                        "Compressed Gneiss II-Grade": 0,
+                        "Compressed Gneiss II-Grade": 3025,
                         "Compressed Gneiss III-Grade": 0,
                         "Compressed Gneiss IV-Grade": 0,
                         "Compressed Golden Cytoserocin": 0,
                         "Compressed Golden Mykoserocin": 0,
-                        "Compressed Griemeer": 0,
+                        "Compressed Griemeer": 18,
                         "Compressed Griemeer II-Grade": 0,
                         "Compressed Griemeer III-Grade": 0,
                         "Compressed Griemeer IV-Grade": 0,
-                        "Compressed Hedbergite": 0,
-                        "Compressed Hedbergite II-Grade": 0,
-                        "Compressed Hedbergite III-Grade": 0,
+                        "Compressed Hedbergite": 10348,
+                        "Compressed Hedbergite II-Grade": 83601,
+                        "Compressed Hedbergite III-Grade": 9198,
                         "Compressed Hedbergite IV-Grade": 0,
                         "Compressed Hemorphite": 0,
                         "Compressed Hemorphite II-Grade": 0,
-                        "Compressed Hemorphite III-Grade": 0,
+                        "Compressed Hemorphite III-Grade": 6848,
                         "Compressed Hemorphite IV-Grade": 0,
                         "Compressed Hezorime": 0,
                         "Compressed Hezorime II-Grade": 0,
@@ -2951,17 +3095,17 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Jaspet II-Grade": 0,
                         "Compressed Jaspet III-Grade": 0,
                         "Compressed Jaspet IV-Grade": 0,
-                        "Compressed Kernite": 0,
-                        "Compressed Kernite II-Grade": 0,
-                        "Compressed Kernite III-Grade": 0,
-                        "Compressed Kernite IV-Grade": 0,
+                        "Compressed Kernite": 168843,
+                        "Compressed Kernite II-Grade": 198715,
+                        "Compressed Kernite III-Grade": 358494,
+                        "Compressed Kernite IV-Grade": 113908,
                         "Compressed Krystallos": 0,
                         "Compressed Kylixium": 0,
-                        "Compressed Kylixium II-Grade": 0,
+                        "Compressed Kylixium II-Grade": 107210,
                         "Compressed Kylixium III-Grade": 0,
                         "Compressed Kylixium IV-Grade": 0,
                         "Compressed Lavish Chromite": 0,
-                        "Compressed Lavish Otavite": 0,
+                        "Compressed Lavish Otavite": 38,
                         "Compressed Lavish Sperrylite": 0,
                         "Compressed Lavish Vanadinite": 0,
                         "Compressed Lime Cytoserocin": 0,
@@ -2973,22 +3117,22 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Mercoxit II-Grade": 0,
                         "Compressed Mercoxit III-Grade": 0,
                         "Compressed Monazite": 0,
-                        "Compressed Mordunium": 0,
-                        "Compressed Mordunium II-Grade": 0,
+                        "Compressed Mordunium": 86816,
+                        "Compressed Mordunium II-Grade": 356152,
                         "Compressed Mordunium III-Grade": 0,
-                        "Compressed Mordunium IV-Grade": 0,
+                        "Compressed Mordunium IV-Grade": 2808289,
                         "Compressed Nocxite": 0,
                         "Compressed Nocxite II-Grade": 0,
                         "Compressed Nocxite III-Grade": 0,
                         "Compressed Nocxite IV-Grade": 0,
-                        "Compressed Omber": 0,
-                        "Compressed Omber II-Grade": 0,
-                        "Compressed Omber III-Grade": 0,
-                        "Compressed Omber IV-Grade": 0,
+                        "Compressed Omber": 2230678,
+                        "Compressed Omber II-Grade": 502824,
+                        "Compressed Omber III-Grade": 2887063,
+                        "Compressed Omber IV-Grade": 704553,
                         "Compressed Otavite": 0,
-                        "Compressed Plagioclase": 0,
-                        "Compressed Plagioclase II-Grade": 0,
-                        "Compressed Plagioclase III-Grade": 0,
+                        "Compressed Plagioclase": 2137618,
+                        "Compressed Plagioclase II-Grade": 1107355,
+                        "Compressed Plagioclase III-Grade": 457623,
                         "Compressed Plagioclase IV-Grade": 0,
                         "Compressed Pollucite": 0,
                         "Compressed Pyroxeres": 0,
@@ -3001,15 +3145,15 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Replete Zircon": 0,
                         "Compressed Scheelite": 0,
                         "Compressed Scordite": 0,
-                        "Compressed Scordite II-Grade": 0,
-                        "Compressed Scordite III-Grade": 0,
+                        "Compressed Scordite II-Grade": 407196,
+                        "Compressed Scordite III-Grade": 9389334,
                         "Compressed Scordite IV-Grade": 0,
                         "Compressed Shimmering Chromite": 0,
                         "Compressed Shimmering Otavite": 0,
                         "Compressed Shimmering Sperrylite": 0,
-                        "Compressed Shimmering Vanadinite": 0,
+                        "Compressed Shimmering Vanadinite": 23078,
                         "Compressed Shining Loparite": 0,
-                        "Compressed Shining Monazite": 0,
+                        "Compressed Shining Monazite": 5000,
                         "Compressed Shining Xenotime": 0,
                         "Compressed Shining Ytterbite": 0,
                         "Compressed Sperrylite": 0,
@@ -3023,14 +3167,14 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed Twinkling Euxenite": 0,
                         "Compressed Twinkling Scheelite": 0,
                         "Compressed Twinkling Titanite": 0,
-                        "Compressed Ueganite": 0,
+                        "Compressed Ueganite": 1,
                         "Compressed Ueganite II-Grade": 0,
                         "Compressed Ueganite III-Grade": 0,
                         "Compressed Ueganite IV-Grade": 0,
                         "Compressed Vanadinite": 0,
-                        "Compressed Veldspar": 0,
-                        "Compressed Veldspar II-Grade": 0,
-                        "Compressed Veldspar III-Grade": 0,
+                        "Compressed Veldspar": 25198602,
+                        "Compressed Veldspar II-Grade": 57051614,
+                        "Compressed Veldspar III-Grade": 3600180,
                         "Compressed Veldspar IV-Grade": 0,
                         "Compressed Vermillion Cytoserocin": 0,
                         "Compressed Vermillion Mykoserocin": 0,
@@ -3039,7 +3183,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Compressed White Glaze": 0,
                         "Compressed White Glaze IV-Grade": 0,
                         "Compressed Xenotime": 0,
-                        "Compressed Ytirium": 0,
+                        "Compressed Ytirium": 104779,
                         "Compressed Ytirium II-Grade": 0,
                         "Compressed Ytirium III-Grade": 0,
                         "Compressed Ytirium IV-Grade": 0,
@@ -3215,7 +3359,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Lavish Vanadinite": 0,
                         "Lime Cytoserocin": 0,
                         "Lime Mykoserocin": 0,
-                        "Liquid Ozone": 701800,
+                        "Liquid Ozone": 0,
                         "Logic Circuit": 0,
                         "Loparite": 0,
                         "Lorentz Fluid": 0,
@@ -3336,7 +3480,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Spodumain III-Grade": 0,
                         "Spodumain IV-Grade": 0,
                         "Sterile Conduits": 0,
-                        "Strontium Clathrates": 228490,
+                        "Strontium Clathrates": 0,
                         "Sulfuric Acid": 0,
                         "Supercomputers": 0,
                         "Superconductors": 0,
@@ -3347,7 +3491,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Synthetic Oil": 0,
                         "Synthetic Synapses": 0,
                         "Tangled Power Conduit": 0,
-                        "Technetium": 6547,
+                        "Technetium": 0,
                         "Telemetry Processor": 0,
                         "Terahertz Metamaterials": 0,
                         "Test Cultures": 0,
@@ -3405,7 +3549,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 21, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 21, 2026 18:08 EVE"
+            "inventoryLastUpdated": "Apr 21, 2026 20:29 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5544,7 +5688,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         function showSubTab(subTabName) {
             // Hide all sub-content
-            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content, #compressed-ores-content').forEach(content => {
+            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content, #compressed-ores-content, #mineral-calc-content').forEach(content => {
                 content.classList.remove('active');
             });
 
@@ -5576,6 +5720,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             renderResearchEquipment(inventory);
             renderSalvage(inventory);
             renderCompressedOres('standard');
+            buildMineralInputs();
         }
 
         // ============================================
@@ -6005,6 +6150,223 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     });
                 });
             });
+        }
+
+        // ── Mineral Calculator ────────────────────────────────────────────────
+        const MINERAL_DEFS = {
+            std: [
+                {id: 34,    name: 'Tritanium'},
+                {id: 35,    name: 'Pyerite'},
+                {id: 36,    name: 'Mexallon'},
+                {id: 37,    name: 'Isogen'},
+                {id: 38,    name: 'Nocxium'},
+                {id: 39,    name: 'Zydrine'},
+                {id: 40,    name: 'Megacyte'},
+                {id: 11399, name: 'Morphite'},
+            ],
+            ice: [
+                {id: 16272, name: 'Heavy Water'},
+                {id: 16273, name: 'Liquid Ozone'},
+                {id: 16275, name: 'Strontium Clathrates'},
+                {id: 17887, name: 'Oxygen Isotopes'},
+                {id: 17889, name: 'Hydrogen Isotopes'},
+                {id: 16274, name: 'Helium Isotopes'},
+                {id: 17888, name: 'Nitrogen Isotopes'},
+            ],
+            moon: [
+                {tier: 'R4 — Ubiquitous'},
+                {id: 16633, name: 'Hydrocarbons'},
+                {id: 16634, name: 'Atmospheric Gases'},
+                {id: 16635, name: 'Evaporite Deposits'},
+                {id: 16636, name: 'Silicates'},
+                {tier: 'R8 — Common'},
+                {id: 16637, name: 'Tungsten'},
+                {id: 16638, name: 'Titanium'},
+                {id: 16639, name: 'Scandium'},
+                {id: 16640, name: 'Cobalt'},
+                {tier: 'R16 — Uncommon'},
+                {id: 16641, name: 'Chromium'},
+                {id: 16642, name: 'Vanadium'},
+                {id: 16643, name: 'Cadmium'},
+                {id: 16644, name: 'Platinum'},
+                {tier: 'R32 — Rare'},
+                {id: 16646, name: 'Mercury'},
+                {id: 16647, name: 'Caesium'},
+                {id: 16648, name: 'Hafnium'},
+                {id: 16649, name: 'Technetium'},
+                {tier: 'R64 — Exceptional'},
+                {id: 16650, name: 'Dysprosium'},
+                {id: 16651, name: 'Neodymium'},
+                {id: 16652, name: 'Promethium'},
+                {id: 16653, name: 'Thulium'},
+            ],
+        };
+
+        function computeMineralEstimates() {
+            if (!BUYBACK_DATA?.oreRefineData || !EMBEDDED_DATA?.inventory) return {};
+            const totals = {};
+            for (const ore of BUYBACK_DATA.oreRefineData) {
+                const qty = EMBEDDED_DATA.inventory[ore.name] || 0;
+                if (qty <= 0) continue;
+                const batches = Math.floor(qty / ore.portionSize);
+                if (batches <= 0) continue;
+                for (const [matId, ypu] of Object.entries(ore.minerals)) {
+                    const id = parseInt(matId);
+                    // ypu = (mat_qty / portionSize) * efficiency, so total = floor(ypu * portionSize * batches)
+                    totals[id] = (totals[id] || 0) + Math.floor(ypu * ore.portionSize * batches);
+                }
+            }
+            return totals;
+        }
+
+        function buildMineralInputs() {
+            const estimates = computeMineralEstimates();
+            const mineralPrices = {};
+            if (BUYBACK_DATA?.items) {
+                for (const item of BUYBACK_DATA.items) {
+                    if (['minerals','ice_products','moon_materials'].includes(item.category)) {
+                        mineralPrices[item.typeId] = item.sellRate;
+                    }
+                }
+            }
+
+            for (const [cat, entries] of Object.entries(MINERAL_DEFS)) {
+                const grid = document.getElementById('mineral-grid-' + cat);
+                if (!grid) continue;
+                entries.forEach(entry => {
+                    if (entry.tier !== undefined) {
+                        const div = document.createElement('div');
+                        div.className = 'mineral-tier-divider';
+                        div.textContent = entry.tier;
+                        grid.appendChild(div);
+                    } else {
+                        const qty = estimates[entry.id] || 0;
+                        const pct = mineralPrices[entry.id];
+                        const qtyStr = qty > 0
+                            ? '<span class="mineral-qty-val">~' + qty.toLocaleString() + '</span>'
+                            : '<span style="color:#2a5a70">None in stock</span>';
+                        const pctStr = pct != null
+                            ? ' &nbsp;·&nbsp; <span class="mineral-pct-val">' + pct + '% JBV</span>'
+                            : '';
+                        const row = document.createElement('div');
+                        row.className = 'mineral-input-row';
+                        row.innerHTML = '<div class="mineral-label-block" title="' + entry.name + '">'
+                            + '<span class="mineral-label-name">' + entry.name + '</span>'
+                            + '<span class="mineral-label-sub">' + qtyStr + pctStr + '</span>'
+                            + '</div>'
+                            + '<input type="number" min="0" step="1" id="mineral-' + entry.id + '" placeholder="0">';
+                        grid.appendChild(row);
+                    }
+                });
+            }
+        }
+
+        function calculateMineralOrder() {
+            if (typeof BUYBACK_DATA === 'undefined' || !BUYBACK_DATA.oreRefineData) {
+                document.getElementById('mineral-results-body').innerHTML =
+                    '<p class="mineral-warn">Ore refining data not loaded.</p>';
+                return;
+            }
+
+            // Read desired minerals
+            const desired = {};
+            const allMineralList = [];
+            for (const minerals of Object.values(MINERAL_DEFS)) {
+                for (const m of minerals) {
+                    if (m.tier !== undefined) continue;
+                    allMineralList.push(m);
+                    const el = document.getElementById('mineral-' + m.id);
+                    const val = el ? parseFloat(el.value) || 0 : 0;
+                    if (val > 0) desired[m.id] = val;
+                }
+            }
+            if (Object.keys(desired).length === 0) {
+                document.getElementById('mineral-results-body').innerHTML =
+                    '<p style="color:#4a8aa0;font-size:.85em;font-style:italic;font-family:\'Rajdhani\',sans-serif">Enter at least one mineral quantity.</p>';
+                return;
+            }
+
+            // Working inventory copy (name -> qty)
+            const inventory = Object.assign({}, EMBEDDED_DATA.inventory);
+            const allocated = {};   // name -> batches used
+            const deficit   = Object.assign({}, desired);
+
+            // Only consider ores actually in stock
+            const oreData = BUYBACK_DATA.oreRefineData.filter(o => (inventory[o.name] || 0) >= o.portionSize);
+
+            // Sort mineral ids: fewest ore sources first (rarest → most common)
+            const mineralIds = Object.keys(deficit).map(Number);
+            mineralIds.sort((a, b) => {
+                const srcA = oreData.filter(o => (o.minerals[String(a)] || 0) > 0).length;
+                const srcB = oreData.filter(o => (o.minerals[String(b)] || 0) > 0).length;
+                return srcA - srcB;
+            });
+
+            // Greedy allocation
+            for (const mid of mineralIds) {
+                if ((deficit[mid] || 0) <= 0) continue;
+                const sources = oreData
+                    .filter(o => (o.minerals[String(mid)] || 0) > 0)
+                    .sort((a, b) => (b.minerals[String(mid)] || 0) - (a.minerals[String(mid)] || 0));
+
+                for (const ore of sources) {
+                    if ((deficit[mid] || 0) <= 0) break;
+                    const availBatches = Math.floor((inventory[ore.name] || 0) / ore.portionSize);
+                    if (availBatches <= 0) continue;
+
+                    const yieldPerBatch = (ore.minerals[String(mid)] || 0) * ore.portionSize;
+                    if (yieldPerBatch <= 0) continue;
+                    const batchesNeeded = Math.ceil(deficit[mid] / yieldPerBatch);
+                    const batchesToUse  = Math.min(batchesNeeded, availBatches);
+
+                    // Subtract all minerals produced by these batches from deficit
+                    for (const [matId, ypu] of Object.entries(ore.minerals)) {
+                        const mid2 = parseInt(matId);
+                        deficit[mid2] = (deficit[mid2] || 0) - ypu * ore.portionSize * batchesToUse;
+                    }
+                    allocated[ore.name] = (allocated[ore.name] || 0) + batchesToUse;
+                    inventory[ore.name] -= batchesToUse * ore.portionSize;
+                }
+            }
+
+            // Check for unfulfilled minerals
+            const unfulfilled = mineralIds
+                .filter(id => (deficit[id] || 0) > 0.01)
+                .map(id => { const m = allMineralList.find(x => x.id === id); return m ? m.name : String(id); });
+
+            const body = document.getElementById('mineral-results-body');
+            if (Object.keys(allocated).length === 0) {
+                body.innerHTML = '<p class="mineral-warn">No on-hand ores can produce the requested minerals.</p>';
+                return;
+            }
+
+            // Sort results by batches descending
+            const sortedAlloc = Object.entries(allocated).sort((a, b) => b[1] - a[1]);
+            let html = '';
+            for (const [name, batches] of sortedAlloc) {
+                const oreEntry = BUYBACK_DATA.oreRefineData.find(o => o.name === name);
+                const qty = batches * (oreEntry ? oreEntry.portionSize : 100);
+                html += '<div class="mineral-result-row">'
+                    + '<span class="mineral-result-name">' + name + '</span>'
+                    + '<span class="mineral-result-qty">' + qty.toLocaleString() + '</span>'
+                    + '</div>';
+            }
+            if (unfulfilled.length > 0) {
+                html += '<p class="mineral-warn">&#9888; Insufficient stock to fully cover: '
+                    + unfulfilled.join(', ') + '</p>';
+            }
+            body.innerHTML = html;
+        }
+
+        function clearMineralCalc() {
+            for (const minerals of Object.values(MINERAL_DEFS)) {
+                for (const m of minerals) {
+                    const el = document.getElementById('mineral-' + m.id);
+                    if (el) el.value = '';
+                }
+            }
+            document.getElementById('mineral-results-body').innerHTML =
+                '<p style="color:#4a8aa0;font-size:.85em;font-style:italic;font-family:\'Rajdhani\',sans-serif">Enter mineral quantities and click Calculate.</p>';
         }
 
         function createItemCard(name, quantity, rates) {
