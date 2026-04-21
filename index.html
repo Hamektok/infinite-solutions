@@ -6243,8 +6243,8 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         const qty = estimates[entry.id] || 0;
                         const pct = mineralPrices[entry.id];
                         const qtyStr = qty > 0
-                            ? '<span class="mineral-qty-val">~' + qty.toLocaleString() + '</span>'
-                            : '<span style="color:#2a5a70">None in stock</span>';
+                            ? '<span class="mineral-qty-val">Est. ' + qty.toLocaleString() + ' Units</span>'
+                            : '<span style="color:#2a5a70">Est. 0 Units</span>';
                         const pctStr = pct != null
                             ? ' &nbsp;·&nbsp; <span class="mineral-pct-val">' + pct + '% JBV</span>'
                             : '';
