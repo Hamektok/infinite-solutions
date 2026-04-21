@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202604211811"></script>
+    <script src="buyback_data.js?v=202604211944"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -526,6 +526,93 @@
         }
 
         .ore-grade-toggle input { cursor: pointer; }
+
+        /* ── Mineral Calculator ──────────────────────────────────────────── */
+        .mineral-group-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: .6em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #00d9ff;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(0,217,255,.15);
+        }
+        .mineral-input-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px 10px;
+        }
+        .mineral-tier-divider {
+            grid-column: 1 / -1;
+            font-family: 'Orbitron', sans-serif;
+            font-size: .55em;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #4a8aa0;
+            padding: 5px 0 2px;
+            border-top: 1px solid rgba(0,217,255,.15);
+            margin-top: 2px;
+        }
+        .mineral-tier-divider:first-child { border-top: none; margin-top: 0; }
+        .mineral-input-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 7px;
+        }
+        .mineral-input-row label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: .92em;
+            font-weight: 700;
+            color: #88d0e8;
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mineral-input-row input {
+            background: rgba(0,20,40,.55);
+            border: 1px solid rgba(0,217,255,.25);
+            border-radius: 4px;
+            color: #a0c8e0;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: .93em;
+            font-weight: 600;
+            padding: 4px 6px;
+            width: 70px;
+            min-width: 70px;
+            flex-shrink: 0;
+            outline: none;
+            transition: border-color .15s;
+            text-align: right;
+        }
+        .mineral-input-row input::placeholder { color: #2a5a70; }
+        .mineral-input-row input:focus { border-color: #00d9ff; outline: none; }
+        .mineral-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(0,217,255,.1);
+            font-size: .9em;
+        }
+        .mineral-result-row:last-child { border-bottom: none; }
+        .mineral-result-name { color: #88d0e8; flex: 1; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
+        .mineral-result-qty {
+            color: #ffcc44;
+            font-family: 'Orbitron', sans-serif;
+            font-size: .8em;
+            font-weight: 700;
+            margin-left: 12px;
+        }
+        .mineral-warn {
+            color: #ff6b6b;
+            font-size: .82em;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
 
         .item {
             background: rgba(0, 50, 80, 0.3);
@@ -2352,6 +2439,7 @@
                     <button class="sub-tab" onclick="showSubTab('research')" data-market-tab="research_equipment">Research Equipment</button>
                     <button class="sub-tab" onclick="showSubTab('salvage')" data-market-tab="salvaged_materials">Salvaged Materials</button>
                     <button class="sub-tab" onclick="showSubTab('compressed-ores')" data-market-tab="compressed_ores">Compressed Ores</button>
+                    <button class="sub-tab" onclick="showSubTab('mineral-calc')" data-market-tab="mineral_calculator">Mineral Calculator</button>
                 </div>
 
                 <div class="content">
@@ -2431,6 +2519,41 @@
                             </label>
                         </div>
                         <div class="item-grid" id="compressed-ores-grid"></div>
+                    </div>
+
+                    <!-- MINERAL CALCULATOR SUB-CONTENT -->
+                    <div id="mineral-calc-content" class="tab-content">
+                        <div class="buyback-program-bar" style="margin-bottom:14px;color:#a0c8e0;font-family:'Rajdhani',sans-serif;font-size:15px;line-height:1.5">
+                            Enter the mineral quantities you need below. The calculator will find
+                            the on-hand compressed ore combination that refines to at least your
+                            requested amounts at <strong style="color:#00ffff">90.63% efficiency</strong>.
+                            You may receive additional minerals as a side effect — this is expected.
+                        </div>
+                        <div class="buyback-quote-row" style="gap:16px;align-items:flex-start">
+                            <!-- INPUT PANEL -->
+                            <div class="quote-panel" style="flex:1.4;min-width:260px">
+                                <div class="buyback-section-header">Desired Minerals</div>
+                                <div class="mineral-group-label">Standard Minerals</div>
+                                <div class="mineral-input-grid" id="mineral-grid-std"></div>
+                                <div class="mineral-group-label" style="margin-top:14px">Ice Products</div>
+                                <div class="mineral-input-grid" id="mineral-grid-ice"></div>
+                                <div class="mineral-group-label" style="margin-top:14px">Moon Raw Materials</div>
+                                <div class="mineral-input-grid" id="mineral-grid-moon"></div>
+                                <div style="margin-top:16px;display:flex;gap:10px">
+                                    <button class="btn-calculate" onclick="calculateMineralOrder()">Calculate Order</button>
+                                    <button class="btn-clear" onclick="clearMineralCalc()">Clear</button>
+                                </div>
+                            </div>
+                            <!-- RESULTS PANEL -->
+                            <div class="quote-panel" style="flex:1;min-width:240px">
+                                <div class="buyback-section-header">Order Result</div>
+                                <div id="mineral-results-body">
+                                    <p style="color:#4a8aa0;font-size:.85em;font-style:italic;font-family:'Rajdhani',sans-serif">
+                                        Enter mineral quantities and click Calculate.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="footer">
@@ -3405,7 +3528,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 21, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 21, 2026 18:08 EVE"
+            "inventoryLastUpdated": "Apr 21, 2026 19:54 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5544,7 +5667,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         function showSubTab(subTabName) {
             // Hide all sub-content
-            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content, #compressed-ores-content').forEach(content => {
+            document.querySelectorAll('#minerals-content, #ice-content, #moon-content, #pi-content, #gas-content, #research-content, #salvage-content, #compressed-ores-content, #mineral-calc-content').forEach(content => {
                 content.classList.remove('active');
             });
 
@@ -5576,6 +5699,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             renderResearchEquipment(inventory);
             renderSalvage(inventory);
             renderCompressedOres('standard');
+            buildMineralInputs();
         }
 
         // ============================================
@@ -6005,6 +6129,186 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     });
                 });
             });
+        }
+
+        // ── Mineral Calculator ────────────────────────────────────────────────
+        const MINERAL_DEFS = {
+            std: [
+                {id: 34,    name: 'Tritanium'},
+                {id: 35,    name: 'Pyerite'},
+                {id: 36,    name: 'Mexallon'},
+                {id: 37,    name: 'Isogen'},
+                {id: 38,    name: 'Nocxium'},
+                {id: 39,    name: 'Zydrine'},
+                {id: 40,    name: 'Megacyte'},
+                {id: 11399, name: 'Morphite'},
+            ],
+            ice: [
+                {id: 16272, name: 'Heavy Water'},
+                {id: 16273, name: 'Liquid Ozone'},
+                {id: 16275, name: 'Strontium Clathrates'},
+                {id: 17887, name: 'Oxygen Isotopes'},
+                {id: 17889, name: 'Hydrogen Isotopes'},
+                {id: 16274, name: 'Helium Isotopes'},
+                {id: 17888, name: 'Nitrogen Isotopes'},
+            ],
+            moon: [
+                {tier: 'R4 — Ubiquitous'},
+                {id: 16633, name: 'Hydrocarbons'},
+                {id: 16634, name: 'Atmospheric Gases'},
+                {id: 16635, name: 'Evaporite Deposits'},
+                {id: 16636, name: 'Silicates'},
+                {tier: 'R8 — Common'},
+                {id: 16637, name: 'Tungsten'},
+                {id: 16638, name: 'Titanium'},
+                {id: 16639, name: 'Scandium'},
+                {id: 16640, name: 'Cobalt'},
+                {tier: 'R16 — Uncommon'},
+                {id: 16641, name: 'Chromium'},
+                {id: 16642, name: 'Vanadium'},
+                {id: 16643, name: 'Cadmium'},
+                {id: 16644, name: 'Platinum'},
+                {tier: 'R32 — Rare'},
+                {id: 16646, name: 'Mercury'},
+                {id: 16647, name: 'Caesium'},
+                {id: 16648, name: 'Hafnium'},
+                {id: 16649, name: 'Technetium'},
+                {tier: 'R64 — Exceptional'},
+                {id: 16650, name: 'Dysprosium'},
+                {id: 16651, name: 'Neodymium'},
+                {id: 16652, name: 'Promethium'},
+                {id: 16653, name: 'Thulium'},
+            ],
+        };
+
+        function buildMineralInputs() {
+            for (const [cat, entries] of Object.entries(MINERAL_DEFS)) {
+                const grid = document.getElementById('mineral-grid-' + cat);
+                if (!grid) continue;
+                entries.forEach(entry => {
+                    if (entry.tier !== undefined) {
+                        const div = document.createElement('div');
+                        div.className = 'mineral-tier-divider';
+                        div.textContent = entry.tier;
+                        grid.appendChild(div);
+                    } else {
+                        const row = document.createElement('div');
+                        row.className = 'mineral-input-row';
+                        row.innerHTML = '<label title="' + entry.name + '">' + entry.name + '</label>'
+                            + '<input type="number" min="0" step="1" id="mineral-' + entry.id + '"'
+                            + ' placeholder="0">';
+                        grid.appendChild(row);
+                    }
+                });
+            }
+        }
+
+        function calculateMineralOrder() {
+            if (typeof BUYBACK_DATA === 'undefined' || !BUYBACK_DATA.oreRefineData) {
+                document.getElementById('mineral-results-body').innerHTML =
+                    '<p class="mineral-warn">Ore refining data not loaded.</p>';
+                return;
+            }
+
+            // Read desired minerals
+            const desired = {};
+            const allMineralList = [];
+            for (const minerals of Object.values(MINERAL_DEFS)) {
+                for (const m of minerals) {
+                    if (m.tier !== undefined) continue;
+                    allMineralList.push(m);
+                    const el = document.getElementById('mineral-' + m.id);
+                    const val = el ? parseFloat(el.value) || 0 : 0;
+                    if (val > 0) desired[m.id] = val;
+                }
+            }
+            if (Object.keys(desired).length === 0) {
+                document.getElementById('mineral-results-body').innerHTML =
+                    '<p style="color:#4a8aa0;font-size:.85em;font-style:italic;font-family:\'Rajdhani\',sans-serif">Enter at least one mineral quantity.</p>';
+                return;
+            }
+
+            // Working inventory copy (name -> qty)
+            const inventory = Object.assign({}, EMBEDDED_DATA.inventory);
+            const allocated = {};   // name -> batches used
+            const deficit   = Object.assign({}, desired);
+
+            // Only consider ores actually in stock
+            const oreData = BUYBACK_DATA.oreRefineData.filter(o => (inventory[o.name] || 0) >= o.portionSize);
+
+            // Sort mineral ids: fewest ore sources first (rarest → most common)
+            const mineralIds = Object.keys(deficit).map(Number);
+            mineralIds.sort((a, b) => {
+                const srcA = oreData.filter(o => (o.minerals[String(a)] || 0) > 0).length;
+                const srcB = oreData.filter(o => (o.minerals[String(b)] || 0) > 0).length;
+                return srcA - srcB;
+            });
+
+            // Greedy allocation
+            for (const mid of mineralIds) {
+                if ((deficit[mid] || 0) <= 0) continue;
+                const sources = oreData
+                    .filter(o => (o.minerals[String(mid)] || 0) > 0)
+                    .sort((a, b) => (b.minerals[String(mid)] || 0) - (a.minerals[String(mid)] || 0));
+
+                for (const ore of sources) {
+                    if ((deficit[mid] || 0) <= 0) break;
+                    const availBatches = Math.floor((inventory[ore.name] || 0) / ore.portionSize);
+                    if (availBatches <= 0) continue;
+
+                    const yieldPerBatch = (ore.minerals[String(mid)] || 0) * ore.portionSize;
+                    if (yieldPerBatch <= 0) continue;
+                    const batchesNeeded = Math.ceil(deficit[mid] / yieldPerBatch);
+                    const batchesToUse  = Math.min(batchesNeeded, availBatches);
+
+                    // Subtract all minerals produced by these batches from deficit
+                    for (const [matId, ypu] of Object.entries(ore.minerals)) {
+                        const mid2 = parseInt(matId);
+                        deficit[mid2] = (deficit[mid2] || 0) - ypu * ore.portionSize * batchesToUse;
+                    }
+                    allocated[ore.name] = (allocated[ore.name] || 0) + batchesToUse;
+                    inventory[ore.name] -= batchesToUse * ore.portionSize;
+                }
+            }
+
+            // Check for unfulfilled minerals
+            const unfulfilled = mineralIds
+                .filter(id => (deficit[id] || 0) > 0.01)
+                .map(id => { const m = allMineralList.find(x => x.id === id); return m ? m.name : String(id); });
+
+            const body = document.getElementById('mineral-results-body');
+            if (Object.keys(allocated).length === 0) {
+                body.innerHTML = '<p class="mineral-warn">No on-hand ores can produce the requested minerals.</p>';
+                return;
+            }
+
+            // Sort results by batches descending
+            const sortedAlloc = Object.entries(allocated).sort((a, b) => b[1] - a[1]);
+            let html = '';
+            for (const [name, batches] of sortedAlloc) {
+                const oreEntry = BUYBACK_DATA.oreRefineData.find(o => o.name === name);
+                const qty = batches * (oreEntry ? oreEntry.portionSize : 100);
+                html += '<div class="mineral-result-row">'
+                    + '<span class="mineral-result-name">' + name + '</span>'
+                    + '<span class="mineral-result-qty">' + qty.toLocaleString() + '</span>'
+                    + '</div>';
+            }
+            if (unfulfilled.length > 0) {
+                html += '<p class="mineral-warn">&#9888; Insufficient stock to fully cover: '
+                    + unfulfilled.join(', ') + '</p>';
+            }
+            body.innerHTML = html;
+        }
+
+        function clearMineralCalc() {
+            for (const minerals of Object.values(MINERAL_DEFS)) {
+                for (const m of minerals) {
+                    const el = document.getElementById('mineral-' + m.id);
+                    if (el) el.value = '';
+                }
+            }
+            document.getElementById('mineral-results-body').innerHTML =
+                '<p style="color:#4a8aa0;font-size:.85em;font-style:italic;font-family:\'Rajdhani\',sans-serif">Enter mineral quantities and click Calculate.</p>';
         }
 
         function createItemCard(name, quantity, rates) {
