@@ -7,7 +7,7 @@
     <script src="bpc_pricing_data.js"></script>
     <script src="bpc_data.js"></script>
     <script src="research_jobs.js"></script>
-    <script src="buyback_data.js?v=202604211944"></script>
+    <script src="buyback_data.js?v=202604212024"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
 
@@ -561,16 +561,37 @@
             align-items: center;
             gap: 7px;
         }
-        .mineral-input-row label {
+        .mineral-label-block {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .mineral-label-name {
             font-family: 'Rajdhani', sans-serif;
             font-size: .92em;
             font-weight: 700;
             color: #88d0e8;
             white-space: nowrap;
-            flex: 1;
-            min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        .mineral-label-sub {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: .75em;
+            font-weight: 600;
+            color: #4a8aa0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mineral-label-sub .mineral-qty-val {
+            color: #6fb3d0;
+        }
+        .mineral-label-sub .mineral-pct-val {
+            color: #00d9ff;
         }
         .mineral-input-row input {
             background: rgba(0,20,40,.55);
@@ -3528,7 +3549,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 21, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 21, 2026 20:08 EVE"
+            "inventoryLastUpdated": "Apr 21, 2026 20:25 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -6181,7 +6202,34 @@ Tip: Copy directly from EVE inventory window"></textarea>
             ],
         };
 
+        function computeMineralEstimates() {
+            if (!BUYBACK_DATA?.oreRefineData || !EMBEDDED_DATA?.inventory) return {};
+            const totals = {};
+            for (const ore of BUYBACK_DATA.oreRefineData) {
+                const qty = EMBEDDED_DATA.inventory[ore.name] || 0;
+                if (qty <= 0) continue;
+                const batches = Math.floor(qty / ore.portionSize);
+                if (batches <= 0) continue;
+                for (const [matId, ypu] of Object.entries(ore.minerals)) {
+                    const id = parseInt(matId);
+                    // ypu = (mat_qty / portionSize) * efficiency, so total = floor(ypu * portionSize * batches)
+                    totals[id] = (totals[id] || 0) + Math.floor(ypu * ore.portionSize * batches);
+                }
+            }
+            return totals;
+        }
+
         function buildMineralInputs() {
+            const estimates = computeMineralEstimates();
+            const mineralPrices = {};
+            if (BUYBACK_DATA?.items) {
+                for (const item of BUYBACK_DATA.items) {
+                    if (['minerals','ice_products','moon_materials'].includes(item.category)) {
+                        mineralPrices[item.typeId] = item.sellRate;
+                    }
+                }
+            }
+
             for (const [cat, entries] of Object.entries(MINERAL_DEFS)) {
                 const grid = document.getElementById('mineral-grid-' + cat);
                 if (!grid) continue;
@@ -6192,11 +6240,21 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         div.textContent = entry.tier;
                         grid.appendChild(div);
                     } else {
+                        const qty = estimates[entry.id] || 0;
+                        const pct = mineralPrices[entry.id];
+                        const qtyStr = qty > 0
+                            ? '<span class="mineral-qty-val">~' + qty.toLocaleString() + '</span>'
+                            : '<span style="color:#2a5a70">None in stock</span>';
+                        const pctStr = pct != null
+                            ? ' &nbsp;·&nbsp; <span class="mineral-pct-val">' + pct + '% JBV</span>'
+                            : '';
                         const row = document.createElement('div');
                         row.className = 'mineral-input-row';
-                        row.innerHTML = '<label title="' + entry.name + '">' + entry.name + '</label>'
-                            + '<input type="number" min="0" step="1" id="mineral-' + entry.id + '"'
-                            + ' placeholder="0">';
+                        row.innerHTML = '<div class="mineral-label-block" title="' + entry.name + '">'
+                            + '<span class="mineral-label-name">' + entry.name + '</span>'
+                            + '<span class="mineral-label-sub">' + qtyStr + pctStr + '</span>'
+                            + '</div>'
+                            + '<input type="number" min="0" step="1" id="mineral-' + entry.id + '" placeholder="0">';
                         grid.appendChild(row);
                     }
                 });
