@@ -611,6 +611,9 @@
         }
         .mineral-input-row input::placeholder { color: #2a5a70; }
         .mineral-input-row input:focus { border-color: #00d9ff; outline: none; }
+        .mineral-input-row input::-webkit-outer-spin-button,
+        .mineral-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .mineral-input-row input[type=number] { -moz-appearance: textfield; }
         .mineral-result-row {
             display: flex;
             justify-content: space-between;
