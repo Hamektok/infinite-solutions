@@ -6145,7 +6145,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     fd.textContent = family.baseName;
                     grid.appendChild(fd);
 
-                    const variantsToShow = showVariants ? family.variants : family.variants.slice(0, 1);
+                    const variantsToShow = (showVariants || type === 'moon') ? family.variants : family.variants.slice(0, 1);
                     variantsToShow.forEach(name => {
                         const qty = inventory[name] || 0;
                         const card = createItemCard(name, qty, getRates(name));
