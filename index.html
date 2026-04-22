@@ -515,17 +515,89 @@
             margin-top: 6px;
         }
 
-        .ore-grade-toggle {
-            padding: 6px 2px 10px;
-            font-size: 0.82em;
-            color: rgba(160, 190, 210, 0.6);
+        .ore-tables-row {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
+            gap: 14px;
+            align-items: flex-start;
         }
-
-        .ore-grade-toggle input { cursor: pointer; }
+        .ore-table-panel {
+            flex: 1;
+            min-width: 0;
+            background: #0a1922;
+            border-radius: 6px;
+            border: 1px solid rgba(0,217,255,0.1);
+            overflow: hidden;
+        }
+        .ore-table-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.62em;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #00d9ff;
+            padding: 8px 10px 7px;
+            background: rgba(0,217,255,0.06);
+            border-bottom: 1px solid rgba(0,217,255,0.15);
+        }
+        .ore-compact-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78em;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .ore-compact-table thead th {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.68em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #4a8aa0;
+            padding: 5px 8px 4px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(0,217,255,0.08);
+            text-align: left;
+            font-weight: 400;
+        }
+        .ore-compact-table thead th.ore-col-stock,
+        .ore-compact-table thead th.ore-col-price { text-align: right; }
+        .ore-col-name  { width: 52%; }
+        .ore-col-stock { width: 22%; }
+        .ore-col-price { width: 13%; }
+        .ore-tier-row td {
+            padding: 5px 8px 3px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65em;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(160,190,210,0.55);
+            background: rgba(0,217,255,0.04);
+            border-top: 1px solid rgba(0,217,255,0.1);
+            border-bottom: 1px solid rgba(0,217,255,0.06);
+        }
+        .ore-tier-row:first-child td { border-top: none; }
+        .ore-family-row td {
+            padding: 3px 8px 2px;
+            font-size: 0.72em;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgba(130,160,180,0.45);
+            background: rgba(255,255,255,0.015);
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .ore-data-row td {
+            padding: 4px 8px;
+            color: #88d0e8;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: middle;
+        }
+        .ore-data-row:last-child td { border-bottom: none; }
+        .ore-data-row .ore-col-stock {
+            text-align: right;
+            font-weight: 600;
+            color: #a0c8e0;
+        }
+        .ore-data-row .ore-col-stock.out-of-stock { color: rgba(180,80,80,0.7); }
+        .ore-data-row .ore-col-price { text-align: right; color: #4a8aa0; }
+        .ore-data-row .ore-col-price.corp  { color: #ffcc44; }
+        .ore-data-row .ore-col-price.ally  { color: #00d9ff; }
 
         /* ── Mineral Calculator ──────────────────────────────────────────── */
         .mineral-group-label {
@@ -1522,6 +1594,10 @@
         }
 
         /* Small phones (max-width: 480px) */
+        @media (max-width: 900px) {
+            .ore-tables-row { flex-direction: column; }
+        }
+
         @media (max-width: 480px) {
             h1 {
                 font-size: 25px;
@@ -2525,24 +2601,44 @@
 
                     <!-- COMPRESSED ORES SUB-CONTENT -->
                     <div id="compressed-ores-content" class="tab-content">
-                        <div class="pi-tier-tabs">
-                            <button class="pi-tier-tab ore-cat-tab active"
-                                    onclick="filterCompressedCat(this,'standard')"
-                                    data-market-sub="compressed_ores:standard_ores">Standard Ores</button>
-                            <button class="pi-tier-tab ore-cat-tab"
-                                    onclick="filterCompressedCat(this,'moon')"
-                                    data-market-sub="compressed_ores:moon_ores">Moon Ores</button>
-                            <button class="pi-tier-tab ore-cat-tab"
-                                    onclick="filterCompressedCat(this,'ice')"
-                                    data-market-sub="compressed_ores:ice_ores">Ice Ores</button>
+                        <div class="ore-tables-row">
+                            <div class="ore-table-panel">
+                                <div class="ore-table-header">Standard Ores</div>
+                                <table class="ore-compact-table">
+                                    <thead><tr>
+                                        <th class="ore-col-name">Ore</th>
+                                        <th class="ore-col-stock">Stock</th>
+                                        <th class="ore-col-price">Corp</th>
+                                        <th class="ore-col-price">Alliance</th>
+                                    </tr></thead>
+                                    <tbody id="ore-tbody-standard"></tbody>
+                                </table>
+                            </div>
+                            <div class="ore-table-panel">
+                                <div class="ore-table-header">Moon Ores</div>
+                                <table class="ore-compact-table">
+                                    <thead><tr>
+                                        <th class="ore-col-name">Ore</th>
+                                        <th class="ore-col-stock">Stock</th>
+                                        <th class="ore-col-price">Corp</th>
+                                        <th class="ore-col-price">Alliance</th>
+                                    </tr></thead>
+                                    <tbody id="ore-tbody-moon"></tbody>
+                                </table>
+                            </div>
+                            <div class="ore-table-panel">
+                                <div class="ore-table-header">Ice Ores</div>
+                                <table class="ore-compact-table">
+                                    <thead><tr>
+                                        <th class="ore-col-name">Ore</th>
+                                        <th class="ore-col-stock">Stock</th>
+                                        <th class="ore-col-price">Corp</th>
+                                        <th class="ore-col-price">Alliance</th>
+                                    </tr></thead>
+                                    <tbody id="ore-tbody-ice"></tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="ore-grade-toggle">
-                            <label>
-                                <input type="checkbox" id="showAllGrades" onchange="renderCompressedOres(currentOreType)">
-                                Show grade variants (II-Grade / III-Grade / IV-Grade)
-                            </label>
-                        </div>
-                        <div class="item-grid" id="compressed-ores-grid"></div>
                     </div>
 
                     <!-- MINERAL CALCULATOR SUB-CONTENT -->
@@ -3552,7 +3648,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 22, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 22, 2026 20:08 EVE"
+            "inventoryLastUpdated": "Apr 22, 2026 22:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5722,7 +5818,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
             renderGasCloudMaterials(inventory);
             renderResearchEquipment(inventory);
             renderSalvage(inventory);
-            renderCompressedOres('standard');
+            renderCompressedOres();
             buildMineralInputs();
         }
 
@@ -6109,47 +6205,55 @@ Tip: Copy directly from EVE inventory window"></textarea>
         // COMPRESSED ORES
         // ============================================
 
-        let currentOreType = 'standard';
-
-        function filterCompressedCat(btn, type) {
-            document.querySelectorAll('.ore-cat-tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentOreType = type;
-            renderCompressedOres(type);
-        }
-
-        function renderCompressedOres(type) {
-            const grid = document.getElementById('compressed-ores-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
+        function renderCompressedOres() {
             if (typeof BUYBACK_DATA === 'undefined' || !BUYBACK_DATA.compressedOresData) return;
-            const catalog = BUYBACK_DATA.compressedOresData[type];
-            if (!catalog) return;
-            const showVariants = document.getElementById('showAllGrades') &&
-                                 document.getElementById('showAllGrades').checked;
             const inventory = EMBEDDED_DATA.inventory;
 
-            // catalog is {tierName: [families]} for standard/moon, array [families] for ice
-            const tierGroups = Array.isArray(catalog) ? { '': catalog } : catalog;
+            ['standard', 'moon', 'ice'].forEach(type => {
+                const tbody = document.getElementById('ore-tbody-' + type);
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                const catalog = BUYBACK_DATA.compressedOresData[type];
+                if (!catalog) return;
 
-            Object.entries(tierGroups).forEach(([tierName, families]) => {
-                if (tierName) {
-                    const d = document.createElement('div');
-                    d.className = 'ice-group-divider';
-                    d.textContent = tierName;
-                    grid.appendChild(d);
-                }
-                families.forEach(family => {
-                    const fd = document.createElement('div');
-                    fd.className = 'ore-family-divider';
-                    fd.textContent = family.baseName;
-                    grid.appendChild(fd);
+                const tierGroups = Array.isArray(catalog) ? { '': catalog } : catalog;
+                let firstTier = true;
 
-                    const variantsToShow = (showVariants || type === 'moon') ? family.variants : family.variants.slice(0, 1);
-                    variantsToShow.forEach(name => {
-                        const qty = inventory[name] || 0;
-                        const card = createItemCard(name, qty, getRates(name));
-                        grid.appendChild(card);
+                Object.entries(tierGroups).forEach(([tierName, families]) => {
+                    if (tierName) {
+                        const tr = document.createElement('tr');
+                        tr.className = 'ore-tier-row' + (firstTier ? ' first' : '');
+                        tr.innerHTML = `<td colspan="4">${tierName}</td>`;
+                        tbody.appendChild(tr);
+                        firstTier = false;
+                    }
+                    families.forEach(family => {
+                        // only show family divider row if there are multiple variants
+                        if (family.variants.length > 1) {
+                            const tr = document.createElement('tr');
+                            tr.className = 'ore-family-row';
+                            tr.innerHTML = `<td colspan="4">${family.baseName}</td>`;
+                            tbody.appendChild(tr);
+                        }
+                        family.variants.forEach(name => {
+                            const qty = inventory[name] || 0;
+                            const rates = getRates(name);
+                            const shortName = name.replace('Compressed ', '');
+                            const stockClass = qty === 0 ? 'ore-col-stock out-of-stock' : 'ore-col-stock';
+                            const stockText = qty === 0 ? '—' : qty.toLocaleString();
+                            let corpCell = '<td class="ore-col-price">—</td>';
+                            let allyCell = '<td class="ore-col-price">—</td>';
+                            if (rates) {
+                                corpCell = `<td class="ore-col-price corp">${rates.corp}%</td>`;
+                                allyCell = `<td class="ore-col-price ally">${rates.alliance}%</td>`;
+                            }
+                            const tr = document.createElement('tr');
+                            tr.className = 'ore-data-row';
+                            tr.innerHTML = `<td class="ore-col-name">${shortName}</td>
+                                <td class="${stockClass}">${stockText}</td>
+                                ${corpCell}${allyCell}`;
+                            tbody.appendChild(tr);
+                        });
                     });
                 });
             });
