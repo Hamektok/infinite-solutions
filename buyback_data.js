@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-04-21 22:10 UTC
+// Generated: 2026-04-22 01:51 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -10227,24 +10227,32 @@ const BUYBACK_DATA = {
         {
           "baseName": "Bitumens",
           "variants": [
-            "Compressed Bitumens"
+            "Compressed Bitumens",
+            "Compressed Brimful Bitumens",
+            "Compressed Glistening Bitumens"
           ]
         },
         {
           "baseName": "Coesite",
           "variants": [
-            "Compressed Coesite"
+            "Compressed Coesite",
+            "Compressed Brimful Coesite",
+            "Compressed Glistening Coesite"
           ]
         },
         {
           "baseName": "Sylvite",
           "variants": [
+            "Compressed Brimful Sylvite",
+            "Compressed Glistening Sylvite",
             "Compressed Sylvite"
           ]
         },
         {
           "baseName": "Zeolites",
           "variants": [
+            "Compressed Brimful Zeolites",
+            "Compressed Glistening Zeolites",
             "Compressed Zeolites"
           ]
         }
@@ -10253,25 +10261,33 @@ const BUYBACK_DATA = {
         {
           "baseName": "Cobaltite",
           "variants": [
-            "Compressed Cobaltite"
+            "Compressed Cobaltite",
+            "Compressed Copious Cobaltite",
+            "Compressed Twinkling Cobaltite"
           ]
         },
         {
           "baseName": "Euxenite",
           "variants": [
-            "Compressed Euxenite"
+            "Compressed Euxenite",
+            "Compressed Copious Euxenite",
+            "Compressed Twinkling Euxenite"
           ]
         },
         {
           "baseName": "Scheelite",
           "variants": [
-            "Compressed Scheelite"
+            "Compressed Scheelite",
+            "Compressed Copious Scheelite",
+            "Compressed Twinkling Scheelite"
           ]
         },
         {
           "baseName": "Titanite",
           "variants": [
-            "Compressed Titanite"
+            "Compressed Titanite",
+            "Compressed Copious Titanite",
+            "Compressed Twinkling Titanite"
           ]
         }
       ],
@@ -10279,25 +10295,33 @@ const BUYBACK_DATA = {
         {
           "baseName": "Chromite",
           "variants": [
-            "Compressed Chromite"
+            "Compressed Chromite",
+            "Compressed Lavish Chromite",
+            "Compressed Shimmering Chromite"
           ]
         },
         {
           "baseName": "Otavite",
           "variants": [
-            "Compressed Otavite"
+            "Compressed Otavite",
+            "Compressed Lavish Otavite",
+            "Compressed Shimmering Otavite"
           ]
         },
         {
           "baseName": "Sperrylite",
           "variants": [
-            "Compressed Sperrylite"
+            "Compressed Sperrylite",
+            "Compressed Lavish Sperrylite",
+            "Compressed Shimmering Sperrylite"
           ]
         },
         {
           "baseName": "Vanadinite",
           "variants": [
-            "Compressed Vanadinite"
+            "Compressed Vanadinite",
+            "Compressed Lavish Vanadinite",
+            "Compressed Shimmering Vanadinite"
           ]
         }
       ],
@@ -10305,25 +10329,33 @@ const BUYBACK_DATA = {
         {
           "baseName": "Carnotite",
           "variants": [
-            "Compressed Carnotite"
+            "Compressed Carnotite",
+            "Compressed Replete Carnotite",
+            "Compressed Glowing Carnotite"
           ]
         },
         {
           "baseName": "Cinnabar",
           "variants": [
-            "Compressed Cinnabar"
+            "Compressed Cinnabar",
+            "Compressed Replete Cinnabar",
+            "Compressed Glowing Cinnabar"
           ]
         },
         {
           "baseName": "Pollucite",
           "variants": [
-            "Compressed Pollucite"
+            "Compressed Pollucite",
+            "Compressed Replete Pollucite",
+            "Compressed Glowing Pollucite"
           ]
         },
         {
           "baseName": "Zircon",
           "variants": [
-            "Compressed Zircon"
+            "Compressed Zircon",
+            "Compressed Replete Zircon",
+            "Compressed Glowing Zircon"
           ]
         }
       ],
@@ -10331,25 +10363,33 @@ const BUYBACK_DATA = {
         {
           "baseName": "Loparite",
           "variants": [
-            "Compressed Loparite"
+            "Compressed Loparite",
+            "Compressed Bountiful Loparite",
+            "Compressed Shining Loparite"
           ]
         },
         {
           "baseName": "Monazite",
           "variants": [
-            "Compressed Monazite"
+            "Compressed Monazite",
+            "Compressed Bountiful Monazite",
+            "Compressed Shining Monazite"
           ]
         },
         {
           "baseName": "Xenotime",
           "variants": [
-            "Compressed Xenotime"
+            "Compressed Xenotime",
+            "Compressed Bountiful Xenotime",
+            "Compressed Shining Xenotime"
           ]
         },
         {
           "baseName": "Ytterbite",
           "variants": [
-            "Compressed Ytterbite"
+            "Compressed Ytterbite",
+            "Compressed Bountiful Ytterbite",
+            "Compressed Shining Ytterbite"
           ]
         }
       ]
@@ -12028,5 +12068,5 @@ const BUYBACK_DATA = {
     }
   ],
   "refiningEfficiency": 90.63,
-  "generated": "2026-04-21 22:10 UTC"
+  "generated": "2026-04-22 01:51 UTC"
 };

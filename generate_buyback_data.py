@@ -56,7 +56,12 @@ CONFIG_TO_DB_CATEGORY = {
 
 # Market tab visibility keys
 MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials',
-                   'research_equipment', 'pi_materials', 'salvaged_materials', 'compressed_ores']
+                   'research_equipment', 'pi_materials', 'salvaged_materials', 'compressed_ores',
+                   'mineral_calculator']
+
+# Ice ore base names (portionSize=1 when compressed; all others use portionSize=100)
+ICE_ORE_BASES = {'Blue Ice', 'Clear Icicle', 'Glacial Mass', 'White Glaze',
+                 'Glare Crust', 'Dark Glitter', 'Gelidus', 'Krystallos'}
 
 # Market subcategory definitions: (tab_key, sub_key, display_name)
 MARKET_SUBTAB_DEFS = [
@@ -179,12 +184,25 @@ def build_compressed_ore_catalog(conn):
         ORDER BY category, display_order
     """).fetchall()
 
+    # Moon ore grade prefixes (Brimful/Glistening=R4, Copious/Twinkling=R8,
+    # Lavish/Shimmering=R16, Replete/Glowing=R32, Bountiful/Shining=R64)
+    MOON_GRADE_PREFIXES = (
+        'Brimful ', 'Glistening ', 'Copious ', 'Twinkling ',
+        'Lavish ', 'Shimmering ', 'Replete ', 'Glowing ',
+        'Bountiful ', 'Shining ',
+    )
+
     # Index by category → {base_name: [variant_name, ...]}  (ordered)
     by_cat = {'standard_ore': {}, 'moon_ore': {}, 'ice_ore': {}}
     for name, cat, _ in rows:
-        # Strip prefix and grade suffix to get base name
         base = name.replace('Compressed ', '', 1)
-        base = base.replace(' II-Grade', '').replace(' III-Grade', '').replace(' IV-Grade', '')
+        if cat == 'moon_ore':
+            for prefix in MOON_GRADE_PREFIXES:
+                if base.startswith(prefix):
+                    base = base[len(prefix):]
+                    break
+        else:
+            base = base.replace(' II-Grade', '').replace(' III-Grade', '').replace(' IV-Grade', '')
         by_cat[cat].setdefault(base, []).append(name)
 
     def make_tier_groups(tier_map, cat_key):
@@ -326,6 +344,35 @@ def get_buyback_data():
     # Build compressed ore catalog before closing connection
     compressed_ores_data = build_compressed_ore_catalog(conn)
 
+    # Build oreRefineData for the mineral calculator
+    _eff = refining_efficiency / 100.0
+    _ore_refine_rows = conn.execute("""
+        SELECT tm.type_id, tm.type_name, tm.category, t.materials_json
+        FROM tracked_market_items tm
+        JOIN type_materials t ON t.type_id = tm.type_id
+        WHERE tm.category IN ('standard_ore','ice_ore','moon_ore')
+          AND tm.type_name LIKE 'Compressed%'
+    """).fetchall()
+    ore_refine_data = []
+    for _tid, _tname, _cat, _mats_json in _ore_refine_rows:
+        try:
+            _mats = json.loads(_mats_json)
+        except Exception:
+            continue
+        _portion = 1 if any(b in _tname for b in ICE_ORE_BASES) else 100
+        _minerals = {}
+        for _m in _mats:
+            _per_unit = (_m['quantity'] / _portion) * _eff
+            if _per_unit > 0:
+                _minerals[str(_m['materialTypeID'])] = round(_per_unit, 6)
+        if _minerals:
+            ore_refine_data.append({
+                'name': _tname,
+                'category': _cat,
+                'portionSize': _portion,
+                'minerals': _minerals,
+            })
+
     conn.close()
 
     # Identify all ore type_ids that need mineral-value calculation
@@ -429,6 +476,7 @@ def get_buyback_data():
         'categories': categories,
         'marketVisibility': market_visibility,
         'compressedOresData': compressed_ores_data,
+        'oreRefineData': ore_refine_data,
         'refiningEfficiency': refining_efficiency,
         'generated': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
     }
