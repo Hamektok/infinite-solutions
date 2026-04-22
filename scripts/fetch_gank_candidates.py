@@ -136,14 +136,16 @@ CYNO_JUMPER_SHIPS = STEALTH_BOMBERS | T3_CRUISERS | BLACK_OPS | DREADS | CARRIER
 
 NPC_CORP_THRESHOLD  = 2_000_000
 
-# Faction Warfare militia factions and their opposing counterpart.
-# A kill where the victim is enlisted in one FW faction and an attacker
-# is enlisted in the opposing faction is legitimate militia combat — not a gank.
+# Faction Warfare: each faction maps to the set of factions it is at war with.
+# Angel Cartel (500011) fights both Amarr and Minmatar.
+# Guristas Pirates (500010) fight both Caldari and Gallente.
 FW_OPPOSING = {
-    500001: 500004,  # Caldari State  vs Gallente Federation
-    500004: 500001,  # Gallente Federation vs Caldari State
-    500003: 500002,  # Amarr Empire   vs Minmatar Republic
-    500002: 500003,  # Minmatar Republic vs Amarr Empire
+    500001: {500004, 500010},  # Caldari vs Gallente + Guristas
+    500004: {500001, 500010},  # Gallente vs Caldari + Guristas
+    500010: {500001, 500004},  # Guristas vs Caldari + Gallente
+    500003: {500002, 500011},  # Amarr vs Minmatar + Angel Cartel
+    500002: {500003, 500011},  # Minmatar vs Amarr + Angel Cartel
+    500011: {500003, 500002},  # Angel Cartel vs Amarr + Minmatar
 }
 
 
@@ -156,7 +158,7 @@ def is_fw_kill(esi):
     if not opposing:
         return False
     return any(
-        a.get('faction_id') == opposing and a.get('character_id', 0) > 0
+        a.get('faction_id') in opposing and a.get('character_id', 0) > 0
         for a in esi.get('attackers', [])
     )
 

@@ -1,0 +1,12 @@
+{
+  "published": "2026-04-13T20:46:24",
+  "pricing_mode": "per_ly",
+  "econ_bonus": 0.07,
+  "exp_bonus": 1.275,
+  "rate_per_ly": 12.0,
+  "rate_flat": 0.0,
+  "collateral_pct": 0.0,
+  "jf_skill": 4,
+  "jfc_skill": 4,
+  "iso_jbv_pct": 100.0
+}

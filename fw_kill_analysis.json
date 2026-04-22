@@ -1,0 +1,77 @@
+{
+  "total_kills": 786,
+  "fw_kill_count": 17,
+  "clean_kill_count": 769,
+  "fw_kills": {
+    "134719999": {
+      "victim_faction": "Amarr Empire",
+      "attacker_faction": "Angel Cartel"
+    },
+    "134729930": {
+      "victim_faction": "Caldari State",
+      "attacker_faction": "Gallente Federation"
+    },
+    "134757277": {
+      "victim_faction": "Amarr Empire",
+      "attacker_faction": "Angel Cartel"
+    },
+    "134779093": {
+      "victim_faction": "Caldari State",
+      "attacker_faction": "Gallente Federation"
+    },
+    "134779596": {
+      "victim_faction": "Caldari State",
+      "attacker_faction": "Gallente Federation"
+    },
+    "134785297": {
+      "victim_faction": "Minmatar Republic",
+      "attacker_faction": "Angel Cartel"
+    },
+    "134801059": {
+      "victim_faction": "Amarr Empire",
+      "attacker_faction": "Angel Cartel"
+    },
+    "134804248": {
+      "victim_faction": "Amarr Empire",
+      "attacker_faction": "Angel Cartel"
+    },
+    "134821924": {
+      "victim_faction": "Amarr Empire",
+      "attacker_faction": "Minmatar Republic"
+    },
+    "134825649": {
+      "victim_faction": "Caldari State",
+      "attacker_faction": "Gallente Federation"
+    },
+    "134826493": {
+      "victim_faction": "Minmatar Republic",
+      "attacker_faction": "Angel Cartel"
+    },
+    "134826807": {
+      "victim_faction": "Caldari State",
+      "attacker_faction": "Gallente Federation"
+    },
+    "134841722": {
+      "victim_faction": "Caldari State",
+      "attacker_faction": "Gallente Federation"
+    },
+    "134857598": {
+      "victim_faction": "Minmatar Republic",
+      "attacker_faction": "Amarr Empire"
+    },
+    "134861530": {
+      "victim_faction": "Amarr Empire",
+      "attacker_faction": "Minmatar Republic"
+    },
+    "134862132": {
+      "victim_faction": "Minmatar Republic",
+      "attacker_faction": "Amarr Empire"
+    },
+    "134867306": {
+      "victim_faction": "Caldari State",
+      "attacker_faction": "Gallente Federation"
+    }
+  },
+  "hash_errors": [],
+  "esi_errors": []
+}

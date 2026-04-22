@@ -56,16 +56,18 @@ COMP_INTEL_CATEGORIES = {
 
 # Market tab visibility
 MARKET_TAB_KEYS = ['minerals', 'ice_products', 'moon_materials', 'gas_cloud_materials',
-                   'research_equipment', 'pi_materials', 'salvaged_materials', 'compressed_ores']
+                   'research_equipment', 'pi_materials', 'salvaged_materials', 'compressed_ores',
+                   'mineral_calculator']
 MARKET_TAB_LABELS = {
-    'minerals':            'Minerals',
-    'ice_products':        'Ice Products',
-    'moon_materials':      'Moon Materials',
-    'gas_cloud_materials': 'Gas Cloud Materials',
-    'research_equipment':  'Research Equipment',
-    'pi_materials':        'Planetary Materials',
-    'salvaged_materials':  'Salvaged Materials',
-    'compressed_ores':     'Compressed Ores',
+    'minerals':             'Minerals',
+    'ice_products':         'Ice Products',
+    'moon_materials':       'Moon Materials',
+    'gas_cloud_materials':  'Gas Cloud Materials',
+    'research_equipment':   'Research Equipment',
+    'pi_materials':         'Planetary Materials',
+    'salvaged_materials':   'Salvaged Materials',
+    'compressed_ores':      'Compressed Ores',
+    'mineral_calculator':   'Mineral Calculator',
 }
 
 # Market subcategory definitions: (tab_key, sub_key, display_label)
@@ -9396,14 +9398,12 @@ class AdminDashboard:
                 }
 
                 conn2 = sqlite3.connect(DB_PATH)
+                url = f'https://esi.evetech.net/latest/characters/{char_id}/contacts/?standing=-10'
                 for i in range(0, len(rows), BATCH):
                     batch = rows[i:i + BATCH]
-                    body  = [{'contact_id': eid, 'contact_type': etype, 'standing': -10}
-                             for eid, etype in batch]
-                    url   = (f'https://esi.evetech.net/latest'
-                             f'/characters/{char_id}/contacts/')
-                    r = _req.put(url, json=body, headers=headers, timeout=15)
-                    if r.status_code in (200, 204):
+                    body  = [eid for eid, etype in batch]
+                    r = _req.post(url, json=body, headers=headers, timeout=15)
+                    if r.status_code in (200, 201, 204):
                         pushed += len(batch)
                         for eid, etype in batch:
                             conn2.execute(
