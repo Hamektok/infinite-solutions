@@ -686,29 +686,88 @@
         .mineral-input-row input::-webkit-outer-spin-button,
         .mineral-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .mineral-input-row input[type=number] { -moz-appearance: textfield; }
-        .mineral-result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 7px 0;
-            border-bottom: 1px solid rgba(0,217,255,.1);
-            font-size: .9em;
-        }
-        .mineral-result-row:last-child { border-bottom: none; }
-        .mineral-result-name { color: #88d0e8; flex: 1; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
-        .mineral-result-qty {
-            color: #ffcc44;
-            font-family: 'Orbitron', sans-serif;
-            font-size: .8em;
-            font-weight: 700;
-            margin-left: 12px;
-        }
         .mineral-warn {
             color: #ff6b6b;
             font-size: .82em;
             margin-top: 10px;
             line-height: 1.4;
         }
+        /* ── Order Receipt ── */
+        .rcpt-wrap {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85em;
+            color: #a0c8e0;
+        }
+        .rcpt-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7em;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #00d9ff;
+            margin-bottom: 2px;
+        }
+        .rcpt-timestamp {
+            font-size: 0.78em;
+            color: #4a8aa0;
+            margin-bottom: 12px;
+        }
+        .rcpt-section-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.6em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #4a8aa0;
+            padding: 8px 0 5px;
+            border-bottom: 1px solid rgba(0,217,255,0.12);
+            margin-bottom: 4px;
+        }
+        .rcpt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 4px;
+        }
+        .rcpt-table td {
+            padding: 4px 4px 4px 0;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            line-height: 1.35;
+        }
+        .rcpt-table tr:last-child td { border-bottom: none; }
+        .rcpt-name { color: #88d0e8; font-weight: 600; width: 45%; }
+        .rcpt-qty  { color: #a0c8e0; text-align: right; white-space: nowrap; }
+        .rcpt-corp-col { color: #ffcc44; text-align: right; white-space: nowrap; padding-left: 8px !important; }
+        .rcpt-ally-col { color: #00d9ff; text-align: right; white-space: nowrap; padding-left: 8px !important; }
+        .rcpt-rate-note { display: block; font-size: 0.76em; color: #4a8aa0; }
+        .rcpt-divider {
+            border: none;
+            border-top: 1px solid rgba(0,217,255,0.15);
+            margin: 8px 0;
+        }
+        .rcpt-total-block {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin: 6px 0 12px;
+        }
+        .rcpt-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .rcpt-total-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.6em;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #4a8aa0;
+        }
+        .rcpt-total-val { font-weight: 700; font-size: 1em; }
+        .rcpt-total-val.corp { color: #ffcc44; }
+        .rcpt-total-val.ally { color: #00d9ff; }
+        .rcpt-mineral-row td { padding: 3px 4px 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .rcpt-mineral-row:last-child td { border-bottom: none; }
+        .rcpt-min-name { color: #88d0e8; font-weight: 600; }
+        .rcpt-min-qty  { color: #a0c8e0; text-align: right; font-variant-numeric: tabular-nums; }
 
         .item {
             background: rgba(0, 50, 80, 0.3);
@@ -3648,7 +3707,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 22, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 22, 2026 22:08 EVE"
+            "inventoryLastUpdated": "Apr 23, 2026 00:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5986,6 +6045,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         // Build name→{allianceRate, corpRate} lookup from buyback_data.js
         const SELL_RATE_LOOKUP = {};
+        const ORE_JBV_LOOKUP   = {};
         const PARTNER_SLOT_LOOKUP = {};
         const FLAG_LOOKUP = {};
         const SUPPLIER_LOOKUP = {};
@@ -6004,6 +6064,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         alliance: item.sellRate,
                         corp: item.corpRate != null ? item.corpRate : item.sellRate,
                     };
+                }
+                if (item.avgJitaBuy != null && item.avgJitaBuy > 0) {
+                    ORE_JBV_LOOKUP[item.name] = item.avgJitaBuy;
                 }
                 if (item.partnerSlot && item.slotOpen) {
                     PARTNER_SLOT_LOOKUP[item.name] = true;
@@ -6447,22 +6510,108 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 return;
             }
 
-            // Sort results by batches descending
+            // ISK formatter
+            function fmtISK(v) {
+                if (v >= 1e9) return (v / 1e9).toFixed(2) + 'B ISK';
+                if (v >= 1e6) return (v / 1e6).toFixed(2) + 'M ISK';
+                if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K ISK';
+                return Math.round(v).toLocaleString() + ' ISK';
+            }
+
             const sortedAlloc = Object.entries(allocated).sort((a, b) => b[1] - a[1]);
-            let html = '';
+            let corpGrand = 0, allyGrand = 0;
+            const mineralsProduced = {};
+            let oreRows = '';
+
             for (const [name, batches] of sortedAlloc) {
                 const oreEntry = BUYBACK_DATA.oreRefineData.find(o => o.name === name);
-                const qty = batches * (oreEntry ? oreEntry.portionSize : 100);
-                html += '<div class="mineral-result-row">'
-                    + '<span class="mineral-result-name">' + name + '</span>'
-                    + '<span class="mineral-result-qty">' + qty.toLocaleString() + '</span>'
-                    + '</div>';
+                const portionSize = oreEntry ? oreEntry.portionSize : 100;
+                const qty = batches * portionSize;
+                const shortName = name.replace('Compressed ', '');
+
+                // Accumulate mineral yield
+                if (oreEntry) {
+                    for (const [matId, ypu] of Object.entries(oreEntry.minerals)) {
+                        const id = parseInt(matId);
+                        mineralsProduced[id] = (mineralsProduced[id] || 0) + Math.floor(ypu * portionSize * batches);
+                    }
+                }
+
+                const rates = getRates(name);
+                const jbv   = ORE_JBV_LOOKUP[name] || 0;
+                let corpCell = '<td class="rcpt-corp-col">—</td><td class="rcpt-ally-col">—</td>';
+                if (rates && jbv > 0) {
+                    const corpISK = jbv * (rates.corp / 100) * qty;
+                    const allyISK = jbv * (rates.alliance / 100) * qty;
+                    corpGrand += corpISK;
+                    allyGrand += allyISK;
+                    corpCell = `<td class="rcpt-corp-col">${fmtISK(corpISK)}<span class="rcpt-rate-note">${rates.corp}% JBV</span></td>`
+                             + `<td class="rcpt-ally-col">${fmtISK(allyISK)}<span class="rcpt-rate-note">${rates.alliance}% JBV</span></td>`;
+                }
+
+                oreRows += `<tr><td class="rcpt-name">${shortName}</td>`
+                         + `<td class="rcpt-qty">${qty.toLocaleString()}</td>`
+                         + corpCell + `</tr>`;
             }
-            if (unfulfilled.length > 0) {
-                html += '<p class="mineral-warn">&#9888; Insufficient stock to fully cover: '
-                    + unfulfilled.join(', ') + '</p>';
+
+            // Mineral yield rows — only show minerals that were actually produced
+            const mineralLookup = {};
+            for (const group of Object.values(MINERAL_DEFS)) {
+                for (const m of group) { if (m.id) mineralLookup[m.id] = m.name; }
             }
-            body.innerHTML = html;
+            let mineralRows = '';
+            const producedEntries = Object.entries(mineralsProduced)
+                .map(([id, qty]) => ({ id: parseInt(id), name: mineralLookup[parseInt(id)] || ('Type ' + id), qty }))
+                .filter(e => e.qty > 0)
+                .sort((a, b) => b.qty - a.qty);
+            for (const e of producedEntries) {
+                mineralRows += `<tr class="rcpt-mineral-row">`
+                    + `<td class="rcpt-min-name">${e.name}</td>`
+                    + `<td class="rcpt-min-qty">${e.qty.toLocaleString()}</td></tr>`;
+            }
+
+            const now = new Date();
+            const ts = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+                     + ' · ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+
+            const totalBlock = (corpGrand > 0)
+                ? `<div class="rcpt-total-block">
+                    <div class="rcpt-total-row">
+                        <span class="rcpt-total-label">Corp Total</span>
+                        <span class="rcpt-total-val corp">${fmtISK(corpGrand)}</span>
+                    </div>
+                    <div class="rcpt-total-row">
+                        <span class="rcpt-total-label">Alliance Total</span>
+                        <span class="rcpt-total-val ally">${fmtISK(allyGrand)}</span>
+                    </div>
+                  </div>`
+                : '';
+
+            const warnHtml = unfulfilled.length > 0
+                ? `<p class="mineral-warn">&#9888; Insufficient stock to fully cover: ${unfulfilled.join(', ')}</p>`
+                : '';
+
+            body.innerHTML = `<div class="rcpt-wrap">
+                <div class="rcpt-header">Order Summary</div>
+                <div class="rcpt-timestamp">${ts}</div>
+                <div class="rcpt-section-label">Ore Items</div>
+                <table class="rcpt-table">
+                    <thead><tr>
+                        <th style="color:#4a8aa0;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:left">Ore</th>
+                        <th style="color:#4a8aa0;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:right">Qty</th>
+                        <th style="color:#ffcc44;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:right;padding-left:8px">Corp</th>
+                        <th style="color:#00d9ff;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:right;padding-left:8px">Alliance</th>
+                    </tr></thead>
+                    <tbody>${oreRows}</tbody>
+                </table>
+                <hr class="rcpt-divider">
+                ${totalBlock}
+                <div class="rcpt-section-label">Mineral Yield <span style="font-size:.85em;letter-spacing:0;text-transform:none;font-family:'Rajdhani',sans-serif;color:#4a8aa0"> — 90.63% efficiency</span></div>
+                <table class="rcpt-table" style="margin-top:4px">
+                    <tbody>${mineralRows}</tbody>
+                </table>
+                ${warnHtml}
+            </div>`;
         }
 
         function clearMineralCalc() {
