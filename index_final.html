@@ -6473,12 +6473,25 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 return srcA - srcB;
             });
 
-            // Greedy allocation
+            // Greedy allocation — sort ores by lowest ISK cost per unit of target mineral
             for (const mid of mineralIds) {
                 if ((deficit[mid] || 0) <= 0) continue;
                 const sources = oreData
                     .filter(o => (o.minerals[String(mid)] || 0) > 0)
-                    .sort((a, b) => (b.minerals[String(mid)] || 0) - (a.minerals[String(mid)] || 0));
+                    .sort((a, b) => {
+                        const yA = a.minerals[String(mid)] || 0;
+                        const yB = b.minerals[String(mid)] || 0;
+                        const jbvA = ORE_JBV_LOOKUP[a.name] || 0;
+                        const jbvB = ORE_JBV_LOOKUP[b.name] || 0;
+                        const rA = getRates(a.name);
+                        const rB = getRates(b.name);
+                        const corpA = rA ? rA.corp / 100 : 1;
+                        const corpB = rB ? rB.corp / 100 : 1;
+                        // ISK per unit of this mineral — lower is cheaper for the customer
+                        const iskPerA = (jbvA > 0 && yA > 0) ? (jbvA * corpA) / yA : Infinity;
+                        const iskPerB = (jbvB > 0 && yB > 0) ? (jbvB * corpB) / yB : Infinity;
+                        return iskPerA - iskPerB;
+                    });
 
                 for (const ore of sources) {
                     if ((deficit[mid] || 0) <= 0) break;
