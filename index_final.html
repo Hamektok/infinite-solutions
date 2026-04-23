@@ -2668,8 +2668,6 @@
                                     <thead><tr>
                                         <th class="ore-col-name">Ore</th>
                                         <th class="ore-col-stock">Stock</th>
-                                        <th class="ore-col-price">Corp</th>
-                                        <th class="ore-col-price">Alliance</th>
                                     </tr></thead>
                                     <tbody id="ore-tbody-standard"></tbody>
                                 </table>
@@ -2680,8 +2678,6 @@
                                     <thead><tr>
                                         <th class="ore-col-name">Ore</th>
                                         <th class="ore-col-stock">Stock</th>
-                                        <th class="ore-col-price">Corp</th>
-                                        <th class="ore-col-price">Alliance</th>
                                     </tr></thead>
                                     <tbody id="ore-tbody-moon"></tbody>
                                 </table>
@@ -2692,8 +2688,6 @@
                                     <thead><tr>
                                         <th class="ore-col-name">Ore</th>
                                         <th class="ore-col-stock">Stock</th>
-                                        <th class="ore-col-price">Corp</th>
-                                        <th class="ore-col-price">Alliance</th>
                                     </tr></thead>
                                     <tbody id="ore-tbody-ice"></tbody>
                                 </table>
@@ -6305,17 +6299,10 @@ Tip: Copy directly from EVE inventory window"></textarea>
                             const shortName = name.replace('Compressed ', '');
                             const stockClass = qty === 0 ? 'ore-col-stock out-of-stock' : 'ore-col-stock';
                             const stockText = qty === 0 ? '—' : qty.toLocaleString();
-                            let corpCell = '<td class="ore-col-price">—</td>';
-                            let allyCell = '<td class="ore-col-price">—</td>';
-                            if (rates) {
-                                corpCell = `<td class="ore-col-price corp">${rates.corp}%</td>`;
-                                allyCell = `<td class="ore-col-price ally">${rates.alliance}%</td>`;
-                            }
                             const tr = document.createElement('tr');
                             tr.className = 'ore-data-row';
                             tr.innerHTML = `<td class="ore-col-name">${shortName}</td>
-                                <td class="${stockClass}">${stockText}</td>
-                                ${corpCell}${allyCell}`;
+                                <td class="${stockClass}">${stockText}</td>`;
                             tbody.appendChild(tr);
                         });
                     });
