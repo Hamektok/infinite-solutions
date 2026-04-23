@@ -695,25 +695,25 @@
         /* ── Order Receipt ── */
         .rcpt-wrap {
             font-family: 'Rajdhani', sans-serif;
-            font-size: 0.85em;
+            font-size: 1em;
             color: #a0c8e0;
         }
         .rcpt-header {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.7em;
+            font-size: 0.72em;
             letter-spacing: 2.5px;
             text-transform: uppercase;
             color: #00d9ff;
             margin-bottom: 2px;
         }
         .rcpt-timestamp {
-            font-size: 0.78em;
+            font-size: 0.88em;
             color: #4a8aa0;
             margin-bottom: 12px;
         }
         .rcpt-section-label {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.6em;
+            font-size: 0.65em;
             letter-spacing: 2px;
             text-transform: uppercase;
             color: #4a8aa0;
@@ -727,17 +727,18 @@
             margin-bottom: 4px;
         }
         .rcpt-table td {
-            padding: 4px 4px 4px 0;
+            padding: 5px 4px 5px 0;
             vertical-align: top;
             border-bottom: 1px solid rgba(255,255,255,0.04);
-            line-height: 1.35;
+            line-height: 1.4;
+            font-size: 0.95em;
         }
         .rcpt-table tr:last-child td { border-bottom: none; }
         .rcpt-name { color: #88d0e8; font-weight: 600; width: 45%; }
         .rcpt-qty  { color: #a0c8e0; text-align: right; white-space: nowrap; }
         .rcpt-corp-col { color: #ffcc44; text-align: right; white-space: nowrap; padding-left: 8px !important; }
         .rcpt-ally-col { color: #00d9ff; text-align: right; white-space: nowrap; padding-left: 8px !important; }
-        .rcpt-rate-note { display: block; font-size: 0.76em; color: #4a8aa0; }
+        .rcpt-rate-note { display: block; font-size: 0.82em; color: #4a8aa0; }
         .rcpt-divider {
             border: none;
             border-top: 1px solid rgba(0,217,255,0.15);
@@ -746,7 +747,7 @@
         .rcpt-total-block {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
             margin: 6px 0 12px;
         }
         .rcpt-total-row {
@@ -756,15 +757,15 @@
         }
         .rcpt-total-label {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.6em;
+            font-size: 0.65em;
             letter-spacing: 1.5px;
             text-transform: uppercase;
             color: #4a8aa0;
         }
-        .rcpt-total-val { font-weight: 700; font-size: 1em; }
+        .rcpt-total-val { font-weight: 700; font-size: 1.05em; }
         .rcpt-total-val.corp { color: #ffcc44; }
         .rcpt-total-val.ally { color: #00d9ff; }
-        .rcpt-mineral-row td { padding: 3px 4px 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .rcpt-mineral-row td { padding: 4px 4px 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.95em; }
         .rcpt-mineral-row:last-child td { border-bottom: none; }
         .rcpt-min-name { color: #88d0e8; font-weight: 600; }
         .rcpt-min-qty  { color: #a0c8e0; text-align: right; font-variant-numeric: tabular-nums; }
@@ -6606,7 +6607,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 </table>
                 <hr class="rcpt-divider">
                 ${totalBlock}
-                <div class="rcpt-section-label">Mineral Yield <span style="font-size:.85em;letter-spacing:0;text-transform:none;font-family:'Rajdhani',sans-serif;color:#4a8aa0"> — 90.63% efficiency</span></div>
+                <div class="rcpt-section-label">Mineral Yield <span style="font-size:.9em;letter-spacing:0;text-transform:none;font-family:'Rajdhani',sans-serif;color:#4a8aa0"> — 90.63% efficiency</span></div>
                 <table class="rcpt-table" style="margin-top:4px">
                     <tbody>${mineralRows}</tbody>
                 </table>
