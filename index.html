@@ -337,6 +337,31 @@
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
         }
 
+        .main-tab-under-construction {
+            position: relative;
+            display: inline-block;
+        }
+        .tab-construction {
+            opacity: 0.55;
+        }
+        .construction-badge {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #b85c00;
+            color: #ffe0a0;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 3px;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
         /* ===== SUB TAB NAVIGATION ===== */
         .sub-tabs {
             display: flex;
@@ -515,6 +540,20 @@
             margin-top: 6px;
         }
 
+        .ore-filter-bar {
+            padding: 0 2px 10px;
+        }
+        .ore-filter-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9em;
+            color: #4a8aa0;
+            cursor: pointer;
+            user-select: none;
+        }
+        .ore-filter-toggle input { cursor: pointer; accent-color: #00d9ff; }
         .ore-tables-row {
             display: flex;
             gap: 14px;
@@ -686,29 +725,89 @@
         .mineral-input-row input::-webkit-outer-spin-button,
         .mineral-input-row input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .mineral-input-row input[type=number] { -moz-appearance: textfield; }
-        .mineral-result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 7px 0;
-            border-bottom: 1px solid rgba(0,217,255,.1);
-            font-size: .9em;
-        }
-        .mineral-result-row:last-child { border-bottom: none; }
-        .mineral-result-name { color: #88d0e8; flex: 1; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
-        .mineral-result-qty {
-            color: #ffcc44;
-            font-family: 'Orbitron', sans-serif;
-            font-size: .8em;
-            font-weight: 700;
-            margin-left: 12px;
-        }
         .mineral-warn {
             color: #ff6b6b;
             font-size: .82em;
             margin-top: 10px;
             line-height: 1.4;
         }
+        /* ── Order Receipt ── */
+        .rcpt-wrap {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1em;
+            color: #a0c8e0;
+        }
+        .rcpt-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72em;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #00d9ff;
+            margin-bottom: 2px;
+        }
+        .rcpt-timestamp {
+            font-size: 0.88em;
+            color: #4a8aa0;
+            margin-bottom: 12px;
+        }
+        .rcpt-section-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #4a8aa0;
+            padding: 8px 0 5px;
+            border-bottom: 1px solid rgba(0,217,255,0.12);
+            margin-bottom: 4px;
+        }
+        .rcpt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 4px;
+        }
+        .rcpt-table td {
+            padding: 5px 4px 5px 0;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            line-height: 1.4;
+            font-size: 0.95em;
+        }
+        .rcpt-table tr:last-child td { border-bottom: none; }
+        .rcpt-name { color: #88d0e8; font-weight: 600; width: 45%; }
+        .rcpt-qty  { color: #a0c8e0; text-align: right; white-space: nowrap; }
+        .rcpt-corp-col { color: #ffcc44; text-align: right; white-space: nowrap; padding-left: 8px !important; }
+        .rcpt-ally-col { color: #00d9ff; text-align: right; white-space: nowrap; padding-left: 8px !important; }
+        .rcpt-rate-note { display: block; font-size: 0.82em; color: #4a8aa0; }
+        .rcpt-divider {
+            border: none;
+            border-top: 1px solid rgba(0,217,255,0.15);
+            margin: 8px 0;
+        }
+        .rcpt-total-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 6px 0 12px;
+        }
+        .rcpt-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .rcpt-total-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65em;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #4a8aa0;
+        }
+        .rcpt-total-val { font-weight: 700; font-size: 1.05em; }
+        .rcpt-total-val.corp { color: #ffcc44; }
+        .rcpt-total-val.ally { color: #00d9ff; }
+        .rcpt-mineral-row td { padding: 4px 4px 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.95em; }
+        .rcpt-mineral-row:last-child td { border-bottom: none; }
+        .rcpt-min-name { color: #88d0e8; font-weight: 600; }
+        .rcpt-min-qty  { color: #a0c8e0; text-align: right; font-variant-numeric: tabular-nums; }
 
         .item {
             background: rgba(0, 50, 80, 0.3);
@@ -2520,8 +2619,10 @@
             <!-- MAIN TAB NAVIGATION -->
             <div class="main-tabs">
                 <button class="main-tab active" onclick="showMainTab('market')">Materials & Resources Market</button>
-                <button class="main-tab" onclick="window.open('https://1337servers.com/blueprints/','_blank')" title="Created by Aldent Rendrag">Infinite Directive Blueprint Registry ↗</button>
-                <button class="main-tab" onclick="showMainTab('buyback')">Buyback Program</button>
+                <div class="main-tab-under-construction">
+                    <button class="main-tab tab-construction" onclick="showMainTab('buyback')">Buyback Program</button>
+                    <div class="construction-badge">🚧 Under Construction</div>
+                </div>
                 <!-- <button class="main-tab" onclick="window.location='sig_store.html'" style="color:#ff8855;border-bottom-color:#ff4444;">⚔ Corp SIG Store</button> -->
             </div>
 
@@ -2601,6 +2702,12 @@
 
                     <!-- COMPRESSED ORES SUB-CONTENT -->
                     <div id="compressed-ores-content" class="tab-content">
+                        <div class="ore-filter-bar">
+                            <label class="ore-filter-toggle">
+                                <input type="checkbox" id="hideEmptyOres" checked onchange="renderCompressedOres()">
+                                Hide out-of-stock ores
+                            </label>
+                        </div>
                         <div class="ore-tables-row">
                             <div class="ore-table-panel">
                                 <div class="ore-table-header">Standard Ores</div>
@@ -2608,8 +2715,6 @@
                                     <thead><tr>
                                         <th class="ore-col-name">Ore</th>
                                         <th class="ore-col-stock">Stock</th>
-                                        <th class="ore-col-price">Corp</th>
-                                        <th class="ore-col-price">Alliance</th>
                                     </tr></thead>
                                     <tbody id="ore-tbody-standard"></tbody>
                                 </table>
@@ -2620,8 +2725,6 @@
                                     <thead><tr>
                                         <th class="ore-col-name">Ore</th>
                                         <th class="ore-col-stock">Stock</th>
-                                        <th class="ore-col-price">Corp</th>
-                                        <th class="ore-col-price">Alliance</th>
                                     </tr></thead>
                                     <tbody id="ore-tbody-moon"></tbody>
                                 </table>
@@ -2632,8 +2735,6 @@
                                     <thead><tr>
                                         <th class="ore-col-name">Ore</th>
                                         <th class="ore-col-stock">Stock</th>
-                                        <th class="ore-col-price">Corp</th>
-                                        <th class="ore-col-price">Alliance</th>
                                     </tr></thead>
                                     <tbody id="ore-tbody-ice"></tbody>
                                 </table>
@@ -3648,7 +3749,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         "Zydrine": 0
             },
             "blueprintsLastUpdated": "Apr 22, 2026 08:00 EVE",
-            "inventoryLastUpdated": "Apr 23, 2026 00:08 EVE"
+            "inventoryLastUpdated": "Apr 23, 2026 02:08 EVE"
 };
 
         let BLUEPRINT_DATA = [
@@ -5986,6 +6087,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
 
         // Build name→{allianceRate, corpRate} lookup from buyback_data.js
         const SELL_RATE_LOOKUP = {};
+        const ORE_JBV_LOOKUP   = {};
         const PARTNER_SLOT_LOOKUP = {};
         const FLAG_LOOKUP = {};
         const SUPPLIER_LOOKUP = {};
@@ -6004,6 +6106,9 @@ Tip: Copy directly from EVE inventory window"></textarea>
                         alliance: item.sellRate,
                         corp: item.corpRate != null ? item.corpRate : item.sellRate,
                     };
+                }
+                if (item.avgJitaBuy != null && item.avgJitaBuy > 0) {
+                    ORE_JBV_LOOKUP[item.name] = item.avgJitaBuy;
                 }
                 if (item.partnerSlot && item.slotOpen) {
                     PARTNER_SLOT_LOOKUP[item.name] = true;
@@ -6217,41 +6322,44 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 if (!catalog) return;
 
                 const tierGroups = Array.isArray(catalog) ? { '': catalog } : catalog;
+                const hideEmpty = document.getElementById('hideEmptyOres')?.checked ?? true;
                 let firstTier = true;
 
                 Object.entries(tierGroups).forEach(([tierName, families]) => {
+                    // Skip entire tier if all variants are empty and filter is on
+                    if (hideEmpty && tierName) {
+                        const anyInStock = families.some(f => f.variants.some(n => (inventory[n] || 0) > 0));
+                        if (!anyInStock) return;
+                    }
+
                     if (tierName) {
                         const tr = document.createElement('tr');
                         tr.className = 'ore-tier-row' + (firstTier ? ' first' : '');
-                        tr.innerHTML = `<td colspan="4">${tierName}</td>`;
+                        tr.innerHTML = `<td colspan="2">${tierName}</td>`;
                         tbody.appendChild(tr);
                         firstTier = false;
                     }
                     families.forEach(family => {
-                        // only show family divider row if there are multiple variants
+                        const visibleVariants = hideEmpty
+                            ? family.variants.filter(n => (inventory[n] || 0) > 0)
+                            : family.variants;
+                        if (visibleVariants.length === 0) return;
+
                         if (family.variants.length > 1) {
                             const tr = document.createElement('tr');
                             tr.className = 'ore-family-row';
-                            tr.innerHTML = `<td colspan="4">${family.baseName}</td>`;
+                            tr.innerHTML = `<td colspan="2">${family.baseName}</td>`;
                             tbody.appendChild(tr);
                         }
-                        family.variants.forEach(name => {
+                        visibleVariants.forEach(name => {
                             const qty = inventory[name] || 0;
-                            const rates = getRates(name);
                             const shortName = name.replace('Compressed ', '');
                             const stockClass = qty === 0 ? 'ore-col-stock out-of-stock' : 'ore-col-stock';
                             const stockText = qty === 0 ? '—' : qty.toLocaleString();
-                            let corpCell = '<td class="ore-col-price">—</td>';
-                            let allyCell = '<td class="ore-col-price">—</td>';
-                            if (rates) {
-                                corpCell = `<td class="ore-col-price corp">${rates.corp}%</td>`;
-                                allyCell = `<td class="ore-col-price ally">${rates.alliance}%</td>`;
-                            }
                             const tr = document.createElement('tr');
                             tr.className = 'ore-data-row';
                             tr.innerHTML = `<td class="ore-col-name">${shortName}</td>
-                                <td class="${stockClass}">${stockText}</td>
-                                ${corpCell}${allyCell}`;
+                                <td class="${stockClass}">${stockText}</td>`;
                             tbody.appendChild(tr);
                         });
                     });
@@ -6409,12 +6517,25 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 return srcA - srcB;
             });
 
-            // Greedy allocation
+            // Greedy allocation — sort ores by lowest ISK cost per unit of target mineral
             for (const mid of mineralIds) {
                 if ((deficit[mid] || 0) <= 0) continue;
                 const sources = oreData
                     .filter(o => (o.minerals[String(mid)] || 0) > 0)
-                    .sort((a, b) => (b.minerals[String(mid)] || 0) - (a.minerals[String(mid)] || 0));
+                    .sort((a, b) => {
+                        const yA = a.minerals[String(mid)] || 0;
+                        const yB = b.minerals[String(mid)] || 0;
+                        const jbvA = ORE_JBV_LOOKUP[a.name] || 0;
+                        const jbvB = ORE_JBV_LOOKUP[b.name] || 0;
+                        const rA = getRates(a.name);
+                        const rB = getRates(b.name);
+                        const corpA = rA ? rA.corp / 100 : 1;
+                        const corpB = rB ? rB.corp / 100 : 1;
+                        // ISK per unit of this mineral — lower is cheaper for the customer
+                        const iskPerA = (jbvA > 0 && yA > 0) ? (jbvA * corpA) / yA : Infinity;
+                        const iskPerB = (jbvB > 0 && yB > 0) ? (jbvB * corpB) / yB : Infinity;
+                        return iskPerA - iskPerB;
+                    });
 
                 for (const ore of sources) {
                     if ((deficit[mid] || 0) <= 0) break;
@@ -6447,22 +6568,68 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 return;
             }
 
-            // Sort results by batches descending
             const sortedAlloc = Object.entries(allocated).sort((a, b) => b[1] - a[1]);
-            let html = '';
+            const mineralsProduced = {};
+            let oreRows = '';
+
             for (const [name, batches] of sortedAlloc) {
                 const oreEntry = BUYBACK_DATA.oreRefineData.find(o => o.name === name);
-                const qty = batches * (oreEntry ? oreEntry.portionSize : 100);
-                html += '<div class="mineral-result-row">'
-                    + '<span class="mineral-result-name">' + name + '</span>'
-                    + '<span class="mineral-result-qty">' + qty.toLocaleString() + '</span>'
-                    + '</div>';
+                const portionSize = oreEntry ? oreEntry.portionSize : 100;
+                const qty = batches * portionSize;
+                const shortName = name.replace('Compressed ', '');
+
+                if (oreEntry) {
+                    for (const [matId, ypu] of Object.entries(oreEntry.minerals)) {
+                        const id = parseInt(matId);
+                        mineralsProduced[id] = (mineralsProduced[id] || 0) + Math.floor(ypu * portionSize * batches);
+                    }
+                }
+
+                oreRows += `<tr><td class="rcpt-name">${shortName}</td>`
+                         + `<td class="rcpt-qty">${qty.toLocaleString()}</td></tr>`;
             }
-            if (unfulfilled.length > 0) {
-                html += '<p class="mineral-warn">&#9888; Insufficient stock to fully cover: '
-                    + unfulfilled.join(', ') + '</p>';
+
+            const mineralLookup = {};
+            for (const group of Object.values(MINERAL_DEFS)) {
+                for (const m of group) { if (m.id) mineralLookup[m.id] = m.name; }
             }
-            body.innerHTML = html;
+            let mineralRows = '';
+            const producedEntries = Object.entries(mineralsProduced)
+                .map(([id, qty]) => ({ id: parseInt(id), name: mineralLookup[parseInt(id)] || ('Type ' + id), qty }))
+                .filter(e => e.qty > 0)
+                .sort((a, b) => b.qty - a.qty);
+            for (const e of producedEntries) {
+                mineralRows += `<tr class="rcpt-mineral-row">`
+                    + `<td class="rcpt-min-name">${e.name}</td>`
+                    + `<td class="rcpt-min-qty">${e.qty.toLocaleString()}</td></tr>`;
+            }
+
+            const now = new Date();
+            const ts = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+                     + ' · ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+
+            const warnHtml = unfulfilled.length > 0
+                ? `<p class="mineral-warn">&#9888; Insufficient stock to fully cover: ${unfulfilled.join(', ')}</p>`
+                : '';
+
+            body.innerHTML = `<div class="rcpt-wrap">
+                <div class="rcpt-header">Order Summary</div>
+                <div class="rcpt-timestamp">${ts}</div>
+                <div class="rcpt-section-label">Ore Items</div>
+                <table class="rcpt-table">
+                    <thead><tr>
+                        <th style="color:#4a8aa0;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:left">Ore</th>
+                        <th style="color:#4a8aa0;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:right">Qty</th>
+                    </tr></thead>
+                    <tbody>${oreRows}</tbody>
+                </table>
+                <hr class="rcpt-divider">
+                <div class="rcpt-section-label">Mineral Yield <span style="font-size:.9em;letter-spacing:0;text-transform:none;font-family:'Rajdhani',sans-serif;color:#4a8aa0"> — 90.63% efficiency</span></div>
+                <table class="rcpt-table" style="margin-top:4px">
+                    <tbody>${mineralRows}</tbody>
+                </table>
+                ${warnHtml}
+            </div>`;
         }
 
         function clearMineralCalc() {
