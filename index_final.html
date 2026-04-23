@@ -515,6 +515,20 @@
             margin-top: 6px;
         }
 
+        .ore-filter-bar {
+            padding: 0 2px 10px;
+        }
+        .ore-filter-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9em;
+            color: #4a8aa0;
+            cursor: pointer;
+            user-select: none;
+        }
+        .ore-filter-toggle input { cursor: pointer; accent-color: #00d9ff; }
         .ore-tables-row {
             display: flex;
             gap: 14px;
@@ -2661,6 +2675,12 @@
 
                     <!-- COMPRESSED ORES SUB-CONTENT -->
                     <div id="compressed-ores-content" class="tab-content">
+                        <div class="ore-filter-bar">
+                            <label class="ore-filter-toggle">
+                                <input type="checkbox" id="hideEmptyOres" checked onchange="renderCompressedOres()">
+                                Hide out-of-stock ores
+                            </label>
+                        </div>
                         <div class="ore-tables-row">
                             <div class="ore-table-panel">
                                 <div class="ore-table-header">Standard Ores</div>
@@ -6275,27 +6295,37 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 if (!catalog) return;
 
                 const tierGroups = Array.isArray(catalog) ? { '': catalog } : catalog;
+                const hideEmpty = document.getElementById('hideEmptyOres')?.checked ?? true;
                 let firstTier = true;
 
                 Object.entries(tierGroups).forEach(([tierName, families]) => {
+                    // Skip entire tier if all variants are empty and filter is on
+                    if (hideEmpty && tierName) {
+                        const anyInStock = families.some(f => f.variants.some(n => (inventory[n] || 0) > 0));
+                        if (!anyInStock) return;
+                    }
+
                     if (tierName) {
                         const tr = document.createElement('tr');
                         tr.className = 'ore-tier-row' + (firstTier ? ' first' : '');
-                        tr.innerHTML = `<td colspan="4">${tierName}</td>`;
+                        tr.innerHTML = `<td colspan="2">${tierName}</td>`;
                         tbody.appendChild(tr);
                         firstTier = false;
                     }
                     families.forEach(family => {
-                        // only show family divider row if there are multiple variants
+                        const visibleVariants = hideEmpty
+                            ? family.variants.filter(n => (inventory[n] || 0) > 0)
+                            : family.variants;
+                        if (visibleVariants.length === 0) return;
+
                         if (family.variants.length > 1) {
                             const tr = document.createElement('tr');
                             tr.className = 'ore-family-row';
-                            tr.innerHTML = `<td colspan="4">${family.baseName}</td>`;
+                            tr.innerHTML = `<td colspan="2">${family.baseName}</td>`;
                             tbody.appendChild(tr);
                         }
-                        family.variants.forEach(name => {
+                        visibleVariants.forEach(name => {
                             const qty = inventory[name] || 0;
-                            const rates = getRates(name);
                             const shortName = name.replace('Compressed ', '');
                             const stockClass = qty === 0 ? 'ore-col-stock out-of-stock' : 'ore-col-stock';
                             const stockText = qty === 0 ? '—' : qty.toLocaleString();
