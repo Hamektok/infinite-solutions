@@ -337,6 +337,31 @@
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
         }
 
+        .main-tab-under-construction {
+            position: relative;
+            display: inline-block;
+        }
+        .tab-construction {
+            opacity: 0.55;
+        }
+        .construction-badge {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #b85c00;
+            color: #ffe0a0;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 3px;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
         /* ===== SUB TAB NAVIGATION ===== */
         .sub-tabs {
             display: flex;
@@ -2594,7 +2619,10 @@
             <!-- MAIN TAB NAVIGATION -->
             <div class="main-tabs">
                 <button class="main-tab active" onclick="showMainTab('market')">Materials & Resources Market</button>
-                <!-- <button class="main-tab" onclick="window.open('https://1337servers.com/blueprints/','_blank')" title="Created by Aldent Rendrag">Infinite Directive Blueprint Registry ↗</button> -->
+                <div class="main-tab-under-construction">
+                    <button class="main-tab tab-construction" onclick="window.open('https://1337servers.com/blueprints/','_blank')" title="Created by Aldent Rendrag">Infinite Directive Blueprint Registry ↗</button>
+                    <div class="construction-badge">🚧 Under Construction</div>
+                </div>
                 <button class="main-tab" onclick="showMainTab('buyback')">Buyback Program</button>
                 <!-- <button class="main-tab" onclick="window.location='sig_store.html'" style="color:#ff8855;border-bottom-color:#ff4444;">⚔ Corp SIG Store</button> -->
             </div>
