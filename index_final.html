@@ -6524,16 +6524,7 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 return;
             }
 
-            // ISK formatter
-            function fmtISK(v) {
-                if (v >= 1e9) return (v / 1e9).toFixed(2) + 'B ISK';
-                if (v >= 1e6) return (v / 1e6).toFixed(2) + 'M ISK';
-                if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K ISK';
-                return Math.round(v).toLocaleString() + ' ISK';
-            }
-
             const sortedAlloc = Object.entries(allocated).sort((a, b) => b[1] - a[1]);
-            let corpGrand = 0, allyGrand = 0;
             const mineralsProduced = {};
             let oreRows = '';
 
@@ -6543,7 +6534,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
                 const qty = batches * portionSize;
                 const shortName = name.replace('Compressed ', '');
 
-                // Accumulate mineral yield
                 if (oreEntry) {
                     for (const [matId, ypu] of Object.entries(oreEntry.minerals)) {
                         const id = parseInt(matId);
@@ -6551,24 +6541,10 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     }
                 }
 
-                const rates = getRates(name);
-                const jbv   = ORE_JBV_LOOKUP[name] || 0;
-                let corpCell = '<td class="rcpt-corp-col">—</td><td class="rcpt-ally-col">—</td>';
-                if (rates && jbv > 0) {
-                    const corpISK = jbv * (rates.corp / 100) * qty;
-                    const allyISK = jbv * (rates.alliance / 100) * qty;
-                    corpGrand += corpISK;
-                    allyGrand += allyISK;
-                    corpCell = `<td class="rcpt-corp-col">${fmtISK(corpISK)}<span class="rcpt-rate-note">${rates.corp}% JBV</span></td>`
-                             + `<td class="rcpt-ally-col">${fmtISK(allyISK)}<span class="rcpt-rate-note">${rates.alliance}% JBV</span></td>`;
-                }
-
                 oreRows += `<tr><td class="rcpt-name">${shortName}</td>`
-                         + `<td class="rcpt-qty">${qty.toLocaleString()}</td>`
-                         + corpCell + `</tr>`;
+                         + `<td class="rcpt-qty">${qty.toLocaleString()}</td></tr>`;
             }
 
-            // Mineral yield rows — only show minerals that were actually produced
             const mineralLookup = {};
             for (const group of Object.values(MINERAL_DEFS)) {
                 for (const m of group) { if (m.id) mineralLookup[m.id] = m.name; }
@@ -6588,19 +6564,6 @@ Tip: Copy directly from EVE inventory window"></textarea>
             const ts = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
                      + ' · ' + now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
 
-            const totalBlock = (corpGrand > 0)
-                ? `<div class="rcpt-total-block">
-                    <div class="rcpt-total-row">
-                        <span class="rcpt-total-label">Corp Total</span>
-                        <span class="rcpt-total-val corp">${fmtISK(corpGrand)}</span>
-                    </div>
-                    <div class="rcpt-total-row">
-                        <span class="rcpt-total-label">Alliance Total</span>
-                        <span class="rcpt-total-val ally">${fmtISK(allyGrand)}</span>
-                    </div>
-                  </div>`
-                : '';
-
             const warnHtml = unfulfilled.length > 0
                 ? `<p class="mineral-warn">&#9888; Insufficient stock to fully cover: ${unfulfilled.join(', ')}</p>`
                 : '';
@@ -6613,13 +6576,10 @@ Tip: Copy directly from EVE inventory window"></textarea>
                     <thead><tr>
                         <th style="color:#4a8aa0;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:left">Ore</th>
                         <th style="color:#4a8aa0;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:right">Qty</th>
-                        <th style="color:#ffcc44;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:right;padding-left:8px">Corp</th>
-                        <th style="color:#00d9ff;font-size:.7em;font-weight:400;padding-bottom:4px;text-align:right;padding-left:8px">Alliance</th>
                     </tr></thead>
                     <tbody>${oreRows}</tbody>
                 </table>
                 <hr class="rcpt-divider">
-                ${totalBlock}
                 <div class="rcpt-section-label">Mineral Yield <span style="font-size:.9em;letter-spacing:0;text-transform:none;font-family:'Rajdhani',sans-serif;color:#4a8aa0"> — 90.63% efficiency</span></div>
                 <table class="rcpt-table" style="margin-top:4px">
                     <tbody>${mineralRows}</tbody>
