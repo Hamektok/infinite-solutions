@@ -19,9 +19,9 @@ const BPC_PRICING_DATA = [
         "te": 20,
         "quality": 1.0,
         "qualityPercent": 100.0,
-        "jitaSellPrice": 720278.57,
-        "price10Runs": 72027.86,
-        "pricePerRun": 7202.79
+        "jitaSellPrice": 702921.43,
+        "price10Runs": 70292.14,
+        "pricePerRun": 7029.21
     }
 ];
 
