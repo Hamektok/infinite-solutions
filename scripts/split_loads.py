@@ -1,6 +1,9 @@
 """
-Split compressed ore inventory across N loads by refined mineral value.
-Usage: python split_loads.py [N]   (default N=6)
+Split compressed ore inventory across loads by refined mineral value.
+Usage:
+  python split_loads.py [N]            split into N equal loads (default 6)
+  python split_loads.py [N] --no-split keep stacks whole, N equal loads
+  python split_loads.py --cap [MAX_B]  fill loads up to MAX_B billion ISK (default 1)
 
 Uses type_materials table for per-batch yields, 90.63% efficiency, 100% Jita sell prices.
 """
@@ -8,26 +11,74 @@ import sqlite3, json, math, heapq, os, sys
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'mydatabase.db')
 
-N_LOADS = int(sys.argv[1]) if len(sys.argv) > 1 else 6
+NO_SPLIT  = '--no-split' in sys.argv
+CAP_MODE  = '--cap' in sys.argv
+if CAP_MODE:
+    cap_idx = sys.argv.index('--cap')
+    _cap_arg = sys.argv[cap_idx + 1] if cap_idx + 1 < len(sys.argv) and sys.argv[cap_idx + 1][0].isdigit() else '1'
+    CAP_VAL  = float(_cap_arg) * 1_000_000_000
+    N_LOADS  = None
+else:
+    CAP_VAL  = None
+    N_LOADS  = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1][0].isdigit() else 6
 
 # Inventory: name -> quantity
 INVENTORY = {
-    'Compressed Veldspar':              1650554,
-    'Compressed Veldspar II-Grade':     2751852,
-    'Compressed Veldspar III-Grade':    7552145,
-    'Compressed Scordite II-Grade':      362136,
-    'Compressed Kernite':                 34490,
-    'Compressed Kernite II-Grade':        20370,
-    'Compressed Kernite III-Grade':       13401,
-    'Compressed Omber III-Grade':         24293,
-    'Compressed Jaspet III-Grade':        12234,
+    'Atmospheric Gases':                    940,
+    'Compressed Bistot':                   5628,
+    'Compressed Bitumens':                 2512,
+    'Compressed Blue Ice':                 1000,
+    'Compressed Bountiful Monazite':      72479,
+    'Compressed Brimful Bitumens':       153397,
+    'Compressed Brimful Sylvite':          6715,
+    'Compressed Brimful Zeolites':       330389,
+    'Compressed Clear Icicle':             2475,
+    'Compressed Coesite':                 64169,
+    'Compressed Crokite III-Grade':       20927,
+    'Compressed Crokite IV-Grade':        15492,
+    'Compressed Dark Ochre':              21160,
+    'Compressed Dark Ochre III-Grade':    11331,
+    'Compressed Dark Ochre IV-Grade':       792,
+    'Compressed Ducinium':                 1831,
+    'Compressed Eifyrium':                 1532,
+    'Compressed Glacial Mass':              817,
+    'Compressed Glistening Bitumens':      5545,
+    'Compressed Glistening Coesite':      42076,
+    'Compressed Gneiss IV-Grade':            20,
+    'Compressed Griemeer III-Grade':         39,
     'Compressed Hedbergite II-Grade':     10066,
+    'Compressed Hedbergite III-Grade':    16226,
+    'Compressed Hemorphite':               4855,
     'Compressed Hemorphite II-Grade':      2944,
     'Compressed Hemorphite III-Grade':      744,
-    'Compressed Crokite IV-Grade':        13797,
-    'Compressed Brimful Bitumens':       153397,
-    'Compressed Coesite':                 64099,
-    'Compressed Blue Ice':                 1000,
+    'Compressed Jaspet III-Grade':        21665,
+    'Compressed Kernite':                495510,
+    'Compressed Kernite II-Grade':       220856,
+    'Compressed Kernite III-Grade':      299873,
+    'Compressed Kernite IV-Grade':           92,
+    'Compressed Kylixium III-Grade':      74310,
+    'Compressed Loparite':                  677,
+    'Compressed Omber':                  118017,
+    'Compressed Omber II-Grade':         439669,
+    'Compressed Omber III-Grade':         38084,
+    'Compressed Omber IV-Grade':         289427,
+    'Compressed Plagioclase':           3031572,
+    'Compressed Plagioclase II-Grade':  3362215,
+    'Compressed Plagioclase III-Grade':  631864,
+    'Compressed Pyroxeres II-Grade':     298665,
+    'Compressed Pyroxeres III-Grade':    229587,
+    'Compressed Scordite':             2326744,
+    'Compressed Scordite II-Grade':   15921946,
+    'Compressed Scordite III-Grade':     187642,
+    'Compressed Scordite IV-Grade':    4670418,
+    'Compressed Sylvite':               326804,
+    'Compressed Twinkling Scheelite':        57,
+    'Compressed Vanadinite':                166,
+    'Compressed Veldspar':            36931599,
+    'Compressed Veldspar II-Grade':  104167748,
+    'Compressed Veldspar III-Grade':  40320312,
+    'Compressed Ytirium':               169580,
+    'Compressed Zeolites':               92897,
 }
 
 EFFICIENCY = 0.9063
@@ -116,46 +167,120 @@ for name, qty in INVENTORY.items():
 items.sort(key=lambda x: -x['total_val'])
 
 grand_total = sum(i['total_val'] for i in items)
-target = grand_total / N_LOADS
 
-# Greedy bin-packing with min-heap; split items that exceed per-load target
-# heap entries: [current_val, load_index, contents_list]
-heap = [[0.0, i, []] for i in range(N_LOADS)]
-heapq.heapify(heap)
+# ── Packing ───────────────────────────────────────────────────────────────────
+if CAP_MODE:
+    # Fill loads up to CAP_VAL; keep stacks whole.
+    # Items larger than CAP_VAL are force-split (unavoidable).
+    loads = []
 
-for item in items:
-    remaining = item['n_batches']
-    while remaining > 0:
-        load = heapq.heappop(heap)
-        space_val = target - load[0]
-        if item['val_per_batch'] > 0:
-            can_fit = int(space_val / item['val_per_batch'])
+    def new_load():
+        l = [0.0, len(loads), []]
+        loads.append(l)
+        return l
+
+    for item in items:
+        if item['n_batches'] == 0:
+            continue
+        item_val = item['total_val']
+        item_qty = item['n_batches'] * item['portion']
+
+        if item_val <= CAP_VAL:
+            # Keep whole — first-fit into an existing load
+            placed = False
+            for load in loads:
+                if load[0] + item_val <= CAP_VAL:
+                    load[0] += item_val
+                    load[2].append((item['name'], item_qty))
+                    placed = True
+                    break
+            if not placed:
+                load = new_load()
+                load[0] += item_val
+                load[2].append((item['name'], item_qty))
         else:
-            can_fit = remaining
-        batches = min(remaining, max(can_fit, 1))
-        qty = batches * item['portion']
-        val = batches * item['val_per_batch']
-        load[0] += val
-        load[2].append((item['name'], qty))
-        remaining -= batches
-        heapq.heappush(heap, load)
+            # Force-split: item exceeds cap
+            remaining = item['n_batches']
+            while remaining > 0:
+                load = new_load()
+                if item['val_per_batch'] > 0:
+                    batches = min(remaining, int(CAP_VAL / item['val_per_batch']))
+                    batches = max(batches, 1)
+                else:
+                    batches = remaining
+                load[0] += batches * item['val_per_batch']
+                load[2].append((item['name'], batches * item['portion']))
+                remaining -= batches
 
-heap.sort(key=lambda x: x[1])
+    heap = loads
+    target = CAP_VAL
 
-print(f"Grand total: {grand_total/1e6:.2f}M ISK  |  {N_LOADS} loads  |  Target: {target/1e6:.2f}M each")
-print()
+else:
+    target = grand_total / N_LOADS
+    heap = [[0.0, i, []] for i in range(N_LOADS)]
+    heapq.heapify(heap)
+
+    if NO_SPLIT:
+        for item in items:
+            if item['n_batches'] == 0:
+                continue
+            load = heapq.heappop(heap)
+            load[0] += item['total_val']
+            load[2].append((item['name'], item['n_batches'] * item['portion']))
+            heapq.heappush(heap, load)
+    else:
+        for item in items:
+            remaining = item['n_batches']
+            while remaining > 0:
+                load = heapq.heappop(heap)
+                space_val = target - load[0]
+                if item['val_per_batch'] > 0:
+                    can_fit = int(space_val / item['val_per_batch'])
+                else:
+                    can_fit = remaining
+                batches = min(remaining, max(can_fit, 1))
+                qty = batches * item['portion']
+                val = batches * item['val_per_batch']
+                load[0] += val
+                load[2].append((item['name'], qty))
+                remaining -= batches
+                heapq.heappush(heap, load)
+
+    heap.sort(key=lambda x: x[1])
+
+n_loads_actual = len(heap)
+
+# ── Output ────────────────────────────────────────────────────────────────────
+SEP  = "=" * 52
+SEP2 = "-" * 52
+
+print(SEP)
+print(f"  TOTAL   {grand_total/1e6:>10.2f} M ISK")
+print(f"  LOADS   {n_loads_actual:>10}")
+if CAP_MODE:
+    print(f"  CAP     {CAP_VAL/1e6:>10.2f} M ISK each")
+else:
+    print(f"  TARGET  {target/1e6:>10.2f} M ISK each")
+print(SEP)
 
 vals = []
 for load_val, load_idx, contents in heap:
     vals.append(load_val)
-    print(f"Load {load_idx+1}  —  {load_val/1e6:.2f}M ISK")
-    # Consolidate duplicate entries for same item
+    print()
+    print(SEP)
+    print(f"  LOAD {load_idx+1}  —  {load_val/1e6:.2f} M ISK")
+    print(SEP2)
     consolidated = {}
     for name, qty in contents:
         consolidated[name] = consolidated.get(name, 0) + qty
     for name, qty in consolidated.items():
         if qty > 0:
-            print(f"  {name:<45}  {qty:>14,}")
-    print()
+            short = name.replace('Compressed ', '')
+            print(f"  {short:<34}  {qty:>12,}")
+    print(SEP)
 
-print(f"Spread: {(max(vals)-min(vals))/1e6:.2f}M ISK  ({(max(vals)-min(vals))/target*100:.2f}%)")
+print()
+if CAP_MODE:
+    print(f"  Max load: {max(vals)/1e6:.2f} M ISK")
+else:
+    print(f"  Spread: {(max(vals)-min(vals))/1e6:.2f} M ISK  ({(max(vals)-min(vals))/target*100:.2f}%)")

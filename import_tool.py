@@ -63,6 +63,7 @@ CATEGORY_DISPLAY = {
     'ice_ore':            'Compressed Ice',
     'moon_ore':           'Compressed Moon Ore',
     'fw_ammo':            'Crucible of the Faithful',
+    'ammo':               'Ammunition & Charges',
 }
 DISPLAY_TO_CAT = {v: k for k, v in CATEGORY_DISPLAY.items()}
 
@@ -79,6 +80,7 @@ CATEGORY_FETCH_ARG = {
     'Compressed Ice':            'compressed_ice_ore',
     'Compressed Moon Ore':       'compressed_moon_ore',
     'Crucible of the Faithful':  'fw_ammo',
+    'Ammunition & Charges':      'ammo',
 }
 
 PI_GROUP_MAP = {1334: 'P1', 1335: 'P2', 1336: 'P3', 1337: 'P4'}
@@ -97,6 +99,24 @@ SUBCAT_LABELS = {
     'pi_materials':        {'p1':'P1', 'p2':'P2', 'p3':'P3', 'p4':'P4'},
     'salvaged_materials':  {'common':'Common', 'uncommon':'Uncommon', 'rare':'Rare',
                             'very_rare':'Very Rare', 'rogue_drone':'Rogue Drone'},
+    'ammo': {
+        'hybrid_charges':        'Hybrid Charges',
+        'projectile_ammo':       'Projectile Ammo',
+        'frequency_crystals':    'Frequency Crystals',
+        'missiles':              'Missiles',
+        'mining_crystals':       'Mining Crystals',
+        'cap_booster_charges':   'Cap Booster Charges',
+        'scripts':               'Scripts',
+        'nanite_repair_paste':   'Nanite Repair Paste',
+        'command_burst_charges': 'Command Burst Charges',
+        'condenser_packs':       'Condenser Packs',
+        'bombs':                 'Bombs',
+        'exotic_plasma_charges': 'Exotic Plasma Charges',
+        'probes':                'Probes',
+        'breacher_pods':         'Breacher Pods',
+        'structure_area_denial': 'Structure Area Denial Ammunition',
+        'structure_guided_bombs':'Structure Guided Bombs',
+    },
 }
 
 # Items in these DB categories use ore_pct_ site_config keys (shared with admin dashboard)
@@ -131,6 +151,23 @@ SECTION_COLORS = {
     'Rare':                  '#8888ff',
     'Very Rare':             '#ff8888',
     'Rogue Drone':           '#ffaa44',
+    # Ammunition & Charges
+    'Hybrid Charges':                    '#44ccff',
+    'Projectile Ammo':                   '#ffaa44',
+    'Frequency Crystals':                '#ff6644',
+    'Missiles':                          '#ff4466',
+    'Mining Crystals':                   '#44ff88',
+    'Cap Booster Charges':               '#00d9ff',
+    'Scripts':                           '#cc88ff',
+    'Nanite Repair Paste':               '#00ff88',
+    'Command Burst Charges':             '#ffd700',
+    'Condenser Packs':                   '#66ddff',
+    'Bombs':                             '#ff4444',
+    'Exotic Plasma Charges':             '#ff44ff',
+    'Probes':                            '#88d0e8',
+    'Breacher Pods':                     '#ffcc88',
+    'Structure Area Denial Ammunition':  '#cc4444',
+    'Structure Guided Bombs':            '#aa3333',
 }
 
 
@@ -163,6 +200,24 @@ def _get_subcat_key(category, display_order, market_group_id):
         if display_order < 33:  return 'rare'
         if display_order < 43:  return 'very_rare'
         return 'rogue_drone'
+    elif category == 'ammo':
+        if display_order is None: return ''
+        if display_order < 100:  return 'hybrid_charges'
+        if display_order < 200:  return 'projectile_ammo'
+        if display_order < 300:  return 'frequency_crystals'
+        if display_order < 500:  return 'missiles'
+        if display_order < 600:  return 'mining_crystals'
+        if display_order < 700:  return 'cap_booster_charges'
+        if display_order < 800:  return 'scripts'
+        if display_order < 900:  return 'nanite_repair_paste'
+        if display_order < 1000: return 'command_burst_charges'
+        if display_order < 1100: return 'condenser_packs'
+        if display_order < 1200: return 'bombs'
+        if display_order < 1300: return 'exotic_plasma_charges'
+        if display_order < 1400: return 'probes'
+        if display_order < 1500: return 'breacher_pods'
+        if display_order < 1600: return 'structure_area_denial'
+        return 'structure_guided_bombs'
     return ''
 
 
@@ -237,6 +292,7 @@ TAB_DEFS = [
     ('Salvaged Materials',    ['salvaged_materials']),
     ('Compressed Ore',        ['standard_ore', 'ice_ore', 'moon_ore']),
     ('Crucible of the Faithful', ['fw_ammo']),
+    ('Ammunition & Charges',     ['ammo']),
 ]
 
 

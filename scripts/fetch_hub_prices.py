@@ -362,20 +362,20 @@ def main():
         cur = conn.cursor()
         cur.execute("""SELECT DISTINCT type_id FROM tracked_market_items
                        WHERE category = 'standard_ore' AND display_order >= 101""")
-        type_ids = [r[0] for r in cur.fetchall()]
-        label    = f'compressed standard ore ({len(type_ids)} type IDs)'
+        type_ids = list(set([r[0] for r in cur.fetchall()] + MINERAL_IDS))
+        label    = f'compressed standard ore + minerals ({len(type_ids)} type IDs)'
     elif category == 'compressed_ice_ore':
         cur = conn.cursor()
         cur.execute("""SELECT DISTINCT type_id FROM tracked_market_items
                        WHERE category = 'ice_ore' AND display_order >= 101""")
-        type_ids = [r[0] for r in cur.fetchall()]
-        label    = f'compressed ice ({len(type_ids)} type IDs)'
+        type_ids = list(set([r[0] for r in cur.fetchall()] + ICE_PRODUCT_IDS))
+        label    = f'compressed ice + ice products ({len(type_ids)} type IDs)'
     elif category == 'compressed_moon_ore':
         cur = conn.cursor()
         cur.execute("""SELECT DISTINCT type_id FROM tracked_market_items
                        WHERE category = 'moon_ore' AND display_order >= 101""")
-        type_ids = [r[0] for r in cur.fetchall()]
-        label    = f'compressed moon ore ({len(type_ids)} type IDs)'
+        type_ids = list(set([r[0] for r in cur.fetchall()] + MOON_MATERIAL_IDS))
+        label    = f'compressed moon ore + moon materials ({len(type_ids)} type IDs)'
     elif category == 'import_all':
         # All tracked items; for ore/ice/moon_ore only compressed (display_order >= 101)
         cur = conn.cursor()
