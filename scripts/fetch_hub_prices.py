@@ -43,6 +43,9 @@ HUBS = {
     'dodixie': {'region_id': 10000032, 'station_id': 60011866},
     'rens':    {'region_id': 10000030, 'station_id': 60004588},
     'hek':     {'region_id': 10000042, 'station_id': 60005686},
+    # Secondary hubs
+    'khanid':       {'region_id': 10000049, 'station_id': 60012412},
+    'tash_murkon':  {'region_id': 10000020, 'station_id': 60001096},
 }
 
 DEFAULT_RETENTION_DAYS = 90

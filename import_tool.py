@@ -42,13 +42,15 @@ DEFAULT_REFINE_EFF = 90.63
 
 # ── Hub definitions ──────────────────────────────────────────────────────────
 HUBS = {
-    'Jita':    {'station_id': 60003760, 'region_id': 10000002},
-    'Amarr':   {'station_id': 60008494, 'region_id': 10000043},
-    'Dodixie': {'station_id': 60011866, 'region_id': 10000032},
-    'Rens':    {'station_id': 60004588, 'region_id': 10000030},
-    'Hek':     {'station_id': 60005686, 'region_id': 10000042},
+    'Jita':         {'station_id': 60003760, 'region_id': 10000002},
+    'Amarr':        {'station_id': 60008494, 'region_id': 10000043},
+    'Dodixie':      {'station_id': 60011866, 'region_id': 10000032},
+    'Rens':         {'station_id': 60004588, 'region_id': 10000030},
+    'Hek':          {'station_id': 60005686, 'region_id': 10000042},
+    'Khanid':       {'station_id': 60012412, 'region_id': 10000049},
+    'Tash-Murkon':  {'station_id': 60001096, 'region_id': 10000020},
 }
-HUB_ORDER = ['Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita']
+HUB_ORDER = ['Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita', 'Khanid', 'Tash-Murkon']
 
 # ── Category maps (uncompressed ore excluded — compressed ore included) ──────
 CATEGORY_DISPLAY = {
@@ -276,13 +278,17 @@ def ensure_market_snapshots(conn):
 
 # ── Treeview columns (no Sell % — all rates live in the panel) ───────────────
 COLS        = ('name', 'amarr', 'rens', 'hek', 'dodixie', 'jita',
+               'khanid', 'tash_murkon',
                'best_hub', 'margin', 'max_buy', 'dev')
 COL_LABELS  = ('Item Name', 'Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita',
+               'Khanid', 'Tash-Murkon',
                'Best Hub', 'Margin %', 'Max Buy Price', 'vs N-Day Avg %')
-COL_WIDTHS  = (260, 120, 120, 120, 120, 120, 80, 80, 120, 100)
-COL_ANCHORS = ('w', 'e', 'e', 'e', 'e', 'e', 'center', 'e', 'e', 'e')
+COL_WIDTHS  = (260, 120, 120, 120, 120, 120, 120, 120, 80, 80, 120, 100)
+COL_ANCHORS = ('w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'center', 'e', 'e', 'e')
 HUB_COL_MAP = {'amarr': 'Amarr', 'rens': 'Rens', 'hek': 'Hek',
-               'dodixie': 'Dodixie', 'jita': 'Jita'}
+               'dodixie': 'Dodixie', 'jita': 'Jita',
+               'khanid': 'Khanid', 'tash_murkon': 'Tash-Murkon'}
+
 
 # Tab definitions for the product panel notebook
 TAB_DEFS = [
@@ -426,7 +432,7 @@ class ImportTool:
             command=self._fetch_prices)
         self.fetch_btn.pack(side='right')
 
-        # Row 1b — Hub toggles
+        # Row 1b — Hub toggles (all hubs)
         row1b = tk.Frame(inner, bg='#111a25')
         row1b.pack(fill='x', pady=(0, 4))
         tk.Label(row1b, text='Hubs:', bg='#111a25', fg='#7090a8',
@@ -609,6 +615,7 @@ class ImportTool:
         self.tree.tag_configure('alt',      background='#0a1828')
         self.tree.tag_configure('dev_high', foreground='#ff9a00')
         self.tree.tag_configure('dev_low',  foreground='#00d4ff')
+
 
         # ── Status bar ──────────────────────────────────────────────────────
         self.status_var = tk.StringVar(value='Loading…')
@@ -1089,6 +1096,8 @@ class ImportTool:
                 fmt_isk(hs.get('Hek')),
                 fmt_isk(hs.get('Dodixie')),
                 fmt_isk(hs.get('Jita')),
+                fmt_isk(hs.get('Khanid')),
+                fmt_isk(hs.get('Tash-Murkon')),
                 row['best_hub'] or '—',
                 f'{margin:.1f}%' if margin is not None else '—',
                 fmt_isk(row['max_buy']) if row['max_buy'] else '—',
@@ -1131,8 +1140,8 @@ class ImportTool:
         fetch_arg   = CATEGORY_FETCH_ARG.get(cat_display, 'import_all')
         label       = cat_display if cat_display != 'All' else 'All Categories'
 
-        # Only fetch checked hubs; fall back to 'all' if everything is checked
-        checked_hubs = [h.lower() for h in HUB_ORDER if self.hub_vars[h].get()]
+        # Only fetch checked hubs
+        checked_hubs = [h.lower().replace('-', '_') for h in HUB_ORDER if self.hub_vars[h].get()]
         hubs_arg     = ','.join(checked_hubs) if checked_hubs else 'all'
         hubs_label   = ', '.join(h for h in HUB_ORDER if self.hub_vars[h].get()) or 'none'
 
