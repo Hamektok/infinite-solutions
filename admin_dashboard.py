@@ -14,6 +14,12 @@ from datetime import datetime, timezone
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mydatabase.db')
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Characters authorized for gank-watch contact push (name → credentials filename)
+GW_CHARACTERS = {
+    'Gromalok Hakaari': 'credentials_gank_contact.json',
+    'Zanju Hakaari':    'credentials_gank_contact_zanju.json',
+}
+
 # Predefined market item flags (shown as badges on the site)
 ITEM_FLAGS = [
     ('out_of_stock', 'Out of Stock',   '#ff3333'),
@@ -314,12 +320,7 @@ class AdminDashboard:
         self.notebook.add(self.actions_frame, text='  Quick Actions  ')
         self.build_actions_tab()
 
-        # Tab 12: Build Requests
-        self.build_req_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.build_req_frame, text='  Build Requests  ')
-        self._build_build_requests_tab()
-
-        # Tab 13: SIG Store
+        # Tab 12: SIG Store
         self.sig_store_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.sig_store_frame, text='  SIG Store  ')
         self._build_sig_store_tab()
@@ -7179,919 +7180,6 @@ class AdminDashboard:
 
 
     # ══════════════════════════════════════════════════════════════════════
-    # BUILD REQUESTS TAB (Tab 12)
-    # ══════════════════════════════════════════════════════════════════════
-
-    def _build_build_requests_tab(self):
-        """Build the Build Requests management tab."""
-        import sys as _sys
-        _sys.path.insert(0, os.path.join(PROJECT_DIR, 'scripts'))
-        from bom_engine import expand_bom, calc_totals
-        self._bom_expand   = expand_bom
-        self._bom_totals   = calc_totals
-        self._bs_bom_data  = None   # current expanded BOM
-        self._bs_req_id    = None   # currently loaded request id
-
-        BG = '#0a1520'
-        outer = tk.Frame(self.build_req_frame, background=BG)
-        outer.pack(fill='both', expand=True, padx=15, pady=10)
-
-        tk.Label(outer, text='Build Requests', background=BG,
-                 foreground='#88d0e8', font=('Segoe UI', 13, 'bold')).pack(anchor='w', pady=(0, 8))
-
-        pane = tk.PanedWindow(outer, orient='vertical', background='#1a3040',
-                              sashrelief='flat', sashwidth=6, sashpad=2)
-        pane.pack(fill='both', expand=True)
-
-        # ── TOP: Request Queue ────────────────────────────────────────────
-        top_card = ttk.Frame(pane, style='Card.TFrame')
-        pane.add(top_card, minsize=180)
-
-        top_inner = ttk.Frame(top_card, style='Card.TFrame')
-        top_inner.pack(fill='both', expand=True, padx=10, pady=8)
-
-        # Toolbar
-        tb = ttk.Frame(top_inner, style='Card.TFrame')
-        tb.pack(fill='x', pady=(0, 6))
-
-        tk.Label(tb, text='Request Queue', background='#0a2030',
-                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
-
-        # Status filter
-        tk.Label(tb, text='Filter:', background='#0a2030',
-                 foreground='#88d0e8', font=('Segoe UI', 9)).pack(side='left')
-        self._bs_filter_var = tk.StringVar(value='active')
-        filter_cb = ttk.Combobox(tb, textvariable=self._bs_filter_var, width=12,
-                                  state='readonly',
-                                  values=['active', 'all', 'pending', 'quoted', 'accepted',
-                                          'assigned', 'in_progress', 'delivered', 'complete', 'cancelled'])
-        filter_cb.pack(side='left', padx=(2, 8))
-        filter_cb.bind('<<ComboboxSelected>>', lambda _: self._bs_load_requests())
-
-        ttk.Button(tb, text='⟳ Refresh', command=self._bs_load_requests).pack(side='left', padx=(0, 16))
-
-        # Action buttons
-        ttk.Button(tb, text='Quote',
-                   command=self._bs_open_quote).pack(side='left', padx=(0, 4))
-        ttk.Button(tb, text='Assign Builder',
-                   command=self._bs_assign_dialog).pack(side='left', padx=(0, 4))
-        ttk.Button(tb, text='Mark Delivered',
-                   command=self._bs_mark_delivered).pack(side='left', padx=(0, 4))
-        ttk.Button(tb, text='Cancel',
-                   command=self._bs_cancel_request).pack(side='left', padx=(0, 16))
-        ttk.Button(tb, text='View Details',
-                   command=self._bs_view_details).pack(side='left', padx=(0, 4))
-
-        # Request treeview
-        req_cols = ('req_id', 'customer', 'item', 'qty', 'status', 'quote', 'builder', 'deadline', 'submitted')
-        self._bs_tree = ttk.Treeview(top_inner, columns=req_cols, show='headings',
-                                      selectmode='browse', height=7)
-        for cid, hd, w, a in [
-            ('req_id',    'REQ#',      60,  'c'),
-            ('customer',  'Customer',  130, 'w'),
-            ('item',      'Item',      180, 'w'),
-            ('qty',       'Qty',        45, 'e'),
-            ('status',    'Status',     90, 'c'),
-            ('quote',     'Quote ISK', 130, 'e'),
-            ('builder',   'Builder',   110, 'w'),
-            ('deadline',  'Deadline',   90, 'c'),
-            ('submitted', 'Submitted',  90, 'c'),
-        ]:
-            self._bs_tree.heading(cid, text=hd,
-                                  command=lambda c=cid: self._bs_sort(c))
-            self._bs_tree.column(cid, width=w, minwidth=30, anchor=a)
-
-        # Row colours by status
-        self._bs_tree.tag_configure('pending',     foreground='#8899bb')
-        self._bs_tree.tag_configure('quoted',      foreground='#ffcc44')
-        self._bs_tree.tag_configure('accepted',    foreground='#00d9ff')
-        self._bs_tree.tag_configure('assigned',    foreground='#aaddff')
-        self._bs_tree.tag_configure('in_progress', foreground='#bb88ff')
-        self._bs_tree.tag_configure('delivered',   foreground='#88ffbb')
-        self._bs_tree.tag_configure('complete',    foreground='#00ff88')
-        self._bs_tree.tag_configure('cancelled',   foreground='#666666')
-        self._bs_tree.tag_configure('row_a',       background='#0a1e2e')
-        self._bs_tree.tag_configure('row_b',       background='#0d2535')
-
-        req_vsb = ttk.Scrollbar(top_inner, orient='vertical', command=self._bs_tree.yview)
-        self._bs_tree.configure(yscrollcommand=req_vsb.set)
-        req_vsb.pack(side='right', fill='y')
-        self._bs_tree.pack(fill='both', expand=True)
-        self._bs_tree.bind('<Double-1>', lambda _: self._bs_open_quote())
-
-        # ── BOTTOM: sub-notebook (Quote Tool | Builder Pool) ──────────────
-        bot_card = ttk.Frame(pane, style='Card.TFrame')
-        pane.add(bot_card, minsize=260)
-
-        self._bs_subnb = ttk.Notebook(bot_card)
-        self._bs_subnb.pack(fill='both', expand=True, padx=6, pady=6)
-
-        # ── Quote Tool tab ────────────────────────────────────────────────
-        qt_frame = ttk.Frame(self._bs_subnb, style='Card.TFrame')
-        self._bs_subnb.add(qt_frame, text='  Quote Tool  ')
-        self._bs_build_quote_panel(qt_frame)
-
-        # ── Builder Pool tab ──────────────────────────────────────────────
-        bp_frame = ttk.Frame(self._bs_subnb, style='Card.TFrame')
-        self._bs_subnb.add(bp_frame, text='  Builder Pool  ')
-        self._bs_build_builder_panel(bp_frame)
-
-        # Initial load
-        self._bs_load_requests()
-
-    # ── Quote Tool panel ──────────────────────────────────────────────────
-
-    def _bs_build_quote_panel(self, parent):
-        BG = '#0a2030'
-        inner = tk.Frame(parent, background=BG)
-        inner.pack(fill='both', expand=True, padx=8, pady=6)
-
-        # Context label
-        self._bs_qt_ctx = tk.Label(inner, text='Select a pending request and click Quote',
-                                    background=BG, foreground='#446688',
-                                    font=('Segoe UI', 10, 'italic'))
-        self._bs_qt_ctx.pack(anchor='w', pady=(0, 6))
-
-        # Split: materials left, summary right
-        split = tk.Frame(inner, background=BG)
-        split.pack(fill='both', expand=True)
-
-        # ── Left: BOM treeview ────────────────────────────────────────────
-        left = tk.Frame(split, background=BG)
-        left.pack(side='left', fill='both', expand=True)
-
-        # Basis controls
-        basis_bar = tk.Frame(left, background=BG)
-        basis_bar.pack(fill='x', pady=(0, 4))
-        tk.Label(basis_bar, text='Set all:', background=BG,
-                 foreground='#668899', font=('Segoe UI', 9)).pack(side='left')
-        ttk.Button(basis_bar, text='JBV',
-                   command=lambda: self._bs_set_all_basis('JBV')).pack(side='left', padx=2)
-        ttk.Button(basis_bar, text='JSV',
-                   command=lambda: self._bs_set_all_basis('JSV')).pack(side='left', padx=2)
-        ttk.Button(basis_bar, text='Reset',
-                   command=self._bs_reset_basis).pack(side='left', padx=(2, 12))
-        ttk.Button(basis_bar, text='Toggle Selected',
-                   command=self._bs_toggle_selected_basis).pack(side='left', padx=2)
-        self._bs_basis_summary = tk.Label(basis_bar, text='', background=BG,
-                                           foreground='#446688', font=('Segoe UI', 9))
-        self._bs_basis_summary.pack(side='right')
-
-        # Materials treeview
-        mat_cols = ('name', 'qty', 'basis', 'unit_price', 'total')
-        self._bs_mat_tree = ttk.Treeview(left, columns=mat_cols, show='headings',
-                                          selectmode='browse', height=8)
-        for cid, hd, w, a in [
-            ('name',       'Material',   220, 'w'),
-            ('qty',        'Qty',         90, 'e'),
-            ('basis',      'Basis',       55, 'c'),
-            ('unit_price', 'Unit Price', 130, 'e'),
-            ('total',      'Total ISK',  140, 'e'),
-        ]:
-            self._bs_mat_tree.heading(cid, text=hd)
-            self._bs_mat_tree.column(cid, width=w, minwidth=30, anchor=a)
-
-        self._bs_mat_tree.tag_configure('jbv',      foreground='#00ff88')
-        self._bs_mat_tree.tag_configure('jsv',      foreground='#00d9ff')
-        self._bs_mat_tree.tag_configure('no_price', foreground='#ff6666')
-        self._bs_mat_tree.tag_configure('row_a',    background='#0a1e2e')
-        self._bs_mat_tree.tag_configure('row_b',    background='#0d2535')
-
-        mat_vsb = ttk.Scrollbar(left, orient='vertical', command=self._bs_mat_tree.yview)
-        self._bs_mat_tree.configure(yscrollcommand=mat_vsb.set)
-        mat_vsb.pack(side='right', fill='y')
-        self._bs_mat_tree.pack(fill='both', expand=True)
-
-        # Job costs summary below treeview
-        jobs_frame = tk.Frame(left, background=BG)
-        jobs_frame.pack(fill='x', pady=(4, 0))
-        self._bs_jobs_lbl = tk.Label(jobs_frame, text='', background=BG,
-                                      foreground='#bb88ff', font=('Segoe UI', 9),
-                                      justify='left', anchor='w')
-        self._bs_jobs_lbl.pack(side='left')
-
-        # ── Right: Quote summary ──────────────────────────────────────────
-        right = tk.Frame(split, background='#0a1828', width=220)
-        right.pack(side='right', fill='y', padx=(10, 0))
-        right.pack_propagate(False)
-
-        def _lrow(label, var_attr, color='#cce6ff'):
-            row = tk.Frame(right, background='#0a1828')
-            row.pack(fill='x', padx=10, pady=2)
-            tk.Label(row, text=label, background='#0a1828',
-                     foreground='#668899', font=('Segoe UI', 9), anchor='w').pack(side='left')
-            lbl = tk.Label(row, text='—', background='#0a1828',
-                           foreground=color, font=('Segoe UI', 9, 'bold'), anchor='e')
-            lbl.pack(side='right')
-            setattr(self, var_attr, lbl)
-
-        tk.Label(right, text='Quote Builder', background='#0a1828',
-                 foreground='#00d9ff', font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=10, pady=(8, 6))
-
-        _lrow('JBV Materials',  '_bs_lbl_jbv',  '#00ff88')
-        _lrow('JSV Materials',  '_bs_lbl_jsv',  '#00d9ff')
-        _lrow('Job Costs',      '_bs_lbl_jobs', '#bb88ff')
-
-        sep = tk.Frame(right, background='#1a3040', height=1)
-        sep.pack(fill='x', padx=10, pady=4)
-
-        _lrow('Subtotal',  '_bs_lbl_sub')
-
-        # Markup row
-        mu_row = tk.Frame(right, background='#0a1828')
-        mu_row.pack(fill='x', padx=10, pady=4)
-        tk.Label(mu_row, text='Markup %', background='#0a1828',
-                 foreground='#668899', font=('Segoe UI', 9)).pack(side='left')
-        self._bs_markup_var = tk.DoubleVar(value=15.0)
-        mu_spin = tk.Spinbox(mu_row, from_=0, to=100, increment=1,
-                             textvariable=self._bs_markup_var, width=5,
-                             background='#0a2030', foreground='#cce6ff',
-                             font=('Segoe UI', 9),
-                             command=self._bs_recalc)
-        mu_spin.pack(side='right')
-        self._bs_markup_var.trace_add('write', lambda *_: self._bs_recalc())
-
-        sep2 = tk.Frame(right, background='#1a3040', height=1)
-        sep2.pack(fill='x', padx=10, pady=4)
-
-        _lrow('Final Quote',   '_bs_lbl_quote', '#ffcc44')
-        _lrow('Corp Margin',   '_bs_lbl_margin', '#00ff88')
-        _lrow('Builder (~70%)', '_bs_lbl_builder', '#bb88ff')
-
-        sep3 = tk.Frame(right, background='#1a3040', height=1)
-        sep3.pack(fill='x', padx=10, pady=6)
-
-        self._bs_save_btn = ttk.Button(right, text='Save Quote',
-                                        style='Save.TButton',
-                                        command=self._bs_save_quote,
-                                        state='disabled')
-        self._bs_save_btn.pack(fill='x', padx=10, pady=2)
-
-        ttk.Button(right, text='Send Discord Notification',
-                   command=self._bs_send_discord).pack(fill='x', padx=10, pady=2)
-
-    # ── Builder Pool panel ────────────────────────────────────────────────
-
-    def _bs_build_builder_panel(self, parent):
-        BG = '#0a2030'
-        inner = tk.Frame(parent, background=BG)
-        inner.pack(fill='both', expand=True, padx=8, pady=6)
-
-        # Toolbar
-        tb = tk.Frame(inner, background=BG)
-        tb.pack(fill='x', pady=(0, 6))
-        tk.Label(tb, text='Builder Pool', background=BG,
-                 foreground='#66d9ff', font=('Segoe UI', 10, 'bold')).pack(side='left', padx=(0, 12))
-        ttk.Button(tb, text='+ Add Builder',
-                   command=self._bs_add_builder_dialog).pack(side='left', padx=(0, 4))
-        ttk.Button(tb, text='Edit',
-                   command=self._bs_edit_builder_dialog).pack(side='left', padx=(0, 4))
-        ttk.Button(tb, text='Toggle Active',
-                   command=self._bs_toggle_builder_active).pack(side='left', padx=(0, 4))
-        ttk.Button(tb, text='Log Payment',
-                   command=self._bs_log_payment_dialog).pack(side='left', padx=(0, 16))
-        ttk.Button(tb, text='⟳ Refresh',
-                   command=self._bs_load_builders).pack(side='left')
-
-        # Builder treeview
-        b_cols = ('name', 'active', 'specs', 'cut_pct', 'owed', 'total_earned')
-        self._bs_builder_tree = ttk.Treeview(inner, columns=b_cols, show='headings',
-                                              selectmode='browse', height=8)
-        for cid, hd, w, a in [
-            ('name',         'Character',    160, 'w'),
-            ('active',       'Active',        55, 'c'),
-            ('specs',        'Specialisations', 200, 'w'),
-            ('cut_pct',      'Cut %',          55, 'e'),
-            ('owed',         'ISK Owed',      140, 'e'),
-            ('total_earned', 'Total Earned',  140, 'e'),
-        ]:
-            self._bs_builder_tree.heading(cid, text=hd)
-            self._bs_builder_tree.column(cid, width=w, minwidth=30, anchor=a)
-
-        self._bs_builder_tree.tag_configure('active',   foreground='#00ff88')
-        self._bs_builder_tree.tag_configure('inactive', foreground='#666666')
-
-        b_vsb = ttk.Scrollbar(inner, orient='vertical', command=self._bs_builder_tree.yview)
-        self._bs_builder_tree.configure(yscrollcommand=b_vsb.set)
-        b_vsb.pack(side='right', fill='y')
-        self._bs_builder_tree.pack(fill='both', expand=True)
-
-        self._bs_load_builders()
-
-    # ── Data loading ──────────────────────────────────────────────────────
-
-    def _bs_load_requests(self):
-        """Reload the request queue treeview from DB."""
-        filt = self._bs_filter_var.get()
-        conn = sqlite3.connect(DB_PATH)
-        cur  = conn.cursor()
-
-        if filt == 'all':
-            cur.execute('''SELECT r.id, r.customer_name, r.item_name, r.quantity,
-                                  r.status, r.quote_price, r.deadline, r.created_at,
-                                  b.character_name AS builder_name
-                           FROM build_requests r
-                           LEFT JOIN build_builders b ON r.builder_id = b.id
-                           ORDER BY r.created_at DESC''')
-        elif filt == 'active':
-            cur.execute('''SELECT r.id, r.customer_name, r.item_name, r.quantity,
-                                  r.status, r.quote_price, r.deadline, r.created_at,
-                                  b.character_name AS builder_name
-                           FROM build_requests r
-                           LEFT JOIN build_builders b ON r.builder_id = b.id
-                           WHERE r.status NOT IN ('complete', 'cancelled')
-                           ORDER BY r.created_at DESC''')
-        else:
-            cur.execute('''SELECT r.id, r.customer_name, r.item_name, r.quantity,
-                                  r.status, r.quote_price, r.deadline, r.created_at,
-                                  b.character_name AS builder_name
-                           FROM build_requests r
-                           LEFT JOIN build_builders b ON r.builder_id = b.id
-                           WHERE r.status = ?
-                           ORDER BY r.created_at DESC''', (filt,))
-        rows = cur.fetchall()
-        conn.close()
-
-        self._bs_tree.delete(*self._bs_tree.get_children())
-        for i, r in enumerate(rows):
-            rid, cust, item, qty, status, quote, deadline, created, builder = r
-            quote_str   = f'{quote:,.0f}' if quote else '—'
-            deadline_str = deadline[:10] if deadline else '—'
-            created_str  = created[:10] if created else '—'
-            builder_str  = builder or '—'
-            tags = (status, 'row_a' if i % 2 == 0 else 'row_b')
-            self._bs_tree.insert('', 'end', iid=str(rid), tags=tags,
-                                 values=(f'REQ-{rid:04d}', cust, item, qty, status,
-                                         quote_str, builder_str, deadline_str, created_str))
-
-    def _bs_load_builders(self):
-        """Reload the builder pool treeview."""
-        conn = sqlite3.connect(DB_PATH)
-        cur  = conn.cursor()
-        cur.execute('''SELECT b.id, b.character_name, b.active,
-                              b.specializations, b.default_builder_pct,
-                              COALESCE(SUM(CASE WHEN p.paid=0 THEN p.isk_owed ELSE 0 END), 0) AS owed,
-                              COALESCE(SUM(p.isk_owed), 0) AS total_earned
-                       FROM build_builders b
-                       LEFT JOIN build_payouts p ON p.builder_id = b.id
-                       GROUP BY b.id
-                       ORDER BY b.active DESC, b.character_name''')
-        rows = cur.fetchall()
-        conn.close()
-
-        self._bs_builder_tree.delete(*self._bs_builder_tree.get_children())
-        for r in rows:
-            bid, name, active, specs_json, cut, owed, earned = r
-            try:
-                specs = ', '.join(json.loads(specs_json or '[]'))
-            except Exception:
-                specs = specs_json or ''
-            tag = 'active' if active else 'inactive'
-            self._bs_builder_tree.insert('', 'end', iid=str(bid), tags=(tag,),
-                                         values=(name, '✓' if active else '—',
-                                                 specs, f'{cut:.0f}%',
-                                                 f'{owed:,.0f}',
-                                                 f'{earned:,.0f}'))
-
-    # ── Quote Tool logic ──────────────────────────────────────────────────
-
-    def _bs_selected_req_id(self):
-        sel = self._bs_tree.selection()
-        if not sel:
-            messagebox.showinfo('Build Requests', 'Select a request first.')
-            return None
-        return int(sel[0])
-
-    def _bs_open_quote(self):
-        """Expand BOM and populate the quote tool for the selected request."""
-        rid = self._bs_selected_req_id()
-        if rid is None:
-            return
-
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        req = conn.execute('SELECT * FROM build_requests WHERE id = ?', (rid,)).fetchone()
-        conn.close()
-
-        if not req:
-            return
-
-        self._bs_req_id = rid
-        self._bs_subnb.select(0)  # switch to Quote Tool tab
-
-        self._bs_qt_ctx.configure(
-            text=f'REQ-{rid:04d}  ·  {req["item_name"]} ×{req["quantity"]}  '
-                 f'|  ME10  ·  SCI {self._get_cfg("mfg_sci", "?")}%  ·  Tax {self._get_cfg("mfg_facility_tax", "?")}%',
-            foreground='#88d0e8'
-        )
-
-        if req['markup_pct']:
-            self._bs_markup_var.set(req['markup_pct'])
-
-        if not req['item_type_id']:
-            messagebox.showwarning('Quote Tool',
-                                   f'No type_id stored for "{req["item_name"]}" — '
-                                   f'cannot auto-expand BOM.\nEnter quote manually.')
-            return
-
-        result = self._bom_expand(req['item_type_id'], req['quantity'], DB_PATH)
-        if not result['ok']:
-            messagebox.showerror('BOM Error', result['error'])
-            return
-
-        self._bs_bom_data = result
-        self._bs_render_bom()
-        self._bs_recalc()
-        self._bs_save_btn.configure(state='normal')
-
-    def _bs_render_bom(self):
-        """Populate the materials treeview from current BOM data."""
-        if not self._bs_bom_data:
-            return
-        mats = self._bs_bom_data['materials']
-        self._bs_mat_tree.delete(*self._bs_mat_tree.get_children())
-
-        jbv_count = jsv_count = no_price = 0
-        for i, m in enumerate(mats):
-            price = m['jbv'] if m['basis'] == 'JBV' else m['jsv']
-            eff   = price * (m['pct'] / 100)
-            total = m['qty'] * eff
-
-            if not m['has_price']:
-                tag   = 'no_price'
-                p_str = 'NO PRICE'
-                t_str = '—'
-                no_price += 1
-            elif m['basis'] == 'JBV':
-                tag   = 'jbv'
-                p_str = f'{eff:,.2f}'
-                t_str = f'{total:,.0f}'
-                jbv_count += 1
-            else:
-                tag   = 'jsv'
-                p_str = f'{eff:,.2f}'
-                t_str = f'{total:,.0f}'
-                jsv_count += 1
-
-            row_tag = 'row_a' if i % 2 == 0 else 'row_b'
-            self._bs_mat_tree.insert('', 'end', iid=str(i), tags=(tag, row_tag),
-                                     values=(m['name'], f'{m["qty"]:,}',
-                                             m['basis'], p_str, t_str))
-
-        # Job costs summary
-        jobs = self._bs_bom_data['jobs']
-        job_lines = [f'{j["name"]} ×{j["runs"]}  →  {j["job_cost"]/1e6:.2f}M ISK'
-                     for j in sorted(jobs, key=lambda x: x['depth'])]
-        self._bs_jobs_lbl.configure(
-            text='Jobs: ' + '   |   '.join(job_lines[:4]) +
-                 (f'  (+{len(job_lines)-4} more)' if len(job_lines) > 4 else '')
-        )
-        self._bs_basis_summary.configure(
-            text=f'{jbv_count} JBV · {jsv_count} JSV' +
-                 (f' · {no_price} ⚠ no price' if no_price else '')
-        )
-
-    def _bs_recalc(self):
-        """Recalculate totals and update the summary panel."""
-        if not self._bs_bom_data:
-            return
-        t = self._bom_totals(self._bs_bom_data['materials'], self._bs_bom_data['jobs'])
-
-        try:
-            markup = float(self._bs_markup_var.get())
-        except Exception:
-            markup = 15.0
-
-        quote  = t['subtotal'] * (1 + markup / 100)
-        margin = quote - t['subtotal']
-        conn   = sqlite3.connect(DB_PATH)
-        build_pct = float(conn.execute(
-            "SELECT value FROM site_config WHERE key='build_default_builder_pct'"
-        ).fetchone()[0] or 70)
-        conn.close()
-        builder_cut = quote * (build_pct / 100)
-
-        def fmt(n): return f'{n:,.0f} ISK'
-        self._bs_lbl_jbv.configure(text=fmt(t['jbv_mat']))
-        self._bs_lbl_jsv.configure(text=fmt(t['jsv_mat']))
-        self._bs_lbl_jobs.configure(text=fmt(t['job_cost']))
-        self._bs_lbl_sub.configure(text=fmt(t['subtotal']))
-        self._bs_lbl_quote.configure(text=fmt(quote))
-        self._bs_lbl_margin.configure(text=fmt(margin))
-        self._bs_lbl_builder.configure(text=fmt(builder_cut))
-
-    def _bs_set_all_basis(self, basis):
-        if not self._bs_bom_data:
-            return
-        for m in self._bs_bom_data['materials']:
-            m['basis'] = basis
-        self._bs_render_bom()
-        self._bs_recalc()
-
-    def _bs_reset_basis(self):
-        if not self._bs_bom_data:
-            return
-        for m in self._bs_bom_data['materials']:
-            m['basis'] = 'JBV' if m['has_local_price'] else 'JSV'
-        self._bs_render_bom()
-        self._bs_recalc()
-
-    def _bs_toggle_selected_basis(self):
-        if not self._bs_bom_data:
-            return
-        sel = self._bs_mat_tree.selection()
-        if not sel:
-            return
-        idx = int(sel[0])
-        m = self._bs_bom_data['materials'][idx]
-        m['basis'] = 'JSV' if m['basis'] == 'JBV' else 'JBV'
-        self._bs_render_bom()
-        self._bs_recalc()
-
-    # ── Save / actions ────────────────────────────────────────────────────
-
-    def _bs_save_quote(self):
-        if not self._bs_bom_data or not self._bs_req_id:
-            return
-        t = self._bom_totals(self._bs_bom_data['materials'], self._bs_bom_data['jobs'])
-        try:
-            markup = float(self._bs_markup_var.get())
-        except Exception:
-            markup = 15.0
-        quote = t['subtotal'] * (1 + markup / 100)
-
-        conn = sqlite3.connect(DB_PATH)
-        conn.execute(
-            '''UPDATE build_requests
-               SET status='quoted', materials_cost_est=?, job_cost_est=?,
-                   markup_pct=?, quote_price=?, updated_at=datetime('now')
-               WHERE id=?''',
-            (t['jbv_mat'] + t['jsv_mat'], t['job_cost'], markup, quote, self._bs_req_id)
-        )
-        conn.commit()
-        conn.close()
-        self._bs_load_requests()
-        self.update_status(f'Quote saved for REQ-{self._bs_req_id:04d}: {quote:,.0f} ISK')
-        messagebox.showinfo('Quote Saved',
-                            f'REQ-{self._bs_req_id:04d} → quoted\n'
-                            f'Quote: {quote:,.0f} ISK\n\n'
-                            f'Use "Send Discord Notification" to notify the customer.')
-
-    def _bs_send_discord(self):
-        if not self._bs_req_id:
-            return
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        req = conn.execute('SELECT * FROM build_requests WHERE id=?', (self._bs_req_id,)).fetchone()
-        webhook = conn.execute(
-            "SELECT value FROM site_config WHERE key='build_discord_webhook'"
-        ).fetchone()
-        conn.close()
-
-        if not webhook or not webhook[0]:
-            messagebox.showwarning('Discord',
-                                   'No webhook configured.\n'
-                                   'Set build_discord_webhook in site_config.')
-            return
-
-        import urllib.request
-        msg = (f'**Build Quote — REQ-{req["id"]:04d}**\n'
-               f'Customer: {req["customer_name"]}\n'
-               f'Item: **{req["item_name"]}** ×{req["quantity"]}\n'
-               f'Quote: **{req["quote_price"]:,.0f} ISK**\n'
-               f'Delivery: {req["delivery_location"]}\n'
-               f'Lookup token: `{req["lookup_token"]}`\n'
-               f'Reply Accept to confirm. Quote valid 48h.')
-        try:
-            data = json.dumps({'content': msg}).encode()
-            req2 = urllib.request.Request(webhook[0], data=data,
-                                          headers={'Content-Type': 'application/json'})
-            urllib.request.urlopen(req2, timeout=8)
-            self.update_status('Discord notification sent.')
-        except Exception as e:
-            messagebox.showerror('Discord Error', str(e))
-
-    def _bs_assign_dialog(self):
-        rid = self._bs_selected_req_id()
-        if rid is None:
-            return
-
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        req      = conn.execute('SELECT * FROM build_requests WHERE id=?', (rid,)).fetchone()
-        builders = conn.execute(
-            'SELECT id, character_name, default_builder_pct FROM build_builders WHERE active=1 ORDER BY character_name'
-        ).fetchall()
-        conn.close()
-
-        if not builders:
-            messagebox.showinfo('Assign Builder',
-                                'No active builders in the pool.\nAdd builders in the Builder Pool tab first.')
-            return
-
-        dlg = tk.Toplevel(self.root)
-        dlg.title(f'Assign Builder — REQ-{rid:04d}')
-        dlg.geometry('380x260')
-        dlg.configure(bg='#0a1520')
-        dlg.grab_set()
-
-        tk.Label(dlg, text=f'REQ-{rid:04d}: {req["item_name"]} ×{req["quantity"]}',
-                 background='#0a1520', foreground='#cce6ff',
-                 font=('Segoe UI', 11, 'bold')).pack(pady=(14, 4), padx=16, anchor='w')
-
-        tk.Label(dlg, text='Select builder:', background='#0a1520',
-                 foreground='#88d0e8', font=('Segoe UI', 10)).pack(padx=16, anchor='w')
-
-        builder_names = [b['character_name'] for b in builders]
-        builder_ids   = [b['id'] for b in builders]
-        builder_pcts  = [b['default_builder_pct'] for b in builders]
-
-        sel_var = tk.StringVar(value=builder_names[0])
-        cb = ttk.Combobox(dlg, textvariable=sel_var, values=builder_names,
-                           state='readonly', width=28)
-        cb.pack(padx=16, pady=6, anchor='w')
-
-        pct_frame = tk.Frame(dlg, background='#0a1520')
-        pct_frame.pack(fill='x', padx=16, pady=4)
-        tk.Label(pct_frame, text='Builder cut %:', background='#0a1520',
-                 foreground='#88d0e8', font=('Segoe UI', 10)).pack(side='left')
-        pct_var = tk.DoubleVar(value=builder_pcts[0])
-        pct_spin = tk.Spinbox(pct_frame, from_=0, to=100, increment=5,
-                              textvariable=pct_var, width=6,
-                              background='#0a2030', foreground='#cce6ff', font=('Segoe UI', 10))
-        pct_spin.pack(side='left', padx=6)
-
-        def on_builder_change(*_):
-            idx = builder_names.index(sel_var.get())
-            pct_var.set(builder_pcts[idx])
-        sel_var.trace_add('write', on_builder_change)
-
-        def do_assign():
-            idx = builder_names.index(sel_var.get())
-            bid = builder_ids[idx]
-            pct = float(pct_var.get())
-            conn2 = sqlite3.connect(DB_PATH)
-            conn2.execute(
-                '''UPDATE build_requests
-                   SET builder_id=?, builder_pct=?, status='assigned',
-                       assigned_at=datetime('now'), updated_at=datetime('now')
-                   WHERE id=?''',
-                (bid, pct, rid)
-            )
-            conn2.commit()
-            conn2.close()
-            dlg.destroy()
-            self._bs_load_requests()
-            self.update_status(f'REQ-{rid:04d} assigned to {sel_var.get()}')
-
-        btn_row = tk.Frame(dlg, background='#0a1520')
-        btn_row.pack(pady=14)
-        ttk.Button(btn_row, text='Assign', style='Save.TButton',
-                   command=do_assign).pack(side='left', padx=6)
-        ttk.Button(btn_row, text='Cancel',
-                   command=dlg.destroy).pack(side='left', padx=6)
-
-    def _bs_mark_delivered(self):
-        rid = self._bs_selected_req_id()
-        if rid is None:
-            return
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        req = conn.execute('SELECT * FROM build_requests WHERE id=?', (rid,)).fetchone()
-
-        price_str = f'{req["quote_price"]:,.0f}' if req['quote_price'] else '?'
-        if not messagebox.askyesno('Mark Delivered',
-                                   f'Mark REQ-{rid:04d} as delivered?\n'
-                                   f'Item: {req["item_name"]} ×{req["quantity"]}\n'
-                                   f'Quote: {price_str} ISK\n\n'
-                                   f'This will create a payout record for the builder.'):
-            conn.close()
-            return
-
-        # Update request
-        conn.execute(
-            '''UPDATE build_requests
-               SET status='delivered', contract_price_actual=quote_price,
-                   completed_at=datetime('now'), updated_at=datetime('now')
-               WHERE id=?''', (rid,)
-        )
-        # Create payout record if builder assigned
-        if req['builder_id'] and req['quote_price'] and req['builder_pct']:
-            isk_owed = req['quote_price'] * (req['builder_pct'] / 100)
-            conn.execute(
-                'INSERT INTO build_payouts (builder_id, request_id, isk_owed, paid) VALUES (?,?,?,0)',
-                (req['builder_id'], rid, isk_owed)
-            )
-        conn.commit()
-        conn.close()
-        self._bs_load_requests()
-        self._bs_load_builders()
-        self.update_status(f'REQ-{rid:04d} marked delivered.')
-
-    def _bs_cancel_request(self):
-        rid = self._bs_selected_req_id()
-        if rid is None:
-            return
-        if messagebox.askyesno('Cancel Request', f'Cancel REQ-{rid:04d}?'):
-            conn = sqlite3.connect(DB_PATH)
-            conn.execute(
-                "UPDATE build_requests SET status='cancelled', updated_at=datetime('now') WHERE id=?",
-                (rid,)
-            )
-            conn.commit()
-            conn.close()
-            self._bs_load_requests()
-            self.update_status(f'REQ-{rid:04d} cancelled.')
-
-    def _bs_view_details(self):
-        rid = self._bs_selected_req_id()
-        if rid is None:
-            return
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        req = conn.execute('SELECT * FROM build_requests WHERE id=?', (rid,)).fetchone()
-        conn.close()
-
-        dlg = tk.Toplevel(self.root)
-        dlg.title(f'REQ-{rid:04d} Details')
-        dlg.geometry('460x340')
-        dlg.configure(bg='#0a1520')
-        dlg.grab_set()
-
-        def row(label, value, color='#cce6ff'):
-            f = tk.Frame(dlg, background='#0a1520')
-            f.pack(fill='x', padx=18, pady=2)
-            tk.Label(f, text=label, background='#0a1520', foreground='#668899',
-                     font=('Segoe UI', 9), width=18, anchor='w').pack(side='left')
-            tk.Label(f, text=str(value or '—'), background='#0a1520', foreground=color,
-                     font=('Segoe UI', 10)).pack(side='left')
-
-        tk.Label(dlg, text=f'REQ-{rid:04d}  ·  {req["item_name"]}',
-                 background='#0a1520', foreground='#00d9ff',
-                 font=('Segoe UI', 13, 'bold')).pack(pady=(14, 10), padx=18, anchor='w')
-
-        row('Customer',   req['customer_name'])
-        row('Quantity',   req['quantity'])
-        row('Status',     req['status'], '#ffcc44')
-        row('Delivery',   req['delivery_location'])
-        row('Deadline',   req['deadline'])
-        row('Lookup Token', req['lookup_token'], '#00d9ff')
-        row('Quote Price', f'{req["quote_price"]:,.0f} ISK' if req['quote_price'] else '—', '#ffcc44')
-        row('Submitted',  req['created_at'][:16] if req['created_at'] else '—')
-        if req['notes']:
-            tk.Label(dlg, text='Notes:', background='#0a1520', foreground='#668899',
-                     font=('Segoe UI', 9)).pack(anchor='w', padx=18, pady=(8, 2))
-            tk.Label(dlg, text=req['notes'], background='#0a1520', foreground='#aabbcc',
-                     font=('Segoe UI', 10), wraplength=400, justify='left').pack(anchor='w', padx=18)
-
-        ttk.Button(dlg, text='Close', command=dlg.destroy).pack(pady=12)
-
-    def _bs_sort(self, col):
-        """Sort the request treeview by column."""
-        items = [(self._bs_tree.set(k, col), k) for k in self._bs_tree.get_children('')]
-        items.sort(key=lambda x: x[0])
-        for idx, (_, k) in enumerate(items):
-            self._bs_tree.move(k, '', idx)
-
-    # ── Builder pool actions ──────────────────────────────────────────────
-
-    def _bs_add_builder_dialog(self):
-        self._bs_builder_form_dialog(None)
-
-    def _bs_edit_builder_dialog(self):
-        sel = self._bs_builder_tree.selection()
-        if not sel:
-            messagebox.showinfo('Builder Pool', 'Select a builder to edit.')
-            return
-        self._bs_builder_form_dialog(int(sel[0]))
-
-    def _bs_builder_form_dialog(self, builder_id):
-        existing = None
-        if builder_id:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
-            existing = conn.execute('SELECT * FROM build_builders WHERE id=?', (builder_id,)).fetchone()
-            conn.close()
-
-        dlg = tk.Toplevel(self.root)
-        dlg.title('Add Builder' if not existing else f'Edit — {existing["character_name"]}')
-        dlg.geometry('380x320')
-        dlg.configure(bg='#0a1520')
-        dlg.grab_set()
-
-        fields = {}
-        def field(label, default=''):
-            f = tk.Frame(dlg, background='#0a1520')
-            f.pack(fill='x', padx=16, pady=4)
-            tk.Label(f, text=label, background='#0a1520', foreground='#88d0e8',
-                     font=('Segoe UI', 10), width=18, anchor='w').pack(side='left')
-            e = tk.Entry(f, background='#0a2030', foreground='#cce6ff',
-                         insertbackground='#cce6ff', font=('Segoe UI', 10), width=22)
-            e.insert(0, str(default))
-            e.pack(side='left')
-            return e
-
-        fields['name'] = field('Character Name', existing['character_name'] if existing else '')
-        fields['char_id'] = field('Character ID', existing['character_id'] if existing else '')
-        fields['cut']  = field('Default Cut %',  existing['default_builder_pct'] if existing else '70')
-        fields['specs'] = field('Specialisations',
-                                ', '.join(json.loads(existing['specializations'] or '[]')) if existing else '')
-
-        notes_frame = tk.Frame(dlg, background='#0a1520')
-        notes_frame.pack(fill='x', padx=16, pady=4)
-        tk.Label(notes_frame, text='Notes', background='#0a1520', foreground='#88d0e8',
-                 font=('Segoe UI', 10), width=18, anchor='w').pack(side='left')
-        notes_e = tk.Text(notes_frame, background='#0a2030', foreground='#cce6ff',
-                          font=('Segoe UI', 10), width=22, height=3)
-        if existing and existing['notes']:
-            notes_e.insert('1.0', existing['notes'])
-        notes_e.pack(side='left')
-
-        def save():
-            name  = fields['name'].get().strip()
-            cid   = fields['char_id'].get().strip() or None
-            cut   = float(fields['cut'].get() or 70)
-            specs_raw = [s.strip() for s in fields['specs'].get().split(',') if s.strip()]
-            specs = json.dumps(specs_raw)
-            notes = notes_e.get('1.0', 'end').strip()
-            if not name:
-                messagebox.showerror('Validation', 'Character name is required.')
-                return
-            conn2 = sqlite3.connect(DB_PATH)
-            if existing:
-                conn2.execute(
-                    '''UPDATE build_builders SET character_name=?, character_id=?,
-                       default_builder_pct=?, specializations=?, notes=? WHERE id=?''',
-                    (name, cid, cut, specs, notes, builder_id)
-                )
-            else:
-                conn2.execute(
-                    '''INSERT INTO build_builders
-                       (character_name, character_id, default_builder_pct, specializations, notes, active)
-                       VALUES (?,?,?,?,?,1)''',
-                    (name, cid, cut, specs, notes)
-                )
-            conn2.commit()
-            conn2.close()
-            dlg.destroy()
-            self._bs_load_builders()
-
-        btn_row = tk.Frame(dlg, background='#0a1520')
-        btn_row.pack(pady=12)
-        ttk.Button(btn_row, text='Save', style='Save.TButton', command=save).pack(side='left', padx=6)
-        ttk.Button(btn_row, text='Cancel', command=dlg.destroy).pack(side='left', padx=6)
-
-    def _bs_toggle_builder_active(self):
-        sel = self._bs_builder_tree.selection()
-        if not sel:
-            messagebox.showinfo('Builder Pool', 'Select a builder first.')
-            return
-        bid = int(sel[0])
-        conn = sqlite3.connect(DB_PATH)
-        cur  = conn.cursor()
-        cur.execute('SELECT active FROM build_builders WHERE id=?', (bid,))
-        current = cur.fetchone()[0]
-        conn.execute('UPDATE build_builders SET active=? WHERE id=?', (0 if current else 1, bid))
-        conn.commit()
-        conn.close()
-        self._bs_load_builders()
-
-    def _bs_log_payment_dialog(self):
-        sel = self._bs_builder_tree.selection()
-        if not sel:
-            messagebox.showinfo('Log Payment', 'Select a builder first.')
-            return
-        bid  = int(sel[0])
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        builder = conn.execute('SELECT * FROM build_builders WHERE id=?', (bid,)).fetchone()
-        owed_rows = conn.execute(
-            '''SELECT p.id, r.item_name, r.quantity, p.isk_owed
-               FROM build_payouts p
-               JOIN build_requests r ON r.id = p.request_id
-               WHERE p.builder_id=? AND p.paid=0''', (bid,)
-        ).fetchall()
-        conn.close()
-
-        if not owed_rows:
-            messagebox.showinfo('Log Payment', f'{builder["character_name"]} has no unpaid payouts.')
-            return
-
-        total_owed = sum(r['isk_owed'] for r in owed_rows)
-        if messagebox.askyesno('Log Payment',
-                               f'Mark ALL unpaid for {builder["character_name"]} as paid?\n'
-                               f'Total: {total_owed:,.0f} ISK\n'
-                               f'({len(owed_rows)} payout(s))'):
-            conn2 = sqlite3.connect(DB_PATH)
-            conn2.execute(
-                "UPDATE build_payouts SET paid=1, paid_date=date('now') WHERE builder_id=? AND paid=0",
-                (bid,)
-            )
-            conn2.commit()
-            conn2.close()
-            self._bs_load_builders()
-            self.update_status(f'Payment logged for {builder["character_name"]}: {total_owed:,.0f} ISK')
-
     def _get_cfg(self, key, default=''):
         conn = sqlite3.connect(DB_PATH)
         row  = conn.execute('SELECT value FROM site_config WHERE key=?', (key,)).fetchone()
@@ -9166,6 +8254,24 @@ class AdminDashboard:
         tk.Label(right, text='In-Game Contacts', bg=PANEL2, fg=GOLD,
                  font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=12, pady=(8, 4))
 
+        char_row = tk.Frame(right, bg=PANEL2)
+        char_row.pack(anchor='w', padx=12, pady=(0, 4))
+        tk.Label(char_row, text='Character:', bg=PANEL2, fg=FG, font=FONT).pack(side='left')
+        self._gw_char_var = tk.StringVar(value='Gromalok Hakaari')
+        ttk.Combobox(char_row, textvariable=self._gw_char_var, width=18, state='readonly',
+                     values=list(GW_CHARACTERS.keys())).pack(side='left', padx=(6, 0))
+
+        min_kills_row = tk.Frame(right, bg=PANEL2)
+        min_kills_row.pack(anchor='w', padx=12, pady=(0, 6))
+        tk.Label(min_kills_row, text='Min. kills to push/show:', bg=PANEL2, fg=FG,
+                 font=FONT).pack(side='left')
+        _saved_min = self._get_cfg('gank_min_kills', '2')
+        self._gw_min_kills_var = tk.StringVar(value=_saved_min)
+        tk.Spinbox(min_kills_row, from_=1, to=9999, width=6,
+                   textvariable=self._gw_min_kills_var,
+                   bg=ENTRY, fg=FG, buttonbackground=PANEL2,
+                   insertbackground=FG, font=FONT).pack(side='left', padx=(6, 0))
+
         tk.Label(right, text='Push all watchlist entries to your\ncontacts at −10 standing.',
                  bg=PANEL2, fg=DIM, font=('Segoe UI', 8), justify='left').pack(
                      anchor='w', padx=12, pady=(0, 6))
@@ -9189,8 +8295,89 @@ class AdminDashboard:
                   bg=PANEL2, fg=DIM, font=('Segoe UI', 8), relief='flat', padx=6,
                   command=self._gw_reauthorize).pack(side='left')
 
+        ttk.Separator(right, orient='horizontal').pack(fill='x', padx=8, pady=(10, 4))
+
+        tk.Label(right, text='Maintenance', bg=PANEL2, fg=GOLD,
+                 font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=12, pady=(0, 4))
+
+        prune_days_row = tk.Frame(right, bg=PANEL2)
+        prune_days_row.pack(anchor='w', padx=12, pady=(0, 4))
+        tk.Label(prune_days_row, text='Remove inactive after:', bg=PANEL2, fg=FG,
+                 font=FONT).pack(side='left')
+        _saved_days = self._get_cfg('gank_prune_days', '30')
+        self._gw_prune_days_var = tk.StringVar(value=_saved_days)
+        tk.Spinbox(prune_days_row, from_=7, to=365, width=5,
+                   textvariable=self._gw_prune_days_var,
+                   bg=ENTRY, fg=FG, buttonbackground=PANEL2,
+                   insertbackground=FG, font=FONT).pack(side='left', padx=(6, 0))
+        tk.Label(prune_days_row, text='days', bg=PANEL2, fg=DIM,
+                 font=FONT).pack(side='left', padx=(4, 0))
+
+        tk.Label(right, text='Cyno alts are never pruned.',
+                 bg=PANEL2, fg=DIM, font=('Segoe UI', 8, 'italic')).pack(
+                     anchor='w', padx=12, pady=(0, 4))
+
+        tk.Button(right, text='Prune Inactive Entries',
+                  bg=PANEL2, fg='#e08030', font=FONT, relief='flat', padx=8,
+                  command=self._gw_prune_inactive).pack(anchor='w', padx=12, pady=(0, 8))
+
         # Populate tree on load
         self._gw_reload_tree()
+
+    def _gw_prune_inactive(self):
+        """Remove non-cyno watchlist entries with no kills in the last N days."""
+        try:
+            days = max(7, int(self._gw_prune_days_var.get() or 30))
+        except ValueError:
+            days = 30
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("INSERT OR REPLACE INTO site_config(key,value) VALUES('gank_prune_days',?)",
+                     (str(days),))
+        conn.commit()
+
+        # Find candidates: non-cyno entries whose most recent kill is older than `days`
+        # (or they have no kill log entry at all and were added more than `days` ago)
+        candidates = conn.execute("""
+            SELECT w.entity_id, w.entity_type, w.entity_name,
+                   COALESCE(MAX(k.killmail_time), w.added_at) AS last_activity
+            FROM gank_watchlist w
+            LEFT JOIN gank_kill_log k ON k.entity_id = w.entity_id
+            WHERE w.tag != 'cyno_alt'
+            GROUP BY w.entity_id, w.entity_type
+            HAVING last_activity < datetime('now', ? || ' days')
+        """, (f'-{days}',)).fetchall()
+        conn.close()
+
+        if not candidates:
+            messagebox.showinfo('Prune Inactive',
+                                f'No entries found with no activity in the last {days} days.')
+            return
+
+        names = '\n'.join(
+            f'  {name or "(unknown)"} ({etype}) — last: {last[:10]}'
+            for _, etype, name, last in candidates[:20]
+        )
+        if len(candidates) > 20:
+            names += f'\n  … and {len(candidates) - 20} more'
+
+        if not messagebox.askyesno(
+            'Prune Inactive',
+            f'Remove {len(candidates)} entries with no activity in {days}+ days?\n\n{names}'
+        ):
+            return
+
+        conn2 = sqlite3.connect(DB_PATH)
+        for eid, etype, *_ in candidates:
+            conn2.execute(
+                'DELETE FROM gank_watchlist WHERE entity_id=? AND entity_type=?',
+                (eid, etype)
+            )
+        conn2.commit()
+        conn2.close()
+
+        self._gw_reload_tree()
+        self._gw_progress.set(f'Pruned {len(candidates)} inactive entries.')
 
     def _gw_reload_tree(self):
         """Reload treeview from DB."""
@@ -9313,8 +8500,16 @@ class AdminDashboard:
         _th.Thread(target=run, daemon=True).start()
 
     def _gw_publish(self):
-        """Call _build_gank_watchlist.py via subprocess."""
+        """Save threshold to site_config then rebuild gank_watchlist.html."""
         import subprocess as _sp, threading as _th
+
+        # Save current min_kills threshold before building
+        min_kills = max(1, int(self._gw_min_kills_var.get() or 1))
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("INSERT OR REPLACE INTO site_config(key,value) VALUES('gank_min_kills',?)",
+                     (str(min_kills),))
+        conn.commit()
+        conn.close()
 
         build_script = os.path.join(PROJECT_DIR, '_build_gank_watchlist.py')
 
@@ -9337,10 +8532,14 @@ class AdminDashboard:
 
         _th.Thread(target=run, daemon=True).start()
 
-    def _gw_get_token(self):
-        """Refresh and return (access_token, scopes, char_id) using credentials_gank_contact.json."""
-        import json as _json, base64 as _b64, requests as _req, os as _os
-        cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
+    def _gw_selected_cred_path(self):
+        fname = GW_CHARACTERS.get(self._gw_char_var.get(), 'credentials_gank_contact.json')
+        import os as _os
+        return _os.path.join(PROJECT_DIR, 'config', fname)
+
+    def _gw_get_token(self, cred_path):
+        """Refresh and return (access_token, scopes, char_id) for the given credentials file."""
+        import json as _json, base64 as _b64, requests as _req
         with open(cred_path) as f:
             creds = _json.load(f)
         r = _req.post('https://login.eveonline.com/v2/oauth/token',
@@ -9369,7 +8568,7 @@ class AdminDashboard:
             try:
                 import requests as _req
 
-                token, scopes, char_id = self._gw_get_token()
+                token, scopes, char_id = self._gw_get_token(self._gw_selected_cred_path())
 
                 if 'esi-characters.write_contacts.v1' not in scopes:
                     self.root.after(0, lambda: self._gw_scope_warn.set(
@@ -9379,15 +8578,21 @@ class AdminDashboard:
                     return
                 self.root.after(0, lambda: self._gw_scope_warn.set(''))
 
-                # Load watchlist
+                # Save threshold and load filtered watchlist
+                min_kills = max(1, int(self._gw_min_kills_var.get() or 1))
                 conn  = sqlite3.connect(DB_PATH)
+                conn.execute("INSERT OR REPLACE INTO site_config(key,value) VALUES('gank_min_kills',?)",
+                             (str(min_kills),))
+                conn.commit()
                 rows  = conn.execute(
                     'SELECT entity_id, entity_type FROM gank_watchlist'
+                    ' WHERE kill_count >= ? OR tag = ?',
+                    (min_kills, 'cyno_alt')
                 ).fetchall()
                 conn.close()
 
                 if not rows:
-                    self.root.after(0, lambda: self._gw_push_status.set('Watchlist is empty.'))
+                    self.root.after(0, lambda: self._gw_push_status.set('No entries meet the minimum kills threshold.'))
                     return
 
                 BATCH = 100
@@ -9434,7 +8639,7 @@ class AdminDashboard:
             try:
                 import requests as _req
 
-                token, scopes, char_id = self._gw_get_token()
+                token, scopes, char_id = self._gw_get_token(self._gw_selected_cred_path())
 
                 if 'esi-characters.read_contacts.v1' not in scopes:
                     self.root.after(0, lambda: self._gw_scope_warn.set(
@@ -9490,17 +8695,45 @@ class AdminDashboard:
         _th.Thread(target=run, daemon=True).start()
 
     def _gw_reauthorize(self):
-        """Open EVE SSO URL in browser with required scopes."""
+        """Open EVE SSO URL in browser with required scopes for the selected character."""
         import webbrowser as _wb
-        import json as _json, os as _os
+        import json as _json, urllib.parse as _up, os as _os
 
-        cred_path = _os.path.join(PROJECT_DIR, 'config', 'credentials_gank_contact.json')
-        try:
-            with open(cred_path) as f:
-                creds = _json.load(f)
-            client_id = creds.get('client_id', '')
-        except Exception:
-            client_id = ''
+        cred_path = self._gw_selected_cred_path()
+        cred_file = GW_CHARACTERS.get(self._gw_char_var.get(), 'credentials_gank_contact.json')
+
+        # If the selected character's credential file doesn't exist yet,
+        # fall back to Hamektok's app (same Raxxiz account) to get a valid client_id.
+        # The user still needs to run authorize_gank_char.py to create the file.
+        if not _os.path.exists(cred_path):
+            fallback = _os.path.join(PROJECT_DIR, 'config', 'credentials_hamektok.json')
+            try:
+                with open(fallback) as f:
+                    creds = _json.load(f)
+                client_id = creds.get('client_id', '')
+            except Exception:
+                client_id = ''
+            self._gw_scope_warn.set(
+                f'No credentials file found for {self._gw_char_var.get()}.\n'
+                f'Run: python scripts/authorize_gank_char.py\n'
+                f'(Re-authorize will open a browser for reference only.)'
+            )
+        else:
+            try:
+                with open(cred_path) as f:
+                    creds = _json.load(f)
+                client_id = creds.get('client_id', '')
+                self._gw_scope_warn.set(
+                    f'Browser opened — manually update refresh_token in config/{cred_file} '
+                    f'after completing auth.'
+                )
+            except Exception:
+                client_id = ''
+                self._gw_scope_warn.set(f'Could not read config/{cred_file}.')
+
+        if not client_id:
+            self._gw_scope_warn.set('No client_id found — cannot open auth URL.')
+            return
 
         scopes = (
             'esi-characters.write_contacts.v1 '
@@ -9508,9 +8741,8 @@ class AdminDashboard:
             'esi-wallet.read_character_wallet.v1 '
             'esi-characters.read_standings.v1'
         )
-        import urllib.parse
         url = ('https://login.eveonline.com/v2/oauth/authorize?'
-               + urllib.parse.urlencode({
+               + _up.urlencode({
                    'response_type': 'code',
                    'client_id':     client_id,
                    'redirect_uri':  'http://localhost:5000/auth/callback',
@@ -9518,7 +8750,6 @@ class AdminDashboard:
                    'state':         'reauth_gank_watch',
                }))
         _wb.open(url)
-        self._gw_scope_warn.set('Browser opened — complete auth, then update refresh_token in credentials_gank_contact.json.')
 
 
 def main():

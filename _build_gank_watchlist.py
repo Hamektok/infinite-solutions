@@ -26,17 +26,21 @@ ganker_alliances = []
 ganker_corps     = []
 ganker_chars     = []
 cyno_chars       = []
+min_kills        = 2
 
 try:
     conn = sqlite3.connect(DB_PATH)
+    _min_row = conn.execute("SELECT value FROM site_config WHERE key='gank_min_kills'").fetchone()
+    min_kills = int(_min_row[0]) if _min_row else 2
     rows = conn.execute("""
         SELECT w.entity_name, w.entity_type, w.tag, w.kill_count,
                GROUP_CONCAT(DISTINCT k.victim_ship_name) as ships
         FROM gank_watchlist w
         LEFT JOIN gank_kill_log k ON k.entity_id = w.entity_id
+        WHERE (w.kill_count >= ? OR w.tag = 'cyno_alt')
         GROUP BY w.entity_id
         ORDER BY w.kill_count DESC, w.entity_name COLLATE NOCASE
-    """).fetchall()
+    """, (min_kills,)).fetchall()
     conn.close()
 
     for name, etype, tag, kills, ships_csv in rows:
@@ -156,7 +160,7 @@ footer{{text-align:center;color:var(--dim);font-size:.76em;margin-top:28px;lette
   <div class="hdr">
     <h1>GANKER WATCHLIST</h1>
     <div class="sub">Infinite Solutions</div>
-    <div class="meta">{total_entries:,} entities tracked &mdash; updated {build_ts}</div>
+    <div class="meta">{total_entries:,} entities tracked &mdash; min. {min_kills} kill(s) &mdash; updated {build_ts}</div>
   </div>
 
   <div class="filter-bar">
