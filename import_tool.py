@@ -51,9 +51,10 @@ HUBS = {
 HUB_ORDER = ['Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita']
 
 SECONDARY_HUBS = {
-    'Agil': {'station_id': 60012412, 'region_id': 10000049},
+    'Khanid':      {'station_id': 60012412, 'region_id': 10000049},
+    'Tash-Murkon': {'station_id': 60001096, 'region_id': 10000020},
 }
-SECONDARY_HUB_ORDER = ['Agil']
+SECONDARY_HUB_ORDER = ['Khanid', 'Tash-Murkon']
 
 # ── Category maps (uncompressed ore excluded — compressed ore included) ──────
 CATEGORY_DISPLAY = {
@@ -280,19 +281,26 @@ def ensure_market_snapshots(conn):
 
 
 # ── Treeview columns (no Sell % — all rates live in the panel) ───────────────
-COLS        = ('name', 'amarr', 'rens', 'hek', 'dodixie', 'jita', 'agil',
+COLS        = ('name', 'amarr', 'rens', 'hek', 'dodixie', 'jita',
+               'khanid', 'tash_murkon',
                'best_hub', 'margin', 'max_buy', 'dev')
-COL_LABELS  = ('Item Name', 'Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita', 'Agil',
+COL_LABELS  = ('Item Name', 'Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita',
+               'Khanid', 'Tash-Murkon',
                'Best Hub', 'Margin %', 'Max Buy Price', 'vs N-Day Avg %')
-COL_WIDTHS  = (260, 120, 120, 120, 120, 120, 120, 80, 80, 120, 100)
-COL_ANCHORS = ('w', 'e', 'e', 'e', 'e', 'e', 'e', 'center', 'e', 'e', 'e')
+COL_WIDTHS  = (260, 120, 120, 120, 120, 120, 120, 120, 80, 80, 120, 100)
+COL_ANCHORS = ('w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'center', 'e', 'e', 'e')
 HUB_COL_MAP = {'amarr': 'Amarr', 'rens': 'Rens', 'hek': 'Hek',
-               'dodixie': 'Dodixie', 'jita': 'Jita', 'agil': 'Agil'}
+               'dodixie': 'Dodixie', 'jita': 'Jita',
+               'khanid': 'Khanid', 'tash_murkon': 'Tash-Murkon'}
 
-# Width tables for shelf toggling
-PRIMARY_COL_WIDTHS   = dict(zip(COLS, COL_WIDTHS))  # default widths
-SECONDARY_COL_HIDDEN = {'amarr': 0, 'rens': 0, 'hek': 0, 'dodixie': 0, 'jita': 0}  # hidden in Agil mode
-PRIMARY_COL_HIDDEN   = {'agil': 0}  # hidden in primary mode
+# Default column widths for restore when switching shelves
+PRIMARY_COL_WIDTHS = dict(zip(COLS, COL_WIDTHS))
+# Shelf key → which column it owns (secondary hubs only)
+SHELF_COL = {'khanid': 'khanid', 'tash_murkon': 'tash_murkon'}
+# All secondary columns (hidden in primary mode, all but one hidden per secondary shelf)
+SECONDARY_COLS = ('khanid', 'tash_murkon')
+# All primary hub columns (hidden in any secondary mode)
+PRIMARY_HUB_COLS = ('amarr', 'rens', 'hek', 'dodixie', 'jita')
 
 # Tab definitions for the product panel notebook
 TAB_DEFS = [
@@ -451,13 +459,20 @@ class ImportTool:
             activebackground='#1a4a60', activeforeground='#44eeff',
             command=lambda: self._set_shelf('primary'))
         self._shelf_btn_primary.pack(side='left', padx=(4, 2))
-        self._shelf_btn_agil = tk.Button(
-            row1b, text='Agil',
+        self._shelf_btn_khanid = tk.Button(
+            row1b, text='Khanid',
             bg='#111a25', fg='#7090a8', font=('Segoe UI', 10),
             relief='flat', padx=10, pady=2,
             activebackground='#1a2535', activeforeground='#aaccdd',
-            command=lambda: self._set_shelf('agil'))
-        self._shelf_btn_agil.pack(side='left', padx=(0, 12))
+            command=lambda: self._set_shelf('khanid'))
+        self._shelf_btn_khanid.pack(side='left', padx=(0, 2))
+        self._shelf_btn_tash = tk.Button(
+            row1b, text='Tash-Murkon',
+            bg='#111a25', fg='#7090a8', font=('Segoe UI', 10),
+            relief='flat', padx=10, pady=2,
+            activebackground='#1a2535', activeforeground='#aaccdd',
+            command=lambda: self._set_shelf('tash_murkon'))
+        self._shelf_btn_tash.pack(side='left', padx=(0, 12))
 
         # Primary hub toggles (hidden when Agil shelf active)
         self._hub_toggles_frame = tk.Frame(row1b, bg='#111a25')
@@ -643,8 +658,9 @@ class ImportTool:
         self.tree.tag_configure('dev_high', foreground='#ff9a00')
         self.tree.tag_configure('dev_low',  foreground='#00d4ff')
 
-        # Hide Agil column initially (primary shelf is default)
-        self.tree.column('agil', width=0, minwidth=0, stretch=False)
+        # Hide secondary columns initially (primary shelf is default)
+        for _sc in ('khanid', 'tash_murkon'):
+            self.tree.column(_sc, width=0, minwidth=0, stretch=False)
 
         # ── Status bar ──────────────────────────────────────────────────────
         self.status_var = tk.StringVar(value='Loading…')
@@ -936,30 +952,37 @@ class ImportTool:
             self.subcat_var.set('All')
 
     def _set_shelf(self, mode):
-        """Switch between 'primary' (5 hubs) and 'agil' (secondary) shelf."""
+        """Switch between 'primary', 'khanid', or 'tash_murkon' shelf."""
         self._shelf_var.set(mode)
-        if mode == 'agil':
-            # Highlight Agil button, dim Primary
-            self._shelf_btn_agil.config(bg='#1a2535', fg='#ffd700', font=('Segoe UI', 10, 'bold'))
-            self._shelf_btn_primary.config(bg='#111a25', fg='#7090a8', font=('Segoe UI', 10))
-            # Hide hub toggles — Agil is always on
-            self._hub_toggles_frame.pack_forget()
-            # Show Agil column, hide primary hub columns
-            for col in ('amarr', 'rens', 'hek', 'dodixie', 'jita'):
-                self.tree.column(col, width=0, minwidth=0, stretch=False)
-            self.tree.column('agil', width=PRIMARY_COL_WIDTHS['agil'],
-                             minwidth=60, stretch=True)
-        else:
-            # Highlight Primary button, dim Agil
-            self._shelf_btn_primary.config(bg='#1a3a50', fg='#00d9ff', font=('Segoe UI', 10, 'bold'))
-            self._shelf_btn_agil.config(bg='#111a25', fg='#7090a8', font=('Segoe UI', 10))
-            # Restore hub toggles
+        # Reset all shelf buttons to dim style
+        for btn in (self._shelf_btn_primary, self._shelf_btn_khanid, self._shelf_btn_tash):
+            btn.config(bg='#111a25', fg='#7090a8', font=('Segoe UI', 10))
+
+        if mode == 'primary':
+            self._shelf_btn_primary.config(bg='#1a3a50', fg='#00d9ff',
+                                           font=('Segoe UI', 10, 'bold'))
             self._hub_toggles_frame.pack(side='left')
-            # Show primary hub columns, hide Agil column
-            for col in ('amarr', 'rens', 'hek', 'dodixie', 'jita'):
-                self.tree.column(col, width=PRIMARY_COL_WIDTHS[col],
-                                 minwidth=40, stretch=True)
-            self.tree.column('agil', width=0, minwidth=0, stretch=False)
+            for col in PRIMARY_HUB_COLS:
+                self.tree.column(col, width=PRIMARY_COL_WIDTHS[col], minwidth=40, stretch=True)
+            for col in SECONDARY_COLS:
+                self.tree.column(col, width=0, minwidth=0, stretch=False)
+        else:
+            if mode == 'khanid':
+                self._shelf_btn_khanid.config(bg='#1a2535', fg='#ffd700',
+                                              font=('Segoe UI', 10, 'bold'))
+            else:
+                self._shelf_btn_tash.config(bg='#1a2535', fg='#ffd700',
+                                            font=('Segoe UI', 10, 'bold'))
+            self._hub_toggles_frame.pack_forget()
+            for col in PRIMARY_HUB_COLS:
+                self.tree.column(col, width=0, minwidth=0, stretch=False)
+            active_col = SHELF_COL[mode]
+            for col in SECONDARY_COLS:
+                if col == active_col:
+                    self.tree.column(col, width=PRIMARY_COL_WIDTHS[col],
+                                     minwidth=60, stretch=True)
+                else:
+                    self.tree.column(col, width=0, minwidth=0, stretch=False)
         self._apply_filter()
 
     def _on_cat_change(self, event=None):
@@ -1055,7 +1078,12 @@ class ImportTool:
         best_hub    = None
         best_margin = None
         shelf = self._shelf_var.get()
-        active_hubs = (SECONDARY_HUB_ORDER if shelf == 'agil' else HUB_ORDER)
+        if shelf == 'primary':
+            active_hubs = HUB_ORDER
+        elif shelf == 'khanid':
+            active_hubs = ['Khanid']
+        else:
+            active_hubs = ['Tash-Murkon']
         for hub_name in active_hubs:
             if shelf == 'primary' and not self.hub_vars[hub_name].get():
                 continue
@@ -1158,7 +1186,8 @@ class ImportTool:
                 fmt_isk(hs.get('Hek')),
                 fmt_isk(hs.get('Dodixie')),
                 fmt_isk(hs.get('Jita')),
-                fmt_isk(hs.get('Agil')),
+                fmt_isk(hs.get('Khanid')),
+                fmt_isk(hs.get('Tash-Murkon')),
                 row['best_hub'] or '—',
                 f'{margin:.1f}%' if margin is not None else '—',
                 fmt_isk(row['max_buy']) if row['max_buy'] else '—',
@@ -1202,9 +1231,13 @@ class ImportTool:
         label       = cat_display if cat_display != 'All' else 'All Categories'
 
         # Hub selection depends on active shelf
-        if self._shelf_var.get() == 'agil':
-            hubs_arg   = 'agil'
-            hubs_label = 'Agil'
+        shelf = self._shelf_var.get()
+        if shelf == 'khanid':
+            hubs_arg   = 'khanid'
+            hubs_label = 'Khanid'
+        elif shelf == 'tash_murkon':
+            hubs_arg   = 'tash_murkon'
+            hubs_label = 'Tash-Murkon'
         else:
             checked_hubs = [h.lower() for h in HUB_ORDER if self.hub_vars[h].get()]
             hubs_arg     = ','.join(checked_hubs) if checked_hubs else 'all'
