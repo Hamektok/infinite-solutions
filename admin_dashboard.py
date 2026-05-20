@@ -8532,19 +8532,45 @@ class AdminDashboard:
             # Commit and push to GitHub Pages
             self.root.after(0, lambda: self._gw_progress.set('Committing and pushing…'))
             try:
-                _sp.run(['git', 'add', 'gank_watchlist.html'],
-                        cwd=PROJECT_DIR, check=True)
-                _sp.run(['git', 'commit', '-m',
-                         f'update gank_watchlist.html (min {min_kills} kills)'],
-                        cwd=PROJECT_DIR, check=True)
-                # Push to main — the branch GitHub Pages serves
-                _sp.run(['git', 'push', 'origin', 'HEAD:main'],
-                        cwd=PROJECT_DIR, check=True)
+                def _git(*args):
+                    """Run a git command, return (returncode, stdout, stderr)."""
+                    r = _sp.run(['git'] + list(args),
+                                cwd=PROJECT_DIR,
+                                capture_output=True, text=True)
+                    return r.returncode, r.stdout.strip(), r.stderr.strip()
+
+                # Stage the file
+                rc, out, err = _git('add', 'gank_watchlist.html')
+                if rc != 0:
+                    msg = err or out or f'exit {rc}'
+                    self.root.after(0, lambda m=msg: self._gw_progress.set(f'git add failed: {m}'))
+                    return
+
+                # Commit — "nothing to commit" is exit 1, treat as OK (file unchanged)
+                rc, out, err = _git('commit', '-m',
+                                    f'update gank_watchlist.html (min {min_kills} kills)')
+                if rc != 0:
+                    combined = (out + ' ' + err).lower()
+                    if 'nothing to commit' in combined or 'nothing added' in combined:
+                        # File didn't change — still push in case remote is behind
+                        pass
+                    else:
+                        msg = err or out or f'exit {rc}'
+                        self.root.after(0, lambda m=msg: self._gw_progress.set(f'git commit failed: {m}'))
+                        return
+
+                # Push current commit (whichever branch we're on) to remote main
+                rc, out, err = _git('push', 'origin', 'HEAD:main')
+                if rc != 0:
+                    msg = err or out or f'exit {rc}'
+                    self.root.after(0, lambda m=msg: self._gw_progress.set(f'git push failed: {m}'))
+                    return
+
                 self.root.after(0, lambda: self._gw_progress.set(
                     f'Published — gank_watchlist.html live (min {min_kills} kills).'))
-            except _sp.CalledProcessError as e:
+            except Exception as e:
                 self.root.after(0, lambda: self._gw_progress.set(
-                    f'Build OK but git push failed: {e}'))
+                    f'Git error: {e}'))
 
         _th.Thread(target=run, daemon=True).start()
 
