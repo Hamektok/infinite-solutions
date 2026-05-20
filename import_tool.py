@@ -42,19 +42,15 @@ DEFAULT_REFINE_EFF = 90.63
 
 # ── Hub definitions ──────────────────────────────────────────────────────────
 HUBS = {
-    'Jita':    {'station_id': 60003760, 'region_id': 10000002},
-    'Amarr':   {'station_id': 60008494, 'region_id': 10000043},
-    'Dodixie': {'station_id': 60011866, 'region_id': 10000032},
-    'Rens':    {'station_id': 60004588, 'region_id': 10000030},
-    'Hek':     {'station_id': 60005686, 'region_id': 10000042},
+    'Jita':         {'station_id': 60003760, 'region_id': 10000002},
+    'Amarr':        {'station_id': 60008494, 'region_id': 10000043},
+    'Dodixie':      {'station_id': 60011866, 'region_id': 10000032},
+    'Rens':         {'station_id': 60004588, 'region_id': 10000030},
+    'Hek':          {'station_id': 60005686, 'region_id': 10000042},
+    'Khanid':       {'station_id': 60012412, 'region_id': 10000049},
+    'Tash-Murkon':  {'station_id': 60001096, 'region_id': 10000020},
 }
-HUB_ORDER = ['Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita']
-
-SECONDARY_HUBS = {
-    'Khanid':      {'station_id': 60012412, 'region_id': 10000049},
-    'Tash-Murkon': {'station_id': 60001096, 'region_id': 10000020},
-}
-SECONDARY_HUB_ORDER = ['Khanid', 'Tash-Murkon']
+HUB_ORDER = ['Amarr', 'Rens', 'Hek', 'Dodixie', 'Jita', 'Khanid', 'Tash-Murkon']
 
 # ── Category maps (uncompressed ore excluded — compressed ore included) ──────
 CATEGORY_DISPLAY = {
@@ -293,14 +289,6 @@ HUB_COL_MAP = {'amarr': 'Amarr', 'rens': 'Rens', 'hek': 'Hek',
                'dodixie': 'Dodixie', 'jita': 'Jita',
                'khanid': 'Khanid', 'tash_murkon': 'Tash-Murkon'}
 
-# Default column widths for restore when switching shelves
-PRIMARY_COL_WIDTHS = dict(zip(COLS, COL_WIDTHS))
-# Shelf key → which column it owns (secondary hubs only)
-SHELF_COL = {'khanid': 'khanid', 'tash_murkon': 'tash_murkon'}
-# All secondary columns (hidden in primary mode, all but one hidden per secondary shelf)
-SECONDARY_COLS = ('khanid', 'tash_murkon')
-# All primary hub columns (hidden in any secondary mode)
-PRIMARY_HUB_COLS = ('amarr', 'rens', 'hek', 'dodixie', 'jita')
 
 # Tab definitions for the product panel notebook
 TAB_DEFS = [
@@ -332,7 +320,6 @@ class ImportTool:
         self.coll_basis_var = tk.StringVar(value='JBV')
         self.hub_vars       = {hub: tk.BooleanVar(value=True) for hub in HUB_ORDER}
         self.dev_days_var   = tk.IntVar(value=7)
-        self._shelf_var     = tk.StringVar(value='primary')  # 'primary' or 'agil'
 
         self._all_rows        = []
         self._sort_col        = None
@@ -445,43 +432,14 @@ class ImportTool:
             command=self._fetch_prices)
         self.fetch_btn.pack(side='right')
 
-        # Row 1b — Shelf selector + Hub toggles
+        # Row 1b — Hub toggles (all hubs)
         row1b = tk.Frame(inner, bg='#111a25')
         row1b.pack(fill='x', pady=(0, 4))
-
-        # Shelf toggle buttons
-        tk.Label(row1b, text='Shelf:', bg='#111a25', fg='#7090a8',
-                 font=('Segoe UI', 10)).pack(side='left')
-        self._shelf_btn_primary = tk.Button(
-            row1b, text='Primary Hubs',
-            bg='#1a3a50', fg='#00d9ff', font=('Segoe UI', 10, 'bold'),
-            relief='flat', padx=10, pady=2,
-            activebackground='#1a4a60', activeforeground='#44eeff',
-            command=lambda: self._set_shelf('primary'))
-        self._shelf_btn_primary.pack(side='left', padx=(4, 2))
-        self._shelf_btn_khanid = tk.Button(
-            row1b, text='Khanid',
-            bg='#111a25', fg='#7090a8', font=('Segoe UI', 10),
-            relief='flat', padx=10, pady=2,
-            activebackground='#1a2535', activeforeground='#aaccdd',
-            command=lambda: self._set_shelf('khanid'))
-        self._shelf_btn_khanid.pack(side='left', padx=(0, 2))
-        self._shelf_btn_tash = tk.Button(
-            row1b, text='Tash-Murkon',
-            bg='#111a25', fg='#7090a8', font=('Segoe UI', 10),
-            relief='flat', padx=10, pady=2,
-            activebackground='#1a2535', activeforeground='#aaccdd',
-            command=lambda: self._set_shelf('tash_murkon'))
-        self._shelf_btn_tash.pack(side='left', padx=(0, 12))
-
-        # Primary hub toggles (hidden when Agil shelf active)
-        self._hub_toggles_frame = tk.Frame(row1b, bg='#111a25')
-        self._hub_toggles_frame.pack(side='left')
-        tk.Label(self._hub_toggles_frame, text='Hubs:', bg='#111a25', fg='#7090a8',
+        tk.Label(row1b, text='Hubs:', bg='#111a25', fg='#7090a8',
                  font=('Segoe UI', 10)).pack(side='left')
         for hub_name in HUB_ORDER:
             tk.Checkbutton(
-                self._hub_toggles_frame, text=hub_name,
+                row1b, text=hub_name,
                 variable=self.hub_vars[hub_name],
                 bg='#111a25', fg='#c8dff0',
                 selectcolor='#0d1117',
@@ -658,9 +616,6 @@ class ImportTool:
         self.tree.tag_configure('dev_high', foreground='#ff9a00')
         self.tree.tag_configure('dev_low',  foreground='#00d4ff')
 
-        # Hide secondary columns initially (primary shelf is default)
-        for _sc in ('khanid', 'tash_murkon'):
-            self.tree.column(_sc, width=0, minwidth=0, stretch=False)
 
         # ── Status bar ──────────────────────────────────────────────────────
         self.status_var = tk.StringVar(value='Loading…')
@@ -877,10 +832,6 @@ class ImportTool:
                 pair = prices.get((HUBS[hub_name]['station_id'], type_id))
                 hub_sell[hub_name] = pair[1] if pair else None
                 hub_buy[hub_name]  = pair[0] if pair else None
-            for hub_name in SECONDARY_HUB_ORDER:
-                pair = prices.get((SECONDARY_HUBS[hub_name]['station_id'], type_id))
-                hub_sell[hub_name] = pair[1] if pair else None
-                hub_buy[hub_name]  = pair[0] if pair else None
 
             jita_pair = prices.get((jita_sid, type_id))
             jita_jbv, jita_jsv = (jita_pair if jita_pair
@@ -950,40 +901,6 @@ class ImportTool:
         self.subcat_combo['values'] = opts
         if self.subcat_var.get() not in opts:
             self.subcat_var.set('All')
-
-    def _set_shelf(self, mode):
-        """Switch between 'primary', 'khanid', or 'tash_murkon' shelf."""
-        self._shelf_var.set(mode)
-        # Reset all shelf buttons to dim style
-        for btn in (self._shelf_btn_primary, self._shelf_btn_khanid, self._shelf_btn_tash):
-            btn.config(bg='#111a25', fg='#7090a8', font=('Segoe UI', 10))
-
-        if mode == 'primary':
-            self._shelf_btn_primary.config(bg='#1a3a50', fg='#00d9ff',
-                                           font=('Segoe UI', 10, 'bold'))
-            self._hub_toggles_frame.pack(side='left')
-            for col in PRIMARY_HUB_COLS:
-                self.tree.column(col, width=PRIMARY_COL_WIDTHS[col], minwidth=40, stretch=True)
-            for col in SECONDARY_COLS:
-                self.tree.column(col, width=0, minwidth=0, stretch=False)
-        else:
-            if mode == 'khanid':
-                self._shelf_btn_khanid.config(bg='#1a2535', fg='#ffd700',
-                                              font=('Segoe UI', 10, 'bold'))
-            else:
-                self._shelf_btn_tash.config(bg='#1a2535', fg='#ffd700',
-                                            font=('Segoe UI', 10, 'bold'))
-            self._hub_toggles_frame.pack_forget()
-            for col in PRIMARY_HUB_COLS:
-                self.tree.column(col, width=0, minwidth=0, stretch=False)
-            active_col = SHELF_COL[mode]
-            for col in SECONDARY_COLS:
-                if col == active_col:
-                    self.tree.column(col, width=PRIMARY_COL_WIDTHS[col],
-                                     minwidth=60, stretch=True)
-                else:
-                    self.tree.column(col, width=0, minwidth=0, stretch=False)
-        self._apply_filter()
 
     def _on_cat_change(self, event=None):
         self._update_subcat_combo()
@@ -1077,15 +994,8 @@ class ImportTool:
 
         best_hub    = None
         best_margin = None
-        shelf = self._shelf_var.get()
-        if shelf == 'primary':
-            active_hubs = HUB_ORDER
-        elif shelf == 'khanid':
-            active_hubs = ['Khanid']
-        else:
-            active_hubs = ['Tash-Murkon']
-        for hub_name in active_hubs:
-            if shelf == 'primary' and not self.hub_vars[hub_name].get():
+        for hub_name in HUB_ORDER:
+            if not self.hub_vars[hub_name].get():
                 continue
             if buy_mode == 'Buy Orders':
                 bp          = row['hub_buy'].get(hub_name)
@@ -1230,18 +1140,10 @@ class ImportTool:
         fetch_arg   = CATEGORY_FETCH_ARG.get(cat_display, 'import_all')
         label       = cat_display if cat_display != 'All' else 'All Categories'
 
-        # Hub selection depends on active shelf
-        shelf = self._shelf_var.get()
-        if shelf == 'khanid':
-            hubs_arg   = 'khanid'
-            hubs_label = 'Khanid'
-        elif shelf == 'tash_murkon':
-            hubs_arg   = 'tash_murkon'
-            hubs_label = 'Tash-Murkon'
-        else:
-            checked_hubs = [h.lower() for h in HUB_ORDER if self.hub_vars[h].get()]
-            hubs_arg     = ','.join(checked_hubs) if checked_hubs else 'all'
-            hubs_label   = ', '.join(h for h in HUB_ORDER if self.hub_vars[h].get()) or 'none'
+        # Only fetch checked hubs
+        checked_hubs = [h.lower().replace('-', '_') for h in HUB_ORDER if self.hub_vars[h].get()]
+        hubs_arg     = ','.join(checked_hubs) if checked_hubs else 'all'
+        hubs_label   = ', '.join(h for h in HUB_ORDER if self.hub_vars[h].get()) or 'none'
 
         self.fetch_btn.configure(state='disabled', text='Fetching…')
         self._set_status(f'Fetching {label} [{hubs_label}] from ESI — this may take a few minutes…')
