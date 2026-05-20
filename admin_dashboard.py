@@ -8520,15 +8520,31 @@ class AdminDashboard:
                     [sys.executable, build_script],
                     capture_output=True, text=True, cwd=PROJECT_DIR
                 )
-                if result.returncode == 0:
-                    self.root.after(0, lambda: self._gw_progress.set(
-                        'gank_watchlist.html built successfully.'))
-                else:
+                if result.returncode != 0:
                     err = (result.stderr.strip().splitlines()[-1]
                            if result.stderr.strip() else 'unknown error')
                     self.root.after(0, lambda: self._gw_progress.set(f'Build failed: {err}'))
+                    return
             except Exception as e:
                 self.root.after(0, lambda: self._gw_progress.set(f'Build error: {e}'))
+                return
+
+            # Commit and push to GitHub Pages
+            self.root.after(0, lambda: self._gw_progress.set('Committing and pushing…'))
+            try:
+                _sp.run(['git', 'add', 'gank_watchlist.html'],
+                        cwd=PROJECT_DIR, check=True)
+                _sp.run(['git', 'commit', '-m',
+                         f'update gank_watchlist.html (min {min_kills} kills)'],
+                        cwd=PROJECT_DIR, check=True)
+                # Push to main — the branch GitHub Pages serves
+                _sp.run(['git', 'push', 'origin', 'HEAD:main'],
+                        cwd=PROJECT_DIR, check=True)
+                self.root.after(0, lambda: self._gw_progress.set(
+                    f'Published — gank_watchlist.html live (min {min_kills} kills).'))
+            except _sp.CalledProcessError as e:
+                self.root.after(0, lambda: self._gw_progress.set(
+                    f'Build OK but git push failed: {e}'))
 
         _th.Thread(target=run, daemon=True).start()
 
