@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-05-27 14:17 UTC
+// Generated: 2026-05-27 17:10 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -23699,11 +23699,11 @@ const BUYBACK_DATA = {
   },
   "marketVisibility": {
     "minerals": {
-      "visible": false,
+      "visible": true,
       "subs": {}
     },
     "ice_products": {
-      "visible": false,
+      "visible": true,
       "subs": {
         "fuel_blocks": {
           "visible": true,
@@ -23720,7 +23720,7 @@ const BUYBACK_DATA = {
       }
     },
     "moon_materials": {
-      "visible": false,
+      "visible": true,
       "subs": {
         "raw": {
           "visible": true,
@@ -23796,7 +23796,7 @@ const BUYBACK_DATA = {
       "subs": {}
     },
     "compressed_ores": {
-      "visible": true,
+      "visible": false,
       "subs": {
         "standard_ores": {
           "visible": true,
@@ -23813,7 +23813,7 @@ const BUYBACK_DATA = {
       }
     },
     "mineral_calculator": {
-      "visible": true,
+      "visible": false,
       "subs": {}
     }
   },
@@ -25898,5 +25898,5 @@ const BUYBACK_DATA = {
     }
   ],
   "refiningEfficiency": 90.63,
-  "generated": "2026-05-27 14:17 UTC"
+  "generated": "2026-05-27 17:10 UTC"
 };
