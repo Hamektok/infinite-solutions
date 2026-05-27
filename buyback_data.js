@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-05-27 17:33 UTC
+// Generated: 2026-05-27 17:39 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -14310,9 +14310,7 @@ const BUYBACK_DATA = {
       "quota": 10000,
       "avgJitaBuy": 11790.0,
       "volume": 2.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 30376,
@@ -14327,9 +14325,7 @@ const BUYBACK_DATA = {
       "quota": 4000,
       "avgJitaBuy": 16250.0,
       "volume": 5.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 30377,
@@ -14344,9 +14340,7 @@ const BUYBACK_DATA = {
       "quota": 2000,
       "avgJitaBuy": 32630.0,
       "volume": 5.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 30370,
@@ -14361,9 +14355,7 @@ const BUYBACK_DATA = {
       "quota": 25000,
       "avgJitaBuy": 4378.0,
       "volume": 1.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 30378,
@@ -14378,9 +14370,7 @@ const BUYBACK_DATA = {
       "quota": 2000,
       "avgJitaBuy": 45120.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 30371,
@@ -14395,9 +14385,7 @@ const BUYBACK_DATA = {
       "quota": 25000,
       "avgJitaBuy": 4113.0,
       "volume": 1.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 30372,
@@ -14412,9 +14400,7 @@ const BUYBACK_DATA = {
       "quota": 15000,
       "avgJitaBuy": 6852.0,
       "volume": 1.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 30373,
@@ -14429,9 +14415,7 @@ const BUYBACK_DATA = {
       "quota": 10000,
       "avgJitaBuy": 7046.0,
       "volume": 2.0,
-      "flags": [
-        "low_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 30374,
@@ -14446,9 +14430,7 @@ const BUYBACK_DATA = {
       "quota": 10000,
       "avgJitaBuy": 10250.0,
       "volume": 2.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25268,
@@ -14463,9 +14445,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 38220.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28694,
@@ -14480,9 +14460,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 78400.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25279,
@@ -14497,9 +14475,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 25690.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28695,
@@ -14514,9 +14490,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 52890.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25275,
@@ -14531,9 +14505,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 30680.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28696,
@@ -14548,9 +14520,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 70380.0,
       "volume": 10.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25273,
@@ -14565,9 +14535,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 44060.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28697,
@@ -14582,9 +14550,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 95060.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25277,
@@ -14599,9 +14565,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 36110.0,
       "volume": 10.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 28698,
@@ -14616,9 +14580,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 75320.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25276,
@@ -14633,9 +14595,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 150000.0,
       "volume": 10.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 28699,
@@ -14650,9 +14610,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 85950.0,
       "volume": 10.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25278,
@@ -14667,9 +14625,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 37450.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28700,
@@ -14684,9 +14640,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 82190.0,
       "volume": 10.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25274,
@@ -14701,9 +14655,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 59360.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28701,
@@ -14718,9 +14670,7 @@ const BUYBACK_DATA = {
       "quota": 1000,
       "avgJitaBuy": 90990.0,
       "volume": 10.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 16262,
@@ -15095,9 +15045,7 @@ const BUYBACK_DATA = {
       "quota": 6000,
       "avgJitaBuy": 17250.0,
       "volume": 5.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 4246,
@@ -15112,9 +15060,7 @@ const BUYBACK_DATA = {
       "quota": 6000,
       "avgJitaBuy": 17530.0,
       "volume": 5.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 4247,
@@ -15129,9 +15075,7 @@ const BUYBACK_DATA = {
       "quota": 6000,
       "avgJitaBuy": 17620.0,
       "volume": 5.0,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 4312,
@@ -15146,9 +15090,7 @@ const BUYBACK_DATA = {
       "quota": 6000,
       "avgJitaBuy": 17090.0,
       "volume": 5.0,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 16272,
@@ -15283,9 +15225,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 18.26,
       "volume": 0.01,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 37,
@@ -15300,9 +15240,7 @@ const BUYBACK_DATA = {
       "quota": 550000,
       "avgJitaBuy": 244.2,
       "volume": 0.01,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 36,
@@ -15317,9 +15255,7 @@ const BUYBACK_DATA = {
       "quota": 1500000,
       "avgJitaBuy": 57.44,
       "volume": 0.01,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 38,
@@ -15364,9 +15300,7 @@ const BUYBACK_DATA = {
       "quota": 45000,
       "avgJitaBuy": 2944.0,
       "volume": 0.01,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 11399,
@@ -15516,9 +15450,7 @@ const BUYBACK_DATA = {
       "quota": 25000,
       "avgJitaBuy": 6022.0,
       "volume": 0.05,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 16643,
@@ -15548,9 +15480,7 @@ const BUYBACK_DATA = {
       "quota": 25000,
       "avgJitaBuy": 6834.0,
       "volume": 0.05,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 16642,
@@ -15595,9 +15525,7 @@ const BUYBACK_DATA = {
       "quota": 12500,
       "avgJitaBuy": 3458.0,
       "volume": 0.05,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 16647,
@@ -15627,9 +15555,7 @@ const BUYBACK_DATA = {
       "quota": 12500,
       "avgJitaBuy": 8523.0,
       "volume": 0.05,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 16652,
@@ -15644,9 +15570,7 @@ const BUYBACK_DATA = {
       "quota": 6250,
       "avgJitaBuy": 56080.0,
       "volume": 0.05,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 16651,
@@ -15661,9 +15585,7 @@ const BUYBACK_DATA = {
       "quota": 6250,
       "avgJitaBuy": 70540.0,
       "volume": 0.05,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 16650,
@@ -18095,9 +18017,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2345,
@@ -18114,9 +18034,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2348,
@@ -18133,9 +18051,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2349,
@@ -18152,9 +18068,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2351,
@@ -18171,9 +18085,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2352,
@@ -18190,9 +18102,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2354,
@@ -18209,9 +18119,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2360,
@@ -18228,9 +18136,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2361,
@@ -18247,9 +18153,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2367,
@@ -18266,9 +18170,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2401,
@@ -18285,9 +18187,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2463,
@@ -18305,9 +18205,7 @@ const BUYBACK_DATA = {
       "partnerSlot": true,
       "slotOpen": false,
       "suppliedBy": "Cural Azaph",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 2867,
@@ -18324,9 +18222,7 @@ const BUYBACK_DATA = {
       "volume": 50.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2868,
@@ -18343,9 +18239,7 @@ const BUYBACK_DATA = {
       "volume": 50.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2869,
@@ -18362,9 +18256,7 @@ const BUYBACK_DATA = {
       "volume": 50.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2870,
@@ -18381,9 +18273,7 @@ const BUYBACK_DATA = {
       "volume": 50.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2871,
@@ -18400,9 +18290,7 @@ const BUYBACK_DATA = {
       "volume": 50.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2872,
@@ -18419,9 +18307,7 @@ const BUYBACK_DATA = {
       "volume": 50.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2875,
@@ -18438,9 +18324,7 @@ const BUYBACK_DATA = {
       "volume": 50.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2876,
@@ -18458,9 +18342,7 @@ const BUYBACK_DATA = {
       "partnerSlot": true,
       "slotOpen": false,
       "suppliedBy": "Rax Hakaari",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 3645,
@@ -18477,9 +18359,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3775,
@@ -18496,9 +18376,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3779,
@@ -18515,9 +18393,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3828,
@@ -18534,9 +18410,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9838,
@@ -18553,9 +18427,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9842,
@@ -18572,9 +18444,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9846,
@@ -18591,9 +18461,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2358,
@@ -18610,9 +18478,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2344,
@@ -18629,9 +18495,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 17392,
@@ -18648,9 +18512,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2366,
@@ -18667,9 +18529,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 17898,
@@ -18686,9 +18546,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2346,
@@ -18705,9 +18563,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 12836,
@@ -18724,9 +18580,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 17136,
@@ -18743,9 +18597,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28974,
@@ -18762,9 +18614,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 15317,
@@ -18781,9 +18631,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2327,
@@ -18800,9 +18648,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2321,
@@ -18819,9 +18665,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3695,
@@ -18838,9 +18682,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3697,
@@ -18857,9 +18699,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3691,
@@ -18876,9 +18716,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2319,
@@ -18895,9 +18733,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2393,
@@ -18914,9 +18750,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2396,
@@ -18933,9 +18767,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2390,
@@ -18952,9 +18784,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2397,
@@ -18971,9 +18801,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2392,
@@ -18990,9 +18818,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2389,
@@ -19009,9 +18835,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2399,
@@ -19028,9 +18852,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2395,
@@ -19048,9 +18870,7 @@ const BUYBACK_DATA = {
       "partnerSlot": true,
       "slotOpen": false,
       "suppliedBy": "Terra Rendrag",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 2398,
@@ -19067,9 +18887,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9828,
@@ -19086,9 +18904,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2400,
@@ -19105,9 +18921,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 44,
@@ -19124,9 +18938,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3683,
@@ -19143,9 +18955,7 @@ const BUYBACK_DATA = {
       "volume": 0.19,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 3689,
@@ -19162,9 +18972,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9832,
@@ -19181,9 +18989,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9848,
@@ -19200,9 +19006,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9830,
@@ -19219,9 +19023,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9834,
@@ -19238,9 +19040,7 @@ const BUYBACK_DATA = {
       "volume": 3.0,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9836,
@@ -19257,9 +19057,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 9840,
@@ -19276,9 +19074,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2312,
@@ -19295,9 +19091,7 @@ const BUYBACK_DATA = {
       "volume": 0.75,
       "partnerSlot": true,
       "slotOpen": true,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 2317,
@@ -19315,9 +19109,7 @@ const BUYBACK_DATA = {
       "partnerSlot": true,
       "slotOpen": false,
       "suppliedBy": "Cural Azaph",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20421,
@@ -19332,9 +19124,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 95970.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25887,
@@ -19349,9 +19139,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 90540.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20115,
@@ -19366,9 +19154,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 9203.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 11496,
@@ -19383,9 +19169,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 11010.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20417,
@@ -19400,9 +19184,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 93840.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20418,
@@ -19417,9 +19199,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 93680.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20410,
@@ -19434,9 +19214,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 95120.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20419,
@@ -19451,9 +19229,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 93000.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20411,
@@ -19468,9 +19244,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 101100.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20171,
@@ -19485,9 +19259,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 95540.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20413,
@@ -19502,9 +19274,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 101200.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20424,
@@ -19519,9 +19289,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 35810.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20172,
@@ -19536,9 +19304,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 86080.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20415,
@@ -19553,9 +19319,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 92420.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20416,
@@ -19570,9 +19334,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 99000.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 20423,
@@ -19587,9 +19349,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 88020.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20425,
@@ -19604,9 +19364,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 7002.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20412,
@@ -19621,9 +19379,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 85520.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20114,
@@ -19638,9 +19394,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 8007.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20414,
@@ -19655,9 +19409,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 94330.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 20420,
@@ -19672,9 +19424,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 94100.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 52309,
@@ -19689,9 +19439,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 47070.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 81051,
@@ -19706,9 +19454,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 82200.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 34201,
@@ -19723,9 +19469,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 391400.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 34202,
@@ -19740,9 +19484,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 2088000.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 34203,
@@ -19757,9 +19499,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 792100.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 34207,
@@ -19774,9 +19514,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 3854000.0,
       "volume": 0.1,
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 34208,
@@ -19791,9 +19529,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 6267000.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 34204,
@@ -19808,9 +19544,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 946900.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 34205,
@@ -19825,9 +19559,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 325300.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 34206,
@@ -19842,9 +19574,7 @@ const BUYBACK_DATA = {
       "quota": 0,
       "avgJitaBuy": 376000.0,
       "volume": 0.1,
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25588,
@@ -19860,9 +19590,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 2676.0,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25589,
@@ -19878,9 +19606,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 425.0,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25593,
@@ -19896,9 +19622,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 6239.0,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25595,
@@ -19914,9 +19638,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 2122.0,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25596,
@@ -19932,9 +19654,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 3604.0,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25597,
@@ -19950,9 +19670,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 220.4,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25598,
@@ -19968,9 +19686,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 2801.0,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25599,
@@ -19986,9 +19702,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 308.8,
       "volume": 0.01,
       "tier": "Common",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25590,
@@ -20004,9 +19718,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 82500.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25591,
@@ -20022,9 +19734,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 76120.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25592,
@@ -20040,9 +19750,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 15000.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25594,
@@ -20058,9 +19766,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 72110.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25600,
@@ -20076,9 +19782,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 45640.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25601,
@@ -20094,9 +19798,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 3141.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25602,
@@ -20112,9 +19814,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 7600.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25603,
@@ -20130,9 +19830,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 4672.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25604,
@@ -20148,9 +19846,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 17580.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25605,
@@ -20166,9 +19862,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 23780.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25606,
@@ -20184,9 +19878,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 12510.0,
       "volume": 0.01,
       "tier": "Uncommon",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25607,
@@ -20202,9 +19894,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 176000.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25611,
@@ -20220,9 +19910,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 81240.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25613,
@@ -20238,9 +19926,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 329000.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25614,
@@ -20256,9 +19942,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 70010.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25615,
@@ -20274,9 +19958,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 51700.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25616,
@@ -20292,9 +19974,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 965.1,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25618,
@@ -20310,9 +19990,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 4166.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25620,
@@ -20328,9 +20006,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 12020.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25621,
@@ -20346,9 +20022,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 65310.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25623,
@@ -20364,9 +20038,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 17800.0,
       "volume": 0.01,
       "tier": "Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25608,
@@ -20382,9 +20054,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 549700.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25609,
@@ -20400,9 +20070,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 1456000.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25610,
@@ -20418,9 +20086,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 1001000.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25612,
@@ -20436,9 +20102,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 526000.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25617,
@@ -20454,9 +20118,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 284100.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25619,
@@ -20472,9 +20134,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 2414000.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25622,
@@ -20490,9 +20150,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 155800.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 25624,
@@ -20508,9 +20166,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 2028000.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 25625,
@@ -20526,9 +20182,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 1165000.0,
       "volume": 0.01,
       "tier": "Very Rare",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 28361,
@@ -20544,9 +20198,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 837.0,
       "volume": 0.01,
       "tier": "Rogue Drone",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 28362,
@@ -20562,9 +20214,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 4200.0,
       "volume": 0.02,
       "tier": "Rogue Drone",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 28363,
@@ -20580,9 +20230,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 231700.0,
       "volume": 0.03,
       "tier": "Rogue Drone",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 28364,
@@ -20598,9 +20246,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 4601.0,
       "volume": 0.07,
       "tier": "Rogue Drone",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 28365,
@@ -20616,9 +20262,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 1602.0,
       "volume": 0.1,
       "tier": "Rogue Drone",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 28366,
@@ -20634,9 +20278,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 10000.0,
       "volume": 0.08,
       "tier": "Rogue Drone",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 21815,
@@ -20652,9 +20294,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 2004000.0,
       "volume": 0.01,
       "tier": "Rogue Drone",
-      "flags": [
-        "new_arrival"
-      ]
+      "flags": []
     },
     {
       "typeId": 81945,
@@ -20670,9 +20310,7 @@ const BUYBACK_DATA = {
       "avgJitaBuy": 820600.0,
       "volume": 0.01,
       "tier": "Rogue Drone",
-      "flags": [
-        "out_of_stock"
-      ]
+      "flags": []
     },
     {
       "typeId": 1230,
@@ -25898,5 +25536,5 @@ const BUYBACK_DATA = {
     }
   ],
   "refiningEfficiency": 90.63,
-  "generated": "2026-05-27 17:33 UTC"
+  "generated": "2026-05-27 17:39 UTC"
 };
