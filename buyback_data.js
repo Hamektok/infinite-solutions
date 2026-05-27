@@ -1,5 +1,5 @@
 // Auto-generated buyback program data
-// Generated: 2026-05-27 17:10 UTC
+// Generated: 2026-05-27 17:33 UTC
 const BUYBACK_DATA = {
   "items": [
     {
@@ -23706,7 +23706,7 @@ const BUYBACK_DATA = {
       "visible": true,
       "subs": {
         "fuel_blocks": {
-          "visible": true,
+          "visible": false,
           "displayName": "Fuel Blocks"
         },
         "refined_ice": {
@@ -25898,5 +25898,5 @@ const BUYBACK_DATA = {
     }
   ],
   "refiningEfficiency": 90.63,
-  "generated": "2026-05-27 17:10 UTC"
+  "generated": "2026-05-27 17:33 UTC"
 };
