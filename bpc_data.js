@@ -1308,7 +1308,7 @@ const BPC_DATA = [
     "me": 5,
     "te": 10,
     "runs": 1,
-    "quantity": 3,
+    "quantity": 2,
     "category": "Ships",
     "subcategory": "Mining Barge Blueprint"
   },

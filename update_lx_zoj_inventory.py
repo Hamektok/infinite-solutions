@@ -32,9 +32,9 @@ CHARACTER_ID      = 97153110   # Hamektok Hakaari
 CREDENTIALS_FILE  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                   'config', 'credentials_hamektok.json')
 
-# 4-HWWF Keepstar (WinterCo. Central Station) — new inventory location
-LX_ZOJ_STRUCTURE_ID   = 1035466617946   # the Keepstar
-STORE_CONTAINER_ID     = 1053458856856   # "Store Items" container (Hamektok Hakaari)
+# New inventory location (structure 1054012057485)
+LX_ZOJ_STRUCTURE_ID   = 1054012057485
+STORE_CONTAINER_ID     = 1054012057485   # items in structure hangar directly
 
 # FW Staging Structure ID — loaded from site_config at runtime (blank = disabled)
 FW_STRUCTURE_ID = None  # populated in main() from site_config
@@ -100,7 +100,7 @@ def get_character_assets(headers):
     return all_assets
 
 def filter_lx_zoj_items(assets):
-    """Filter assets to the Store Items container at the 4-HWWF Keepstar,
+    """Filter assets to the structure hangar (STORE_CONTAINER_ID / LX_ZOJ_STRUCTURE_ID),
     including contents of any sub-containers within it.
 
     Each returned asset gets a '_container_item_id' key set to the item_id of
@@ -724,8 +724,8 @@ def main():
     original_branch = ensure_main_branch()
 
     print(f"\nCharacter ID: {CHARACTER_ID} (Hamektok Hakaari)")
-    print(f"Structure: 4-HWWF Keepstar ({LX_ZOJ_STRUCTURE_ID})")
-    print(f"Container: Store Items ({STORE_CONTAINER_ID})")
+    print(f"Structure: {LX_ZOJ_STRUCTURE_ID}")
+    print(f"Hangar root: {STORE_CONTAINER_ID}")
 
     # Get authentication
     headers = get_authenticated_headers()
