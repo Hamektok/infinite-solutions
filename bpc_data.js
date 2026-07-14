@@ -203,6 +203,16 @@ const BPC_DATA = [
     "subcategory": "Frigate"
   },
   {
+    "typeId": 48098,
+    "name": "Baryon Exotic Plasma S Blueprint",
+    "me": 0,
+    "te": 0,
+    "runs": 5,
+    "quantity": 1,
+    "category": "Ammunition",
+    "subcategory": "Exotic Plasma Charge Blueprint"
+  },
+  {
     "typeId": 11986,
     "name": "Basilisk Blueprint",
     "me": 3,
@@ -2141,6 +2151,16 @@ const BPC_DATA = [
     "quantity": 2,
     "category": "Rigs",
     "subcategory": "Rigs"
+  },
+  {
+    "typeId": 48474,
+    "name": "Supratidal Scoped Entropic Disintegrator Blueprint",
+    "me": 0,
+    "te": 0,
+    "runs": 1,
+    "quantity": 1,
+    "category": "Modules",
+    "subcategory": "Weapon Modules"
   },
   {
     "typeId": 17352,
